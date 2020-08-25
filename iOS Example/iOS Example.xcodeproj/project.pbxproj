@@ -1,0 +1,418 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F89AEF8424F57A6B00CF5F57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */; };
+		F89AEF8624F57A6B00CF5F57 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89AEF8524F57A6B00CF5F57 /* SceneDelegate.swift */; };
+		F89AEF8824F57A6B00CF5F57 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89AEF8724F57A6B00CF5F57 /* ViewController.swift */; };
+		F89AEF8B24F57A6B00CF5F57 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8924F57A6B00CF5F57 /* Main.storyboard */; };
+		F89AEF8D24F57A6C00CF5F57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */; };
+		F89AEF9024F57A6C00CF5F57 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */; };
+		F89AEFAE24F5826E00CF5F57 /* Authgear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; };
+		F89AEFAF24F5826E00CF5F57 /* Authgear.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F89AEFAA24F5826400CF5F57 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F89AEFA524F5826400CF5F57 /* Authgear.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = "Authgear::Authgear::Product";
+			remoteInfo = "Authgear-iOS";
+		};
+		F89AEFAC24F5826400CF5F57 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F89AEFA524F5826400CF5F57 /* Authgear.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = "Authgear::AuthgearTests::Product";
+			remoteInfo = "Authgear-iOS Tests";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F89AEFB024F5826E00CF5F57 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F89AEFAF24F5826E00CF5F57 /* Authgear.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F89AEF8024F57A6B00CF5F57 /* iOS Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F89AEF8524F57A6B00CF5F57 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		F89AEF8724F57A6B00CF5F57 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		F89AEF8A24F57A6B00CF5F57 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F89AEF8F24F57A6C00CF5F57 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		F89AEF9124F57A6C00CF5F57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F89AEFA524F5826400CF5F57 /* Authgear.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Authgear.xcodeproj; path = ../Authgear.xcodeproj; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F89AEF7D24F57A6B00CF5F57 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F89AEFAE24F5826E00CF5F57 /* Authgear.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F89AEF7724F57A6B00CF5F57 = {
+			isa = PBXGroup;
+			children = (
+				F89AEF8224F57A6B00CF5F57 /* iOS Example */,
+				F89AEF8124F57A6B00CF5F57 /* Products */,
+				F89AEF9724F57AFA00CF5F57 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		F89AEF8124F57A6B00CF5F57 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F89AEF8024F57A6B00CF5F57 /* iOS Example.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F89AEF8224F57A6B00CF5F57 /* iOS Example */ = {
+			isa = PBXGroup;
+			children = (
+				F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */,
+				F89AEF8524F57A6B00CF5F57 /* SceneDelegate.swift */,
+				F89AEF8724F57A6B00CF5F57 /* ViewController.swift */,
+				F89AEF8924F57A6B00CF5F57 /* Main.storyboard */,
+				F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */,
+				F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */,
+				F89AEF9124F57A6C00CF5F57 /* Info.plist */,
+			);
+			path = "iOS Example";
+			sourceTree = "<group>";
+		};
+		F89AEF9724F57AFA00CF5F57 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F89AEFA524F5826400CF5F57 /* Authgear.xcodeproj */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F89AEFA624F5826400CF5F57 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F89AEFAB24F5826400CF5F57 /* Authgear.framework */,
+				F89AEFAD24F5826400CF5F57 /* Authgear-iOS Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F89AEF7F24F57A6B00CF5F57 /* iOS Example */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F89AEF9424F57A6C00CF5F57 /* Build configuration list for PBXNativeTarget "iOS Example" */;
+			buildPhases = (
+				F89AEF7C24F57A6B00CF5F57 /* Sources */,
+				F89AEF7D24F57A6B00CF5F57 /* Frameworks */,
+				F89AEF7E24F57A6B00CF5F57 /* Resources */,
+				F89AEFB024F5826E00CF5F57 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "iOS Example";
+			productName = "iOS Example";
+			productReference = F89AEF8024F57A6B00CF5F57 /* iOS Example.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F89AEF7824F57A6B00CF5F57 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1160;
+				LastUpgradeCheck = 1160;
+				ORGANIZATIONNAME = Authgear;
+				TargetAttributes = {
+					F89AEF7F24F57A6B00CF5F57 = {
+						CreatedOnToolsVersion = 11.6;
+					};
+				};
+			};
+			buildConfigurationList = F89AEF7B24F57A6B00CF5F57 /* Build configuration list for PBXProject "iOS Example" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F89AEF7724F57A6B00CF5F57;
+			productRefGroup = F89AEF8124F57A6B00CF5F57 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = F89AEFA624F5826400CF5F57 /* Products */;
+					ProjectRef = F89AEFA524F5826400CF5F57 /* Authgear.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				F89AEF7F24F57A6B00CF5F57 /* iOS Example */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		F89AEFAB24F5826400CF5F57 /* Authgear.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Authgear.framework;
+			remoteRef = F89AEFAA24F5826400CF5F57 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F89AEFAD24F5826400CF5F57 /* Authgear-iOS Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Authgear-iOS Tests.xctest";
+			remoteRef = F89AEFAC24F5826400CF5F57 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F89AEF7E24F57A6B00CF5F57 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F89AEF9024F57A6C00CF5F57 /* LaunchScreen.storyboard in Resources */,
+				F89AEF8D24F57A6C00CF5F57 /* Assets.xcassets in Resources */,
+				F89AEF8B24F57A6B00CF5F57 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F89AEF7C24F57A6B00CF5F57 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F89AEF8824F57A6B00CF5F57 /* ViewController.swift in Sources */,
+				F89AEF8424F57A6B00CF5F57 /* AppDelegate.swift in Sources */,
+				F89AEF8624F57A6B00CF5F57 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F89AEF8924F57A6B00CF5F57 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F89AEF8A24F57A6B00CF5F57 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F89AEF8F24F57A6C00CF5F57 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F89AEF9224F57A6C00CF5F57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F89AEF9324F57A6C00CF5F57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F89AEF9524F57A6C00CF5F57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "iOS Example/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.authgear.iOS-Example";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F89AEF9624F57A6C00CF5F57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "iOS Example/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.authgear.iOS-Example";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F89AEF7B24F57A6B00CF5F57 /* Build configuration list for PBXProject "iOS Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F89AEF9224F57A6C00CF5F57 /* Debug */,
+				F89AEF9324F57A6C00CF5F57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F89AEF9424F57A6C00CF5F57 /* Build configuration list for PBXNativeTarget "iOS Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F89AEF9524F57A6C00CF5F57 /* Debug */,
+				F89AEF9624F57A6C00CF5F57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F89AEF7824F57A6B00CF5F57 /* Project object */;
+}
