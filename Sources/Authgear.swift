@@ -1,4 +1,3 @@
-open class Authgear {
-    let text = "Hello, World!"
-}
+// Require entry point for SPM
+open class Authgear {}
 

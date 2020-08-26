@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
+		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
+		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
+		F83D84A824F64D0E00B4393C /* AuthContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D84A724F64D0E00B4393C /* AuthContainer.swift */; };
+		F83D84AA24F66C5100B4393C /* OIDCConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */; };
+		F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D84AB24F66D3400B4393C /* APIClient.swift */; };
+		F83D84AE24F6A93600B4393C /* CodeVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D84AD24F6A93600B4393C /* CodeVerifier.swift */; };
+		F83D84B024F860AA00B4393C /* AuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D84AF24F860AA00B4393C /* AuthenticationSession.swift */; };
+		F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A22501845D0027888F /* Decodable+Any.swift */; };
+		F8A657A52501D31E0027888F /* JWK.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A42501D31E0027888F /* JWK.swift */; };
+		F8A657A7250551ED0027888F /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A6250551ED0027888F /* JWT.swift */; };
+		F8A657A925055A7C0027888F /* Data+Base64URLEncoded.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A825055A7C0027888F /* Data+Base64URLEncoded.swift */; };
 		OBJ_23 /* Authgear.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_8 /* Authgear.swift */; };
 		OBJ_41 /* AuthgearTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* AuthgearTests.swift */; };
 		OBJ_42 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* XCTestManifests.swift */; };
@@ -26,6 +38,18 @@
 /* Begin PBXFileReference section */
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F83392EE24FC344D00A69D3C /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
+		F83392F024FDA87900A69D3C /* AuthgearError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthgearError.swift; sourceTree = "<group>"; };
+		F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLComponents+QueryParames.swift"; sourceTree = "<group>"; };
+		F83D84A724F64D0E00B4393C /* AuthContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuthContainer.swift; path = Auth/AuthContainer.swift; sourceTree = "<group>"; };
+		F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OIDCConfiguration.swift; sourceTree = "<group>"; };
+		F83D84AB24F66D3400B4393C /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		F83D84AD24F6A93600B4393C /* CodeVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeVerifier.swift; sourceTree = "<group>"; };
+		F83D84AF24F860AA00B4393C /* AuthenticationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationSession.swift; sourceTree = "<group>"; };
+		F8A657A22501845D0027888F /* Decodable+Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decodable+Any.swift"; sourceTree = "<group>"; };
+		F8A657A42501D31E0027888F /* JWK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWK.swift; sourceTree = "<group>"; };
+		F8A657A6250551ED0027888F /* JWT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWT.swift; sourceTree = "<group>"; };
+		F8A657A825055A7C0027888F /* Data+Base64URLEncoded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Base64URLEncoded.swift"; sourceTree = "<group>"; };
 		OBJ_11 /* AuthgearTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthgearTests.swift; sourceTree = "<group>"; };
 		OBJ_12 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
 		OBJ_17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -71,7 +95,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -80,13 +104,24 @@
 				OBJ_13 /* Products */,
 				OBJ_17 /* README.md */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				F83D84AB24F66D3400B4393C /* APIClient.swift */,
+				F83D84A724F64D0E00B4393C /* AuthContainer.swift */,
+				F83D84AF24F860AA00B4393C /* AuthenticationSession.swift */,
 				OBJ_8 /* Authgear.swift */,
+				F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */,
+				F83D84AD24F6A93600B4393C /* CodeVerifier.swift */,
+				F83392EE24FC344D00A69D3C /* Storage.swift */,
+				F83392F024FDA87900A69D3C /* AuthgearError.swift */,
+				F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */,
+				F8A657A22501845D0027888F /* Decodable+Any.swift */,
+				F8A657A42501D31E0027888F /* JWK.swift */,
+				F8A657A6250551ED0027888F /* JWT.swift */,
+				F8A657A825055A7C0027888F /* Data+Base64URLEncoded.swift */,
 			);
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -151,7 +186,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_13 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -167,7 +202,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				F83D84AA24F66C5100B4393C /* OIDCConfiguration.swift in Sources */,
+				F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */,
+				F83392EF24FC344D00A69D3C /* Storage.swift in Sources */,
+				F83D84AE24F6A93600B4393C /* CodeVerifier.swift in Sources */,
+				F8A657A925055A7C0027888F /* Data+Base64URLEncoded.swift in Sources */,
+				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
+				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
+				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
+				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
+				F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */,
 				OBJ_23 /* Authgear.swift in Sources */,
+				F83D84B024F860AA00B4393C /* AuthenticationSession.swift in Sources */,
+				F83D84A824F64D0E00B4393C /* AuthContainer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +261,7 @@
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TARGET_NAME = Authgear;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -243,6 +291,7 @@
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TARGET_NAME = Authgear;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -264,12 +313,13 @@
 					"SWIFT_PACKAGE=1",
 					"DEBUG=1",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SWIFT_PACKAGE DEBUG";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				USE_HEADERMAP = NO;
@@ -341,11 +391,12 @@
 					"$(inherited)",
 					"SWIFT_PACKAGE=1",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DXcode";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator watchos watchsimulator";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SWIFT_PACKAGE";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				USE_HEADERMAP = NO;
