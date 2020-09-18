@@ -8,7 +8,7 @@
 import AuthenticationServices
 import SafariServices
 
-internal protocol AuthenticationSession {
+protocol AuthenticationSession {
     typealias CompletionHandler = (Result<URL, AuthenticationSessionError>) -> Void
     @discardableResult func start() -> Bool
     func cancel()
@@ -19,13 +19,13 @@ extension SFAuthenticationSession: AuthenticationSession {}
 @available(iOS 12.0, *)
 extension ASWebAuthenticationSession: AuthenticationSession {}
 
-internal enum AuthenticationSessionError: Error {
+enum AuthenticationSessionError: Error {
     case sessionError(Error)
     case canceledLogin
 }
 
-internal class AuthenticationSessionProvider: NSObject {
-    internal func makeAuthenticationSession(
+class AuthenticationSessionProvider: NSObject {
+    func makeAuthenticationSession(
         url: URL,
         callbackURLSchema: String,
         completionHandler: @escaping AuthenticationSession.CompletionHandler

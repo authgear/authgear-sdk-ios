@@ -6,7 +6,7 @@
 //
 import Foundation
 
-internal struct OIDCConfiguration: Decodable {
+struct OIDCConfiguration: Decodable {
     let authorizationEndpoint: URL
     let tokenEndpoint: URL
     let userinfoEndpoint: URL

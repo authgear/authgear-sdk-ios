@@ -8,9 +8,9 @@
 import Foundation
 import CommonCrypto
 
-internal struct CodeVerifier {
+struct CodeVerifier {
 
-    internal let value: String = {
+    let value: String = {
         var buffer = [UInt8](repeating: 0, count: 32)
         let status = SecRandomCopyBytes(kSecRandomDefault, buffer.count, &buffer)
 

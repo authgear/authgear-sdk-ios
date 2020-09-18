@@ -8,13 +8,13 @@
 import Foundation
 import Security
 
-internal enum JWKError: Error {
+enum JWKError: Error {
     case publicKeyNotFound
     case unknownError(OSStatus)
     case keyError(Error)
 }
 
-internal struct JWK: Encodable {
+struct JWK: Encodable {
     let kid: String
     let alg: String = "RS256"
     let kty: String = "RSA"
@@ -22,7 +22,7 @@ internal struct JWK: Encodable {
     let e: String
 }
 
-internal struct JWKStore {
+struct JWKStore {
 
     func loadKey(keyId: String, tag: String) throws -> JWK? {
         if let privateKey = try loadPrivateKey(tag: tag) {

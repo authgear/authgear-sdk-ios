@@ -13,7 +13,7 @@ public typealias AuthorizeCompletionHandler = (Result<AuthorizeResponse, Error>)
 public typealias VoidCompletionHandler = (Result<Void, Error>
 ) -> Void
 
-internal protocol BaseContainer {
+protocol BaseContainer {
     var name: String { get }
     var clientId: String! { get set }
     var apiClient: AuthAPIClient { get }
@@ -100,10 +100,10 @@ public protocol AuthContainerDelegate: class {
 }
 
 public class AuthContainer: NSObject, BaseContainer {
-    internal let name: String
-    internal let apiClient: AuthAPIClient
-    internal let storage: ContainerStorage
-    internal var clientId: String!
+    let name: String
+    let apiClient: AuthAPIClient
+    let storage: ContainerStorage
+    var clientId: String!
 
     private let isThirdParty = true
 

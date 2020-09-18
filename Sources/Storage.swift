@@ -8,7 +8,7 @@
 import Foundation
 import Security
 
-internal protocol ContainerStorage {
+protocol ContainerStorage {
     func setRefreshToken(namespace: String, token: String) throws
     func setAnonymousKeyId(namespace: String, kid: String) throws
     func getRefreshToken(namespace: String) throws -> String?
@@ -17,23 +17,23 @@ internal protocol ContainerStorage {
     func delAnonymousKeyId(namespace: String) throws
 }
 
-internal protocol StorageDriver {
+protocol StorageDriver {
     func get(key: String) throws -> String?
     func set(key: String, value: String) throws
     func del(key: String) throws
 }
 
-internal protocol HasStorageDriver {
+protocol HasStorageDriver {
     var storageDriver: StorageDriver { get }
 }
 
 
-internal protocol StorageKeyConvertible {
+protocol StorageKeyConvertible {
     func keyRefreshToken(namespace: String) -> String
     func keyAnonymousKeyId(namespace: String) -> String
 }
 
-internal extension ContainerStorage where Self: HasStorageDriver & StorageKeyConvertible {
+extension ContainerStorage where Self: HasStorageDriver & StorageKeyConvertible {
     func setRefreshToken(namespace: String, token: String) throws {
         try self.storageDriver.set(key: self.keyRefreshToken(namespace: namespace), value: token)
     }
@@ -59,8 +59,8 @@ internal extension ContainerStorage where Self: HasStorageDriver & StorageKeyCon
     }
 }
 
-internal class DefaultContainerStorage: ContainerStorage ,HasStorageDriver, StorageKeyConvertible {
-    internal let storageDriver: StorageDriver
+class DefaultContainerStorage: ContainerStorage ,HasStorageDriver, StorageKeyConvertible {
+    let storageDriver: StorageDriver
 
     init(storageDriver: StorageDriver) {
         self.storageDriver = storageDriver
@@ -79,7 +79,7 @@ internal class DefaultContainerStorage: ContainerStorage ,HasStorageDriver, Stor
     }
 }
 
-internal class MemoryStorageDriver: StorageDriver {
+class MemoryStorageDriver: StorageDriver {
 
 
     private var backingStorage = [String: String]()
@@ -97,12 +97,12 @@ internal class MemoryStorageDriver: StorageDriver {
     }
 }
 
-internal enum KeychainError: Error {
+enum KeychainError: Error {
     case encoding
     case unhandledError(status: OSStatus)
 }
 
-internal class KeychainStorageDriver: StorageDriver {
+class KeychainStorageDriver: StorageDriver {
 
     func get(key: String) throws -> String? {
         let query: [String: Any] = [

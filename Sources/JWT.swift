@@ -8,7 +8,7 @@
 import Foundation
 import CommonCrypto
 
-internal protocol JWTHeader: Encodable {
+protocol JWTHeader: Encodable {
     func encode() throws -> String
 }
 
@@ -20,7 +20,7 @@ extension JWTHeader {
     }
 }
 
-internal protocol JWTPayload: Encodable {
+protocol JWTPayload: Encodable {
     func encode() throws -> String
 }
 
@@ -32,7 +32,7 @@ extension JWTPayload {
     }
 }
 
-internal struct JWTSigner {
+struct JWTSigner {
 
     private let privateKey: SecKey
 
@@ -59,7 +59,7 @@ internal struct JWTSigner {
     }
 }
 
-internal struct JWT<Header: JWTHeader, Payload: JWTPayload> {
+struct JWT<Header: JWTHeader, Payload: JWTPayload> {
     let header: Header
     let payload: Payload
 
@@ -73,7 +73,7 @@ internal struct JWT<Header: JWTHeader, Payload: JWTPayload> {
 
 typealias AnonymousJWT = JWT<AnonymousJWTHeader,AnonymousJWYPayload>
 
-internal struct AnonymousJWTHeader: JWTHeader {
+struct AnonymousJWTHeader: JWTHeader {
     let typ = "vnd.authgear.anonymous-request"
     let kid: String
     let alg: String
@@ -91,7 +91,7 @@ internal struct AnonymousJWTHeader: JWTHeader {
     }
 }
 
-internal struct AnonymousJWYPayload: JWTPayload {
+struct AnonymousJWYPayload: JWTPayload {
     enum Action: String, Encodable {
         case auth
         case promote

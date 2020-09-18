@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal enum AuthAPIClientError: Error {
+enum AuthAPIClientError: Error {
     case invalidResponse
     case dataTaskError(Error)
     case decodeError(Error)
@@ -17,7 +17,7 @@ internal enum AuthAPIClientError: Error {
     case oidcError(OIDCError)
 }
 
-internal enum GrantType: String {
+enum GrantType: String {
     case authorizationCode = "authorization_code"
     case refreshToken = "refresh_token"
     case anonymous = "urn:authgear:params:oauth:grant-type:anonymous-request"
@@ -27,12 +27,12 @@ enum IntParsingError: Error {
     case invalidInput(String)
 }
 
-internal struct OIDCError: Error, Decodable {
+struct OIDCError: Error, Decodable {
     let error: String
     let errorDescription: String
 }
 
-internal struct ServerError: Error, Decodable {
+struct ServerError: Error, Decodable {
     let name: String
     let message: String
     let reason: String
@@ -54,7 +54,7 @@ internal struct ServerError: Error, Decodable {
     }
 }
 
-internal enum APIResponse<T: Decodable>: Decodable {
+enum APIResponse<T: Decodable>: Decodable {
     case result(T)
     case error(ServerError)
 
@@ -83,7 +83,7 @@ internal enum APIResponse<T: Decodable>: Decodable {
     }
 }
 
-internal struct TokenResponse: Decodable {
+struct TokenResponse: Decodable {
     let idToken: String?
     let tokenType: String
     let accessToken: String
@@ -119,16 +119,16 @@ internal struct TokenResponse: Decodable {
     }
 }
 
-internal struct ChallengeBody: Encodable {
+struct ChallengeBody: Encodable {
     let purpose: String
 }
 
-internal struct ChallengeResponse: Decodable {
+struct ChallengeResponse: Decodable {
     let token: String
     let expireAt: String
 }
 
-internal protocol AuthAPIClient: class {
+protocol AuthAPIClient: class {
     var endpoint: URL? { get set }
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void)
     func requestOIDCToken(
@@ -235,19 +235,19 @@ extension AuthAPIClient {
     }
 }
 
-internal protocol AuthAPIClientDelegate: class {
+protocol AuthAPIClientDelegate: class {
     func getAccessToken() -> String?
     func shouldRefreshAccessToken() -> Bool
     func refreshAccessToken(handler: VoidCompletionHandler?)
 }
 
-internal class DefaultAuthAPIClient: AuthAPIClient {
+class DefaultAuthAPIClient: AuthAPIClient {
     public var endpoint: URL?
 
     private let defaultSession = URLSession(configuration: .default)
     private var oidcConfiguration: OIDCConfiguration?
 
-    internal weak var delegate: AuthAPIClientDelegate?
+    weak var delegate: AuthAPIClientDelegate?
 
     private func buildFetchOIDCConfigurationRequest() -> URLRequest? {
         guard let endpoint = self.endpoint else {
@@ -256,7 +256,7 @@ internal class DefaultAuthAPIClient: AuthAPIClient {
         return URLRequest(url: endpoint.appendingPathComponent("/.well-known/openid-configuration"))
     }
 
-    internal func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void) {
+    func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void) {
 
         if let configuration = self.oidcConfiguration {
             return handler(.success(configuration))
@@ -272,7 +272,7 @@ internal class DefaultAuthAPIClient: AuthAPIClient {
         }
     }
 
-    internal func fetch(
+    func fetch(
         request: URLRequest,
         handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
     ) {
@@ -303,7 +303,7 @@ internal class DefaultAuthAPIClient: AuthAPIClient {
         dataTaslk.resume()
     }
 
-    internal func fetch<T: Decodable>(
+    func fetch<T: Decodable>(
         request: URLRequest,
         keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .convertFromSnakeCase,
         handler: @escaping (Result<T, Error>) -> Void) {
@@ -322,7 +322,7 @@ internal class DefaultAuthAPIClient: AuthAPIClient {
         }
     }
 
-    internal func refreshAccessTokenIfNeeded(handler: @escaping (Result<Void, Error>) -> Void) {
+    func refreshAccessTokenIfNeeded(handler: @escaping (Result<Void, Error>) -> Void) {
         if let delegate = self.delegate,
             delegate.shouldRefreshAccessToken() {
             delegate.refreshAccessToken { result in
@@ -337,7 +337,7 @@ internal class DefaultAuthAPIClient: AuthAPIClient {
         return handler(.success(()))
     }
 
-    internal func fetchWithRefreshToken(
+    func fetchWithRefreshToken(
         request: URLRequest,
         handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
     ) {
@@ -357,7 +357,7 @@ internal class DefaultAuthAPIClient: AuthAPIClient {
         }
     }
 
-    internal func requestOIDCToken(
+    func requestOIDCToken(
         grantType: GrantType,
         clientId: String,
         redirectURI: String? = nil,
