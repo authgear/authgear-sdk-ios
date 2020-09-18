@@ -1,10 +1,3 @@
-//
-//  AuthenticationSession.swift
-//  Authgear-iOS
-//
-//  Created by Peter Cheng on 28/8/2020.
-//
-
 import AuthenticationServices
 import SafariServices
 

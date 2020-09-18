@@ -1,11 +1,3 @@
-//
-//  AppDelegate.swift
-//  iOS Example
-//
-//  Created by Peter Cheng on 26/8/2020.
-//  Copyright © 2020 Authgear. All rights reserved.
-//
-
 import UIKit
 
 @UIApplicationMain

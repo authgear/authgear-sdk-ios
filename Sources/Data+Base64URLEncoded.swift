@@ -1,10 +1,3 @@
-//
-//  Data+Base64URLEncoded.swift
-//  Authgear-iOS
-//
-//  Created by Peter Cheng on 7/9/2020.
-//
-
 import Foundation
 
 extension Data {

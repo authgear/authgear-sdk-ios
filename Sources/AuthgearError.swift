@@ -1,10 +1,3 @@
-//
-//  AuthgearError.swift
-//  Authgear-iOS
-//
-//  Created by Peter Cheng on 1/9/2020.
-//
-
 import Foundation
 
 public enum AuthgearError: Error {

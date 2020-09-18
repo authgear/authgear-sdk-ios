@@ -1,10 +1,3 @@
-//
-//  JWKStore.swift
-//  Authgear-iOS
-//
-//  Created by Peter Cheng on 4/9/2020.
-//
-
 import Foundation
 import Security
 

@@ -1,10 +1,3 @@
-//
-//  Storage.swift
-//  Authgear-iOS
-//
-//  Created by Peter Cheng on 31/8/2020.
-//
-
 import Foundation
 import Security
 
