@@ -12,7 +12,7 @@ extension SFAuthenticationSession: AuthenticationSession {}
 @available(iOS 12.0, *)
 extension ASWebAuthenticationSession: AuthenticationSession {}
 
-enum AuthenticationSessionError: Error {
+public enum AuthenticationSessionError: Error {
     case sessionError(Error)
     case canceledLogin
 }

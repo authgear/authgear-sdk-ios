@@ -1,6 +1,6 @@
 import Foundation
 
-enum AuthAPIClientError: Error {
+public enum AuthAPIClientError: Error {
     case invalidResponse
     case dataTaskError(Error)
     case decodeError(Error)
@@ -16,16 +16,12 @@ enum GrantType: String {
     case anonymous = "urn:authgear:params:oauth:grant-type:anonymous-request"
 }
 
-enum IntParsingError: Error {
-    case invalidInput(String)
-}
-
-struct OIDCError: Error, Decodable {
+public struct OIDCError: Error, Decodable {
     let error: String
     let errorDescription: String
 }
 
-struct ServerError: Error, Decodable {
+public struct ServerError: Error, Decodable {
     let name: String
     let message: String
     let reason: String
@@ -38,7 +34,7 @@ struct ServerError: Error, Decodable {
         case info
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.name = try values.decode(String.self, forKey: .name)
         self.message = try values.decode(String.self, forKey: .message)
@@ -82,34 +78,6 @@ struct TokenResponse: Decodable {
     let accessToken: String
     let expiresIn: Int
     let refreshToken: String?
-
-    enum CodingKeys: String, CodingKey {
-        case idToken
-        case tokenType
-        case accessToken
-        case expiresIn
-        case refreshToken
-    }
-
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.idToken = try values.decodeIfPresent(String.self, forKey: .idToken)
-        self.tokenType = try values.decode(String.self, forKey: .tokenType)
-        self.accessToken = try values.decode(String.self, forKey: .accessToken)
-
-        let expiresInIntValue = try? values.decode(Int.self, forKey: .expiresIn)
-        if let expiresInIntValue = expiresInIntValue {
-            self.expiresIn = expiresInIntValue
-        } else {
-            let expiresInValue = try values.decode(String.self, forKey: .expiresIn)
-            if let expiresIn = Int(expiresInValue) {
-                self.expiresIn = expiresIn
-            } else {
-                throw IntParsingError.invalidInput(expiresInValue)
-            }
-        }
-        self.refreshToken = try values.decodeIfPresent(String.self, forKey: .refreshToken)
-    }
 }
 
 struct ChallengeBody: Encodable {

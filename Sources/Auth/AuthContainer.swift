@@ -38,7 +38,7 @@ protocol BaseContainer {
 }
 
 
-public struct AuthorizeOptions {
+struct AuthorizeOptions {
     let redirectURI: String
     let state: String?
     let prompt: String?
