@@ -72,7 +72,7 @@ struct AnonymousJWTHeader: JWTHeader {
     let alg: String
     let jwk: JWK?
 
-    init(jwk: JWK, new: Bool = true) {
+    init(jwk: JWK, new: Bool) {
         self.kid = jwk.kid
         self.alg = jwk.alg
 
