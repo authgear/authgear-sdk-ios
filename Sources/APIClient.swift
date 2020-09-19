@@ -308,7 +308,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
             case .success:
                 var request = request
                 if let accessToken = self?.delegate?.getAccessToken() {
-                    request.setValue("bearer \(accessToken)", forHTTPHeaderField: "authorization")
+                    request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
                 }
 
                 self?.fetch(request: request, handler: handler)
@@ -387,7 +387,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 var urlRequest = URLRequest(url: config.userinfoEndpoint)
                 if let accessToken = accessToken {
                     urlRequest.setValue(
-                        "bearer \(accessToken)",
+                        "Bearer \(accessToken)",
                         forHTTPHeaderField: "authorization"
                     )
                 }
