@@ -103,7 +103,7 @@ protocol AuthAPIClient: class {
         handler: @escaping (Result<TokenResponse, Error>) -> Void
     )
     func requestOIDCUserInfo(
-        accessToken: String?,
+        accessToken: String,
         handler: @escaping (Result<UserInfo, Error>) -> Void
     )
     func requestOIDCRevocation(
@@ -163,7 +163,7 @@ extension AuthAPIClient {
     }
 
     func syncRequestOIDCUserInfo(
-        accessToken: String?
+        accessToken: String
     ) throws -> UserInfo {
         return try withSemaphore { handler in
             self.requestOIDCUserInfo(
@@ -378,19 +378,17 @@ class DefaultAuthAPIClient: AuthAPIClient {
     }
 
     func requestOIDCUserInfo(
-        accessToken: String? = nil,
+        accessToken: String,
         handler: @escaping (Result<UserInfo, Error>) -> Void
     ) {
         self.fetchOIDCConfiguration { [weak self] result in
             switch result {
             case .success(let config):
                 var urlRequest = URLRequest(url: config.userinfoEndpoint)
-                if let accessToken = accessToken {
                     urlRequest.setValue(
                         "Bearer \(accessToken)",
                         forHTTPHeaderField: "authorization"
                     )
-                }
                 self?.fetch(request: urlRequest, keyDecodingStrategy: .useDefaultKeys, handler: handler)
 
             case .failure(let error):
