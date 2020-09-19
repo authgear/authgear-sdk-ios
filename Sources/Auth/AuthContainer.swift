@@ -71,8 +71,8 @@ struct AuthorizeOptions {
 public struct UserInfo: Decodable {
 
     enum CodingKeys: String, CodingKey {
-        case isAnonymous = "https://authgear.com/user/is_anonymous"
-        case isVerified = "https://authgear.com/user/is_verified"
+        case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
+        case isVerified = "https://authgear.com/claims/user/is_verified"
         case iss
         case sub
     }
