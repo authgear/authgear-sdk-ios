@@ -98,8 +98,6 @@ public class AuthContainer: NSObject, BaseContainer {
     let storage: ContainerStorage
     var clientId: String!
 
-    private let isThirdParty = true
-
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
 
@@ -138,26 +136,16 @@ public class AuthContainer: NSObject, BaseContainer {
     private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier) throws -> URL {
         let configuration = try self.apiClient.syncFetchOIDCConfiguration()
         var queryItems = [URLQueryItem]()
-        if self.isThirdParty {
-            queryItems.append(contentsOf: [
-                URLQueryItem(name: "response_type", value: "code"),
-                URLQueryItem(
-                    name: "scope",
-                    value: "openid offline_access https://authgear.com/scopes/full-access"
-                ),
-                URLQueryItem(name: "code_challenge_method", value: "S256"),
-                URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge()),
-            ])
 
-        } else {
-            queryItems.append(contentsOf: [
-                URLQueryItem(name: "response_type", value: "none"),
-                URLQueryItem(
-                    name: "scope",
-                    value: "openid https://authgear.com/scopes/full-access"
-                )
-            ])
-        }
+        queryItems.append(contentsOf: [
+            URLQueryItem(name: "response_type", value: "code"),
+            URLQueryItem(
+                name: "scope",
+                value: "openid offline_access https://authgear.com/scopes/full-access"
+            ),
+            URLQueryItem(name: "code_challenge_method", value: "S256"),
+            URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge()),
+        ])
 
         queryItems.append(URLQueryItem(name: "client_id", value: self.clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
@@ -242,47 +230,42 @@ public class AuthContainer: NSObject, BaseContainer {
             )
         }
 
-        if !self.isThirdParty {
-            self.apiClient.requestOIDCUserInfo(accessToken: nil) { result in
-                handler(result.map { AuthorizeResponse(userInfo: $0, state: state)})
-            }
-        } else {
-            guard let code = params["code"] else {
-                return handler(
-                    .failure(AuthgearError.oauthError(
-                        error: "invalid_request",
-                        description: "Missing parameter: code")
-                    )
+        guard let code = params["code"] else {
+            return handler(
+                .failure(AuthgearError.oauthError(
+                    error: "invalid_request",
+                    description: "Missing parameter: code")
                 )
-            }
-            let redirectURI = { () -> String in
-                var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-                urlComponents.fragment = nil
-                urlComponents.query = nil
-
-                return urlComponents.url!.absoluteString
-            }()
-
-
-            do {
-                let tokenResponse = try self.apiClient.syncRequestOIDCToken(
-                    grantType: GrantType.authorizationCode,
-                    clientId: self.clientId,
-                    redirectURI: redirectURI,
-                    code: code,
-                    codeVerifier: verifier.value,
-                    refreshToken: nil,
-                    jwt: nil
-                )
-
-                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
-                try self.persistTokenResponse(tokenResponse)
-
-                handler(.success(AuthorizeResponse(userInfo: userInfo, state: state)))
-            } catch {
-                handler(.failure(error))
-            }
+            )
         }
+        let redirectURI = { () -> String in
+            var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+            urlComponents.fragment = nil
+            urlComponents.query = nil
+
+            return urlComponents.url!.absoluteString
+        }()
+
+
+        do {
+            let tokenResponse = try self.apiClient.syncRequestOIDCToken(
+                grantType: GrantType.authorizationCode,
+                clientId: self.clientId,
+                redirectURI: redirectURI,
+                code: code,
+                codeVerifier: verifier.value,
+                refreshToken: nil,
+                jwt: nil
+            )
+
+            let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
+            try self.persistTokenResponse(tokenResponse)
+
+            handler(.success(AuthorizeResponse(userInfo: userInfo, state: state)))
+        } catch {
+            handler(.failure(error))
+        }
+
     }
 
     private func persistTokenResponse(
@@ -439,10 +422,12 @@ public class AuthContainer: NSObject, BaseContainer {
     ) {
         DispatchQueue.global(qos: .utility).async {
             do {
-                if self.isThirdParty {
-                    let token = try self.storage.getRefreshToken(namespace: self.name)
-                    try self.apiClient.syncRequestOIDCRevocation(refreshToken: token ?? "")
-                }
+                let token = try self.storage.getRefreshToken(
+                    namespace: self.name
+                )
+                try self.apiClient.syncRequestOIDCRevocation(
+                    refreshToken: token ?? ""
+                )
                 try self.cleanupSession()
                 handler(.success(()))
             } catch {
