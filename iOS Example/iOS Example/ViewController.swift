@@ -28,7 +28,8 @@ class ViewController: UIViewController {
 
     @IBAction func promoteAnonymousUser(_ sender: Any) {
         container.promoteAnonymousUser(
-        redirectURI: "self.test.myApp://host/path") { result in
+            redirectURI: "self.test.myApp://host/path"
+        ) { result in
             print(result)
         }
     }

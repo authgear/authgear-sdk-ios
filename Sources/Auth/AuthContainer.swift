@@ -106,6 +106,7 @@ public class AuthContainer: NSObject, BaseContainer {
     private var expireAt: Date?
 
     private let jwkStore = JWKStore()
+    private let workerQueue: DispatchQueue
 
     public weak var delegate: AuthContainerDelegate?
 
@@ -113,6 +114,7 @@ public class AuthContainer: NSObject, BaseContainer {
         self.name = name ?? "default"
         self.apiClient = DefaultAuthAPIClient()
         self.storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+        self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
 
     public func configure(clientId: String, endpoint: String) {
@@ -192,7 +194,9 @@ public class AuthContainer: NSObject, BaseContainer {
                     completionHandler: { [weak self] result in
                         switch result {
                         case .success(let url):
-                            self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
+                            self?.workerQueue.async {
+                                self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
+                            }
                         case .failure(let error):
                             switch error {
                             case .canceledLogin:
@@ -289,6 +293,16 @@ public class AuthContainer: NSObject, BaseContainer {
 
     }
 
+    private func withMainQueueHandler<ResultType, ErrorType: Error>(
+        _ handler: @escaping (Result<ResultType, ErrorType>) -> Void
+    ) -> ((Result<ResultType, ErrorType>) -> Void) {
+        return { result in
+            DispatchQueue.main.async {
+                handler(result)
+            }
+        }
+    }
+
     public func authorize(
         redirectURI: String,
         state: String? = nil,
@@ -297,7 +311,7 @@ public class AuthContainer: NSObject, BaseContainer {
         uiLocales: [String]? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        DispatchQueue.global(qos: .utility).async {
+        self.workerQueue.async {
             self.authorize(
                 AuthorizeOptions(
                     redirectURI: redirectURI,
@@ -306,7 +320,7 @@ public class AuthContainer: NSObject, BaseContainer {
                     loginHint: loginHint,
                     uiLocales: uiLocales
                 ),
-                handler: handler
+                handler: self.withMainQueueHandler(handler)
             )
         }
     }
@@ -314,7 +328,8 @@ public class AuthContainer: NSObject, BaseContainer {
     public func authenticateAnonymously(
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        DispatchQueue.global(qos: .utility).async {
+        let handler = self.withMainQueueHandler(handler)
+        self.workerQueue.async {
             do {
                 let token = try self.apiClient.syncRequestOAuthChallenge(purpose: "anonymous_request").token
                 let keyId = try self.storage.getAnonymousKeyId(namespace: self.name) ?? UUID().uuidString
@@ -364,7 +379,8 @@ public class AuthContainer: NSObject, BaseContainer {
         uiLocales: [String]? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        DispatchQueue.global(qos: .utility).async {
+        let handler = self.withMainQueueHandler(handler)
+        self.workerQueue.async {
             do {
                 guard let keyId = try self.storage.getAnonymousKeyId(namespace: self.name) else {
                     return handler(.failure(AuthgearError.anonymousUserNotFound))
@@ -420,7 +436,8 @@ public class AuthContainer: NSObject, BaseContainer {
         redirectURI: String? = nil,
         handler: @escaping (Result<Void, Error>) -> Void
     ) {
-        DispatchQueue.global(qos: .utility).async {
+        let handler = self.withMainQueueHandler(handler)
+        self.workerQueue.async {
             do {
                 let token = try self.storage.getRefreshToken(
                     namespace: self.name
@@ -457,7 +474,7 @@ extension AuthContainer: AuthAPIClientDelegate {
     }
 
     func refreshAccessToken(handler: VoidCompletionHandler?) {
-        DispatchQueue.global(qos: .utility).async {
+        self.workerQueue.async {
 
             do {
                 guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
