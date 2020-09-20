@@ -1,5 +1,5 @@
-import Foundation
 import CommonCrypto
+import Foundation
 
 protocol JWTHeader: Encodable {
     func encode() throws -> String
@@ -26,7 +26,6 @@ extension JWTPayload {
 }
 
 struct JWTSigner {
-
     private let privateKey: SecKey
 
     init(privateKey: SecKey) {
@@ -43,9 +42,9 @@ struct JWTSigner {
 
         var error: Unmanaged<CFError>?
 
-        guard let signedData = SecKeyCreateSignature(self.privateKey, .rsaSignatureDigestPKCS1v15SHA256, Data(buffer) as CFData, &error) else {
+        guard let signedData = SecKeyCreateSignature(privateKey, .rsaSignatureDigestPKCS1v15SHA256, Data(buffer) as CFData, &error) else {
             throw JWKError.keyError(JWKError.keyError(error!
-                .takeRetainedValue() as Error))
+                    .takeRetainedValue() as Error))
         }
 
         return (signedData as Data).base64urlEncodedString()
@@ -64,7 +63,7 @@ struct JWT<Header: JWTHeader, Payload: JWTPayload> {
     }
 }
 
-typealias AnonymousJWT = JWT<AnonymousJWTHeader,AnonymousJWYPayload>
+typealias AnonymousJWT = JWT<AnonymousJWTHeader, AnonymousJWYPayload>
 
 struct AnonymousJWTHeader: JWTHeader {
     let typ = "vnd.authgear.anonymous-request"
@@ -73,8 +72,8 @@ struct AnonymousJWTHeader: JWTHeader {
     let jwk: JWK?
 
     init(jwk: JWK, new: Bool) {
-        self.kid = jwk.kid
-        self.alg = jwk.alg
+        kid = jwk.kid
+        alg = jwk.alg
 
         if new {
             self.jwk = jwk
@@ -89,6 +88,7 @@ struct AnonymousJWYPayload: JWTPayload {
         case auth
         case promote
     }
+
     let iat: Int
     let exp: Int
     let challenge: String
@@ -96,8 +96,8 @@ struct AnonymousJWYPayload: JWTPayload {
 
     init(challenge: String, action: Action) {
         let now = Int(Date().timeIntervalSince1970)
-        self.iat = now
-        self.exp = now + 60
+        iat = now
+        exp = now + 60
         self.challenge = challenge
         self.action = action
     }

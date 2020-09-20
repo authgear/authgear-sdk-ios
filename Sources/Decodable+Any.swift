@@ -90,7 +90,6 @@ extension UnkeyedDecodingContainer {
     }
 }
 
-
 extension KeyedEncodingContainerProtocol where Key == JSONCodingKeys {
     mutating func encode(_ value: [String: Any]) throws {
         for (key, value) in value {
@@ -152,7 +151,7 @@ extension UnkeyedEncodingContainer {
             case Optional<Any>.none:
                 try encodeNil()
             default:
-                let keys = JSONCodingKeys(intValue: index).map({ [ $0 ] }) ?? []
+                let keys = JSONCodingKeys(intValue: index).map { [$0] } ?? []
                 throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: codingPath + keys, debugDescription: "Invalid JSON value"))
             }
         }

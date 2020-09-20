@@ -1,8 +1,7 @@
-import UIKit
 import Authgear
+import UIKit
 
 class ViewController: UIViewController {
-
     let container = AuthContainer()
 
     override func viewDidLoad() {
@@ -40,4 +39,3 @@ class ViewController: UIViewController {
         }
     }
 }
-

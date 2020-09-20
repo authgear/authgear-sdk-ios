@@ -20,7 +20,6 @@ protocol HasStorageDriver {
     var storageDriver: StorageDriver { get }
 }
 
-
 protocol StorageKeyConvertible {
     func keyRefreshToken(namespace: String) -> String
     func keyAnonymousKeyId(namespace: String) -> String
@@ -28,31 +27,31 @@ protocol StorageKeyConvertible {
 
 extension ContainerStorage where Self: HasStorageDriver & StorageKeyConvertible {
     func setRefreshToken(namespace: String, token: String) throws {
-        try self.storageDriver.set(key: self.keyRefreshToken(namespace: namespace), value: token)
+        try storageDriver.set(key: keyRefreshToken(namespace: namespace), value: token)
     }
 
     func setAnonymousKeyId(namespace: String, kid: String) throws {
-        try self.storageDriver.set(key: self.keyAnonymousKeyId(namespace: namespace), value: kid)
+        try storageDriver.set(key: keyAnonymousKeyId(namespace: namespace), value: kid)
     }
 
     func getRefreshToken(namespace: String) throws -> String? {
-        try self.storageDriver.get(key: self.keyRefreshToken(namespace: namespace))
+        try storageDriver.get(key: keyRefreshToken(namespace: namespace))
     }
 
     func getAnonymousKeyId(namespace: String) throws -> String? {
-        try self.storageDriver.get(key: self.keyAnonymousKeyId(namespace: namespace))
+        try storageDriver.get(key: keyAnonymousKeyId(namespace: namespace))
     }
 
     func delRefreshToken(namespace: String) throws {
-        try self.storageDriver.del(key: self.keyRefreshToken(namespace: namespace))
+        try storageDriver.del(key: keyRefreshToken(namespace: namespace))
     }
 
     func delAnonymousKeyId(namespace: String) throws {
-        try self.storageDriver.del(key: self.keyAnonymousKeyId(namespace: namespace))
+        try storageDriver.del(key: keyAnonymousKeyId(namespace: namespace))
     }
 }
 
-class DefaultContainerStorage: ContainerStorage ,HasStorageDriver, StorageKeyConvertible {
+class DefaultContainerStorage: ContainerStorage, HasStorageDriver, StorageKeyConvertible {
     let storageDriver: StorageDriver
 
     init(storageDriver: StorageDriver) {
@@ -60,33 +59,31 @@ class DefaultContainerStorage: ContainerStorage ,HasStorageDriver, StorageKeyCon
     }
 
     private func scopedKey(_ key: String) -> String {
-        return "authgear_\(key)"
+        "authgear_\(key)"
     }
 
     public func keyRefreshToken(namespace: String) -> String {
-        return self.scopedKey("\(namespace)_refreshToken")
+        scopedKey("\(namespace)_refreshToken")
     }
 
     public func keyAnonymousKeyId(namespace: String) -> String {
-        return self.scopedKey("\(namespace)_anonymousKeyID")
+        scopedKey("\(namespace)_anonymousKeyID")
     }
 }
 
 class MemoryStorageDriver: StorageDriver {
-
-
     private var backingStorage = [String: String]()
 
     func get(key: String) throws -> String? {
-        self.backingStorage[key]
+        backingStorage[key]
     }
 
     func set(key: String, value: String) throws {
-        self.backingStorage[key] = value
+        backingStorage[key] = value
     }
 
     func del(key: String) throws {
-        self.backingStorage.removeValue(forKey: key)
+        backingStorage.removeValue(forKey: key)
     }
 }
 
@@ -96,7 +93,6 @@ enum KeychainError: Error {
 }
 
 class KeychainStorageDriver: StorageDriver {
-
     func get(key: String) throws -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -108,7 +104,7 @@ class KeychainStorageDriver: StorageDriver {
         var result: AnyObject?
 
         let status = withUnsafeMutablePointer(to: &result) {
-          SecItemCopyMatching(query as CFDictionary, UnsafeMutablePointer($0))
+            SecItemCopyMatching(query as CFDictionary, UnsafeMutablePointer($0))
         }
 
         switch status {
@@ -127,21 +123,19 @@ class KeychainStorageDriver: StorageDriver {
 
     func set(key: String, value: String) throws {
         let status: OSStatus
-        if try self.get(key: key) != nil {
+        if try get(key: key) != nil {
             let query: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrAccount as String: key
             ]
 
-            let update: [String: Any] = [
-                kSecValueData as String: value.data(using: .utf8)!
-            ]
+            let update: [String: Any] = [kSecValueData as String: value.data(using: .utf8)!]
             status = SecItemUpdate(query as CFDictionary, update as CFDictionary)
         } else {
             let query: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrAccount as String: key,
-                kSecValueData as String: value.data(using: .utf8)!,
+                kSecValueData as String: value.data(using: .utf8)!
             ]
 
             status = SecItemAdd(query as CFDictionary, nil)
@@ -157,7 +151,7 @@ class KeychainStorageDriver: StorageDriver {
     func del(key: String) throws {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
+            kSecAttrAccount as String: key
         ]
         let status = SecItemDelete(query as CFDictionary)
         switch status {
@@ -167,5 +161,4 @@ class KeychainStorageDriver: StorageDriver {
             throw KeychainError.unhandledError(status: status)
         }
     }
-
 }

@@ -36,10 +36,10 @@ public struct ServerError: Error, Decodable {
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.name = try values.decode(String.self, forKey: .name)
-        self.message = try values.decode(String.self, forKey: .message)
-        self.reason = try values.decode(String.self, forKey: .reason)
-        self.info = try values.decode([String: Any].self, forKey: .info)
+        name = try values.decode(String.self, forKey: .name)
+        message = try values.decode(String.self, forKey: .message)
+        reason = try values.decode(String.self, forKey: .reason)
+        info = try values.decode([String: Any].self, forKey: .info)
     }
 }
 
@@ -64,9 +64,9 @@ enum APIResponse<T: Decodable>: Decodable {
 
     func toResult() -> Result<T, Error> {
         switch self {
-        case .result(let value):
+        case let .result(value):
             return .success(value)
-        case .error(let error):
+        case let .error(error):
             return .failure(AuthAPIClientError.serverError(error))
         }
     }
@@ -89,7 +89,7 @@ struct ChallengeResponse: Decodable {
     let expireAt: String
 }
 
-protocol AuthAPIClient: class {
+protocol AuthAPIClient: AnyObject {
     var endpoint: URL? { get set }
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void)
     func requestOIDCToken(
@@ -117,7 +117,6 @@ protocol AuthAPIClient: class {
 }
 
 extension AuthAPIClient {
-
     private func withSemaphore<T>(
         asynTask: (@escaping (Result<T, Error>) -> Void) -> Void
     ) throws -> T {
@@ -134,7 +133,7 @@ extension AuthAPIClient {
     }
 
     func syncFetchOIDCConfiguration() throws -> OIDCConfiguration {
-        return try withSemaphore { handler in
+        try withSemaphore { handler in
             self.fetchOIDCConfiguration(handler: handler)
         }
     }
@@ -148,7 +147,7 @@ extension AuthAPIClient {
         refreshToken: String?,
         jwt: String?
     ) throws -> TokenResponse {
-        return try withSemaphore { handler in
+        try withSemaphore { handler in
             self.requestOIDCToken(
                 grantType: grantType,
                 clientId: clientId,
@@ -165,7 +164,7 @@ extension AuthAPIClient {
     func syncRequestOIDCUserInfo(
         accessToken: String
     ) throws -> UserInfo {
-        return try withSemaphore { handler in
+        try withSemaphore { handler in
             self.requestOIDCUserInfo(
                 accessToken: accessToken,
                 handler: handler
@@ -176,7 +175,7 @@ extension AuthAPIClient {
     func syncRequestOIDCRevocation(
         refreshToken: String
     ) throws {
-        return try withSemaphore { handler in
+        try withSemaphore { handler in
             self.requestOIDCRevocation(
                 refreshToken: refreshToken,
                 handler: handler
@@ -187,7 +186,7 @@ extension AuthAPIClient {
     func syncRequestOAuthChallenge(
         purpose: String
     ) throws -> ChallengeResponse {
-        return try withSemaphore { handler in
+        try withSemaphore { handler in
             self.requestOAuthChallenge(
                 purpose: purpose,
                 handler: handler
@@ -196,7 +195,7 @@ extension AuthAPIClient {
     }
 }
 
-protocol AuthAPIClientDelegate: class {
+protocol AuthAPIClientDelegate: AnyObject {
     func getAccessToken() -> String?
     func shouldRefreshAccessToken() -> Bool
     func refreshAccessToken(handler: VoidCompletionHandler?)
@@ -218,8 +217,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
     }
 
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void) {
-
-        if let configuration = self.oidcConfiguration {
+        if let configuration = oidcConfiguration {
             return handler(.success(configuration))
         }
 
@@ -227,7 +225,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
             return handler(.failure(AuthAPIClientError.missingEndpoint))
         }
 
-        self.fetch(request: request) { [weak self] (result: Result<OIDCConfiguration, Error>) in
+        fetch(request: request) { [weak self] (result: Result<OIDCConfiguration, Error>) in
             self?.oidcConfiguration = try? result.get()
             return handler(result)
         }
@@ -237,7 +235,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         request: URLRequest,
         handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
     ) {
-        let dataTaslk = self.defaultSession.dataTask(with: request) { (data, response, error) in
+        let dataTaslk = defaultSession.dataTask(with: request) { data, response, error in
 
             guard let response = response as? HTTPURLResponse else {
                 return handler(.failure(AuthAPIClientError.invalidResponse))
@@ -267,9 +265,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
     func fetch<T: Decodable>(
         request: URLRequest,
         keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .convertFromSnakeCase,
-        handler: @escaping (Result<T, Error>) -> Void) {
-
-        self.fetch(request: request) { result in
+        handler: @escaping (Result<T, Error>) -> Void
+    ) {
+        fetch(request: request) { result in
             handler(result.flatMap { (data, _) -> Result<T, Error> in
                 do {
                     let decorder = JSONDecoder()
@@ -290,7 +288,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 switch result {
                 case .success:
                     return handler(.success(()))
-                case .failure(let error):
+                case let .failure(error):
                     return handler(.failure(error))
                 }
             }
@@ -302,8 +300,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         request: URLRequest,
         handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
     ) {
-
-        self.refreshAccessTokenIfNeeded { [weak self] result in
+        refreshAccessTokenIfNeeded { [weak self] result in
             switch result {
             case .success:
                 var request = request
@@ -312,7 +309,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 }
 
                 self?.fetch(request: request, handler: handler)
-            case .failure(let error):
+            case let .failure(error):
                 return handler(.failure(error))
             }
         }
@@ -328,9 +325,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
         jwt: String? = nil,
         handler: @escaping (Result<TokenResponse, Error>) -> Void
     ) {
-        self.fetchOIDCConfiguration { [weak self] result in
+        fetchOIDCConfiguration { [weak self] result in
             switch result {
-            case .success(let config):
+            case let .success(config):
                 var queryParams = [String: String]()
                 queryParams["client_id"] = clientId
                 queryParams["grant_type"] = grantType.rawValue
@@ -370,10 +367,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
                 self?.fetch(request: urlRequest, handler: handler)
 
-            case .failure(let error):
+            case let .failure(error):
                 return handler(.failure(error))
             }
-
         }
     }
 
@@ -381,20 +377,19 @@ class DefaultAuthAPIClient: AuthAPIClient {
         accessToken: String,
         handler: @escaping (Result<UserInfo, Error>) -> Void
     ) {
-        self.fetchOIDCConfiguration { [weak self] result in
+        fetchOIDCConfiguration { [weak self] result in
             switch result {
-            case .success(let config):
+            case let .success(config):
                 var urlRequest = URLRequest(url: config.userinfoEndpoint)
-                    urlRequest.setValue(
-                        "Bearer \(accessToken)",
-                        forHTTPHeaderField: "authorization"
-                    )
+                urlRequest.setValue(
+                    "Bearer \(accessToken)",
+                    forHTTPHeaderField: "authorization"
+                )
                 self?.fetch(request: urlRequest, keyDecodingStrategy: .useDefaultKeys, handler: handler)
 
-            case .failure(let error):
+            case let .failure(error):
                 return handler(.failure(error))
             }
-
         }
     }
 
@@ -402,9 +397,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
         refreshToken: String,
         handler: @escaping (Result<Void, Error>) -> Void
     ) {
-        self.fetchOIDCConfiguration { [weak self] result in
+        fetchOIDCConfiguration { [weak self] result in
             switch result {
-            case .success(let config):
+            case let .success(config):
 
                 var urlComponents = URLComponents()
                 urlComponents.queryParams = ["token": refreshToken]
@@ -420,9 +415,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 urlRequest.httpBody = body
 
                 self?.fetch(request: urlRequest, handler: { result in
-                    handler(result.map { _ in ()})
+                    handler(result.map { _ in () })
                 })
-            case .failure(let error):
+            case let .failure(error):
                 return handler(.failure(error))
             }
         }
@@ -432,7 +427,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
         purpose: String,
         handler: @escaping (Result<ChallengeResponse, Error>) -> Void
     ) {
-
         guard let endpoint = self.endpoint else {
             return handler(.failure(AuthAPIClientError.missingEndpoint))
         }
@@ -442,9 +436,8 @@ class DefaultAuthAPIClient: AuthAPIClient {
         urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
         urlRequest.httpBody = try? JSONEncoder().encode(ChallengeBody(purpose: purpose))
 
-        self.fetch(request: urlRequest, handler: { (result: Result<APIResponse<ChallengeResponse>, Error>) in
-            return handler(result.flatMap { $0.toResult() })
+        fetch(request: urlRequest, handler: { (result: Result<APIResponse<ChallengeResponse>, Error>) in
+            handler(result.flatMap { $0.toResult() })
         })
     }
 }
-

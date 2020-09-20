@@ -1,5 +1,5 @@
-import XCTest
 @testable import Authgear
+import XCTest
 
 final class AuthgearTests: XCTestCase {
     func testExample() {
@@ -9,7 +9,5 @@ final class AuthgearTests: XCTestCase {
         XCTAssertEqual(Authgear().text, "Hello, World!")
     }
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+    static var allTests = [("testExample", testExample)]
 }

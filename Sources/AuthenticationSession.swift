@@ -66,10 +66,9 @@ class AuthenticationSessionProvider: NSObject {
     }
 }
 
-
 extension AuthenticationSessionProvider: ASWebAuthenticationPresentationContextProviding {
     @available(iOS 13.0, *)
     public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared.windows.filter {$0.isKeyWindow}.first!
+        UIApplication.shared.windows.filter { $0.isKeyWindow }.first!
     }
 }

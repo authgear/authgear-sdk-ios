@@ -1,5 +1,5 @@
-import Foundation
 import AuthenticationServices
+import Foundation
 import SafariServices
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResponse, Error>) -> Void
@@ -37,7 +37,6 @@ protocol BaseContainer {
     )
 }
 
-
 struct AuthorizeOptions {
     let redirectURI: String
     let state: String?
@@ -46,7 +45,6 @@ struct AuthorizeOptions {
     let uiLocales: [String]?
 
     var urlScheme: String {
-
         if let index = redirectURI.firstIndex(of: ":") {
             return String(redirectURI[..<index])
         }
@@ -69,7 +67,6 @@ struct AuthorizeOptions {
 }
 
 public struct UserInfo: Decodable {
-
     enum CodingKeys: String, CodingKey {
         case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
         case isVerified = "https://authgear.com/claims/user/is_verified"
@@ -88,7 +85,7 @@ public struct AuthorizeResponse {
     public let state: String?
 }
 
-public protocol AuthContainerDelegate: class {
+public protocol AuthContainerDelegate: AnyObject {
     func onRefreshTokenExpired()
 }
 
@@ -112,31 +109,32 @@ public class AuthContainer: NSObject, BaseContainer {
 
     public init(name: String? = nil) {
         self.name = name ?? "default"
-        self.apiClient = DefaultAuthAPIClient()
-        self.storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
-        self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
+        apiClient = DefaultAuthAPIClient()
+        storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+        workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
 
     public func configure(clientId: String, endpoint: String) {
-        self.configure(clientId: clientId, endpoint: endpoint, handler: nil)
+        configure(clientId: clientId, endpoint: endpoint, handler: nil)
     }
 
     public func configure(
         clientId: String,
         endpoint: String,
-        handler: VoidCompletionHandler? = nil) {
+        handler: VoidCompletionHandler? = nil
+    ) {
         self.clientId = clientId
-        self.apiClient.endpoint = URL(string: endpoint)
+        apiClient.endpoint = URL(string: endpoint)
 
-        self.refreshToken = try? self.storage.getRefreshToken(namespace: self.name)
+        refreshToken = try? storage.getRefreshToken(namespace: name)
 
-        if self.shouldRefreshAccessToken() {
-            self.refreshAccessToken(handler: handler)
+        if shouldRefreshAccessToken() {
+            refreshAccessToken(handler: handler)
         }
     }
 
     private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier) throws -> URL {
-        let configuration = try self.apiClient.syncFetchOIDCConfiguration()
+        let configuration = try apiClient.syncFetchOIDCConfiguration()
         var queryItems = [URLQueryItem]()
 
         queryItems.append(contentsOf: [
@@ -146,14 +144,13 @@ public class AuthContainer: NSObject, BaseContainer {
                 value: "openid offline_access https://authgear.com/scopes/full-access"
             ),
             URLQueryItem(name: "code_challenge_method", value: "S256"),
-            URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge()),
+            URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
         ])
 
-        queryItems.append(URLQueryItem(name: "client_id", value: self.clientId))
+        queryItems.append(URLQueryItem(name: "client_id", value: clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
 
         if let state = options.state {
-
             queryItems.append(URLQueryItem(name: "state", value: state))
         }
 
@@ -173,8 +170,8 @@ public class AuthContainer: NSObject, BaseContainer {
         }
 
         var urlComponents = URLComponents(
-           url: configuration.authorizationEndpoint,
-           resolvingAgainstBaseURL: false
+            url: configuration.authorizationEndpoint,
+            resolvingAgainstBaseURL: false
         )!
 
         urlComponents.queryItems = queryItems
@@ -182,28 +179,30 @@ public class AuthContainer: NSObject, BaseContainer {
         return urlComponents.url!
     }
 
-    private func authorize(_ options: AuthorizeOptions,
-                          handler: @escaping AuthorizeCompletionHandler) {
+    private func authorize(
+        _ options: AuthorizeOptions,
+        handler: @escaping AuthorizeCompletionHandler
+    ) {
         let verifier = CodeVerifier()
         do {
-            let url = try self.authorizeEndpoint(options, verifier: verifier)
+            let url = try authorizeEndpoint(options, verifier: verifier)
             DispatchQueue.main.async {
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: options.urlScheme,
                     completionHandler: { [weak self] result in
                         switch result {
-                        case .success(let url):
+                        case let .success(url):
                             self?.workerQueue.async {
                                 self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
                             }
-                        case .failure(let error):
+                        case let .failure(error):
                             switch error {
                             case .canceledLogin:
                                 return handler(
                                     .failure(AuthgearError.canceledLogin)
                                 )
-                            case .sessionError(let error):
+                            case let .sessionError(error):
                                 return handler(
                                     .failure(AuthgearError.unexpectedError(error))
                                 )
@@ -218,9 +217,11 @@ public class AuthContainer: NSObject, BaseContainer {
         }
     }
 
-    private func finishAuthorization(url: URL,
-                                     verifier: CodeVerifier,
-                                     handler: @escaping AuthorizeCompletionHandler) {
+    private func finishAuthorization(
+        url: URL,
+        verifier: CodeVerifier,
+        handler: @escaping AuthorizeCompletionHandler
+    ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
         let params = urlComponents.queryParams
         let state = params["state"]
@@ -238,7 +239,8 @@ public class AuthContainer: NSObject, BaseContainer {
             return handler(
                 .failure(AuthgearError.oauthError(
                     error: "invalid_request",
-                    description: "Missing parameter: code")
+                    description: "Missing parameter: code"
+                )
                 )
             )
         }
@@ -250,11 +252,10 @@ public class AuthContainer: NSObject, BaseContainer {
             return urlComponents.url!.absoluteString
         }()
 
-
         do {
-            let tokenResponse = try self.apiClient.syncRequestOIDCToken(
+            let tokenResponse = try apiClient.syncRequestOIDCToken(
                 grantType: GrantType.authorizationCode,
-                clientId: self.clientId,
+                clientId: clientId,
                 redirectURI: redirectURI,
                 code: code,
                 codeVerifier: verifier.value,
@@ -262,35 +263,33 @@ public class AuthContainer: NSObject, BaseContainer {
                 jwt: nil
             )
 
-            let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
-            try self.persistTokenResponse(tokenResponse)
+            let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
+            try persistTokenResponse(tokenResponse)
 
             handler(.success(AuthorizeResponse(userInfo: userInfo, state: state)))
         } catch {
             handler(.failure(error))
         }
-
     }
 
     private func persistTokenResponse(
         _ tokenResponse: TokenResponse
     ) throws {
-        self.accessToken = tokenResponse.accessToken
-        self.refreshToken = tokenResponse.refreshToken
-        self.expireAt = Date(timeIntervalSinceNow: TimeInterval(tokenResponse.expiresIn))
+        accessToken = tokenResponse.accessToken
+        refreshToken = tokenResponse.refreshToken
+        expireAt = Date(timeIntervalSinceNow: TimeInterval(tokenResponse.expiresIn))
 
         if let refreshToekn = tokenResponse.refreshToken {
-            try self.storage.setRefreshToken(namespace: self.name, token: refreshToekn)
+            try storage.setRefreshToken(namespace: name, token: refreshToekn)
         }
     }
 
     private func cleanupSession() throws {
-        try self.storage.delRefreshToken(namespace: self.name)
-        try self.storage.delAnonymousKeyId(namespace: self.name)
-        self.accessToken = nil
-        self.refreshToken = nil
-        self.expireAt = nil
-
+        try storage.delRefreshToken(namespace: name)
+        try storage.delAnonymousKeyId(namespace: name)
+        accessToken = nil
+        refreshToken = nil
+        expireAt = nil
     }
 
     private func withMainQueueHandler<ResultType, ErrorType: Error>(
@@ -311,7 +310,7 @@ public class AuthContainer: NSObject, BaseContainer {
         uiLocales: [String]? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        self.workerQueue.async {
+        workerQueue.async {
             self.authorize(
                 AuthorizeOptions(
                     redirectURI: redirectURI,
@@ -328,8 +327,8 @@ public class AuthContainer: NSObject, BaseContainer {
     public func authenticateAnonymously(
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        let handler = self.withMainQueueHandler(handler)
-        self.workerQueue.async {
+        let handler = withMainQueueHandler(handler)
+        workerQueue.async {
             do {
                 let token = try self.apiClient.syncRequestOAuthChallenge(purpose: "anonymous_request").token
                 let keyId = try self.storage.getAnonymousKeyId(namespace: self.name) ?? UUID().uuidString
@@ -379,8 +378,8 @@ public class AuthContainer: NSObject, BaseContainer {
         uiLocales: [String]? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        let handler = self.withMainQueueHandler(handler)
-        self.workerQueue.async {
+        let handler = withMainQueueHandler(handler)
+        workerQueue.async {
             do {
                 guard let keyId = try self.storage.getAnonymousKeyId(namespace: self.name) else {
                     return handler(.failure(AuthgearError.anonymousUserNotFound))
@@ -417,11 +416,11 @@ public class AuthContainer: NSObject, BaseContainer {
                     guard let this = self else { return }
 
                     switch result {
-                    case .success(let response):
+                    case let .success(response):
                         try? this.storage.delAnonymousKeyId(namespace: this.name)
                         handler(.success(response
-                            ))
-                    case .failure(let error):
+                        ))
+                    case let .failure(error):
                         handler(.failure(error))
                     }
                 }
@@ -436,8 +435,8 @@ public class AuthContainer: NSObject, BaseContainer {
         redirectURI: String? = nil,
         handler: @escaping (Result<Void, Error>) -> Void
     ) {
-        let handler = self.withMainQueueHandler(handler)
-        self.workerQueue.async {
+        let handler = withMainQueueHandler(handler)
+        workerQueue.async {
             do {
                 let token = try self.storage.getRefreshToken(
                     namespace: self.name
@@ -456,26 +455,25 @@ public class AuthContainer: NSObject, BaseContainer {
 
 extension AuthContainer: AuthAPIClientDelegate {
     func getAccessToken() -> String? {
-        return self.accessToken
+        accessToken
     }
 
     func shouldRefreshAccessToken() -> Bool {
-        if self.refreshToken == nil {
+        if refreshToken == nil {
             return false
         }
 
         guard accessToken != nil,
             let expireAt = self.expireAt,
-            expireAt.timeIntervalSinceNow.sign == .minus  else {
-                return true
+            expireAt.timeIntervalSinceNow.sign == .minus else {
+            return true
         }
 
         return false
     }
 
     func refreshAccessToken(handler: VoidCompletionHandler?) {
-        self.workerQueue.async {
-
+        workerQueue.async {
             do {
                 guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
                     try self.cleanupSession()
@@ -496,8 +494,8 @@ extension AuthContainer: AuthAPIClientDelegate {
                 try self.persistTokenResponse(tokenResponse)
             } catch {
                 if let error = error as? AuthAPIClientError,
-                   case let .oidcError(oidcError) = error,
-                   oidcError.error == "invalid_grant"  {
+                    case let .oidcError(oidcError) = error,
+                    oidcError.error == "invalid_grant" {
                     self.delegate?.onRefreshTokenExpired()
                     try? self.cleanupSession()
                     handler?(.success(()))

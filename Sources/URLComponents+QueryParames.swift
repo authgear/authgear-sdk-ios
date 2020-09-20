@@ -14,7 +14,7 @@ extension URLComponents {
             return [:]
         }
         set {
-            self.queryItems = newValue.map { URLQueryItem(name: $0.key, value: $0.value)}
+            queryItems = newValue.map { URLQueryItem(name: $0.key, value: $0.value) }
         }
     }
 }

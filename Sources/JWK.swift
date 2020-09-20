@@ -16,7 +16,6 @@ struct JWK: Encodable {
 }
 
 struct JWKStore {
-
     func loadKey(keyId: String, tag: String) throws -> JWK? {
         if let privateKey = try loadPrivateKey(tag: tag) {
             if let publicKey = SecKeyCopyPublicKey(privateKey) {
@@ -33,10 +32,10 @@ struct JWKStore {
             kSecClass as String: kSecClassKey,
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
             kSecAttrKeyClass as String: kSecAttrKeyClassPrivate,
-            kSecAttrKeySizeInBits as String : 2048,
+            kSecAttrKeySizeInBits as String: 2048,
             kSecAttrIsPermanent as String: kCFBooleanTrue as Any,
             kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
-            kSecReturnRef as String: kCFBooleanTrue as Any,
+            kSecReturnRef as String: kCFBooleanTrue as Any
         ]
 
         var item: CFTypeRef?
@@ -55,14 +54,14 @@ struct JWKStore {
 
     private func publicKeyToJWK(keyId: String, publicKey: SecKey) throws -> JWK {
         var error: Unmanaged<CFError>?
-        guard let keyData = SecKeyCopyExternalRepresentation(publicKey, &error) else{
+        guard let keyData = SecKeyCopyExternalRepresentation(publicKey, &error) else {
             throw JWKError.keyError(error!.takeRetainedValue() as Error)
         }
         let data = keyData as Data
 
-        let n = data.subdata(in: Range(NSRange.init(location: data.count > 269 ? 9 : 8, length: 256))!)
-        let e = data.subdata(in: Range(NSRange.init(location: data.count - 3, length: 3))!)
-        
+        let n = data.subdata(in: Range(NSRange(location: data.count > 269 ? 9 : 8, length: 256))!)
+        let e = data.subdata(in: Range(NSRange(location: data.count - 3, length: 3))!)
+
         return JWK(
             kid: keyId,
             n: n.base64urlEncodedString(),
@@ -74,7 +73,7 @@ struct JWKStore {
         var publicKeySec, privateKeySec: SecKey?
         let keyattribute = [
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-            kSecAttrKeySizeInBits as String : 2048,
+            kSecAttrKeySizeInBits as String: 2048,
             kSecAttrIsPermanent as String: kCFBooleanTrue as Any,
             kSecAttrApplicationTag as String: tag.data(using: .utf8)!
         ] as CFDictionary
