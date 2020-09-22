@@ -18,7 +18,7 @@ pod 'Authgear', '~> 0.0.1'
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Peter-ChengTszTung/authgear-sdk-ios-draft.git")
+    .package(url: "https://github.com/authgear/authgear-sdk-ios.git")
 ]
 ```
 
