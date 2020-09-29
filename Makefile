@@ -8,7 +8,7 @@ lint:
 
 .PHONY: build
 build:
-	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme Authgear-iOS build
+	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme Authgear-iOS -sdk iphonesimulator12.4 build
 
 .PHONY: test
 test:
