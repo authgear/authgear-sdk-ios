@@ -78,7 +78,7 @@ public class Authgear: NSObject {
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
 
-    private var accessToken: String?
+    public private(set) var accessToken: String?
     private var refreshToken: String?
     private var expireAt: Date?
 
