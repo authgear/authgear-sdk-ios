@@ -6,37 +6,6 @@ public typealias AuthorizeCompletionHandler = (Result<AuthorizeResponse, Error>)
 public typealias VoidCompletionHandler = (Result<Void, Error>
 ) -> Void
 
-protocol BaseContainer {
-    var name: String { get }
-    var clientId: String! { get set }
-    var apiClient: AuthAPIClient { get }
-    var storage: ContainerStorage { get }
-
-    func configure(clientId: String, endpoint: String)
-    func authorize(
-        redirectURI: String,
-        state: String?,
-        prompt: String?,
-        loginHint: String?,
-        uiLocales: [String]?,
-        handler: @escaping AuthorizeCompletionHandler
-    )
-    func authenticateAnonymously(
-        handler: @escaping AuthorizeCompletionHandler
-    )
-    func promoteAnonymousUser(
-        redirectURI: String,
-        state: String?,
-        uiLocales: [String]?,
-        handler: @escaping AuthorizeCompletionHandler
-    )
-    func logout(
-        force: Bool,
-        redirectURI: String?,
-        handler: @escaping (Result<Void, Error>) -> Void
-    )
-}
-
 struct AuthorizeOptions {
     let redirectURI: String
     let state: String?
@@ -89,7 +58,7 @@ public protocol AuthContainerDelegate: AnyObject {
     func onRefreshTokenExpired()
 }
 
-public class AuthContainer: NSObject, BaseContainer {
+public class AuthContainer: NSObject {
     let name: String
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
