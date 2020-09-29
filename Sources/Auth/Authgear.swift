@@ -3,8 +3,7 @@ import Foundation
 import SafariServices
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResponse, Error>) -> Void
-public typealias VoidCompletionHandler = (Result<Void, Error>
-) -> Void
+public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
 struct AuthorizeOptions {
     let redirectURI: String
@@ -54,6 +53,11 @@ public struct AuthorizeResponse {
     public let state: String?
 }
 
+public enum AuthgearPage: String {
+    case settings = "/settings"
+    case identity = "/settings/identities"
+}
+
 public protocol AuthgearDelegate: AnyObject {
     func onRefreshTokenExpired()
 }
@@ -79,8 +83,7 @@ public class Authgear: NSObject {
     public init(clientId: String, endpoint: String, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
-        apiClient = DefaultAuthAPIClient()
-        apiClient.endpoint = URL(string: endpoint)
+        apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
@@ -416,6 +419,36 @@ public class Authgear: NSObject {
                 handler(.failure(error))
             }
         }
+    }
+
+    public func openUrl(
+        path: String,
+        handler: VoidCompletionHandler? = nil
+    ) {
+        let url = apiClient.endpoint.appendingPathComponent(path)
+        DispatchQueue.main.async {
+            self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
+                url: url,
+                callbackURLSchema: "",
+                completionHandler: { [weak self] result in
+                    switch result {
+                    case .success:
+                        self?.workerQueue.async {
+                            handler?(.success(()))
+                        }
+                    case let .failure(error):
+                        self?.workerQueue.async {
+                            handler?(.failure(AuthgearError.unexpectedError(error)))
+                        }
+                    }
+                }
+            )
+            self.authenticationSession?.start()
+        }
+    }
+
+    public func open(page: AuthgearPage) {
+        openUrl(path: page.rawValue)
     }
 }
 
