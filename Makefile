@@ -1,3 +1,6 @@
+BUILD_SDK="iphonesimulator13.2"
+TEST_DESTINATION="platform=iOS Simulator,name=iPhone SE,OS=12.4"
+
 .PHONY: format
 format:
 	swiftformat .
@@ -8,8 +11,8 @@ lint:
 
 .PHONY: build
 build:
-	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme Authgear-iOS -sdk iphonesimulator12.4 build
+	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme Authgear-iOS -sdk ${BUILD_SDK} build
 
 .PHONY: test
 test:
-	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme Authgear-iOS -destination 'platform=iOS Simulator,name=iPhone SE,OS=12.4' test
+	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme Authgear-iOS -destination ${TEST_DESTINATION} test
