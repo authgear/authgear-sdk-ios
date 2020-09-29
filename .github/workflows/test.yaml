@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - '*'
+    - '!gh-pages'
+  pull_request:
+    branches:
+    - '*'
+    - '!gh-pages'
+
+jobs:
+  test:
+    runs-on: macos-10.15
+    steps:
+    - uses: actions/checkout@v2
+    - run: brew install swiftformat
+    - run: make lint
+    - run: make build
+    - run: make test
