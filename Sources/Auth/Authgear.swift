@@ -22,10 +22,10 @@ struct AuthorizeOptions {
 
     public init(
         redirectURI: String,
-        state: String? = nil,
-        prompt: String? = nil,
-        loginHint: String? = nil,
-        uiLocales: [String]? = nil
+        state: String?,
+        prompt: String?,
+        loginHint: String?,
+        uiLocales: [String]?
     ) {
         self.redirectURI = redirectURI
         self.state = state
@@ -271,7 +271,7 @@ public class Authgear: NSObject {
     public func authorize(
         redirectURI: String,
         state: String? = nil,
-        prompt: String? = nil,
+        prompt: String? = "login",
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
         handler: @escaping AuthorizeCompletionHandler
