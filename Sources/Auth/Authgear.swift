@@ -53,6 +53,12 @@ public struct AuthorizeResponse {
     public let state: String?
 }
 
+public enum SessionState {
+    case loggedIn
+    case noSession
+    case unknown
+}
+
 public enum AuthgearPage: String {
     case settings = "/settings"
     case identity = "/settings/identities"
@@ -60,6 +66,7 @@ public enum AuthgearPage: String {
 
 public protocol AuthgearDelegate: AnyObject {
     func onRefreshTokenExpired()
+    func onSessionStateChanged()
 }
 
 public class Authgear: NSObject {
@@ -77,6 +84,8 @@ public class Authgear: NSObject {
 
     private let jwkStore = JWKStore()
     private let workerQueue: DispatchQueue
+
+    public private(set) var sessionState: SessionState = .unknown
 
     public weak var delegate: AuthgearDelegate?
 
@@ -96,9 +105,15 @@ public class Authgear: NSObject {
         refreshToken = try? storage.getRefreshToken(namespace: name)
 
         if shouldRefreshAccessToken() {
-            if !skipRefreshAccessToken {
+            if skipRefreshAccessToken {
+                sessionState = .loggedIn
+                delegate?.onSessionStateChanged()
+            } else {
                 refreshAccessToken(handler: handler)
             }
+        } else {
+            sessionState = .noSession
+            delegate?.onSessionStateChanged()
         }
     }
 
@@ -251,6 +266,9 @@ public class Authgear: NSObject {
         if let refreshToekn = tokenResponse.refreshToken {
             try storage.setRefreshToken(namespace: name, token: refreshToekn)
         }
+
+        sessionState = .loggedIn
+        delegate?.onSessionStateChanged()
     }
 
     private func cleanupSession() throws {
@@ -259,6 +277,9 @@ public class Authgear: NSObject {
         accessToken = nil
         refreshToken = nil
         expireAt = nil
+
+        sessionState = .noSession
+        delegate?.onSessionStateChanged()
     }
 
     private func withMainQueueHandler<ResultType, ErrorType: Error>(
