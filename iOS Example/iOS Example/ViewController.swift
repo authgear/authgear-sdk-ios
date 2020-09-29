@@ -2,12 +2,12 @@ import Authgear
 import UIKit
 
 class ViewController: UIViewController {
-    let container = Authgear()
+    let container = Authgear(clientId: "client_id", endpoint: "http://localhost:3000")
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        container.configure(clientId: "client_id", endpoint: "http://localhost:3000")
+        container.configure()
     }
 
     @IBAction func login(_ sender: Any) {
