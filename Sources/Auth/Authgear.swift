@@ -62,7 +62,7 @@ public class Authgear: NSObject {
     let name: String
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
-    var clientId: String!
+    let clientId: String
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -76,29 +76,26 @@ public class Authgear: NSObject {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(name: String? = nil) {
+    public init(clientId: String, endpoint: String, name: String? = nil) {
+        self.clientId = clientId
         self.name = name ?? "default"
         apiClient = DefaultAuthAPIClient()
+        apiClient.endpoint = URL(string: endpoint)
+
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
 
-    public func configure(clientId: String, endpoint: String) {
-        configure(clientId: clientId, endpoint: endpoint, handler: nil)
-    }
-
     public func configure(
-        clientId: String,
-        endpoint: String,
+        skipRefreshAccessToken: Bool = false,
         handler: VoidCompletionHandler? = nil
     ) {
-        self.clientId = clientId
-        apiClient.endpoint = URL(string: endpoint)
-
         refreshToken = try? storage.getRefreshToken(namespace: name)
 
         if shouldRefreshAccessToken() {
-            refreshAccessToken(handler: handler)
+            if !skipRefreshAccessToken {
+                refreshAccessToken(handler: handler)
+            }
         }
     }
 
