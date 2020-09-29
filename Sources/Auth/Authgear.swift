@@ -66,7 +66,7 @@ public enum AuthgearPage: String {
 
 public protocol AuthgearDelegate: AnyObject {
     func onRefreshTokenExpired()
-    func onSessionStateChanged()
+    func onSessionStateChanged(newState: SessionState)
 }
 
 public class Authgear: NSObject {
@@ -107,13 +107,13 @@ public class Authgear: NSObject {
         if shouldRefreshAccessToken() {
             if skipRefreshAccessToken {
                 sessionState = .loggedIn
-                delegate?.onSessionStateChanged()
+                delegate?.onSessionStateChanged(newState: sessionState)
             } else {
                 refreshAccessToken(handler: handler)
             }
         } else {
             sessionState = .noSession
-            delegate?.onSessionStateChanged()
+            delegate?.onSessionStateChanged(newState: sessionState)
         }
     }
 
@@ -268,7 +268,7 @@ public class Authgear: NSObject {
         }
 
         sessionState = .loggedIn
-        delegate?.onSessionStateChanged()
+        delegate?.onSessionStateChanged(newState: sessionState)
     }
 
     private func cleanupSession() throws {
@@ -279,7 +279,7 @@ public class Authgear: NSObject {
         expireAt = nil
 
         sessionState = .noSession
-        delegate?.onSessionStateChanged()
+        delegate?.onSessionStateChanged(newState: sessionState)
     }
 
     private func withMainQueueHandler<ResultType, ErrorType: Error>(
