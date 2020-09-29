@@ -2,7 +2,7 @@ import Authgear
 import UIKit
 
 class ViewController: UIViewController {
-    let container = AuthContainer()
+    let container = Authgear()
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -54,11 +54,11 @@ public struct AuthorizeResponse {
     public let state: String?
 }
 
-public protocol AuthContainerDelegate: AnyObject {
+public protocol AuthgearDelegate: AnyObject {
     func onRefreshTokenExpired()
 }
 
-public class AuthContainer: NSObject {
+public class Authgear: NSObject {
     let name: String
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
@@ -74,7 +74,7 @@ public class AuthContainer: NSObject {
     private let jwkStore = JWKStore()
     private let workerQueue: DispatchQueue
 
-    public weak var delegate: AuthContainerDelegate?
+    public weak var delegate: AuthgearDelegate?
 
     public init(name: String? = nil) {
         self.name = name ?? "default"
@@ -422,7 +422,7 @@ public class AuthContainer: NSObject {
     }
 }
 
-extension AuthContainer: AuthAPIClientDelegate {
+extension Authgear: AuthAPIClientDelegate {
     func getAccessToken() -> String? {
         accessToken
     }
