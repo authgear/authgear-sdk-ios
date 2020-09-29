@@ -17,14 +17,6 @@ jobs:
     - uses: actions/checkout@v2
     - run: brew install swiftformat
     - run: sudo xcode-select -s /Applications/Xcode_11.app/Contents/Developer
-    - name: Prepare iOS 11 simulator
-      # https://github.com/actions/virtual-environments/issues/551#issuecomment-637344435
-      run: |
-        sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
-        sudo ln -s "/Applications/Xcode_11.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime" "/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 11.4.simruntime"
-        xcrun simctl list runtimes
-        xcrun simctl create custom-test-device "iPhone SE" "com.apple.CoreSimulator.SimRuntime.iOS-11-4"
-        xcrun simctl list devices 11.4
     - run: make lint
     - run: make build BUILD_SDK='"iphonesimulator13.0"'
-    - run: make test TEST_DESTINATION='"platform=iOS Simulator,name=iPhone SE,OS=11.4"'
+    - run: make test TEST_DESTINATION='"platform=iOS Simulator,name=iPhone 11,OS=13.0"'
