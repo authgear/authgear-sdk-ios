@@ -21,7 +21,7 @@ jobs:
       # https://github.com/actions/virtual-environments/issues/551#issuecomment-637344435
       run: |
         sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
-        sudo ln -s "/Applications/Xcode_11.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime" "/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 11.4.simruntime"
+        sudo ln -s "/Applications/Xcode_11.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime" "/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 11.4.simruntime"
         xcrun simctl list runtimes
         xcrun simctl create custom-test-device "iPhone SE" "com.apple.CoreSimulator.SimRuntime.iOS-11-4"
         xcrun simctl list devices 11.4
