@@ -16,6 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: brew install swiftformat
+    - run: sudo xcode-select -s /Applications/Xcode_10.3.app/Contents/Developer
     - run: make lint
     - run: make build
     - run: make test
