@@ -3,6 +3,7 @@ import Foundation
 import SafariServices
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResponse, Error>) -> Void
+public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
 struct AuthorizeOptions {
@@ -543,6 +544,24 @@ public class Authgear: NSObject {
                 }
                 handler?(.failure(error))
             }
+        }
+    }
+
+    public func fetchUserInfo(handler: @escaping UserInfoCompletionHandler) {
+        let handler = withMainQueueHandler(handler)
+        let fetchUserInfo = { (accessToken: String) in
+            self.workerQueue.async {
+                let result = Result { try self.apiClient.syncRequestOIDCUserInfo(accessToken: accessToken) }
+                handler(result)
+            }
+        }
+
+        if shouldRefreshAccessToken() {
+            refreshAccessToken { _ in
+                fetchUserInfo(self.accessToken ?? "")
+            }
+        } else {
+            fetchUserInfo(accessToken ?? "")
         }
     }
 }
