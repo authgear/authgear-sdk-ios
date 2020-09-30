@@ -2,14 +2,21 @@ import Authgear
 import UIKit
 
 class ViewController: UIViewController {
+    private static let ClientId = "client_id"
+    private static let Endpoint = "http://localhost:3000"
     let container = AuthContainer()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        container.configure(clientId: "client_id", endpoint: "http://localhost:3000")
+        container.configure(clientId: ViewController.ClientId, endpoint: ViewController.Endpoint)
+        clientId.text = ViewController.ClientId
+        endpoint.text = ViewController.Endpoint
     }
 
+    @IBOutlet weak var clientId: UILabel!
+    @IBOutlet weak var endpoint: UILabel!
+    
     @IBAction func login(_ sender: Any) {
         container.authorize(
             redirectURI: "self.test.myApp://host/path",
