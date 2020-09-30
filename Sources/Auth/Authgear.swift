@@ -102,19 +102,31 @@ public class Authgear: NSObject {
         skipRefreshAccessToken: Bool = false,
         handler: VoidCompletionHandler? = nil
     ) {
-        refreshToken = try? storage.getRefreshToken(namespace: name)
+        workerQueue.async {
+            let refreshToken = Result { try self.storage.getRefreshToken(namespace: self.name) }
+            switch refreshToken {
+            case let .success(token):
+                if self.shouldRefreshAccessToken() && !skipRefreshAccessToken {
+                    return self.refreshAccessToken(handler: handler)
+                }
 
-        if shouldRefreshAccessToken() {
-            if skipRefreshAccessToken {
-                sessionState = .loggedIn
-                delegate?.onSessionStateChanged(newState: sessionState)
-            } else {
-                refreshAccessToken(handler: handler)
+                DispatchQueue.main.async {
+                    self.refreshToken = token
+                    self.setSessionState(token == nil ? .noSession : .loggedIn)
+                    handler?(.success(()))
+                }
+
+            case let .failure(error):
+                DispatchQueue.main.async {
+                    handler?(.failure(error))
+                }
             }
-        } else {
-            sessionState = .noSession
-            delegate?.onSessionStateChanged(newState: sessionState)
         }
+    }
+
+    private func setSessionState(_ newState: SessionState) {
+        sessionState = newState
+        delegate?.onSessionStateChanged(newState: newState)
     }
 
     private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier) throws -> URL {
@@ -168,9 +180,11 @@ public class Authgear: NSObject {
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let verifier = CodeVerifier()
-        do {
-            let url = try authorizeEndpoint(options, verifier: verifier)
-            DispatchQueue.main.async {
+        let url = Result { try authorizeEndpoint(options, verifier: verifier) }
+
+        DispatchQueue.main.async {
+            switch url {
+            case let .success(url):
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: options.urlScheme,
@@ -183,21 +197,17 @@ public class Authgear: NSObject {
                         case let .failure(error):
                             switch error {
                             case .canceledLogin:
-                                return handler(
-                                    .failure(AuthgearError.canceledLogin)
-                                )
+                                return handler(.failure(AuthgearError.canceledLogin))
                             case let .sessionError(error):
-                                return handler(
-                                    .failure(AuthgearError.unexpectedError(error))
-                                )
+                                return handler(.failure(AuthgearError.unexpectedError(error)))
                             }
                         }
                     }
                 )
                 self.authenticationSession?.start()
+            case let .failure(error):
+                handler(.failure(error))
             }
-        } catch {
-            handler(.failure(error))
         }
     }
 
@@ -224,8 +234,7 @@ public class Authgear: NSObject {
                 .failure(AuthgearError.oauthError(
                     error: "invalid_request",
                     description: "Missing parameter: code"
-                )
-                )
+                ))
             )
         }
         let redirectURI = { () -> String in
@@ -248,38 +257,52 @@ public class Authgear: NSObject {
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
-            try persistTokenResponse(tokenResponse)
 
-            handler(.success(AuthorizeResponse(userInfo: userInfo, state: state)))
+            let result = persistSession(tokenResponse)
+                .map { AuthorizeResponse(userInfo: userInfo, state: state) }
+            return handler(result)
+
         } catch {
-            handler(.failure(error))
+            return handler(.failure(error))
         }
     }
 
-    private func persistTokenResponse(
-        _ tokenResponse: TokenResponse
-    ) throws {
-        accessToken = tokenResponse.accessToken
-        refreshToken = tokenResponse.refreshToken
-        expireAt = Date(timeIntervalSinceNow: TimeInterval(tokenResponse.expiresIn))
-
-        if let refreshToekn = tokenResponse.refreshToken {
-            try storage.setRefreshToken(namespace: name, token: refreshToekn)
+    private func persistSession(_ tokenResponse: TokenResponse) -> Result<Void, Error> {
+        if let refreshToken = tokenResponse.refreshToken {
+            let result = Result { try self.storage.setRefreshToken(namespace: self.name, token: refreshToken) }
+            guard case .success = result else {
+                return result
+            }
         }
 
-        sessionState = .loggedIn
-        delegate?.onSessionStateChanged(newState: sessionState)
+        DispatchQueue.main.async {
+            self.accessToken = tokenResponse.accessToken
+            self.refreshToken = tokenResponse.refreshToken
+            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(tokenResponse.expiresIn))
+            self.setSessionState(.loggedIn)
+        }
+        return .success(())
     }
 
-    private func cleanupSession() throws {
-        try storage.delRefreshToken(namespace: name)
-        try storage.delAnonymousKeyId(namespace: name)
-        accessToken = nil
-        refreshToken = nil
-        expireAt = nil
+    private func cleanupSession(force: Bool) -> Result<Void, Error> {
+        if case let .failure(error) = Result(catching: { try storage.delRefreshToken(namespace: name) }) {
+            if !force {
+                return .failure(error)
+            }
+        }
+        if case let .failure(error) = Result(catching: { try storage.delAnonymousKeyId(namespace: name) }) {
+            if !force {
+                return .failure(error)
+            }
+        }
 
-        sessionState = .noSession
-        delegate?.onSessionStateChanged(newState: sessionState)
+        DispatchQueue.main.async {
+            self.accessToken = nil
+            self.refreshToken = nil
+            self.expireAt = nil
+            self.setSessionState(.noSession)
+        }
+        return .success(())
     }
 
     private func withMainQueueHandler<ResultType, ErrorType: Error>(
@@ -352,10 +375,11 @@ public class Authgear: NSObject {
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
 
-                try self.persistTokenResponse(tokenResponse)
-                try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId)
+                let result = self.persistSession(tokenResponse)
+                    .flatMap { Result { try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId) } }
+                    .map { AuthorizeResponse(userInfo: userInfo, state: nil) }
+                handler(result)
 
-                handler(.success(AuthorizeResponse(userInfo: userInfo, state: nil)))
             } catch {
                 handler(.failure(error))
             }
@@ -397,19 +421,22 @@ public class Authgear: NSObject {
                 let loginHint = "https://authgear.com/login_hint?type=anonymous&jwt=\(signedJWT.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
 
                 self.authorize(
-                    redirectURI: redirectURI,
-                    state: state,
-                    prompt: "login",
-                    loginHint: loginHint,
-                    uiLocales: uiLocales
+                    AuthorizeOptions(
+                        redirectURI: redirectURI,
+                        state: state,
+                        prompt: "login",
+                        loginHint: loginHint,
+                        uiLocales: uiLocales
+                    )
                 ) { [weak self] result in
                     guard let this = self else { return }
 
                     switch result {
                     case let .success(response):
-                        try? this.storage.delAnonymousKeyId(namespace: this.name)
-                        handler(.success(response
-                        ))
+                        this.workerQueue.async {
+                            let result = Result { try this.storage.delAnonymousKeyId(namespace: this.name) }
+                            handler(result.map { response })
+                        }
                     case let .failure(error):
                         handler(.failure(error))
                     }
@@ -434,10 +461,13 @@ public class Authgear: NSObject {
                 try self.apiClient.syncRequestOIDCRevocation(
                     refreshToken: token ?? ""
                 )
-                try self.cleanupSession()
-                handler(.success(()))
+                return handler(self.cleanupSession(force: force))
+
             } catch {
-                handler(.failure(error))
+                if force {
+                    return handler(self.cleanupSession(force: true))
+                }
+                return handler(.failure(error))
             }
         }
     }
@@ -446,39 +476,28 @@ public class Authgear: NSObject {
         path: String,
         handler: VoidCompletionHandler? = nil
     ) {
+        let handler = handler.map { h in withMainQueueHandler(h) }
         let url = apiClient.endpoint.appendingPathComponent(path)
-        DispatchQueue.main.async {
-            self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
-                url: url,
-                callbackURLSchema: "",
-                completionHandler: { [weak self] result in
-                    switch result {
-                    case .success:
-                        self?.workerQueue.async {
-                            handler?(.success(()))
-                        }
-                    case let .failure(error):
-                        self?.workerQueue.async {
-                            handler?(.failure(AuthgearError.unexpectedError(error)))
-                        }
-                    }
+        authenticationSession = authenticationSessionProvider.makeAuthenticationSession(
+            url: url,
+            callbackURLSchema: "",
+            completionHandler: { result in
+                switch result {
+                case .success:
+                    handler?(.success(()))
+                case let .failure(error):
+                    handler?(.failure(AuthgearError.unexpectedError(error)))
                 }
-            )
-            self.authenticationSession?.start()
-        }
+            }
+        )
+        authenticationSession?.start()
     }
 
     public func open(page: AuthgearPage) {
         openUrl(path: page.rawValue)
     }
-}
 
-extension Authgear: AuthAPIClientDelegate {
-    func getAccessToken() -> String? {
-        accessToken
-    }
-
-    func shouldRefreshAccessToken() -> Bool {
+    public func shouldRefreshAccessToken() -> Bool {
         if refreshToken == nil {
             return false
         }
@@ -492,12 +511,12 @@ extension Authgear: AuthAPIClientDelegate {
         return false
     }
 
-    func refreshAccessToken(handler: VoidCompletionHandler?) {
+    public func refreshAccessToken(handler: VoidCompletionHandler? = nil) {
+        let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
             do {
                 guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
-                    try self.cleanupSession()
-                    handler?(.success(()))
+                    handler?(self.cleanupSession(force: true))
                     return
                 }
 
@@ -511,18 +530,25 @@ extension Authgear: AuthAPIClientDelegate {
                     jwt: nil
                 )
 
-                try self.persistTokenResponse(tokenResponse)
+                handler?(self.persistSession(tokenResponse))
             } catch {
                 if let error = error as? AuthAPIClientError,
                     case let .oidcError(oidcError) = error,
                     oidcError.error == "invalid_grant" {
-                    self.delegate?.onRefreshTokenExpired()
-                    try? self.cleanupSession()
-                    handler?(.success(()))
-                    return
+                    return DispatchQueue.main.async {
+                        self.setSessionState(.noSession)
+                        self.delegate?.onRefreshTokenExpired()
+                        handler?(self.cleanupSession(force: true))
+                    }
                 }
                 handler?(.failure(error))
             }
         }
+    }
+}
+
+extension Authgear: AuthAPIClientDelegate {
+    func getAccessToken() -> String? {
+        accessToken
     }
 }
