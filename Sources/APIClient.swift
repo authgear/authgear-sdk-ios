@@ -4,7 +4,6 @@ public enum AuthAPIClientError: Error {
     case invalidResponse
     case dataTaskError(Error)
     case decodeError(Error)
-    case missingEndpoint
     case serverError(ServerError)
     case statusCode(Int, Data?)
     case oidcError(OIDCError)
@@ -90,7 +89,7 @@ struct ChallengeResponse: Decodable {
 }
 
 protocol AuthAPIClient: AnyObject {
-    var endpoint: URL? { get set }
+    var endpoint: URL { get }
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void)
     func requestOIDCToken(
         grantType: GrantType,
@@ -202,18 +201,19 @@ protocol AuthAPIClientDelegate: AnyObject {
 }
 
 class DefaultAuthAPIClient: AuthAPIClient {
-    public var endpoint: URL?
+    public let endpoint: URL
+
+    init(endpoint: URL) {
+        self.endpoint = endpoint
+    }
 
     private let defaultSession = URLSession(configuration: .default)
     private var oidcConfiguration: OIDCConfiguration?
 
     weak var delegate: AuthAPIClientDelegate?
 
-    private func buildFetchOIDCConfigurationRequest() -> URLRequest? {
-        guard let endpoint = self.endpoint else {
-            return nil
-        }
-        return URLRequest(url: endpoint.appendingPathComponent("/.well-known/openid-configuration"))
+    private func buildFetchOIDCConfigurationRequest() -> URLRequest {
+        URLRequest(url: endpoint.appendingPathComponent("/.well-known/openid-configuration"))
     }
 
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void) {
@@ -221,9 +221,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
             return handler(.success(configuration))
         }
 
-        guard let request = buildFetchOIDCConfigurationRequest() else {
-            return handler(.failure(AuthAPIClientError.missingEndpoint))
-        }
+        let request = buildFetchOIDCConfigurationRequest()
 
         fetch(request: request) { [weak self] (result: Result<OIDCConfiguration, Error>) in
             self?.oidcConfiguration = try? result.get()
@@ -427,10 +425,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
         purpose: String,
         handler: @escaping (Result<ChallengeResponse, Error>) -> Void
     ) {
-        guard let endpoint = self.endpoint else {
-            return handler(.failure(AuthAPIClientError.missingEndpoint))
-        }
-
         var urlRequest = URLRequest(url: endpoint.appendingPathComponent("/oauth2/challenge"))
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")

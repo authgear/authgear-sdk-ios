@@ -12,6 +12,7 @@ lint:
 .PHONY: build
 build:
 	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme Authgear-iOS -sdk ${BUILD_SDK} build
+	xcodebuild -quiet -workspace Authgear.xcworkspace -scheme 'iOS Example' -sdk ${BUILD_SDK} build
 
 .PHONY: test
 test:
