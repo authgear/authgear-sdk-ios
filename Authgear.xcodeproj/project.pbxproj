@@ -40,7 +40,7 @@
 		F83392EE24FC344D00A69D3C /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		F83392F024FDA87900A69D3C /* AuthgearError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthgearError.swift; sourceTree = "<group>"; };
 		F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLComponents+QueryParames.swift"; sourceTree = "<group>"; };
-		F83D84A724F64D0E00B4393C /* Authgear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Authgear.swift; path = Auth/Authgear.swift; sourceTree = "<group>"; };
+		F83D84A724F64D0E00B4393C /* Authgear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Authgear.swift; path = Authgear.swift; sourceTree = "<group>"; };
 		F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OIDCConfiguration.swift; sourceTree = "<group>"; };
 		F83D84AB24F66D3400B4393C /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		F83D84AD24F6A93600B4393C /* CodeVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeVerifier.swift; sourceTree = "<group>"; };
