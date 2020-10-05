@@ -66,8 +66,8 @@ public enum AuthgearPage: String {
 }
 
 public protocol AuthgearDelegate: AnyObject {
-    func onRefreshTokenExpired()
-    func onSessionStateChanged(newState: SessionState)
+    func authgearRefreshTokenDidExpire(_ container: Authgear)
+    func authgearSessionStateDidChange(_ container: Authgear)
 }
 
 public class Authgear: NSObject {
@@ -127,7 +127,7 @@ public class Authgear: NSObject {
 
     private func setSessionState(_ newState: SessionState) {
         sessionState = newState
-        delegate?.onSessionStateChanged(newState: newState)
+        delegate?.authgearSessionStateDidChange(self)
     }
 
     private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier) throws -> URL {
@@ -538,7 +538,7 @@ public class Authgear: NSObject {
                     oidcError.error == "invalid_grant" {
                     return DispatchQueue.main.async {
                         self.setSessionState(.noSession)
-                        self.delegate?.onRefreshTokenExpired()
+                        self.delegate?.authgearRefreshTokenDidExpire(self)
                         handler?(self.cleanupSession(force: true))
                     }
                 }
