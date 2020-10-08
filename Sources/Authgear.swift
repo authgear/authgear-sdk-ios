@@ -83,6 +83,20 @@ public protocol AuthgearDelegate: AnyObject {
 }
 
 public class Authgear: NSObject, SFSafariViewControllerDelegate {
+    /**
+     * To prevent user from using expired access token, we have to check in advance
+     * whether it had expired in `shouldRefreshAccessToken`. If we
+     * use the expiry time in `TokenResponse` directly to check for expiry, it is possible
+     * that the access token had passed the check but ends up being expired when it arrives at
+     * the server due to slow traffic or unfair scheduler.
+     *
+     * To compat this, we should consider the access token expired earlier than the expiry time
+     * calculated using `TokenResponse.expiresIn`. Current implementation uses
+     * ExpireInPercentage of TokenResponse.expiresIn` to calculate the expiry time.
+     * 
+     * @internal
+     */
+    private static let ExpireInPercentage = 0.9
     let name: String
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
@@ -335,7 +349,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         DispatchQueue.main.async {
             self.accessToken = oidcTokenResponse.accessToken
             self.refreshToken = oidcTokenResponse.refreshToken
-            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(oidcTokenResponse.expiresIn))
+            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(oidcTokenResponse.expiresIn * ExpireInPercentage))
             self.setSessionState(.loggedIn, reason: reason)
         }
         return .success(())
