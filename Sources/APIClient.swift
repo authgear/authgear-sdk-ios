@@ -281,7 +281,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
     func refreshAccessTokenIfNeeded(handler: @escaping (Result<Void, Error>) -> Void) {
         if let delegate = self.delegate,
-            delegate.shouldRefreshAccessToken() {
+           delegate.shouldRefreshAccessToken() {
             delegate.refreshAccessToken { result in
                 switch result {
                 case .success:
