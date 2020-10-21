@@ -247,7 +247,7 @@ public class Authgear: NSObject {
         }()
 
         do {
-            let tokenResponse = try apiClient.syncRequestOIDCToken(
+            let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
                 grantType: GrantType.authorizationCode,
                 clientId: clientId,
                 redirectURI: redirectURI,
@@ -257,9 +257,9 @@ public class Authgear: NSObject {
                 jwt: nil
             )
 
-            let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
+            let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
-            let result = persistSession(tokenResponse)
+            let result = persistSession(oidcTokenResponse)
                 .map { AuthorizeResponse(userInfo: userInfo, state: state) }
             return handler(result)
 
@@ -268,8 +268,8 @@ public class Authgear: NSObject {
         }
     }
 
-    private func persistSession(_ tokenResponse: TokenResponse) -> Result<Void, Error> {
-        if let refreshToken = tokenResponse.refreshToken {
+    private func persistSession(_ oidcTokenResponse: OIDCTokenResponse) -> Result<Void, Error> {
+        if let refreshToken = oidcTokenResponse.refreshToken {
             let result = Result { try self.storage.setRefreshToken(namespace: self.name, token: refreshToken) }
             guard case .success = result else {
                 return result
@@ -277,9 +277,9 @@ public class Authgear: NSObject {
         }
 
         DispatchQueue.main.async {
-            self.accessToken = tokenResponse.accessToken
-            self.refreshToken = tokenResponse.refreshToken
-            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(tokenResponse.expiresIn))
+            self.accessToken = oidcTokenResponse.accessToken
+            self.refreshToken = oidcTokenResponse.refreshToken
+            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(oidcTokenResponse.expiresIn))
             self.setSessionState(.loggedIn)
         }
         return .success(())
@@ -364,7 +364,7 @@ public class Authgear: NSObject {
 
                 let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
 
-                let tokenResponse = try self.apiClient.syncRequestOIDCToken(
+                let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                     grantType: .anonymous,
                     clientId: self.clientId,
                     redirectURI: nil,
@@ -374,9 +374,9 @@ public class Authgear: NSObject {
                     jwt: signedJWT
                 )
 
-                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: tokenResponse.accessToken)
+                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
-                let result = self.persistSession(tokenResponse)
+                let result = self.persistSession(oidcTokenResponse)
                     .flatMap { Result { try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId) } }
                     .map { AuthorizeResponse(userInfo: userInfo, state: nil) }
                 handler(result)
@@ -521,7 +521,7 @@ public class Authgear: NSObject {
                     return
                 }
 
-                let tokenResponse = try self.apiClient.syncRequestOIDCToken(
+                let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                     grantType: GrantType.refreshToken,
                     clientId: self.clientId,
                     redirectURI: nil,
@@ -531,7 +531,7 @@ public class Authgear: NSObject {
                     jwt: nil
                 )
 
-                handler?(self.persistSession(tokenResponse))
+                handler?(self.persistSession(oidcTokenResponse))
             } catch {
                 if let error = error as? AuthAPIClientError,
                    case let .oidcError(oidcError) = error,

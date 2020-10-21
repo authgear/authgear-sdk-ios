@@ -71,7 +71,7 @@ enum APIResponse<T: Decodable>: Decodable {
     }
 }
 
-struct TokenResponse: Decodable {
+struct OIDCTokenResponse: Decodable {
     let idToken: String?
     let tokenType: String
     let accessToken: String
@@ -99,7 +99,7 @@ protocol AuthAPIClient: AnyObject {
         codeVerifier: String?,
         refreshToken: String?,
         jwt: String?,
-        handler: @escaping (Result<TokenResponse, Error>) -> Void
+        handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
     func requestOIDCUserInfo(
         accessToken: String,
@@ -145,7 +145,7 @@ extension AuthAPIClient {
         codeVerifier: String?,
         refreshToken: String?,
         jwt: String?
-    ) throws -> TokenResponse {
+    ) throws -> OIDCTokenResponse {
         try withSemaphore { handler in
             self.requestOIDCToken(
                 grantType: grantType,
@@ -321,7 +321,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         codeVerifier: String? = nil,
         refreshToken: String? = nil,
         jwt: String? = nil,
-        handler: @escaping (Result<TokenResponse, Error>) -> Void
+        handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     ) {
         fetchOIDCConfiguration { [weak self] result in
             switch result {
