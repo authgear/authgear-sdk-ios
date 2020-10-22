@@ -545,7 +545,6 @@ public class Authgear: NSObject {
                    case let .oidcError(oidcError) = error,
                    oidcError.error == "invalid_grant" {
                     return DispatchQueue.main.async {
-                        self.setSessionState(.noSession, reason: .expired)
                         self.delegate?.authgearRefreshTokenDidExpire(self)
                         handler?(self.cleanupSession(force: true, reason: .expired))
                     }
