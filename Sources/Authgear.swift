@@ -2,7 +2,7 @@ import AuthenticationServices
 import Foundation
 import SafariServices
 
-public typealias AuthorizeCompletionHandler = (Result<AuthorizeResponse, Error>) -> Void
+public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
@@ -49,7 +49,7 @@ public struct UserInfo: Decodable {
     let sub: String
 }
 
-public struct AuthorizeResponse {
+public struct AuthorizeResult {
     public let userInfo: UserInfo
     public let state: String?
 }
@@ -260,7 +260,7 @@ public class Authgear: NSObject {
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
             let result = persistSession(oidcTokenResponse)
-                .map { AuthorizeResponse(userInfo: userInfo, state: state) }
+                .map { AuthorizeResult(userInfo: userInfo, state: state) }
             return handler(result)
 
         } catch {
@@ -378,7 +378,7 @@ public class Authgear: NSObject {
 
                 let result = self.persistSession(oidcTokenResponse)
                     .flatMap { Result { try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId) } }
-                    .map { AuthorizeResponse(userInfo: userInfo, state: nil) }
+                    .map { AuthorizeResult(userInfo: userInfo, state: nil) }
                 handler(result)
 
             } catch {
