@@ -27,12 +27,12 @@ class AuthenticationSessionProvider: NSObject {
             if let error = error {
                 if #available(iOS 12.0, *) {
                     if let asError = error as? ASWebAuthenticationSessionError,
-                        asError.code == ASWebAuthenticationSessionError.canceledLogin {
+                       asError.code == ASWebAuthenticationSessionError.canceledLogin {
                         return completionHandler(.failure(AuthenticationSessionError.canceledLogin))
                     }
                 } else {
                     if let sfError = error as? SFAuthenticationError,
-                        sfError.code == SFAuthenticationError.canceledLogin {
+                       sfError.code == SFAuthenticationError.canceledLogin {
                         return completionHandler(.failure(AuthenticationSessionError.canceledLogin))
                     }
                 }

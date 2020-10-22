@@ -504,8 +504,8 @@ public class Authgear: NSObject {
         }
 
         guard accessToken != nil,
-            let expireAt = self.expireAt,
-            expireAt.timeIntervalSinceNow.sign == .minus else {
+              let expireAt = self.expireAt,
+              expireAt.timeIntervalSinceNow.sign == .minus else {
             return true
         }
 
@@ -534,8 +534,8 @@ public class Authgear: NSObject {
                 handler?(self.persistSession(tokenResponse))
             } catch {
                 if let error = error as? AuthAPIClientError,
-                    case let .oidcError(oidcError) = error,
-                    oidcError.error == "invalid_grant" {
+                   case let .oidcError(oidcError) = error,
+                   oidcError.error == "invalid_grant" {
                     return DispatchQueue.main.async {
                         self.setSessionState(.noSession)
                         self.delegate?.authgearRefreshTokenDidExpire(self)
