@@ -17,6 +17,16 @@ class ViewController: UIViewController {
         }
     }
 
+    @IBAction func loginWithoutSession(_ sender: Any) {
+        container!.authorize(
+            redirectURI: "self.test.myApp://host/path",
+            prompt: "login",
+            preferSFSafariViewController: true
+        ) { result in
+            print(result)
+        }
+    }
+
     @IBAction func loginAnonymously(_ sender: Any) {
         container!.authenticateAnonymously { result in
             print(result)
