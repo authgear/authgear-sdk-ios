@@ -65,9 +65,17 @@ public enum AuthgearPage: String {
     case identity = "/settings/identities"
 }
 
+public enum SessionStateChangeReason {
+    case noToken
+    case foundToken
+    case authorized
+    case logout
+    case expired
+}
+
 public protocol AuthgearDelegate: AnyObject {
     func authgearRefreshTokenDidExpire(_ container: Authgear)
-    func authgearSessionStateDidChange(_ container: Authgear)
+    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
 }
 
 public class Authgear: NSObject {
@@ -113,7 +121,7 @@ public class Authgear: NSObject {
 
                 DispatchQueue.main.async {
                     self.refreshToken = token
-                    self.setSessionState(token == nil ? .noSession : .loggedIn)
+                    self.setSessionState(token == nil ? .noSession : .loggedIn, reason: .foundToken)
                     handler?(.success(()))
                 }
 
@@ -125,9 +133,9 @@ public class Authgear: NSObject {
         }
     }
 
-    private func setSessionState(_ newState: SessionState) {
+    private func setSessionState(_ newState: SessionState, reason: SessionStateChangeReason) {
         sessionState = newState
-        delegate?.authgearSessionStateDidChange(self)
+        delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
     private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier) throws -> URL {
@@ -259,7 +267,7 @@ public class Authgear: NSObject {
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
-            let result = persistSession(oidcTokenResponse)
+            let result = persistSession(oidcTokenResponse, reason: .authorized)
                 .map { AuthorizeResult(userInfo: userInfo, state: state) }
             return handler(result)
 
@@ -268,7 +276,7 @@ public class Authgear: NSObject {
         }
     }
 
-    private func persistSession(_ oidcTokenResponse: OIDCTokenResponse) -> Result<Void, Error> {
+    private func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason) -> Result<Void, Error> {
         if let refreshToken = oidcTokenResponse.refreshToken {
             let result = Result { try self.storage.setRefreshToken(namespace: self.name, token: refreshToken) }
             guard case .success = result else {
@@ -280,12 +288,12 @@ public class Authgear: NSObject {
             self.accessToken = oidcTokenResponse.accessToken
             self.refreshToken = oidcTokenResponse.refreshToken
             self.expireAt = Date(timeIntervalSinceNow: TimeInterval(oidcTokenResponse.expiresIn))
-            self.setSessionState(.loggedIn)
+            self.setSessionState(.loggedIn, reason: reason)
         }
         return .success(())
     }
 
-    private func cleanupSession(force: Bool) -> Result<Void, Error> {
+    private func cleanupSession(force: Bool, reason: SessionStateChangeReason) -> Result<Void, Error> {
         if case let .failure(error) = Result(catching: { try storage.delRefreshToken(namespace: name) }) {
             if !force {
                 return .failure(error)
@@ -301,7 +309,7 @@ public class Authgear: NSObject {
             self.accessToken = nil
             self.refreshToken = nil
             self.expireAt = nil
-            self.setSessionState(.noSession)
+            self.setSessionState(.noSession, reason: reason)
         }
         return .success(())
     }
@@ -376,7 +384,7 @@ public class Authgear: NSObject {
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
-                let result = self.persistSession(oidcTokenResponse)
+                let result = self.persistSession(oidcTokenResponse, reason: .authorized)
                     .flatMap { Result { try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId) } }
                     .map { AuthorizeResult(userInfo: userInfo, state: nil) }
                 handler(result)
@@ -462,11 +470,11 @@ public class Authgear: NSObject {
                 try self.apiClient.syncRequestOIDCRevocation(
                     refreshToken: token ?? ""
                 )
-                return handler(self.cleanupSession(force: force))
+                return handler(self.cleanupSession(force: force, reason: .logout))
 
             } catch {
                 if force {
-                    return handler(self.cleanupSession(force: true))
+                    return handler(self.cleanupSession(force: true, reason: .logout))
                 }
                 return handler(.failure(error))
             }
@@ -517,7 +525,7 @@ public class Authgear: NSObject {
         workerQueue.async {
             do {
                 guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
-                    handler?(self.cleanupSession(force: true))
+                    handler?(self.cleanupSession(force: true, reason: .noToken))
                     return
                 }
 
@@ -531,15 +539,14 @@ public class Authgear: NSObject {
                     jwt: nil
                 )
 
-                handler?(self.persistSession(oidcTokenResponse))
+                handler?(self.persistSession(oidcTokenResponse, reason: .foundToken))
             } catch {
                 if let error = error as? AuthAPIClientError,
                    case let .oidcError(oidcError) = error,
                    oidcError.error == "invalid_grant" {
                     return DispatchQueue.main.async {
-                        self.setSessionState(.noSession)
                         self.delegate?.authgearRefreshTokenDidExpire(self)
-                        handler?(self.cleanupSession(force: true))
+                        handler?(self.cleanupSession(force: true, reason: .expired))
                     }
                 }
                 handler?(.failure(error))
