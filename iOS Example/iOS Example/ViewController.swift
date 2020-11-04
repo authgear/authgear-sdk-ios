@@ -2,16 +2,14 @@ import Authgear
 import UIKit
 
 class ViewController: UIViewController {
-    let container = Authgear(clientId: "client_id", endpoint: "http://localhost:3000")
+    var container: Authgear?
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        container.configure()
+    public func configure(container: Authgear) {
+        self.container = container
     }
 
     @IBAction func login(_ sender: Any) {
-        container.authorize(
+        container!.authorize(
             redirectURI: "self.test.myApp://host/path",
             prompt: "login"
         ) { result in
@@ -20,13 +18,13 @@ class ViewController: UIViewController {
     }
 
     @IBAction func loginAnonymously(_ sender: Any) {
-        container.authenticateAnonymously { result in
+        container!.authenticateAnonymously { result in
             print(result)
         }
     }
 
     @IBAction func promoteAnonymousUser(_ sender: Any) {
-        container.promoteAnonymousUser(
+        container!.promoteAnonymousUser(
             redirectURI: "self.test.myApp://host/path"
         ) { result in
             print(result)
@@ -34,7 +32,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func logout(_ sender: Any) {
-        container.logout { result in
+        container!.logout { result in
             print(result)
         }
     }
