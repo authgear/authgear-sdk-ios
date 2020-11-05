@@ -3,6 +3,7 @@ import Foundation
 import SafariServices
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
+public typealias AuthorizeRedirectionHandler = (URL) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
@@ -12,6 +13,7 @@ struct AuthorizeOptions {
     let prompt: String?
     let loginHint: String?
     let uiLocales: [String]?
+    let prefersSFSafariViewController: Bool
 
     var urlScheme: String {
         if let index = redirectURI.firstIndex(of: ":") {
@@ -25,13 +27,15 @@ struct AuthorizeOptions {
         state: String?,
         prompt: String?,
         loginHint: String?,
-        uiLocales: [String]?
+        uiLocales: [String]?,
+        prefersSFSafariViewController: Bool
     ) {
         self.redirectURI = redirectURI
         self.state = state
         self.prompt = prompt
         self.loginHint = loginHint
         self.uiLocales = uiLocales
+        self.prefersSFSafariViewController = prefersSFSafariViewController
     }
 }
 
@@ -78,7 +82,7 @@ public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
 }
 
-public class Authgear: NSObject {
+public class Authgear: NSObject, SFSafariViewControllerDelegate {
     let name: String
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
@@ -95,6 +99,7 @@ public class Authgear: NSObject {
     private let workerQueue: DispatchQueue
 
     public private(set) var sessionState: SessionState = .unknown
+    public private(set) var authorizeRedirectionHandler: AuthorizeRedirectionHandler?
 
     public weak var delegate: AuthgearDelegate?
 
@@ -184,7 +189,37 @@ public class Authgear: NSObject {
         return urlComponents.url!
     }
 
-    private func authorize(
+    private func authorizeWithoutSession(
+        _ options: AuthorizeOptions,
+        handler: @escaping AuthorizeCompletionHandler
+    ) -> AuthorizeRedirectionHandler? {
+        let verifier = CodeVerifier()
+        let requestUrlResult = Result { try authorizeEndpoint(options, verifier: verifier) }
+        switch requestUrlResult {
+        case let .success(requestUrl):
+            let vc = SFSafariViewController(url: requestUrl)
+            vc.delegate = self
+            vc.modalPresentationStyle = .pageSheet
+            UIApplication.shared.windows.filter { $0.isKeyWindow }
+                .first?.rootViewController?.present(vc, animated: true)
+            let redirectHandler: (_ url: URL) -> Void = { [weak self] url in
+                vc.dismiss(animated: true)
+                self?.workerQueue.async {
+                    self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
+                }
+            }
+            return redirectHandler
+        case let .failure(error):
+            handler(.failure(error))
+            return nil
+        }
+    }
+
+    public func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        controller.dismiss(animated: true)
+    }
+
+    private func authorizeWithSession(
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -216,6 +251,19 @@ public class Authgear: NSObject {
                 self.authenticationSession?.start()
             case let .failure(error):
                 handler(.failure(error))
+            }
+        }
+    }
+
+    private func authorize(
+        _ options: AuthorizeOptions,
+        handler: @escaping AuthorizeCompletionHandler
+    ) {
+        if options.prefersSFSafariViewController {
+            authorizeRedirectionHandler = authorizeWithoutSession(options, handler: handler)
+        } else {
+            workerQueue.async {
+                self.authorizeWithSession(options, handler: handler)
             }
         }
     }
@@ -324,26 +372,31 @@ public class Authgear: NSObject {
         }
     }
 
+    public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        authorizeRedirectionHandler?(url)
+        return true
+    }
+
     public func authorize(
         redirectURI: String,
         state: String? = nil,
         prompt: String? = "login",
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
+        prefersSFSafariViewController: Bool = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        workerQueue.async {
-            self.authorize(
-                AuthorizeOptions(
-                    redirectURI: redirectURI,
-                    state: state,
-                    prompt: prompt,
-                    loginHint: loginHint,
-                    uiLocales: uiLocales
-                ),
-                handler: self.withMainQueueHandler(handler)
-            )
-        }
+        authorize(
+            AuthorizeOptions(
+                redirectURI: redirectURI,
+                state: state,
+                prompt: prompt,
+                loginHint: loginHint,
+                uiLocales: uiLocales,
+                prefersSFSafariViewController: prefersSFSafariViewController
+            ),
+            handler: withMainQueueHandler(handler)
+        )
     }
 
     public func authenticateAnonymously(
@@ -399,6 +452,7 @@ public class Authgear: NSObject {
         redirectURI: String,
         state: String? = nil,
         uiLocales: [String]? = nil,
+        prefersSFSafariViewController: Bool = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
@@ -435,7 +489,8 @@ public class Authgear: NSObject {
                         state: state,
                         prompt: "login",
                         loginHint: loginHint,
-                        uiLocales: uiLocales
+                        uiLocales: uiLocales,
+                        prefersSFSafariViewController: prefersSFSafariViewController
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
