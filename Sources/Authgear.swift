@@ -93,7 +93,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
      * To compat this, we should consider the access token expired earlier than the expiry time
      * calculated using `TokenResponse.expiresIn`. Current implementation uses
      * ExpireInPercentage of TokenResponse.expiresIn` to calculate the expiry time.
-     * 
+     *
      * @internal
      */
     private static let ExpireInPercentage = 0.9
