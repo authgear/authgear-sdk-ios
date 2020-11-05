@@ -21,7 +21,7 @@ class ViewController: UIViewController {
         container!.authorize(
             redirectURI: "self.test.myApp://host/path",
             prompt: "login",
-            preferSFSafariViewController: true
+            prefersSFSafariViewController: true
         ) { result in
             print(result)
         }
