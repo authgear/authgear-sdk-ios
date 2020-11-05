@@ -349,7 +349,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         DispatchQueue.main.async {
             self.accessToken = oidcTokenResponse.accessToken
             self.refreshToken = oidcTokenResponse.refreshToken
-            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(oidcTokenResponse.expiresIn * ExpireInPercentage))
+            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn) * Authgear.ExpireInPercentage))
             self.setSessionState(.loggedIn, reason: reason)
         }
         return .success(())
