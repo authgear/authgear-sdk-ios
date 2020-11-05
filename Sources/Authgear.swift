@@ -525,7 +525,8 @@ public class Authgear: NSObject {
         workerQueue.async {
             do {
                 guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
-                    handler?(self.cleanupSession(force: true, reason: .noToken))
+                    let result = self.cleanupSession(force: true, reason: .noToken)
+                    handler?(result)
                     return
                 }
 
@@ -539,14 +540,16 @@ public class Authgear: NSObject {
                     jwt: nil
                 )
 
-                handler?(self.persistSession(oidcTokenResponse, reason: .foundToken))
+                let result = self.persistSession(oidcTokenResponse, reason: .foundToken)
+                handler?(result)
             } catch {
                 if let error = error as? AuthAPIClientError,
                    case let .oidcError(oidcError) = error,
                    oidcError.error == "invalid_grant" {
                     return DispatchQueue.main.async {
                         self.delegate?.authgearRefreshTokenDidExpire(self)
-                        handler?(self.cleanupSession(force: true, reason: .expired))
+                        let result = self.cleanupSession(force: true, reason: .expired)
+                        handler?(result)
                     }
                 }
                 handler?(.failure(error))
