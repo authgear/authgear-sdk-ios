@@ -99,7 +99,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
     private let workerQueue: DispatchQueue
 
     public private(set) var sessionState: SessionState = .unknown
-    public private(set) var authorizeRedirectionHandler: AuthorizeRedirectionHandler = { _ in }
+    public private(set) var authorizeRedirectionHandler: AuthorizeRedirectionHandler?
 
     public weak var delegate: AuthgearDelegate?
 
@@ -260,9 +260,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         handler: @escaping AuthorizeCompletionHandler
     ) {
         if options.preferSFSafariViewController {
-            if let handler = authorizeWithoutSession(options, handler: handler) {
-                authorizeRedirectionHandler = handler
-            }
+            authorizeRedirectionHandler = authorizeWithoutSession(options, handler: handler)
         } else {
             workerQueue.async {
                 self.authorizeWithSession(options, handler: handler)
@@ -375,7 +373,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
     }
 
     public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        authorizeRedirectionHandler(url)
+        authorizeRedirectionHandler?(url)
         return true
     }
 
