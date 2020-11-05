@@ -15,7 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             as? ViewController else {
             fatalError("Failed to load ViewController from storyboard.")
         }
-        vc.configure(container: container)
         window?.rootViewController = vc
         window?.makeKeyAndVisible()
         return true

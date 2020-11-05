@@ -2,10 +2,9 @@ import Authgear
 import UIKit
 
 class ViewController: UIViewController {
-    var container: Authgear?
-
-    public func configure(container: Authgear) {
-        self.container = container
+    private var container: Authgear? {
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        return appDelegate?.container
     }
 
     @IBAction func login(_ sender: Any) {
