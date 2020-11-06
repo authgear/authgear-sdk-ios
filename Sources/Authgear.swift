@@ -47,10 +47,17 @@ public struct UserInfo: Decodable {
         case sub
     }
 
-    let isAnonymous: Bool
-    let isVerified: Bool
-    let iss: String
-    let sub: String
+    public let isAnonymous: Bool
+    public let isVerified: Bool
+    public let iss: String
+    public let sub: String
+
+    public init(isAnonymous: Bool, isVerified: Bool, iss: String, sub: String) {
+        self.isAnonymous = isAnonymous
+        self.isVerified = isVerified
+        self.iss = iss
+        self.sub = sub
+    }
 }
 
 public struct AuthorizeResult {
