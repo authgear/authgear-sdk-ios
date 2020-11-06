@@ -1,13 +1,43 @@
 import Authgear
 import SwiftUI
 
-class MainViewModel {
-    func configure(clientId: String, endpoint: String) throws {
+class MainViewModel: ObservableObject {
+    let appState: AppState
+    @Published var authgearActionErrorMessage: String?
+    @Published var successAlertMessage: String?
+
+    init(appState: AppState) {
+        self.appState = appState
+    }
+
+    func configure(clientId: String, endpoint: String) {
         guard clientId != "", endpoint != "" else {
-            throw AppError.AuthgearConfigureFieldEmpty
+            authgearActionErrorMessage = "Please input client ID and endpoint"
+            return
         }
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        appDelegate!.configureAuthgear(clientId: clientId, endpoint: endpoint)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            authgearActionErrorMessage = "Failed to configure Authgear"
+            return
+        }
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint)
+        successAlertMessage = "Configured Authgear successfully"
+    }
+
+    private func handleAuthorizeResult(_ result: Result<AuthorizeResult, Error>, errorMessage: String) -> Bool {
+        switch result {
+        case let .success(authResult):
+            let userInfo = authResult.userInfo
+            appState.user = UserInfo(
+                userID: userInfo.sub,
+                isAnonymous: userInfo.isAnonymous,
+                isVerified: userInfo.isVerified
+            )
+            return true
+        case let .failure(error):
+            print(error)
+            authgearActionErrorMessage = errorMessage
+            return false
+        }
     }
 
     func login(container: Authgear?) {
@@ -15,7 +45,10 @@ class MainViewModel {
             redirectURI: App.redirectURI,
             prompt: "login"
         ) { result in
-            print(result)
+            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login")
+            if success {
+                self.successAlertMessage = "Logged in successfully"
+            }
         }
     }
 
@@ -25,13 +58,19 @@ class MainViewModel {
             prompt: "login",
             prefersSFSafariViewController: true
         ) { result in
-            print(result)
+            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login")
+            if success {
+                self.successAlertMessage = "Logged in successfully"
+            }
         }
     }
 
     func loginAnonymously(container: Authgear?) {
         container?.authenticateAnonymously { result in
-            print(result)
+            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login anonymously")
+            if success {
+                self.successAlertMessage = "Logged in anonymously"
+            }
         }
     }
 
@@ -43,19 +82,47 @@ class MainViewModel {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI
         ) { result in
-            print(result)
+            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to promote anonymous user")
+            if success {
+                self.successAlertMessage = "Successfully promoted to normal authenticated user"
+            }
         }
     }
 
     func fetchUserInfo(container: Authgear?) {
-        container?.fetchUserInfo { userInfo in
-            print(userInfo)
+        container?.fetchUserInfo { userInfoResult in
+            switch userInfoResult {
+            case let .success(userInfo):
+                self.appState.user = UserInfo(
+                    userID: userInfo.sub,
+                    isAnonymous: userInfo.isAnonymous,
+                    isVerified: userInfo.isVerified
+                )
+                self.successAlertMessage = [
+                    "User Info:",
+                    "",
+                    "User ID: \(userInfo.sub)",
+                    "Is Verified: \(userInfo.isVerified)",
+                    "Is Anonymous: \(userInfo.isAnonymous)",
+                    "ISS: \(userInfo.iss)"
+                ].joined(separator: "\n")
+            case let .failure(error):
+                print(error)
+                self.authgearActionErrorMessage = "Failed to fetch user info"
+            }
         }
     }
 
     func logout(container: Authgear?) {
         container?.logout { result in
-            print(result)
+            switch result {
+            case .success():
+                self.appState.user = nil
+                self.successAlertMessage = "Logged out successfully"
+            case let .failure(error):
+                print(error)
+                self.authgearActionErrorMessage = "Failed to logout"
+            }
         }
     }
 }

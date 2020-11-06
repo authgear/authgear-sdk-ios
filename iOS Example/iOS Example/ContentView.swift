@@ -39,8 +39,7 @@ struct AuthgearConfigurationForm: View {
 
     @State private var clientID: String = ""
     @State private var endpoint: String = ""
-    @State private var hasError: Bool = false
-    @State private var errorMessage: String = ""
+
     var body: some View {
         VStack {
             AuthgearConfigurationInput(
@@ -54,25 +53,12 @@ struct AuthgearConfigurationForm: View {
                 text: $endpoint
             )
             Button(action: {
-                do {
-                    try self.app.mainViewModel.configure(clientId: self.clientID, endpoint: self.endpoint)
-                    self.hasError = false
-                } catch AppError.AuthgearConfigureFieldEmpty {
-                    self.hasError = true
-                    self.errorMessage = "Please input client ID and endpoint"
-                } catch {
-                    self.hasError = true
-                    self.errorMessage = "Failed to configure Authgear"
-                }
+                self.app.mainViewModel.configure(clientId: self.clientID, endpoint: self.endpoint)
             }) {
                 ActionButton(text: "Configure")
             }
             .padding(.top, 15)
         }
-        .alert(
-            isPresented: $hasError,
-            content: { Alert(title: Text("Error"), message: Text(errorMessage)) }
-        )
     }
 }
 
@@ -86,12 +72,10 @@ struct AuthgearActionDescription: View {
 
 struct ActionButtonList: View {
     @EnvironmentObject private var app: App
+    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var mainViewModel: MainViewModel
 
-    var mainViewModel: MainViewModel {
-        app.mainViewModel
-    }
-
-    var container: Authgear? {
+    private var container: Authgear? {
         app.container
     }
 
@@ -99,22 +83,30 @@ struct ActionButtonList: View {
         app.container != nil
     }
 
+    private var loggedIn: Bool {
+        appState.user != nil
+    }
+
+    private var canBePromotedFromAnonymous: Bool {
+        configured && loggedIn && appState.user?.isAnonymous == true
+    }
+
     var body: some View {
         VStack(spacing: 30) {
             Button(action: {
                 self.mainViewModel.login(container: self.container)
             }) {
-                ActionButton(text: "Login").disabled(!configured)
+                ActionButton(text: "Login").disabled(!configured || loggedIn)
             }
             Button(action: {
                 self.mainViewModel.loginWithoutSession(container: self.container)
             }) {
-                ActionButton(text: "Login Without Session").disabled(!configured)
+                ActionButton(text: "Login Without Session").disabled(!configured || loggedIn)
             }
             Button(action: {
                 self.mainViewModel.loginAnonymously(container: self.container)
             }) {
-                ActionButton(text: "Login Anonymously").disabled(!configured)
+                ActionButton(text: "Login Anonymously").disabled(!configured || loggedIn)
             }
             Button(action: {
                 self.mainViewModel.openSetting(container: self.container)
@@ -124,23 +116,57 @@ struct ActionButtonList: View {
             Button(action: {
                 self.mainViewModel.promoteAnonymousUser(container: self.container)
             }) {
-                ActionButton(text: "Promote Anonymous User").disabled(!configured)
+                ActionButton(text: "Promote Anonymous User").disabled(!canBePromotedFromAnonymous)
             }
             Button(action: {
                 self.mainViewModel.fetchUserInfo(container: self.container)
             }) {
-                ActionButton(text: "Fetch User Info").disabled(!configured)
+                ActionButton(text: "Fetch User Info").disabled(!configured || !loggedIn)
             }
             Button(action: {
                 self.mainViewModel.logout(container: self.container)
             }) {
-                ActionButton(text: "Logout").disabled(!configured)
+                ActionButton(text: "Logout").disabled(!configured || !loggedIn)
             }
         }
     }
 }
 
+struct AlertView: View {
+    @EnvironmentObject private var mainViewModel: MainViewModel
+
+    private var hasError: Binding<Bool> { Binding(
+        get: { self.mainViewModel.authgearActionErrorMessage != nil },
+        set: { if !$0 { self.mainViewModel.authgearActionErrorMessage = nil } }
+    ) }
+
+    private var shouldShowSuccessDialog: Binding<Bool> { Binding(
+        get: { self.mainViewModel.successAlertMessage != nil },
+        set: { if !$0 { self.mainViewModel.successAlertMessage = nil } }
+    ) }
+
+    var body: some View {
+        VStack {
+            EmptyView()
+        }
+        .alert(isPresented: shouldShowSuccessDialog, content: {
+            Alert(
+                title: Text("Success"),
+                message: Text(mainViewModel.successAlertMessage ?? "")
+            )
+        })
+        .alert(isPresented: hasError, content: {
+            Alert(
+                title: Text("Error"),
+                message: Text(mainViewModel.authgearActionErrorMessage ?? "")
+            )
+        })
+    }
+}
+
 struct ContentView: View {
+    @EnvironmentObject private var app: App
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -148,6 +174,10 @@ struct ContentView: View {
                 AuthgearConfigurationForm()
                 AuthgearActionDescription()
                 ActionButtonList()
+                    .environmentObject(app.appState)
+                    .environmentObject(app.mainViewModel)
+                AlertView()
+                    .environmentObject(app.mainViewModel)
             }.padding(20)
         }
     }
