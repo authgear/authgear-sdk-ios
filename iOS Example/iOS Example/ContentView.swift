@@ -138,13 +138,31 @@ struct ActionButtonList: View {
     }
 }
 
-struct AlertView: View {
+// TODO: find a better fix
+// chaining alert in same VStack does not work on some device
+struct ErrorAlertView: View {
     @EnvironmentObject private var mainViewModel: MainViewModel
 
     private var hasError: Binding<Bool> { Binding(
         get: { self.mainViewModel.authgearActionErrorMessage != nil },
         set: { if !$0 { self.mainViewModel.authgearActionErrorMessage = nil } }
     ) }
+
+    var body: some View {
+        VStack {
+            EmptyView()
+        }
+        .alert(isPresented: hasError, content: {
+            Alert(
+                title: Text("Error"),
+                message: Text(mainViewModel.authgearActionErrorMessage ?? "")
+            )
+        })
+    }
+}
+
+struct SuccessAlertView: View {
+    @EnvironmentObject private var mainViewModel: MainViewModel
 
     private var shouldShowSuccessDialog: Binding<Bool> { Binding(
         get: { self.mainViewModel.successAlertMessage != nil },
@@ -159,12 +177,6 @@ struct AlertView: View {
             Alert(
                 title: Text("Success"),
                 message: Text(mainViewModel.successAlertMessage ?? "")
-            )
-        })
-        .alert(isPresented: hasError, content: {
-            Alert(
-                title: Text("Error"),
-                message: Text(mainViewModel.authgearActionErrorMessage ?? "")
             )
         })
     }
@@ -182,7 +194,9 @@ struct ContentView: View {
                 ActionButtonList()
                     .environmentObject(app.appState)
                     .environmentObject(app.mainViewModel)
-                AlertView()
+                ErrorAlertView()
+                    .environmentObject(app.mainViewModel)
+                SuccessAlertView()
                     .environmentObject(app.mainViewModel)
             }.padding(20)
         }
@@ -191,6 +205,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView().environmentObject(App())
     }
 }
