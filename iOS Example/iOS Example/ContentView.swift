@@ -200,6 +200,8 @@ struct ContentView: View {
                     .environmentObject(app.mainViewModel)
             }.padding(20)
         }
+        .padding(.top) // avoid overlap with status bar
+        .keyboardAvoider()
     }
 }
 
