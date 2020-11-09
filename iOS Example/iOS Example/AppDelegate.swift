@@ -7,6 +7,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func configureAuthgear(clientId: String, endpoint: String) {
         appContainer.container = Authgear(clientId: clientId, endpoint: endpoint)
+        appContainer.container?.configure()
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
