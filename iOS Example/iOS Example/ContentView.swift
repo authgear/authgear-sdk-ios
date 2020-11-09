@@ -96,38 +96,44 @@ struct ActionButtonList: View {
             Button(action: {
                 self.mainViewModel.login(container: self.container)
             }) {
-                ActionButton(text: "Login").disabled(!configured || loggedIn)
-            }
+                ActionButton(text: "Login")
+            }.disabled(!configured || loggedIn)
+
             Button(action: {
                 self.mainViewModel.loginWithoutSession(container: self.container)
             }) {
-                ActionButton(text: "Login Without Session").disabled(!configured || loggedIn)
-            }
+                ActionButton(text: "Login Without Session")
+            }.disabled(!configured || loggedIn)
+
             Button(action: {
                 self.mainViewModel.loginAnonymously(container: self.container)
             }) {
-                ActionButton(text: "Login Anonymously").disabled(!configured || loggedIn)
-            }
+                ActionButton(text: "Login Anonymously")
+            }.disabled(!configured || loggedIn)
+
             Button(action: {
                 self.mainViewModel.openSetting(container: self.container)
             }) {
-                ActionButton(text: "Open Setting Page").disabled(!configured)
-            }
+                ActionButton(text: "Open Setting Page")
+            }.disabled(!configured)
+
             Button(action: {
                 self.mainViewModel.promoteAnonymousUser(container: self.container)
             }) {
-                ActionButton(text: "Promote Anonymous User").disabled(!canBePromotedFromAnonymous)
-            }
+                ActionButton(text: "Promote Anonymous User")
+            }.disabled(!canBePromotedFromAnonymous)
+
             Button(action: {
                 self.mainViewModel.fetchUserInfo(container: self.container)
             }) {
-                ActionButton(text: "Fetch User Info").disabled(!configured || !loggedIn)
-            }
+                ActionButton(text: "Fetch User Info")
+            }.disabled(!configured || !loggedIn)
+
             Button(action: {
                 self.mainViewModel.logout(container: self.container)
             }) {
-                ActionButton(text: "Logout").disabled(!configured || !loggedIn)
-            }
+                ActionButton(text: "Logout")
+            }.disabled(!configured || !loggedIn)
         }
     }
 }
