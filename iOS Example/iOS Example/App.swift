@@ -11,5 +11,5 @@ class App: ObservableObject {
         mainViewModel = MainViewModel(appState: appState)
     }
 
-    static let redirectURI = "self.test.myApp://host/path"
+    static let redirectURI = "com.authgear.example://host/path"
 }
