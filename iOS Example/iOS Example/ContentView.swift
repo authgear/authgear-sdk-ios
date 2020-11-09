@@ -37,8 +37,8 @@ struct ActionButton: View {
 struct AuthgearConfigurationForm: View {
     @EnvironmentObject private var app: App
 
-    @State private var clientID: String = ""
-    @State private var endpoint: String = ""
+    @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
+    @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
 
     var body: some View {
         VStack {

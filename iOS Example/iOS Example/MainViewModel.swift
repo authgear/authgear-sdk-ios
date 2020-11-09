@@ -19,6 +19,8 @@ class MainViewModel: ObservableObject {
             authgearActionErrorMessage = "Failed to configure Authgear"
             return
         }
+        UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
+        UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint)
         successAlertMessage = "Configured Authgear successfully"
     }
