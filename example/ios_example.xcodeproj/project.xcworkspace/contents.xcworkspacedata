@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/allenloo/repos/authgear-sdk-ios/iOS Example/ios_example.xcodeproj">
+      location = "self:/Users/allenloo/repos/authgear-sdk-ios/example/ios_example.xcodeproj">
    </FileRef>
 </Workspace>
