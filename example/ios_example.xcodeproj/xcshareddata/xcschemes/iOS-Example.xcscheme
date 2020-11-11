@@ -74,6 +74,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "ios_example"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
