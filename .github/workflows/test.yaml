@@ -3,21 +3,21 @@ name: CI
 on:
   push:
     branches:
-    - '*'
-    - '!gh-pages'
+      - "*"
+      - "!gh-pages"
   pull_request:
     branches:
-    - '*'
-    - '!gh-pages'
+      - "*"
+      - "!gh-pages"
 
 jobs:
   test:
     runs-on: macos-10.15
     steps:
-    - uses: actions/checkout@v2
-    # Install swiftformat@0.47.0
-    - run: curl https://raw.githubusercontent.com/Homebrew/homebrew-core/ecf0ff050adb374d845c7875c9a9b0524e616abd/Formula/swiftformat.rb --output swiftformat.rb && brew install swiftformat.rb
-    - run: sudo xcode-select -s /Applications/Xcode_11.app/Contents/Developer
-    - run: make lint
-    - run: make build BUILD_SDK='"iphonesimulator13.0"'
-    - run: make test TEST_DESTINATION='"platform=iOS Simulator,name=iPhone 11,OS=13.0"'
+      - uses: actions/checkout@v2
+      # Install swiftformat@0.47.0
+      - run: curl https://raw.githubusercontent.com/Homebrew/homebrew-core/ecf0ff050adb374d845c7875c9a9b0524e616abd/Formula/swiftformat.rb --output swiftformat.rb && brew install swiftformat.rb
+      - run: sudo xcode-select -s /Applications/Xcode_11.7.app/Contents/Developer
+      - run: make lint
+      - run: make build BUILD_SDK='"iphonesimulator13.0"'
+      - run: make test TEST_DESTINATION='"platform=iOS Simulator,name=iPhone 11,OS=13.0"'
