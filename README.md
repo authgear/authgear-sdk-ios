@@ -1,5 +1,6 @@
 # Authgear
 
+[![Build status](https://build.appcenter.ms/v0.1/apps/d1d791c5-6656-48ec-afbb-e96a54e06dac/branches/master/badge)](https://appcenter.ms)
 
 ## Requirements
 
