@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>AuthgearError Enumeration Reference</title>
+    <title>SessionStateChangeReason Enumeration Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -13,8 +13,8 @@
     <script src="../js/jazzy.search.js" defer></script>
   </head>
   <body>
-    <a name="//apple_ref/swift/Enum/AuthgearError" class="dashAnchor"></a>
-    <a title="AuthgearError Enumeration Reference"></a>
+    <a name="//apple_ref/swift/Enum/SessionStateChangeReason" class="dashAnchor"></a>
+    <a title="SessionStateChangeReason Enumeration Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">Authgear 0.0.1 Docs</a> (4% documented)</p>
@@ -29,7 +29,7 @@
       <p id="breadcrumbs">
         <a href="../index.html">Authgear Reference</a>
         <img id="carat" src="../img/carat.png" />
-        AuthgearError Enumeration Reference
+        SessionStateChangeReason Enumeration Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -113,11 +113,11 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>AuthgearError</h1>
+            <h1>SessionStateChangeReason</h1>
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">AuthgearError</span> <span class="p">:</span> <span class="kt">Error</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">SessionStateChangeReason</span></code></pre>
 
                 </div>
               </div>
@@ -130,9 +130,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A5ErrorO13canceledLoginyA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/canceledLogin" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A5ErrorO13canceledLoginyA2CmF">canceledLogin</a>
+                    <a name="/s:8Authgear24SessionStateChangeReasonO7noTokenyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/noToken" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear24SessionStateChangeReasonO7noTokenyA2CmF">noToken</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -147,7 +147,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">canceledLogin</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">noToken</span></code></pre>
 
                         </div>
                       </div>
@@ -157,9 +157,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A5ErrorO05oauthB0yACSS_SSSgtcACmF"></a>
-                    <a name="//apple_ref/swift/Element/oauthError(error:description:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A5ErrorO05oauthB0yACSS_SSSgtcACmF">oauthError(error:<wbr>description:<wbr>)</a>
+                    <a name="/s:8Authgear24SessionStateChangeReasonO10foundTokenyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/foundToken" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear24SessionStateChangeReasonO10foundTokenyA2CmF">foundToken</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -174,7 +174,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">oauthError</span><span class="p">(</span><span class="nv">error</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span><span class="p">?)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">foundToken</span></code></pre>
 
                         </div>
                       </div>
@@ -184,9 +184,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A5ErrorO010unexpectedB0yACs0B0_pcACmF"></a>
-                    <a name="//apple_ref/swift/Element/unexpectedError(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A5ErrorO010unexpectedB0yACs0B0_pcACmF">unexpectedError(_:<wbr>)</a>
+                    <a name="/s:8Authgear24SessionStateChangeReasonO10authorizedyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/authorized" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear24SessionStateChangeReasonO10authorizedyA2CmF">authorized</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -201,7 +201,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">unexpectedError</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">authorized</span></code></pre>
 
                         </div>
                       </div>
@@ -211,9 +211,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A5ErrorO21anonymousUserNotFoundyA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/anonymousUserNotFound" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A5ErrorO21anonymousUserNotFoundyA2CmF">anonymousUserNotFound</a>
+                    <a name="/s:8Authgear24SessionStateChangeReasonO6logoutyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/logout" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear24SessionStateChangeReasonO6logoutyA2CmF">logout</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -228,7 +228,34 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">anonymousUserNotFound</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">logout</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear24SessionStateChangeReasonO7expiredyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/expired" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear24SessionStateChangeReasonO7expiredyA2CmF">expired</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">expired</span></code></pre>
 
                         </div>
                       </div>
