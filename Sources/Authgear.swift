@@ -65,10 +65,10 @@ public struct AuthorizeResult {
     public let state: String?
 }
 
-public enum SessionState {
-    case loggedIn
-    case noSession
-    case unknown
+public enum SessionState: String {
+    case unknown = "UNKNOWN"
+    case noSession = "NO_SESSION"
+    case authenticated = "AUTHENTICATED"
 }
 
 public enum AuthgearPage: String {
@@ -76,16 +76,15 @@ public enum AuthgearPage: String {
     case identity = "/settings/identities"
 }
 
-public enum SessionStateChangeReason {
-    case noToken
-    case foundToken
-    case authorized
-    case logout
-    case expired
+public enum SessionStateChangeReason: String {
+    case noToken = "NO_TOKEN"
+    case foundToken = "FOUND_TOKEN"
+    case authenticated = "AUTHENTICATED"
+    case logout = "LOGOUT"
+    case invalid = "INVALID"
 }
 
 public protocol AuthgearDelegate: AnyObject {
-    func authgearRefreshTokenDidExpire(_ container: Authgear)
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
 }
 
@@ -147,7 +146,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
 
                 DispatchQueue.main.async {
                     self.refreshToken = token
-                    self.setSessionState(token == nil ? .noSession : .loggedIn, reason: .foundToken)
+                    self.setSessionState(token == nil ? .noSession : .authenticated, reason: .foundToken)
                     handler?(.success(()))
                 }
 
@@ -336,7 +335,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
-            let result = persistSession(oidcTokenResponse, reason: .authorized)
+            let result = persistSession(oidcTokenResponse, reason: .authenticated)
                 .map { AuthorizeResult(userInfo: userInfo, state: state) }
             return handler(result)
 
@@ -357,7 +356,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
             self.accessToken = oidcTokenResponse.accessToken
             self.refreshToken = oidcTokenResponse.refreshToken
             self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn) * Authgear.ExpireInPercentage))
-            self.setSessionState(.loggedIn, reason: reason)
+            self.setSessionState(.authenticated, reason: reason)
         }
         return .success(())
     }
@@ -458,7 +457,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
-                let result = self.persistSession(oidcTokenResponse, reason: .authorized)
+                let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
                     .flatMap { Result { try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId) } }
                     .map { AuthorizeResult(userInfo: userInfo, state: nil) }
                 handler(result)
@@ -623,8 +622,7 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
                    case let .oidcError(oidcError) = error,
                    oidcError.error == "invalid_grant" {
                     return DispatchQueue.main.async {
-                        self.delegate?.authgearRefreshTokenDidExpire(self)
-                        let result = self.cleanupSession(force: true, reason: .expired)
+                        let result = self.cleanupSession(force: true, reason: .invalid)
                         handler?(result)
                     }
                 }
