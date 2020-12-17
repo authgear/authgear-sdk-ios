@@ -104,6 +104,7 @@ public class Authgear: NSObject {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     let clientId: String
+    let isThirdPartyClient: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -120,9 +121,10 @@ public class Authgear: NSObject {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, name: String? = nil) {
+    public init(clientId: String, endpoint: String, name: String? = nil, isThirdPartyClient: Bool = true) {
         self.clientId = clientId
         self.name = name ?? "default"
+        self.isThirdPartyClient = isThirdPartyClient
         apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
@@ -166,13 +168,20 @@ public class Authgear: NSObject {
 
         queryItems.append(contentsOf: [
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(
-                name: "scope",
-                value: "openid offline_access https://authgear.com/scopes/full-access"
-            ),
             URLQueryItem(name: "code_challenge_method", value: "S256"),
             URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
         ])
+        if isThirdPartyClient {
+            queryItems.append(URLQueryItem(
+                name: "scope",
+                value: "openid offline_access"
+            ))
+        } else {
+            queryItems.append(URLQueryItem(
+                name: "scope",
+                value: "openid offline_access https://authgear.com/scopes/full-access"
+            ))
+        }
 
         queryItems.append(URLQueryItem(name: "client_id", value: clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
