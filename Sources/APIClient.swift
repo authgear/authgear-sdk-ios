@@ -88,6 +88,19 @@ struct ChallengeResponse: Decodable {
     let expireAt: String
 }
 
+struct AppSessionTokenBody: Encodable {
+    let refreshToken: String
+
+    enum CodingKeys: String, CodingKey {
+        case refreshToken = "refresh_token"
+    }
+}
+
+struct AppSessionTokenResponse: Decodable {
+    let appSessionToken: String
+    let expireAt: String
+}
+
 protocol AuthAPIClient: AnyObject {
     var endpoint: URL { get }
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void)
@@ -112,6 +125,10 @@ protocol AuthAPIClient: AnyObject {
     func requestOAuthChallenge(
         purpose: String,
         handler: @escaping (Result<ChallengeResponse, Error>) -> Void
+    )
+    func requestAppSessionToken(
+        refreshToken: String,
+        handler: @escaping (Result<AppSessionTokenResponse, Error>) -> Void
     )
 }
 
@@ -188,6 +205,17 @@ extension AuthAPIClient {
         try withSemaphore { handler in
             self.requestOAuthChallenge(
                 purpose: purpose,
+                handler: handler
+            )
+        }
+    }
+
+    func syncRequestAppSessionToken(
+        refreshToken: String
+    ) throws -> AppSessionTokenResponse {
+        try withSemaphore { handler in
+            self.requestAppSessionToken(
+                refreshToken: refreshToken,
                 handler: handler
             )
         }
@@ -431,6 +459,20 @@ class DefaultAuthAPIClient: AuthAPIClient {
         urlRequest.httpBody = try? JSONEncoder().encode(ChallengeBody(purpose: purpose))
 
         fetch(request: urlRequest, handler: { (result: Result<APIResponse<ChallengeResponse>, Error>) in
+            handler(result.flatMap { $0.toResult() })
+        })
+    }
+
+    func requestAppSessionToken(
+        refreshToken: String,
+        handler: @escaping (Result<AppSessionTokenResponse, Error>) -> Void
+    ) {
+        var urlRequest = URLRequest(url: endpoint.appendingPathComponent("/oauth2/app_session_token"))
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
+        urlRequest.httpBody = try? JSONEncoder().encode(AppSessionTokenBody(refreshToken: refreshToken))
+
+        fetch(request: urlRequest, handler: { (result: Result<APIResponse<AppSessionTokenResponse>, Error>) in
             handler(result.flatMap { $0.toResult() })
         })
     }

@@ -5,4 +5,5 @@ public enum AuthgearError: Error {
     case oauthError(error: String, description: String?)
     case unexpectedError(Error)
     case anonymousUserNotFound
+    case unauthenticatedUser
 }

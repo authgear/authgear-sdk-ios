@@ -1,6 +1,7 @@
 import AuthenticationServices
 import Foundation
 import SafariServices
+import WebKit
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
 public typealias AuthorizeRedirectionHandler = (URL) -> Void
@@ -9,6 +10,7 @@ public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
 struct AuthorizeOptions {
     let redirectURI: String
+    let responseType: String?
     let state: String?
     let prompt: String?
     let loginHint: String?
@@ -23,12 +25,14 @@ struct AuthorizeOptions {
 
     public init(
         redirectURI: String,
+        responseType: String,
         state: String?,
         prompt: String?,
         loginHint: String?,
         uiLocales: [String]?
     ) {
         self.redirectURI = redirectURI
+        self.responseType = responseType
         self.state = state
         self.prompt = prompt
         self.loginHint = loginHint
@@ -108,6 +112,7 @@ public class Authgear: NSObject {
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
+    private var webViewViewController: UIViewController?
 
     public private(set) var accessToken: String?
     private var refreshToken: String?
@@ -162,15 +167,16 @@ public class Authgear: NSObject {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier) throws -> URL {
+    private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
-        var queryItems = [URLQueryItem]()
+        var queryItems = [URLQueryItem(name: "response_type", value: options.responseType)]
 
-        queryItems.append(contentsOf: [
-            URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "code_challenge_method", value: "S256"),
-            URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
-        ])
+        if let verifier = verifier {
+            queryItems.append(contentsOf: [
+                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
+            ])
+        }
         if isThirdPartyClient {
             queryItems.append(URLQueryItem(
                 name: "scope",
@@ -380,6 +386,7 @@ public class Authgear: NSObject {
         authorize(
             AuthorizeOptions(
                 redirectURI: redirectURI,
+                responseType: "code",
                 state: state,
                 prompt: prompt,
                 loginHint: loginHint,
@@ -475,6 +482,7 @@ public class Authgear: NSObject {
                 self.authorize(
                     AuthorizeOptions(
                         redirectURI: redirectURI,
+                        responseType: "code",
                         state: state,
                         prompt: "login",
                         loginHint: loginHint,
@@ -530,19 +538,56 @@ public class Authgear: NSObject {
     ) {
         let handler = handler.map { h in withMainQueueHandler(h) }
         let url = apiClient.endpoint.appendingPathComponent(path)
-        authenticationSession = authenticationSessionProvider.makeAuthenticationSession(
-            url: url,
-            callbackURLSchema: "",
-            completionHandler: { result in
-                switch result {
-                case .success:
-                    handler?(.success(()))
-                case let .failure(error):
-                    handler?(.failure(AuthgearError.unexpectedError(error)))
+
+        workerQueue.async {
+            do {
+                guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
+                    handler?(.failure(AuthgearError.unauthenticatedUser))
+                    return
                 }
+
+                let token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
+
+                let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
+
+                let endpoint = try self.authorizeEndpoint(
+                    AuthorizeOptions(
+                        redirectURI: url.absoluteString,
+                        responseType: "none",
+                        state: nil,
+                        prompt: "none",
+                        loginHint: loginHint,
+                        uiLocales: nil
+                    ),
+                    verifier: nil
+                )
+
+                DispatchQueue.main.async {
+                    let vc = UIViewController()
+                    let wv = WKWebView(frame: vc.view.bounds)
+                    wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                    wv.load(URLRequest(url: endpoint))
+                    vc.view.addSubview(wv)
+                    vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.dismissWebView))
+                    self.webViewViewController = vc
+
+                    let nav = UINavigationController(rootViewController: vc)
+                    nav.modalPresentationStyle = .pageSheet
+
+                    let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
+                    window?.rootViewController?.present(nav, animated: true) {
+                        handler?(.success(()))
+                    }
+                }
+            } catch {
+                handler?(.failure(error))
             }
-        )
-        authenticationSession?.start()
+        }
+    }
+
+    @objc func dismissWebView() {
+        webViewViewController?.presentingViewController?.dismiss(animated: true)
+        webViewViewController = nil
     }
 
     public func open(page: AuthgearPage) {
