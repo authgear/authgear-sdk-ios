@@ -10,7 +10,7 @@ class MainViewModel: ObservableObject {
         self.appState = appState
     }
 
-    func configure(clientId: String, endpoint: String) {
+    func configure(clientId: String, endpoint: String, isThirdPartyClient: Bool) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -21,7 +21,8 @@ class MainViewModel: ObservableObject {
         }
         UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint)
+        UserDefaults.standard.set(!isThirdPartyClient, forKey: "authgear.demo.isFirstPartyClient")
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, isThirdPartyClient: isThirdPartyClient)
         successAlertMessage = "Configured Authgear successfully"
     }
 
@@ -46,19 +47,6 @@ class MainViewModel: ObservableObject {
         container?.authorize(
             redirectURI: App.redirectURI,
             prompt: "login"
-        ) { result in
-            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login")
-            if success {
-                self.successAlertMessage = "Logged in successfully"
-            }
-        }
-    }
-
-    func loginWithoutSession(container: Authgear?) {
-        container?.authorize(
-            redirectURI: App.redirectURI,
-            prompt: "login",
-            prefersSFSafariViewController: true
         ) { result in
             let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login")
             if success {

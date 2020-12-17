@@ -9,21 +9,31 @@ struct AuthgearConfigurationDescription: View {
     }
 }
 
-struct AuthgearConfigurationInput: View {
-    var label: String
-    var placeHolder: String
-    @Binding var text: String
+struct AuthgearConfigurationInput<Input: View>: View {
+    let label: String
+    let input: Input
+
     var body: some View {
         HStack(spacing: 15) {
             Text(label)
                 .minimumScaleFactor(0.8)
-                .frame(width: 70, height: nil, alignment: .leading)
-            TextField(placeHolder, text: $text)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .alignmentGuide(.trailing) { dimension in
-                    dimension[.trailing]
-                }
+                .frame(width: 150, height: nil, alignment: .leading)
+            input
         }
+    }
+}
+
+struct AuthgearConfigurationTextField: View {
+    var placeHolder: String
+    @Binding var text: String
+    var body: some View {
+        TextField(placeHolder, text: $text)
+            .autocapitalization(.none)
+            .disableAutocorrection(true)
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .alignmentGuide(.trailing) { dimension in
+                dimension[.trailing]
+            }
     }
 }
 
@@ -39,21 +49,30 @@ struct AuthgearConfigurationForm: View {
 
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
+    @State private var isThirdPartyClient: Bool = !UserDefaults.standard.bool(forKey: "authgear.demo.isFirstPartyClient")
 
     var body: some View {
         VStack {
             AuthgearConfigurationInput(
                 label: "ClientID",
-                placeHolder: "Enter Client ID",
-                text: $clientID
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter Client ID",
+                    text: $clientID
+                )
             )
             AuthgearConfigurationInput(
                 label: "Endpoint",
-                placeHolder: "Enter Endpoint",
-                text: $endpoint
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter Endpoint",
+                    text: $endpoint
+                )
+            )
+            AuthgearConfigurationInput(
+                label: "Is Third-party Client",
+                input: Toggle(isOn: $isThirdPartyClient) { EmptyView() }
             )
             Button(action: {
-                self.app.mainViewModel.configure(clientId: self.clientID, endpoint: self.endpoint)
+                self.app.mainViewModel.configure(clientId: self.clientID, endpoint: self.endpoint, isThirdPartyClient: self.isThirdPartyClient)
             }) {
                 ActionButton(text: "Configure")
             }
@@ -97,12 +116,6 @@ struct ActionButtonList: View {
                 self.mainViewModel.login(container: self.container)
             }) {
                 ActionButton(text: "Login")
-            }.disabled(!configured || loggedIn)
-
-            Button(action: {
-                self.mainViewModel.loginWithoutSession(container: self.container)
-            }) {
-                ActionButton(text: "Login Without Session")
             }.disabled(!configured || loggedIn)
 
             Button(action: {
