@@ -1,6 +1,7 @@
 import AuthenticationServices
 import Foundation
 import SafariServices
+import WebKit
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
 public typealias AuthorizeRedirectionHandler = (URL) -> Void
@@ -9,11 +10,11 @@ public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
 struct AuthorizeOptions {
     let redirectURI: String
+    let responseType: String?
     let state: String?
     let prompt: String?
     let loginHint: String?
     let uiLocales: [String]?
-    let prefersSFSafariViewController: Bool
 
     var urlScheme: String {
         if let index = redirectURI.firstIndex(of: ":") {
@@ -24,18 +25,18 @@ struct AuthorizeOptions {
 
     public init(
         redirectURI: String,
+        responseType: String,
         state: String?,
         prompt: String?,
         loginHint: String?,
-        uiLocales: [String]?,
-        prefersSFSafariViewController: Bool
+        uiLocales: [String]?
     ) {
         self.redirectURI = redirectURI
+        self.responseType = responseType
         self.state = state
         self.prompt = prompt
         self.loginHint = loginHint
         self.uiLocales = uiLocales
-        self.prefersSFSafariViewController = prefersSFSafariViewController
     }
 }
 
@@ -88,7 +89,7 @@ public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
 }
 
-public class Authgear: NSObject, SFSafariViewControllerDelegate {
+public class Authgear: NSObject {
     /**
      * To prevent user from using expired access token, we have to check in advance
      * whether it had expired in `shouldRefreshAccessToken`. If we
@@ -107,9 +108,11 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     let clientId: String
+    let isThirdPartyClient: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
+    private var webViewViewController: UIViewController?
 
     public private(set) var accessToken: String?
     private var refreshToken: String?
@@ -123,9 +126,10 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, name: String? = nil) {
+    public init(clientId: String, endpoint: String, name: String? = nil, isThirdPartyClient: Bool = true) {
         self.clientId = clientId
         self.name = name ?? "default"
+        self.isThirdPartyClient = isThirdPartyClient
         apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
@@ -163,19 +167,27 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier) throws -> URL {
+    private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
-        var queryItems = [URLQueryItem]()
+        var queryItems = [URLQueryItem(name: "response_type", value: options.responseType)]
 
-        queryItems.append(contentsOf: [
-            URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(
+        if let verifier = verifier {
+            queryItems.append(contentsOf: [
+                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
+            ])
+        }
+        if isThirdPartyClient {
+            queryItems.append(URLQueryItem(
+                name: "scope",
+                value: "openid offline_access"
+            ))
+        } else {
+            queryItems.append(URLQueryItem(
                 name: "scope",
                 value: "openid offline_access https://authgear.com/scopes/full-access"
-            ),
-            URLQueryItem(name: "code_challenge_method", value: "S256"),
-            URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
-        ])
+            ))
+        }
 
         queryItems.append(URLQueryItem(name: "client_id", value: clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
@@ -207,36 +219,6 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         urlComponents.queryItems = queryItems
 
         return urlComponents.url!
-    }
-
-    private func authorizeWithoutSession(
-        _ options: AuthorizeOptions,
-        handler: @escaping AuthorizeCompletionHandler
-    ) -> AuthorizeRedirectionHandler? {
-        let verifier = CodeVerifier()
-        let requestUrlResult = Result { try authorizeEndpoint(options, verifier: verifier) }
-        switch requestUrlResult {
-        case let .success(requestUrl):
-            let vc = SFSafariViewController(url: requestUrl)
-            vc.delegate = self
-            vc.modalPresentationStyle = .pageSheet
-            UIApplication.shared.windows.filter { $0.isKeyWindow }
-                .first?.rootViewController?.present(vc, animated: true)
-            let redirectHandler: (_ url: URL) -> Void = { [weak self] url in
-                vc.dismiss(animated: true)
-                self?.workerQueue.async {
-                    self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
-                }
-            }
-            return redirectHandler
-        case let .failure(error):
-            handler(.failure(error))
-            return nil
-        }
-    }
-
-    public func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        controller.dismiss(animated: true)
     }
 
     private func authorizeWithSession(
@@ -279,12 +261,8 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        if options.prefersSFSafariViewController {
-            authorizeRedirectionHandler = authorizeWithoutSession(options, handler: handler)
-        } else {
-            workerQueue.async {
-                self.authorizeWithSession(options, handler: handler)
-            }
+        workerQueue.async {
+            self.authorizeWithSession(options, handler: handler)
         }
     }
 
@@ -403,17 +381,16 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         prompt: String? = "login",
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
-        prefersSFSafariViewController: Bool = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         authorize(
             AuthorizeOptions(
                 redirectURI: redirectURI,
+                responseType: "code",
                 state: state,
                 prompt: prompt,
                 loginHint: loginHint,
-                uiLocales: uiLocales,
-                prefersSFSafariViewController: prefersSFSafariViewController
+                uiLocales: uiLocales
             ),
             handler: withMainQueueHandler(handler)
         )
@@ -472,7 +449,6 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
         redirectURI: String,
         state: String? = nil,
         uiLocales: [String]? = nil,
-        prefersSFSafariViewController: Bool = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
@@ -506,11 +482,11 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
                 self.authorize(
                     AuthorizeOptions(
                         redirectURI: redirectURI,
+                        responseType: "code",
                         state: state,
                         prompt: "login",
                         loginHint: loginHint,
-                        uiLocales: uiLocales,
-                        prefersSFSafariViewController: prefersSFSafariViewController
+                        uiLocales: uiLocales
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -562,19 +538,56 @@ public class Authgear: NSObject, SFSafariViewControllerDelegate {
     ) {
         let handler = handler.map { h in withMainQueueHandler(h) }
         let url = apiClient.endpoint.appendingPathComponent(path)
-        authenticationSession = authenticationSessionProvider.makeAuthenticationSession(
-            url: url,
-            callbackURLSchema: "",
-            completionHandler: { result in
-                switch result {
-                case .success:
-                    handler?(.success(()))
-                case let .failure(error):
-                    handler?(.failure(AuthgearError.unexpectedError(error)))
+
+        workerQueue.async {
+            do {
+                guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
+                    handler?(.failure(AuthgearError.unauthenticatedUser))
+                    return
                 }
+
+                let token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
+
+                let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
+
+                let endpoint = try self.authorizeEndpoint(
+                    AuthorizeOptions(
+                        redirectURI: url.absoluteString,
+                        responseType: "none",
+                        state: nil,
+                        prompt: "none",
+                        loginHint: loginHint,
+                        uiLocales: nil
+                    ),
+                    verifier: nil
+                )
+
+                DispatchQueue.main.async {
+                    let vc = UIViewController()
+                    let wv = WKWebView(frame: vc.view.bounds)
+                    wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                    wv.load(URLRequest(url: endpoint))
+                    vc.view.addSubview(wv)
+                    vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.dismissWebView))
+                    self.webViewViewController = vc
+
+                    let nav = UINavigationController(rootViewController: vc)
+                    nav.modalPresentationStyle = .pageSheet
+
+                    let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
+                    window?.rootViewController?.present(nav, animated: true) {
+                        handler?(.success(()))
+                    }
+                }
+            } catch {
+                handler?(.failure(error))
             }
-        )
-        authenticationSession?.start()
+        }
+    }
+
+    @objc func dismissWebView() {
+        webViewViewController?.presentingViewController?.dismiss(animated: true)
+        webViewViewController = nil
     }
 
     public func open(page: AuthgearPage) {
