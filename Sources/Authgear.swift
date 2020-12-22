@@ -87,6 +87,7 @@ public enum SessionStateChangeReason: String {
 
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
+    func sendWeChatAuthRequest(_ state: String)
 }
 
 public class Authgear: NSObject {
@@ -684,4 +685,19 @@ extension Authgear: AuthAPIClientDelegate {
     func getAccessToken() -> String? {
         accessToken
     }
+}
+
+extension Authgear: WSClientDelegate {
+    func onWebsocketEvent(_ event: WSEvent) {
+        switch event.kind {
+        case .weChatLoginStart:
+            if let state: String = event.data?["state"] as? String {
+                delegate?.sendWeChatAuthRequest(state)
+            }
+        case .webSessionRefresh:
+            break
+        }
+    }
+
+    func onWebsocketError(_ error: Error?) {}
 }
