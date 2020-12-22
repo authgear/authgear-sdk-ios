@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		CC337EC0259063E500CBB3BB /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = CC337EBF259063E500CBB3BB /* Starscream */; };
+		CC337EC82590648800CBB3BB /* WSClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC337EC72590648800CBB3BB /* WSClient.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
 		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
@@ -38,6 +39,7 @@
 /* Begin PBXFileReference section */
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC337EC72590648800CBB3BB /* WSClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WSClient.swift; sourceTree = "<group>"; };
 		F83392EE24FC344D00A69D3C /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		F83392F024FDA87900A69D3C /* AuthgearError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthgearError.swift; sourceTree = "<group>"; };
 		F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLComponents+QueryParames.swift"; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				F8A657A42501D31E0027888F /* JWK.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
 				F8A657A825055A7C0027888F /* Data+Base64URLEncoded.swift */,
+				CC337EC72590648800CBB3BB /* WSClient.swift */,
 			);
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -216,6 +219,7 @@
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
 				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
 				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
+				CC337EC82590648800CBB3BB /* WSClient.swift in Sources */,
 				F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */,
 				F83D84B024F860AA00B4393C /* AuthenticationSession.swift in Sources */,
 				F83D84A824F64D0E00B4393C /* Authgear.swift in Sources */,
