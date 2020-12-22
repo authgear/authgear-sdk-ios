@@ -130,6 +130,11 @@ protocol AuthAPIClient: AnyObject {
         refreshToken: String,
         handler: @escaping (Result<AppSessionTokenResponse, Error>) -> Void
     )
+    func requestWeChatAuthCallback(
+        code: String,
+        state: String,
+        handler: @escaping (Result<Void, Error>) -> Void
+    )
 }
 
 extension AuthAPIClient {
@@ -216,6 +221,15 @@ extension AuthAPIClient {
         try withSemaphore { handler in
             self.requestAppSessionToken(
                 refreshToken: refreshToken,
+                handler: handler
+            )
+        }
+    }
+
+    func syncRequestWeChatAuthCallback(code: String, state: String) throws {
+        try withSemaphore { handler in
+            self.requestWeChatAuthCallback(
+                code: code, state: state,
                 handler: handler
             )
         }
@@ -474,6 +488,25 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
         fetch(request: urlRequest, handler: { (result: Result<APIResponse<AppSessionTokenResponse>, Error>) in
             handler(result.flatMap { $0.toResult() })
+        })
+    }
+
+    func requestWeChatAuthCallback(code: String, state: String, handler: @escaping (Result<Void, Error>) -> Void) {
+        let u = endpoint.appendingPathComponent("/sso/wechat/callback")
+        let queryItems = [
+            URLQueryItem(name: "code", value: code),
+            URLQueryItem(name: "state", value: state)
+        ]
+        var urlComponents = URLComponents(
+            url: u,
+            resolvingAgainstBaseURL: false
+        )!
+        urlComponents.queryItems = queryItems
+        var urlRequest = URLRequest(url: urlComponents.url!)
+        urlRequest.httpMethod = "GET"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
+        fetch(request: urlRequest, handler: { result in
+            handler(result.map { _ in () })
         })
     }
 }
