@@ -49,7 +49,7 @@ struct AuthgearConfigurationForm: View {
 
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
-    @State private var isThirdPartyClient: Bool = !UserDefaults.standard.bool(forKey: "authgear.demo.isFirstPartyClient")
+    @State private var isThirdParty: Bool = !UserDefaults.standard.bool(forKey: "authgear.demo.isFirstParty")
 
     var body: some View {
         VStack {
@@ -68,11 +68,11 @@ struct AuthgearConfigurationForm: View {
                 )
             )
             AuthgearConfigurationInput(
-                label: "Is Third-party Client",
-                input: Toggle(isOn: $isThirdPartyClient) { EmptyView() }
+                label: "Is Third-party app",
+                input: Toggle(isOn: $isThirdParty) { EmptyView() }
             )
             Button(action: {
-                self.app.mainViewModel.configure(clientId: self.clientID, endpoint: self.endpoint, isThirdPartyClient: self.isThirdPartyClient)
+                self.app.mainViewModel.configure(clientId: self.clientID, endpoint: self.endpoint, isThirdParty: self.isThirdParty)
             }) {
                 ActionButton(text: "Configure")
             }

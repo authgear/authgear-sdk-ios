@@ -108,7 +108,7 @@ public class Authgear: NSObject {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     let clientId: String
-    let isThirdPartyClient: Bool
+    let isThirdParty: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -126,10 +126,10 @@ public class Authgear: NSObject {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, name: String? = nil, isThirdPartyClient: Bool = true) {
+    public init(clientId: String, endpoint: String, name: String? = nil, isThirdParty: Bool = true) {
         self.clientId = clientId
         self.name = name ?? "default"
-        self.isThirdPartyClient = isThirdPartyClient
+        self.isThirdParty = isThirdParty
         apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
@@ -177,7 +177,7 @@ public class Authgear: NSObject {
                 URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
             ])
         }
-        if isThirdPartyClient {
+        if isThirdParty {
             queryItems.append(URLQueryItem(
                 name: "scope",
                 value: "openid offline_access"
