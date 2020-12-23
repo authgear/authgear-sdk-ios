@@ -195,6 +195,7 @@ public class Authgear: NSObject {
         queryItems.append(URLQueryItem(name: "client_id", value: clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
         queryItems.append(URLQueryItem(name: "x_ws_channel_id", value: wsChannelID))
+        queryItems.append(URLQueryItem(name: "x_sdk", value: "ios"))
 
         if let state = options.state {
             queryItems.append(URLQueryItem(name: "state", value: state))
