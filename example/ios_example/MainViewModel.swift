@@ -10,7 +10,7 @@ class MainViewModel: ObservableObject {
         self.appState = appState
     }
 
-    func configure(clientId: String, endpoint: String, isThirdPartyClient: Bool) {
+    func configure(clientId: String, endpoint: String, isThirdParty: Bool) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -21,8 +21,8 @@ class MainViewModel: ObservableObject {
         }
         UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
-        UserDefaults.standard.set(!isThirdPartyClient, forKey: "authgear.demo.isFirstPartyClient")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, isThirdPartyClient: isThirdPartyClient)
+        UserDefaults.standard.set(!isThirdParty, forKey: "authgear.demo.isFirstParty")
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, isThirdParty: isThirdParty)
         successAlertMessage = "Configured Authgear successfully"
     }
 
