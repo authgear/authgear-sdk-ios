@@ -35,8 +35,17 @@ protocol WSClient: AnyObject {
 }
 
 class DefaultWSClient: WSClient, WebSocketDelegate {
+    private let pingInterval: TimeInterval = 3
+    // reconnectInterval needs to be longer than requestTimeoutInterval
+    // otherwise reconnection will be triggered before timeout
+    private let reconnectInterval: TimeInterval = 5
+    private let requestTimeoutInterval: TimeInterval = 5
+
     public let endpoint: URL
     private var socket: WebSocket?
+    private var pingTimer: Timer?
+    private var reconnectTimer: Timer?
+    private var wsChannelID: String = ""
     private var isConnected: Bool = false
 
     weak var delegate: WSClientDelegate?
@@ -61,6 +70,7 @@ class DefaultWSClient: WSClient, WebSocketDelegate {
         // try disconnect the existing client if it exists
         disconnect()
 
+        wsChannelID = channelID
         let queryItems = [URLQueryItem(name: "x_ws_channel_id", value: channelID)]
         var urlComponents = URLComponents(
             url: endpoint,
@@ -73,22 +83,53 @@ class DefaultWSClient: WSClient, WebSocketDelegate {
         socket = WebSocket(request: request)
         socket?.delegate = self
         socket?.connect()
+
+        pingTimer = Timer.scheduledTimer(withTimeInterval: pingInterval, repeats: true) { [weak self] _ in
+            self?.sendPing()
+        }
+
+        reconnectTimer = Timer.scheduledTimer(withTimeInterval: reconnectInterval, repeats: true) { [weak self] _ in
+            self?.reconnectIfNeeded()
+        }
     }
 
     func disconnect() {
+        reconnectTimer?.invalidate()
+        reconnectTimer = nil
+
+        pingTimer?.invalidate()
+        pingTimer = nil
+
         socket?.disconnect()
         socket = nil
+
+        wsChannelID = ""
+        isConnected = false
+    }
+
+    func reconnectIfNeeded() {
+        if !isConnected && wsChannelID != "" {
+            connect(wsChannelID)
+        }
+    }
+
+    func sendPing() {
+        if isConnected {
+            socket?.write(ping: Data(), completion: {})
+        }
     }
 
     func didReceive(event: WebSocketEvent, client: WebSocket) {
         switch event {
         case .connected:
             isConnected = true
-        case .disconnected(let _, let code):
-            if code != 1000 {
-                client.connect()
-            }
+        case let .disconnected(_, code):
             isConnected = false
+            if code != 1000 {
+                reconnectIfNeeded()
+            } else {
+                disconnect()
+            }
         case let .text(string):
             let decorder = JSONDecoder()
             decorder.keyDecodingStrategy = .convertFromSnakeCase
@@ -107,8 +148,10 @@ class DefaultWSClient: WSClient, WebSocketDelegate {
             break
         case .cancelled:
             isConnected = false
+            reconnectIfNeeded()
         case let .error(error):
             isConnected = false
+            reconnectIfNeeded()
             delegate?.onWebsocketError(error)
         }
     }
