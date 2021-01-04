@@ -15,6 +15,7 @@ struct AuthorizeOptions {
     let prompt: String?
     let loginHint: String?
     let uiLocales: [String]?
+    var wsChannelID: String?
 
     var urlScheme: String {
         if let index = redirectURI.firstIndex(of: ":") {
@@ -29,7 +30,8 @@ struct AuthorizeOptions {
         state: String?,
         prompt: String?,
         loginHint: String?,
-        uiLocales: [String]?
+        uiLocales: [String]?,
+        wsChannelID: String? = nil
     ) {
         self.redirectURI = redirectURI
         self.responseType = responseType
@@ -37,6 +39,7 @@ struct AuthorizeOptions {
         self.prompt = prompt
         self.loginHint = loginHint
         self.uiLocales = uiLocales
+        self.wsChannelID = wsChannelID
     }
 }
 
@@ -170,7 +173,7 @@ public class Authgear: NSObject {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier?, wsChannelID: String) throws -> URL {
+    private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
         var queryItems = [URLQueryItem(name: "response_type", value: options.responseType)]
 
@@ -194,7 +197,6 @@ public class Authgear: NSObject {
 
         queryItems.append(URLQueryItem(name: "client_id", value: clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
-        queryItems.append(URLQueryItem(name: "x_ws_channel_id", value: wsChannelID))
         queryItems.append(URLQueryItem(name: "x_sdk", value: "ios"))
 
         if let state = options.state {
@@ -216,6 +218,10 @@ public class Authgear: NSObject {
             ))
         }
 
+        if let wsChannelID = options.wsChannelID {
+            queryItems.append(URLQueryItem(name: "x_ws_channel_id", value: wsChannelID))
+        }
+
         var urlComponents = URLComponents(
             url: configuration.authorizationEndpoint,
             resolvingAgainstBaseURL: false
@@ -232,7 +238,9 @@ public class Authgear: NSObject {
     ) {
         let verifier = CodeVerifier()
         let wsChannelID = UUID().uuidString
-        let url = Result { try authorizeEndpoint(options, verifier: verifier, wsChannelID: wsChannelID) }
+        var optionsCopy = options
+        optionsCopy.wsChannelID = wsChannelID
+        let url = Result { try authorizeEndpoint(optionsCopy, verifier: verifier) }
 
         DispatchQueue.main.async {
             switch url {
@@ -566,8 +574,6 @@ public class Authgear: NSObject {
 
                 // this flow is opening authenticated page with app session token
                 // don't need to open websocket to observe
-                let wsChannelID = UUID().uuidString
-
                 let endpoint = try self.authorizeEndpoint(
                     AuthorizeOptions(
                         redirectURI: url.absoluteString,
@@ -577,8 +583,7 @@ public class Authgear: NSObject {
                         loginHint: loginHint,
                         uiLocales: nil
                     ),
-                    verifier: nil,
-                    wsChannelID: wsChannelID
+                    verifier: nil
                 )
 
                 DispatchQueue.main.async {
