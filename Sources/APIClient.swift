@@ -495,7 +495,8 @@ class DefaultAuthAPIClient: AuthAPIClient {
         let u = endpoint.appendingPathComponent("/sso/wechat/callback")
         let queryItems = [
             URLQueryItem(name: "code", value: code),
-            URLQueryItem(name: "state", value: state)
+            URLQueryItem(name: "state", value: state),
+            URLQueryItem(name: "x_sdk", value: "ios")
         ]
         var urlComponents = URLComponents(
             url: u,
@@ -503,8 +504,11 @@ class DefaultAuthAPIClient: AuthAPIClient {
         )!
         urlComponents.queryItems = queryItems
         var urlRequest = URLRequest(url: urlComponents.url!)
-        urlRequest.httpMethod = "GET"
-        urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue(
+            "application/x-www-form-urlencoded",
+            forHTTPHeaderField: "content-type"
+        )
         fetch(request: urlRequest, handler: { result in
             handler(result.map { _ in () })
         })
