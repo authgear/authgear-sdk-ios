@@ -493,22 +493,23 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
     func requestWeChatAuthCallback(code: String, state: String, handler: @escaping (Result<Void, Error>) -> Void) {
         let u = endpoint.appendingPathComponent("/sso/wechat/callback")
+
         let queryItems = [
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "x_sdk", value: "ios")
         ]
-        var urlComponents = URLComponents(
-            url: u,
-            resolvingAgainstBaseURL: false
-        )!
+        var urlComponents = URLComponents()
         urlComponents.queryItems = queryItems
-        var urlRequest = URLRequest(url: urlComponents.url!)
+
+        var urlRequest = URLRequest(url: u)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue(
             "application/x-www-form-urlencoded",
             forHTTPHeaderField: "content-type"
         )
+        urlRequest.httpBody = urlComponents.query?.data(using: .utf8)
+
         fetch(request: urlRequest, handler: { result in
             handler(result.map { _ in () })
         })
