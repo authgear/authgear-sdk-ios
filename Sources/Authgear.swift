@@ -15,6 +15,7 @@ struct AuthorizeOptions {
     let prompt: String?
     let loginHint: String?
     let uiLocales: [String]?
+    var wsChannelID: String?
 
     var urlScheme: String {
         if let index = redirectURI.firstIndex(of: ":") {
@@ -29,7 +30,8 @@ struct AuthorizeOptions {
         state: String?,
         prompt: String?,
         loginHint: String?,
-        uiLocales: [String]?
+        uiLocales: [String]?,
+        wsChannelID: String? = nil
     ) {
         self.redirectURI = redirectURI
         self.responseType = responseType
@@ -37,6 +39,7 @@ struct AuthorizeOptions {
         self.prompt = prompt
         self.loginHint = loginHint
         self.uiLocales = uiLocales
+        self.wsChannelID = wsChannelID
     }
 }
 
@@ -87,6 +90,7 @@ public enum SessionStateChangeReason: String {
 
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
+    func sendWeChatAuthRequest(_ state: String)
 }
 
 public class Authgear: NSObject {
@@ -106,6 +110,7 @@ public class Authgear: NSObject {
     private static let ExpireInPercentage = 0.9
     let name: String
     let apiClient: AuthAPIClient
+    let wsClient: WSClient
     let storage: ContainerStorage
     let clientId: String
     let isThirdParty: Bool
@@ -131,6 +136,7 @@ public class Authgear: NSObject {
         self.name = name ?? "default"
         self.isThirdParty = isThirdParty
         apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
+        wsClient = DefaultWSClient(endpoint: URL(string: endpoint)!)
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
@@ -191,6 +197,7 @@ public class Authgear: NSObject {
 
         queryItems.append(URLQueryItem(name: "client_id", value: clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
+        queryItems.append(URLQueryItem(name: "x_sdk", value: "ios"))
 
         if let state = options.state {
             queryItems.append(URLQueryItem(name: "state", value: state))
@@ -211,6 +218,10 @@ public class Authgear: NSObject {
             ))
         }
 
+        if let wsChannelID = options.wsChannelID {
+            queryItems.append(URLQueryItem(name: "x_ws_channel_id", value: wsChannelID))
+        }
+
         var urlComponents = URLComponents(
             url: configuration.authorizationEndpoint,
             resolvingAgainstBaseURL: false
@@ -226,15 +237,26 @@ public class Authgear: NSObject {
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let verifier = CodeVerifier()
-        let url = Result { try authorizeEndpoint(options, verifier: verifier) }
+        let wsChannelID = UUID().uuidString
+        var optionsCopy = options
+        optionsCopy.wsChannelID = wsChannelID
+        let url = Result { try authorizeEndpoint(optionsCopy, verifier: verifier) }
 
         DispatchQueue.main.async {
             switch url {
             case let .success(url):
+                // connect websocket
+                self.wsClient.delegate = self
+                self.wsClient.connect(wsChannelID)
+
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: options.urlScheme,
                     completionHandler: { [weak self] result in
+                        // disconnect websocket
+                        self?.wsClient.disconnect()
+                        self?.wsClient.delegate = nil
+
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
@@ -550,6 +572,8 @@ public class Authgear: NSObject {
 
                 let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
 
+                // this flow is opening authenticated page with app session token
+                // don't need to open websocket to observe
                 let endpoint = try self.authorizeEndpoint(
                     AuthorizeOptions(
                         redirectURI: url.absoluteString,
@@ -661,10 +685,40 @@ public class Authgear: NSObject {
             fetchUserInfo(accessToken ?? "")
         }
     }
+
+    public func weChatAuthCallback(code: String, state: String, handler: VoidCompletionHandler? = nil) {
+        let handler = handler.map { h in withMainQueueHandler(h) }
+        workerQueue.async {
+            do {
+                try self.apiClient.syncRequestWeChatAuthCallback(
+                    code: code,
+                    state: state
+                )
+                handler?(.success(()))
+            } catch {
+                handler?(.failure(error))
+            }
+        }
+    }
 }
 
 extension Authgear: AuthAPIClientDelegate {
     func getAccessToken() -> String? {
         accessToken
     }
+}
+
+extension Authgear: WSClientDelegate {
+    func onWebsocketEvent(_ event: WSEvent) {
+        switch event.kind {
+        case .weChatLoginStart:
+            if let state: String = event.data?["state"] as? String {
+                delegate?.sendWeChatAuthRequest(state)
+            }
+        case .webSessionRefresh:
+            break
+        }
+    }
+
+    func onWebsocketError(_ error: Error?) {}
 }
