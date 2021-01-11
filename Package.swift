@@ -11,12 +11,11 @@ let package = Package(
     )],
     dependencies: [ // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/daltoniam/Starscream.git", from: "4.0.4")
     ],
     targets: [
         .target(
             name: "Authgear",
-            dependencies: ["Starscream"],
+            dependencies: [],
             path: "Sources"
         ),
         .testTarget(
