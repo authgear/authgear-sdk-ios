@@ -727,6 +727,21 @@ public class Authgear: NSObject {
             fetchUserInfo(accessToken ?? "")
         }
     }
+
+    public func weChatAuthCallback(code: String, state: String, handler: VoidCompletionHandler? = nil) {
+        let handler = handler.map { h in withMainQueueHandler(h) }
+        workerQueue.async {
+            do {
+                try self.apiClient.syncRequestWeChatAuthCallback(
+                    code: code,
+                    state: state
+                )
+                handler?(.success(()))
+            } catch {
+                handler?(.failure(error))
+            }
+        }
+    }
 }
 
 extension Authgear: AuthAPIClientDelegate {
