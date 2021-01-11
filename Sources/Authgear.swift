@@ -90,10 +90,12 @@ public enum SessionStateChangeReason: String {
 
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
+    func sendWeChatAuthRequest(_ state: String)
 }
 
 public extension AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
+    func sendWeChatAuthRequest(_ state: String) {}
 }
 
 public class Authgear: NSObject {
@@ -127,6 +129,8 @@ public class Authgear: NSObject {
 
     private let jwkStore = JWKStore()
     private let workerQueue: DispatchQueue
+
+    private var currentWeChatRedirectURI: String?
 
     public private(set) var sessionState: SessionState = .unknown
     public private(set) var authorizeRedirectionHandler: AuthorizeRedirectionHandler?
@@ -247,10 +251,12 @@ public class Authgear: NSObject {
         DispatchQueue.main.async {
             switch url {
             case let .success(url):
+                self.registerCurrentWeChatRedirectURI(uri: options.weChatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: options.urlScheme,
                     completionHandler: { [weak self] result in
+                        self?.unregisterCurrentWeChatRedirectURI()
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
@@ -384,6 +390,45 @@ public class Authgear: NSObject {
                 handler(result)
             }
         }
+    }
+
+    private func registerCurrentWeChatRedirectURI(uri: String?) {
+        currentWeChatRedirectURI = uri
+    }
+
+    private func unregisterCurrentWeChatRedirectURI() {
+        currentWeChatRedirectURI = nil
+    }
+
+    public func handleWeChatRedirectURI(_ url: URL) -> Bool {
+        if currentWeChatRedirectURI == nil {
+            return false
+        }
+
+        guard var uc = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return false
+        }
+
+        // get state
+        let params = uc.queryParams
+        let state = params["state"]
+        if (state ?? "").isEmpty {
+            return false
+        }
+
+        // construct and compare url without query
+        uc.query = nil
+        uc.fragment = nil
+        guard let urlWithoutQuery = uc.string else {
+            return false
+        }
+
+        if urlWithoutQuery == currentWeChatRedirectURI {
+            delegate?.sendWeChatAuthRequest(state!)
+            return true
+        }
+
+        return false
     }
 
     public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
