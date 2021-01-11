@@ -64,6 +64,7 @@
 		7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAvoidingView.swift; sourceTree = "<group>"; };
 		80C812C632281CE6A9C785F1 /* Pods-ios_example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_example.debug.xcconfig"; path = "Target Support Files/Pods-ios_example/Pods-ios_example.debug.xcconfig"; sourceTree = "<group>"; };
 		CCC8F72E25AC33D0000358F1 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		CCC8F73225AC3488000358F1 /* ios_example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ios_example.entitlements; sourceTree = "<group>"; };
 		F89AEF8024F57A6B00CF5F57 /* ios_example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios_example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -116,6 +117,7 @@
 		F89AEF8224F57A6B00CF5F57 /* ios_example */ = {
 			isa = PBXGroup;
 			children = (
+				CCC8F73225AC3488000358F1 /* ios_example.entitlements */,
 				F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */,
 				7A0B543E255512F800718C05 /* SceneDelegate.swift */,
 				F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */,
@@ -412,6 +414,7 @@
 			baseConfigurationReference = 80C812C632281CE6A9C785F1 /* Pods-ios_example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ios_example/ios_example.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = E2F6KNYMR6;
@@ -452,6 +455,7 @@
 			baseConfigurationReference = 0BF7FAA64028E5C1E5B4FFD9 /* Pods-ios_example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ios_example/ios_example.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = E2F6KNYMR6;
