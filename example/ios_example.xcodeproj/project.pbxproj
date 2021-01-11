@@ -14,6 +14,7 @@
 		7A0B544525554CB300718C05 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B544425554CB300718C05 /* App.swift */; };
 		7A60D0FD255596AF00357B6D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A60D0FC255596AF00357B6D /* AppState.swift */; };
 		7A60D1052559571C00357B6D /* KeyboardAvoidingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */; };
+		CCC8F73025AC33D6000358F1 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCC8F72E25AC33D0000358F1 /* WebKit.framework */; };
 		F89AEF8424F57A6B00CF5F57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */; };
 		F89AEF8D24F57A6C00CF5F57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */; };
 		F89AEF9024F57A6C00CF5F57 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */; };
@@ -62,6 +63,7 @@
 		7A60D0FC255596AF00357B6D /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAvoidingView.swift; sourceTree = "<group>"; };
 		80C812C632281CE6A9C785F1 /* Pods-ios_example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_example.debug.xcconfig"; path = "Target Support Files/Pods-ios_example/Pods-ios_example.debug.xcconfig"; sourceTree = "<group>"; };
+		CCC8F72E25AC33D0000358F1 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		F89AEF8024F57A6B00CF5F57 /* ios_example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios_example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CCC8F73025AC33D6000358F1 /* WebKit.framework in Frameworks */,
 				F89AEFAE24F5826E00CF5F57 /* Authgear.framework in Frameworks */,
 				25D3CE61D191A5A941AE7822 /* Pods_ios_example.framework in Frameworks */,
 			);
@@ -130,6 +133,7 @@
 		F89AEF9724F57AFA00CF5F57 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CCC8F72E25AC33D0000358F1 /* WebKit.framework */,
 				F89AEFA524F5826400CF5F57 /* Authgear.xcodeproj */,
 				334D39BA4EECBD0957B18F9D /* Pods_ios_example.framework */,
 			);
@@ -417,6 +421,24 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"WeChatSDK\"",
+					"-l\"c++\"",
+					"-l\"sqlite3.0\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"WebKit\"",
+					"-ObjC",
+					"-all_load",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.exampleapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS development";
@@ -438,6 +460,24 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"WeChatSDK\"",
+					"-l\"c++\"",
+					"-l\"sqlite3.0\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"WebKit\"",
+					"-ObjC",
+					"-all_load",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.exampleapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";

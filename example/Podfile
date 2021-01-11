@@ -6,5 +6,6 @@ target 'ios_example' do
   use_frameworks!
 
   # Pods for ios_example
+  pod 'WechatOpenSDK'
 
 end
