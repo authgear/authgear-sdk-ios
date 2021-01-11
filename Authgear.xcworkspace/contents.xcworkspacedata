@@ -5,6 +5,9 @@
       location = "group:example/ios_example.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:example/Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "container:Authgear.xcodeproj">
    </FileRef>
 </Workspace>
