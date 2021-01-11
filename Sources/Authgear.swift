@@ -92,6 +92,10 @@ public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
 }
 
+public extension AuthgearDelegate {
+    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
+}
+
 public class Authgear: NSObject {
     /**
      * To prevent user from using expired access token, we have to check in advance
