@@ -65,6 +65,7 @@
 		80C812C632281CE6A9C785F1 /* Pods-ios_example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_example.debug.xcconfig"; path = "Target Support Files/Pods-ios_example/Pods-ios_example.debug.xcconfig"; sourceTree = "<group>"; };
 		CCC8F72E25AC33D0000358F1 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		CCC8F73225AC3488000358F1 /* ios_example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ios_example.entitlements; sourceTree = "<group>"; };
+		CCC8F73925AC35D9000358F1 /* WechatOpenSDK-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WechatOpenSDK-Bridging-Header.h"; sourceTree = "<group>"; };
 		F89AEF8024F57A6B00CF5F57 /* ios_example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios_example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -128,6 +129,7 @@
 				7A0B544425554CB300718C05 /* App.swift */,
 				7A60D0FC255596AF00357B6D /* AppState.swift */,
 				7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */,
+				CCC8F73925AC35D9000358F1 /* WechatOpenSDK-Bridging-Header.h */,
 			);
 			path = ios_example;
 			sourceTree = "<group>";
@@ -445,6 +447,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.exampleapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS development";
+				SWIFT_OBJC_BRIDGING_HEADER = "ios_example/WechatOpenSDK-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -486,6 +489,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.exampleapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS";
+				SWIFT_OBJC_BRIDGING_HEADER = "ios_example/WechatOpenSDK-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
