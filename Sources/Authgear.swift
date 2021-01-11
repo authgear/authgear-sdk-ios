@@ -221,6 +221,8 @@ public class Authgear: NSObject {
             ))
         }
 
+        queryItems.append(URLQueryItem(name: "x_platform", value: "ios"))
+
         var urlComponents = URLComponents(
             url: configuration.authorizationEndpoint,
             resolvingAgainstBaseURL: false
