@@ -4,7 +4,6 @@ import SafariServices
 import WebKit
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
-public typealias AuthorizeRedirectionHandler = (URL) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
@@ -133,7 +132,6 @@ public class Authgear: NSObject {
     private var currentWeChatRedirectURI: String?
 
     public private(set) var sessionState: SessionState = .unknown
-    public private(set) var authorizeRedirectionHandler: AuthorizeRedirectionHandler?
 
     public weak var delegate: AuthgearDelegate?
 
@@ -432,7 +430,6 @@ public class Authgear: NSObject {
     }
 
     public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        authorizeRedirectionHandler?(url)
         _ = handleWeChatRedirectURI(url)
         return true
     }
