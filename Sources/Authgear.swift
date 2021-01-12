@@ -400,7 +400,7 @@ public class Authgear: NSObject {
         currentWeChatRedirectURI = nil
     }
 
-    public func handleWeChatRedirectURI(_ url: URL) -> Bool {
+    private func handleWeChatRedirectURI(_ url: URL) -> Bool {
         if currentWeChatRedirectURI == nil {
             return false
         }
@@ -433,7 +433,17 @@ public class Authgear: NSObject {
 
     public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         authorizeRedirectionHandler?(url)
+        _ = handleWeChatRedirectURI(url)
         return true
+    }
+
+    @available(iOS 13.0, *)
+    public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let url = userActivity.webpageURL else {
+            return
+        }
+        _ = handleWeChatRedirectURI(url)
     }
 
     public func authorize(
