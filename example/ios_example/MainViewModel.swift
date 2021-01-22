@@ -46,7 +46,8 @@ class MainViewModel: ObservableObject {
     func login(container: Authgear?) {
         container?.authorize(
             redirectURI: App.redirectURI,
-            prompt: "login"
+            prompt: "login",
+            weChatRedirectURI: App.weChatRedirectURI
         ) { result in
             let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login")
             if success {
@@ -70,7 +71,8 @@ class MainViewModel: ObservableObject {
 
     func promoteAnonymousUser(container: Authgear?) {
         container?.promoteAnonymousUser(
-            redirectURI: App.redirectURI
+            redirectURI: App.redirectURI,
+            weChatRedirectURI: App.weChatRedirectURI
         ) { result in
             let success = self.handleAuthorizeResult(result, errorMessage: "Failed to promote anonymous user")
             if success {
