@@ -613,6 +613,7 @@ public class Authgear: NSObject {
 
     public func openUrl(
         path: String,
+        wechatRedirectURI: String? = nil,
         handler: VoidCompletionHandler? = nil
     ) {
         let handler = handler.map { h in withMainQueueHandler(h) }
@@ -637,15 +638,25 @@ public class Authgear: NSObject {
                         prompt: "none",
                         loginHint: loginHint,
                         uiLocales: nil,
-                        weChatRedirectURI: nil
+                        weChatRedirectURI: wechatRedirectURI
                     ),
                     verifier: nil
                 )
 
                 DispatchQueue.main.async {
+                    // For opening setting page, sdk will not know when user end
+                    // the setting page.
+                    // So we cannot unregister the wechat uri in this case
+                    // It is fine to not unresgister it, as everytime we open a
+                    // new authorize section (authorize or setting page)
+                    // registerCurrentWeChatRedirectURI will be called and overwrite
+                    // previous registered wechatRedirectURI
+                    self.registerCurrentWeChatRedirectURI(uri: wechatRedirectURI)
+
                     let vc = UIViewController()
                     let wv = WKWebView(frame: vc.view.bounds)
                     wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                    wv.navigationDelegate = self
                     wv.load(URLRequest(url: endpoint))
                     vc.view.addSubview(wv)
                     vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.dismissWebView))
@@ -670,8 +681,11 @@ public class Authgear: NSObject {
         webViewViewController = nil
     }
 
-    public func open(page: AuthgearPage) {
-        openUrl(path: page.rawValue)
+    public func open(
+        page: AuthgearPage,
+        wechatRedirectURI: String? = nil
+    ) {
+        openUrl(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
     }
 
     public func shouldRefreshAccessToken() -> Bool {
@@ -761,5 +775,19 @@ public class Authgear: NSObject {
 extension Authgear: AuthAPIClientDelegate {
     func getAccessToken() -> String? {
         accessToken
+    }
+}
+
+extension Authgear: WKNavigationDelegate {
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if let url = navigationAction.request.url {
+            let isWeChatRedirectURI = handleWeChatRedirectURI(url)
+            if isWeChatRedirectURI {
+                decisionHandler(.cancel)
+                return
+            }
+        }
+
+        decisionHandler(.allow)
     }
 }
