@@ -66,7 +66,10 @@ class MainViewModel: ObservableObject {
     }
 
     func openSetting(container: Authgear?) {
-        container?.open(page: .settings)
+        container?.open(
+            page: .settings,
+            wechatRedirectURI: App.weChatRedirectURI
+        )
     }
 
     func promoteAnonymousUser(container: Authgear?) {
