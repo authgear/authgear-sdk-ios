@@ -50,6 +50,7 @@ struct AuthgearConfigurationForm: View {
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var isThirdParty: Bool = !UserDefaults.standard.bool(forKey: "authgear.demo.isFirstParty")
+    @State private var page: String = UserDefaults.standard.string(forKey: "authgear.demo.page") ?? ""
 
     var body: some View {
         VStack {
@@ -68,11 +69,18 @@ struct AuthgearConfigurationForm: View {
                 )
             )
             AuthgearConfigurationInput(
+                label: "Page",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "'login' or 'signup'",
+                    text: $page
+                )
+            )
+            AuthgearConfigurationInput(
                 label: "Is Third-party app",
                 input: Toggle(isOn: $isThirdParty) { EmptyView() }
             )
             Button(action: {
-                self.app.mainViewModel.configure(clientId: self.clientID, endpoint: self.endpoint, isThirdParty: self.isThirdParty)
+                self.app.configure(clientId: self.clientID, endpoint: self.endpoint, isThirdParty: self.isThirdParty, page: self.page)
             }) {
                 ActionButton(text: "Configure")
             }
@@ -91,8 +99,6 @@ struct AuthgearActionDescription: View {
 
 struct ActionButtonList: View {
     @EnvironmentObject private var app: App
-    @EnvironmentObject private var appState: AppState
-    @EnvironmentObject private var mainViewModel: MainViewModel
 
     private var container: Authgear? {
         app.container
@@ -103,47 +109,47 @@ struct ActionButtonList: View {
     }
 
     private var loggedIn: Bool {
-        appState.user != nil
+        app.user != nil
     }
 
     private var canBePromotedFromAnonymous: Bool {
-        configured && loggedIn && appState.user?.isAnonymous == true
+        configured && loggedIn && app.user?.isAnonymous == true
     }
 
     var body: some View {
         VStack(spacing: 30) {
             Button(action: {
-                self.mainViewModel.login(container: self.container)
+                self.app.login(container: self.container)
             }) {
                 ActionButton(text: "Login")
             }.disabled(!configured || loggedIn)
 
             Button(action: {
-                self.mainViewModel.loginAnonymously(container: self.container)
+                self.app.loginAnonymously(container: self.container)
             }) {
                 ActionButton(text: "Login Anonymously")
             }.disabled(!configured || loggedIn)
 
             Button(action: {
-                self.mainViewModel.openSetting(container: self.container)
+                self.app.openSetting(container: self.container)
             }) {
                 ActionButton(text: "Open Setting Page")
             }.disabled(!configured)
 
             Button(action: {
-                self.mainViewModel.promoteAnonymousUser(container: self.container)
+                self.app.promoteAnonymousUser(container: self.container)
             }) {
                 ActionButton(text: "Promote Anonymous User")
             }.disabled(!canBePromotedFromAnonymous)
 
             Button(action: {
-                self.mainViewModel.fetchUserInfo(container: self.container)
+                self.app.fetchUserInfo(container: self.container)
             }) {
                 ActionButton(text: "Fetch User Info")
             }.disabled(!configured || !loggedIn)
 
             Button(action: {
-                self.mainViewModel.logout(container: self.container)
+                self.app.logout(container: self.container)
             }) {
                 ActionButton(text: "Logout")
             }.disabled(!configured || !loggedIn)
@@ -154,11 +160,11 @@ struct ActionButtonList: View {
 // TODO: find a better fix
 // chaining alert in same VStack does not work on some device
 struct ErrorAlertView: View {
-    @EnvironmentObject private var mainViewModel: MainViewModel
+    @EnvironmentObject private var app: App
 
     private var hasError: Binding<Bool> { Binding(
-        get: { self.mainViewModel.authgearActionErrorMessage != nil },
-        set: { if !$0 { self.mainViewModel.authgearActionErrorMessage = nil } }
+        get: { self.app.authgearActionErrorMessage != nil },
+        set: { if !$0 { self.app.authgearActionErrorMessage = nil } }
     ) }
 
     var body: some View {
@@ -168,18 +174,18 @@ struct ErrorAlertView: View {
         .alert(isPresented: hasError, content: {
             Alert(
                 title: Text("Error"),
-                message: Text(mainViewModel.authgearActionErrorMessage ?? "")
+                message: Text(self.app.authgearActionErrorMessage ?? "")
             )
         })
     }
 }
 
 struct SuccessAlertView: View {
-    @EnvironmentObject private var mainViewModel: MainViewModel
+    @EnvironmentObject private var app: App
 
     private var shouldShowSuccessDialog: Binding<Bool> { Binding(
-        get: { self.mainViewModel.successAlertMessage != nil },
-        set: { if !$0 { self.mainViewModel.successAlertMessage = nil } }
+        get: { self.app.successAlertMessage != nil },
+        set: { if !$0 { self.app.successAlertMessage = nil } }
     ) }
 
     var body: some View {
@@ -189,7 +195,7 @@ struct SuccessAlertView: View {
         .alert(isPresented: shouldShowSuccessDialog, content: {
             Alert(
                 title: Text("Success"),
-                message: Text(mainViewModel.successAlertMessage ?? "")
+                message: Text(self.app.successAlertMessage ?? "")
             )
         })
     }
@@ -202,15 +208,15 @@ struct ContentView: View {
         ScrollView {
             VStack(spacing: 20) {
                 AuthgearConfigurationDescription()
-                AuthgearConfigurationForm()
+                AuthgearConfigurationForm().environmentObject(app)
                 AuthgearActionDescription()
                 ActionButtonList()
-                    .environmentObject(app.appState)
-                    .environmentObject(app.mainViewModel)
+                    .environmentObject(app)
+                    .environmentObject(app)
                 ErrorAlertView()
-                    .environmentObject(app.mainViewModel)
+                    .environmentObject(app)
                 SuccessAlertView()
-                    .environmentObject(app.mainViewModel)
+                    .environmentObject(app)
             }.padding(20)
         }
         .padding(.top) // avoid overlap with status bar

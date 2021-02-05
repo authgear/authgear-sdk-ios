@@ -10,9 +10,7 @@
 		25D3CE61D191A5A941AE7822 /* Pods_ios_example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 334D39BA4EECBD0957B18F9D /* Pods_ios_example.framework */; };
 		7A0B543F255512F800718C05 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B543E255512F800718C05 /* SceneDelegate.swift */; };
 		7A0B54412555135300718C05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B54402555135300718C05 /* ContentView.swift */; };
-		7A0B544325553D1C00718C05 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B544225553D1C00718C05 /* MainViewModel.swift */; };
 		7A0B544525554CB300718C05 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B544425554CB300718C05 /* App.swift */; };
-		7A60D0FD255596AF00357B6D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A60D0FC255596AF00357B6D /* AppState.swift */; };
 		7A60D1052559571C00357B6D /* KeyboardAvoidingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */; };
 		CCC8F73025AC33D6000358F1 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCC8F72E25AC33D0000358F1 /* WebKit.framework */; };
 		F89AEF8424F57A6B00CF5F57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */; };
@@ -58,9 +56,7 @@
 		334D39BA4EECBD0957B18F9D /* Pods_ios_example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A0B543E255512F800718C05 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7A0B54402555135300718C05 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		7A0B544225553D1C00718C05 /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
 		7A0B544425554CB300718C05 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
-		7A60D0FC255596AF00357B6D /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAvoidingView.swift; sourceTree = "<group>"; };
 		80C812C632281CE6A9C785F1 /* Pods-ios_example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_example.debug.xcconfig"; path = "Target Support Files/Pods-ios_example/Pods-ios_example.debug.xcconfig"; sourceTree = "<group>"; };
 		CCC8F72E25AC33D0000358F1 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -125,9 +121,7 @@
 				F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */,
 				F89AEF9124F57A6C00CF5F57 /* Info.plist */,
 				7A0B54402555135300718C05 /* ContentView.swift */,
-				7A0B544225553D1C00718C05 /* MainViewModel.swift */,
 				7A0B544425554CB300718C05 /* App.swift */,
-				7A60D0FC255596AF00357B6D /* AppState.swift */,
 				7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */,
 				CCC8F73925AC35D9000358F1 /* WechatOpenSDK-Bridging-Header.h */,
 			);
@@ -273,11 +267,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7A0B544325553D1C00718C05 /* MainViewModel.swift in Sources */,
 				F89AEF8424F57A6B00CF5F57 /* AppDelegate.swift in Sources */,
 				7A60D1052559571C00357B6D /* KeyboardAvoidingView.swift in Sources */,
 				7A0B544525554CB300718C05 /* App.swift in Sources */,
-				7A60D0FD255596AF00357B6D /* AppState.swift in Sources */,
 				7A0B54412555135300718C05 /* ContentView.swift in Sources */,
 				7A0B543F255512F800718C05 /* SceneDelegate.swift in Sources */,
 			);
