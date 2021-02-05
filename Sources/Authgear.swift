@@ -15,6 +15,7 @@ struct AuthorizeOptions {
     let loginHint: String?
     let uiLocales: [String]?
     let weChatRedirectURI: String?
+    let page: String?
 
     var urlScheme: String {
         if let index = redirectURI.firstIndex(of: ":") {
@@ -30,7 +31,8 @@ struct AuthorizeOptions {
         prompt: String?,
         loginHint: String?,
         uiLocales: [String]?,
-        weChatRedirectURI: String?
+        weChatRedirectURI: String?,
+        page: String?
     ) {
         self.redirectURI = redirectURI
         self.responseType = responseType
@@ -39,6 +41,7 @@ struct AuthorizeOptions {
         self.loginHint = loginHint
         self.uiLocales = uiLocales
         self.weChatRedirectURI = weChatRedirectURI
+        self.page = page
     }
 }
 
@@ -228,6 +231,10 @@ public class Authgear: NSObject {
         }
 
         queryItems.append(URLQueryItem(name: "x_platform", value: "ios"))
+
+        if let page = options.page {
+            queryItems.append(URLQueryItem(name: "x_page", value: page))
+        }
 
         var urlComponents = URLComponents(
             url: configuration.authorizationEndpoint,
@@ -457,6 +464,7 @@ public class Authgear: NSObject {
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
         weChatRedirectURI: String? = nil,
+        page: String? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         authorize(
@@ -467,7 +475,8 @@ public class Authgear: NSObject {
                 prompt: prompt,
                 loginHint: loginHint,
                 uiLocales: uiLocales,
-                weChatRedirectURI: weChatRedirectURI
+                weChatRedirectURI: weChatRedirectURI,
+                page: page
             ),
             handler: withMainQueueHandler(handler)
         )
@@ -565,7 +574,8 @@ public class Authgear: NSObject {
                         prompt: "login",
                         loginHint: loginHint,
                         uiLocales: uiLocales,
-                        weChatRedirectURI: weChatRedirectURI
+                        weChatRedirectURI: weChatRedirectURI,
+                        page: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -638,7 +648,8 @@ public class Authgear: NSObject {
                         prompt: "none",
                         loginHint: loginHint,
                         uiLocales: nil,
-                        weChatRedirectURI: wechatRedirectURI
+                        weChatRedirectURI: wechatRedirectURI,
+                        page: nil
                     ),
                     verifier: nil
                 )
