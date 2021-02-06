@@ -460,7 +460,7 @@ public class Authgear: NSObject {
     public func authorize(
         redirectURI: String,
         state: String? = nil,
-        prompt: String? = "login",
+        prompt: String? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
         weChatRedirectURI: String? = nil,
