@@ -57,7 +57,6 @@ class App: ObservableObject {
     func login(container: Authgear?) {
         container?.authorize(
             redirectURI: App.redirectURI,
-            prompt: "login",
             weChatRedirectURI: App.weChatRedirectURI,
             page: page
         ) { result in
