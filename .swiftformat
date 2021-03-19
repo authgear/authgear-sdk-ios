@@ -7,6 +7,8 @@
 --enable isEmpty
 --disable andOperator
 --disable wrapMultilineStatementBraces
+--disable redundantSelf
+--disable typeSugar
 
 # format options
 
@@ -21,7 +23,6 @@
 --importgrouping testable-top
 --operatorfunc no-space
 --nospaceoperators ..<, ...
---selfrequired validate
 --stripunusedargs closure-only
 --wraparguments before-first
 --wrapcollections before-first
