@@ -4,7 +4,6 @@ import Security
 enum JWKError: Error {
     case publicKeyNotFound
     case unknownError(OSStatus)
-    case keyError(Error)
 }
 
 struct JWK: Encodable {
@@ -15,11 +14,28 @@ struct JWK: Encodable {
     let e: String
 }
 
+func publicKeyToJWK(kid: String, publicKey: SecKey) throws -> JWK {
+    var error: Unmanaged<CFError>?
+    guard let keyData = SecKeyCopyExternalRepresentation(publicKey, &error) else {
+        throw error!.takeRetainedValue() as Error
+    }
+    let data = keyData as Data
+
+    let n = data.subdata(in: Range(NSRange(location: data.count > 269 ? 9 : 8, length: 256))!)
+    let e = data.subdata(in: Range(NSRange(location: data.count - 3, length: 3))!)
+
+    return JWK(
+        kid: kid,
+        n: n.base64urlEncodedString(),
+        e: e.base64urlEncodedString()
+    )
+}
+
 struct JWKStore {
     func loadKey(keyId: String, tag: String) throws -> JWK? {
         if let privateKey = try loadPrivateKey(tag: tag) {
             if let publicKey = SecKeyCopyPublicKey(privateKey) {
-                return try publicKeyToJWK(keyId: keyId, publicKey: publicKey)
+                return try publicKeyToJWK(kid: keyId, publicKey: publicKey)
             }
             throw JWKError.publicKeyNotFound
         } else {
@@ -52,23 +68,6 @@ struct JWKStore {
         }
     }
 
-    private func publicKeyToJWK(keyId: String, publicKey: SecKey) throws -> JWK {
-        var error: Unmanaged<CFError>?
-        guard let keyData = SecKeyCopyExternalRepresentation(publicKey, &error) else {
-            throw JWKError.keyError(error!.takeRetainedValue() as Error)
-        }
-        let data = keyData as Data
-
-        let n = data.subdata(in: Range(NSRange(location: data.count > 269 ? 9 : 8, length: 256))!)
-        let e = data.subdata(in: Range(NSRange(location: data.count - 3, length: 3))!)
-
-        return JWK(
-            kid: keyId,
-            n: n.base64urlEncodedString(),
-            e: e.base64urlEncodedString()
-        )
-    }
-
     func generateKey(keyId: String, tag: String) throws -> JWK {
         var publicKeySec, privateKeySec: SecKey?
         let keyattribute = [
@@ -82,7 +81,7 @@ struct JWKStore {
 
         switch status {
         case errSecSuccess:
-            return try publicKeyToJWK(keyId: keyId, publicKey: publicKeySec!)
+            return try publicKeyToJWK(kid: keyId, publicKey: publicKeySec!)
         default:
             throw JWKError.unknownError(status)
         }
