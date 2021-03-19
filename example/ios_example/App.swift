@@ -18,6 +18,8 @@ class App: ObservableObject {
     @Published var page: String = ""
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
+    @Published var biometricSupported: Bool = false
+    @Published var biometricEnabled: Bool = false
 
     func configure(clientId: String, endpoint: String, isThirdParty: Bool, page: String) {
         guard clientId != "", endpoint != "" else {
@@ -35,9 +37,30 @@ class App: ObservableObject {
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, isThirdParty: isThirdParty)
         successAlertMessage = "Configured Authgear successfully"
         self.page = page
+        self.updateBiometricState()
+    }
+
+    private func updateBiometricState() {
+        do {
+            try self.container?.checkBiometricSupported()
+            self.biometricSupported = true
+        } catch {
+            authgearActionErrorMessage = "\(error)"
+        }
+
+        if self.biometricSupported {
+            do {
+                if let enabled = try self.container?.isBiometricEnabled() {
+                    self.biometricEnabled = enabled
+                }
+            } catch {
+                authgearActionErrorMessage = "\(error)"
+            }
+        }
     }
 
     private func handleAuthorizeResult(_ result: Result<AuthorizeResult, Error>, errorMessage: String) -> Bool {
+        self.updateBiometricState()
         switch result {
         case let .success(authResult):
             let userInfo = authResult.userInfo
@@ -54,9 +77,10 @@ class App: ObservableObject {
         }
     }
 
-    func login(container: Authgear?) {
+    func login() {
         container?.authorize(
             redirectURI: App.redirectURI,
+            prompt: "login",
             weChatRedirectURI: App.weChatRedirectURI,
             page: page
         ) { result in
@@ -67,7 +91,39 @@ class App: ObservableObject {
         }
     }
 
-    func loginAnonymously(container: Authgear?) {
+    func enableBiometric() {
+        container?.enableBiometric(
+            localizedReason: "Enable biometric!",
+            constraint: .biometryCurrentSet
+        ) { result in
+            if case let .failure(error) = result {
+                print(error)
+                self.authgearActionErrorMessage = "\(error)"
+            }
+            self.updateBiometricState()
+        }
+    }
+
+    func disableBiometric() {
+        do {
+            try container?.disableBiometric()
+        } catch {
+            print(error)
+            self.authgearActionErrorMessage = "\(error)"
+        }
+        self.updateBiometricState()
+    }
+
+    func loginBiometric() {
+        container?.authenticateBiometric { result in
+            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login with biometric")
+            if success {
+                self.successAlertMessage = "Logged in with biometric"
+            }
+        }
+    }
+
+    func loginAnonymously() {
         container?.authenticateAnonymously { result in
             let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login anonymously")
             if success {
@@ -76,14 +132,14 @@ class App: ObservableObject {
         }
     }
 
-    func openSetting(container: Authgear?) {
+    func openSetting() {
         container?.open(
             page: .settings,
             wechatRedirectURI: App.weChatRedirectURI
         )
     }
 
-    func promoteAnonymousUser(container: Authgear?) {
+    func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,
             weChatRedirectURI: App.weChatRedirectURI
@@ -95,7 +151,7 @@ class App: ObservableObject {
         }
     }
 
-    func fetchUserInfo(container: Authgear?) {
+    func fetchUserInfo() {
         container?.fetchUserInfo { userInfoResult in
             switch userInfoResult {
             case let .success(userInfo):
@@ -119,7 +175,7 @@ class App: ObservableObject {
         }
     }
 
-    func logout(container: Authgear?) {
+    func logout() {
         container?.logout { result in
             switch result {
             case .success():
