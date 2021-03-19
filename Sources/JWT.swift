@@ -40,12 +40,20 @@ enum BiometricPayloadAction: String, Encodable {
     case authenticate
 }
 
-// FIXME(biometric): device info
 struct JWTPayload: Encodable {
     let iat: Int
     let exp: Int
     let challenge: String
     let action: String
+    let deviceInfo: DeviceInfoRoot
+
+    enum CodingKeys: String, CodingKey {
+        case iat
+        case exp
+        case challenge
+        case action
+        case deviceInfo = "device_info"
+    }
 
     init(challenge: String, action: String) {
         let now = Int(Date().timeIntervalSince1970)
@@ -53,6 +61,7 @@ struct JWTPayload: Encodable {
         exp = now + 60
         self.challenge = challenge
         self.action = action
+        self.deviceInfo = getDeviceInfo()
     }
 
     func encode() throws -> String {

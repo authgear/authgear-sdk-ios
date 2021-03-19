@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		775FF72A2603649500B81ECD /* Biometric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF7292603649500B81ECD /* Biometric.swift */; };
+		775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF73326047C7700B81ECD /* DeviceInfo.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
 		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
@@ -44,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		775FF7292603649500B81ECD /* Biometric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometric.swift; sourceTree = "<group>"; };
+		775FF73326047C7700B81ECD /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20D6F025BAA3C400E579DD /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = example/Pods/Pods.xcodeproj; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				F83392F024FDA87900A69D3C /* AuthgearError.swift */,
 				F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */,
 				F8A657A22501845D0027888F /* Decodable+Any.swift */,
+				775FF73326047C7700B81ECD /* DeviceInfo.swift */,
 				F8A657A42501D31E0027888F /* JWK.swift */,
 				775FF7292603649500B81ECD /* Biometric.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
@@ -242,6 +245,7 @@
 				F8A657A925055A7C0027888F /* Data+Base64URLEncoded.swift in Sources */,
 				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
 				775FF72A2603649500B81ECD /* Biometric.swift in Sources */,
+				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
 				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
 				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
