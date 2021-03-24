@@ -100,16 +100,20 @@ struct AuthgearActionDescription: View {
 struct ActionButtonList: View {
     @EnvironmentObject private var app: App
 
-    private var container: Authgear? {
-        app.container
-    }
-
     private var configured: Bool {
         app.container != nil
     }
 
     private var loggedIn: Bool {
         app.user != nil
+    }
+
+    private var biometricSupported: Bool {
+        app.biometricSupported
+    }
+
+    private var biometricEnabled: Bool {
+        app.biometricEnabled
     }
 
     private var canBePromotedFromAnonymous: Bool {
@@ -119,37 +123,55 @@ struct ActionButtonList: View {
     var body: some View {
         VStack(spacing: 30) {
             Button(action: {
-                self.app.login(container: self.container)
+                self.app.login()
             }) {
                 ActionButton(text: "Login")
             }.disabled(!configured || loggedIn)
 
             Button(action: {
-                self.app.loginAnonymously(container: self.container)
+                self.app.loginAnonymously()
             }) {
                 ActionButton(text: "Login Anonymously")
             }.disabled(!configured || loggedIn)
 
             Button(action: {
-                self.app.openSetting(container: self.container)
+                self.app.enableBiometric()
             }) {
-                ActionButton(text: "Open Setting Page")
-            }.disabled(!configured)
+                ActionButton(text: "Enable Biometric")
+            }.disabled(!configured || !loggedIn || biometricEnabled)
 
             Button(action: {
-                self.app.promoteAnonymousUser(container: self.container)
+                self.app.disableBiometric()
+            }) {
+                ActionButton(text: "Disable Biometric")
+            }.disabled(!biometricEnabled)
+
+            Button(action: {
+                self.app.loginBiometric()
+            }) {
+                ActionButton(text: "Login with Biometric")
+            }.disabled(!configured || loggedIn || !biometricEnabled)
+
+            Button(action: {
+                self.app.openSetting()
+            }) {
+                ActionButton(text: "Open Setting Page")
+            }.disabled(!configured || !loggedIn)
+
+            Button(action: {
+                self.app.promoteAnonymousUser()
             }) {
                 ActionButton(text: "Promote Anonymous User")
             }.disabled(!canBePromotedFromAnonymous)
 
             Button(action: {
-                self.app.fetchUserInfo(container: self.container)
+                self.app.fetchUserInfo()
             }) {
                 ActionButton(text: "Fetch User Info")
             }.disabled(!configured || !loggedIn)
 
             Button(action: {
-                self.app.logout(container: self.container)
+                self.app.logout()
             }) {
                 ActionButton(text: "Logout")
             }.disabled(!configured || !loggedIn)

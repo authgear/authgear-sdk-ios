@@ -1,6 +1,8 @@
 import AuthenticationServices
 import Foundation
+import LocalAuthentication
 import SafariServices
+import Security
 import WebKit
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
@@ -142,10 +144,14 @@ public class Authgear: NSObject {
         self.clientId = clientId
         self.name = name ?? "default"
         self.isThirdParty = isThirdParty
-        apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
+        let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
+        self.apiClient = client
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
+
+        super.init()
+        client.delegate = self
     }
 
     public func configure(
@@ -341,6 +347,13 @@ public class Authgear: NSObject {
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
             let result = persistSession(oidcTokenResponse, reason: .authenticated)
+                .flatMap {
+                    Result { () -> Void in
+                        if #available(iOS 11.3, *) {
+                            try self.disableBiometric()
+                        }
+                    }
+                }
                 .map { AuthorizeResult(userInfo: userInfo, state: state) }
             return handler(result)
 
@@ -492,17 +505,17 @@ public class Authgear: NSObject {
                 let keyId = try self.storage.getAnonymousKeyId(namespace: self.name) ?? UUID().uuidString
                 let tag = "com.authgear.keys.anonymous.\(keyId)"
 
-                let header: AnonymousJWTHeader
+                let header: JWTHeader
                 if let key = try self.jwkStore.loadKey(keyId: keyId, tag: tag) {
-                    header = AnonymousJWTHeader(jwk: key, new: false)
+                    header = JWTHeader(typ: .anonymous, jwk: key, new: false)
                 } else {
                     let key = try self.jwkStore.generateKey(keyId: keyId, tag: tag)
-                    header = AnonymousJWTHeader(jwk: key, new: true)
+                    header = JWTHeader(typ: .anonymous, jwk: key, new: true)
                 }
 
-                let payload = AnonymousJWYPayload(challenge: token, action: .auth)
+                let payload = JWTPayload(challenge: token, action: AnonymousPayloadAction.auth.rawValue)
 
-                let jwt = AnonymousJWT(header: header, payload: payload)
+                let jwt = JWT(header: header, payload: payload)
 
                 let privateKey = try self.jwkStore.loadPrivateKey(tag: tag)!
 
@@ -521,7 +534,14 @@ public class Authgear: NSObject {
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
 
                 let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
-                    .flatMap { Result { try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId) } }
+                    .flatMap {
+                        Result { () -> Void in
+                            try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId)
+                            if #available(iOS 11.3, *) {
+                                try self.disableBiometric()
+                            }
+                        }
+                    }
                     .map { AuthorizeResult(userInfo: userInfo, state: nil) }
                 handler(result)
 
@@ -548,17 +568,17 @@ public class Authgear: NSObject {
                 let tag = "com.authgear.keys.anonymous.\(keyId)"
                 let token = try self.apiClient.syncRequestOAuthChallenge(purpose: "anonymous_request").token
 
-                let header: AnonymousJWTHeader
+                let header: JWTHeader
                 if let key = try self.jwkStore.loadKey(keyId: keyId, tag: tag) {
-                    header = AnonymousJWTHeader(jwk: key, new: false)
+                    header = JWTHeader(typ: .anonymous, jwk: key, new: false)
                 } else {
                     let key = try self.jwkStore.generateKey(keyId: keyId, tag: tag)
-                    header = AnonymousJWTHeader(jwk: key, new: true)
+                    header = JWTHeader(typ: .anonymous, jwk: key, new: true)
                 }
 
-                let payload = AnonymousJWYPayload(challenge: token, action: .promote)
+                let payload = JWTPayload(challenge: token, action: AnonymousPayloadAction.promote.rawValue)
 
-                let jwt = AnonymousJWT(header: header, payload: payload)
+                let jwt = JWT(header: header, payload: payload)
 
                 let privateKey = try self.jwkStore.loadPrivateKey(tag: tag)!
 
@@ -778,6 +798,118 @@ public class Authgear: NSObject {
                 handler?(.success(()))
             } catch {
                 handler?(.failure(error))
+            }
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func checkBiometricSupported() throws {
+        let context = LAContext()
+        var error: NSError?
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        if let error = error {
+            throw error
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func isBiometricEnabled() throws -> Bool {
+        if let _ = try storage.getBiometricKeyId(namespace: name) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func disableBiometric() throws {
+        if let kid = try storage.getBiometricKeyId(namespace: name) {
+            let tag = "com.authgear.keys.biometric.\(kid)"
+            try removePrivateKey(tag: tag)
+            try storage.delBiometricKeyId(namespace: name)
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func enableBiometric(localizedReason: String, constraint: BiometricAccessConstraint, handler: @escaping VoidCompletionHandler) {
+        let handler = withMainQueueHandler(handler)
+
+        let context = LAContext()
+        // First we perform a biometric authentication first.
+        // But this actually is just a test to ensure biometric authentication works.
+        context.evaluatePolicy(
+            .deviceOwnerAuthenticationWithBiometrics,
+            localizedReason: localizedReason
+        ) { _, error in
+            if let error = error {
+                handler(.failure(error))
+                return
+            }
+
+            self.workerQueue.async {
+                do {
+                    let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
+                    let kid = UUID().uuidString
+                    let tag = "com.authgear.keys.biometric.\(kid)"
+                    let privateKey = try generatePrivateKey()
+                    try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint)
+                    let publicKey = SecKeyCopyPublicKey(privateKey)!
+                    let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
+                    let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
+                    let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.setup.rawValue)
+                    let jwt = JWT(header: header, payload: payload)
+                    let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
+                    _ = try self.apiClient.syncRequestBiometricSetup(clientId: self.clientId, jwt: signedJWT)
+                    try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
+                    handler(.success(()))
+                } catch {
+                    handler(.failure(error))
+                }
+            }
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func authenticateBiometric(handler: @escaping AuthorizeCompletionHandler) {
+        let handler = withMainQueueHandler(handler)
+        workerQueue.async {
+            do {
+                guard let kid = try self.storage.getBiometricKeyId(namespace: self.name) else {
+                    throw NSError(domain: NSOSStatusErrorDomain, code: Int(errSecItemNotFound), userInfo: nil)
+                }
+                let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
+                let tag = "com.authgear.keys.biometric.\(kid)"
+                guard let privateKey = try getPrivateKey(tag: tag) else {
+                    throw NSError(domain: NSOSStatusErrorDomain, code: Int(errSecItemNotFound), userInfo: nil)
+                }
+                let publicKey = SecKeyCopyPublicKey(privateKey)!
+                let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
+                let header = JWTHeader(typ: .biometric, jwk: jwk, new: false)
+                let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.authenticate.rawValue)
+                let jwt = JWT(header: header, payload: payload)
+                let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
+                let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
+                    grantType: .biometric,
+                    clientId: self.clientId,
+                    redirectURI: nil,
+                    code: nil,
+                    codeVerifier: nil,
+                    refreshToken: nil,
+                    jwt: signedJWT
+                )
+
+                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
+                let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
+                    .map { AuthorizeResult(userInfo: userInfo, state: nil) }
+                return handler(result)
+            } catch {
+                // In case the biometric was removed remotely.
+                if case let AuthAPIClientError.oidcError(error) = error {
+                    if error.error == "invalid_grant" && error.errorDescription == "InvalidCredentials" {
+                        try? self.disableBiometric()
+                    }
+                }
+                handler(.failure(error))
             }
         }
     }

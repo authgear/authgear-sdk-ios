@@ -13,6 +13,7 @@ enum GrantType: String {
     case authorizationCode = "authorization_code"
     case refreshToken = "refresh_token"
     case anonymous = "urn:authgear:params:oauth:grant-type:anonymous-request"
+    case biometric = "urn:authgear:params:oauth:grant-type:biometric-request"
 }
 
 public struct OIDCError: Error, Decodable {
@@ -114,6 +115,11 @@ protocol AuthAPIClient: AnyObject {
         jwt: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
+    func requestBiometricSetup(
+        clientId: String,
+        jwt: String,
+        handler: @escaping (Result<Void, Error>) -> Void
+    )
     func requestOIDCUserInfo(
         accessToken: String,
         handler: @escaping (Result<UserInfo, Error>) -> Void
@@ -176,6 +182,19 @@ extension AuthAPIClient {
                 code: code,
                 codeVerifier: codeVerifier,
                 refreshToken: refreshToken,
+                jwt: jwt,
+                handler: handler
+            )
+        }
+    }
+
+    func syncRequestBiometricSetup(
+        clientId: String,
+        jwt: String
+    ) throws {
+        try withSemaphore { handler in
+            self.requestBiometricSetup(
+                clientId: clientId,
                 jwt: jwt,
                 handler: handler
             )
@@ -407,6 +426,44 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
                 self?.fetch(request: urlRequest, handler: handler)
 
+            case let .failure(error):
+                return handler(.failure(error))
+            }
+        }
+    }
+
+    func requestBiometricSetup(
+        clientId: String,
+        jwt: String,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        fetchOIDCConfiguration { [weak self] result in
+            switch result {
+            case let .success(config):
+                var queryParams = [String: String]()
+                queryParams["client_id"] = clientId
+                queryParams["grant_type"] = GrantType.biometric.rawValue
+                queryParams["jwt"] = jwt
+
+                var urlComponents = URLComponents()
+                urlComponents.queryParams = queryParams
+
+                let body = urlComponents.query?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)?.data(using: .utf8)
+
+                var urlRequest = URLRequest(url: config.tokenEndpoint)
+                urlRequest.httpMethod = "POST"
+                if let accessToken = self?.delegate?.getAccessToken() {
+                    urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
+                }
+                urlRequest.setValue(
+                    "application/x-www-form-urlencoded",
+                    forHTTPHeaderField: "content-type"
+                )
+                urlRequest.httpBody = body
+
+                self?.fetch(request: urlRequest, handler: { result in
+                    handler(result.map { _ in () })
+                })
             case let .failure(error):
                 return handler(.failure(error))
             }

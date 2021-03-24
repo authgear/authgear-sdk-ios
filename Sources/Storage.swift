@@ -4,10 +4,15 @@ import Security
 protocol ContainerStorage {
     func setRefreshToken(namespace: String, token: String) throws
     func setAnonymousKeyId(namespace: String, kid: String) throws
+    func setBiometricKeyId(namespace: String, kid: String) throws
+
     func getRefreshToken(namespace: String) throws -> String?
     func getAnonymousKeyId(namespace: String) throws -> String?
+    func getBiometricKeyId(namespace: String) throws -> String?
+
     func delRefreshToken(namespace: String) throws
     func delAnonymousKeyId(namespace: String) throws
+    func delBiometricKeyId(namespace: String) throws
 }
 
 protocol StorageDriver {
@@ -23,6 +28,7 @@ protocol HasStorageDriver {
 protocol StorageKeyConvertible {
     func keyRefreshToken(namespace: String) -> String
     func keyAnonymousKeyId(namespace: String) -> String
+    func keyBiometricKeyId(namespace: String) -> String
 }
 
 extension ContainerStorage where Self: HasStorageDriver & StorageKeyConvertible {
@@ -34,6 +40,10 @@ extension ContainerStorage where Self: HasStorageDriver & StorageKeyConvertible 
         try storageDriver.set(key: keyAnonymousKeyId(namespace: namespace), value: kid)
     }
 
+    func setBiometricKeyId(namespace: String, kid: String) throws {
+        try storageDriver.set(key: keyBiometricKeyId(namespace: namespace), value: kid)
+    }
+
     func getRefreshToken(namespace: String) throws -> String? {
         try storageDriver.get(key: keyRefreshToken(namespace: namespace))
     }
@@ -42,12 +52,20 @@ extension ContainerStorage where Self: HasStorageDriver & StorageKeyConvertible 
         try storageDriver.get(key: keyAnonymousKeyId(namespace: namespace))
     }
 
+    func getBiometricKeyId(namespace: String) throws -> String? {
+        try storageDriver.get(key: keyBiometricKeyId(namespace: namespace))
+    }
+
     func delRefreshToken(namespace: String) throws {
         try storageDriver.del(key: keyRefreshToken(namespace: namespace))
     }
 
     func delAnonymousKeyId(namespace: String) throws {
         try storageDriver.del(key: keyAnonymousKeyId(namespace: namespace))
+    }
+
+    func delBiometricKeyId(namespace: String) throws {
+        try storageDriver.del(key: keyBiometricKeyId(namespace: namespace))
     }
 }
 
@@ -69,6 +87,10 @@ class DefaultContainerStorage: ContainerStorage, HasStorageDriver, StorageKeyCon
     public func keyAnonymousKeyId(namespace: String) -> String {
         scopedKey("\(namespace)_anonymousKeyID")
     }
+
+    public func keyBiometricKeyId(namespace: String) -> String {
+        scopedKey("\(namespace)_biometricKeyID")
+    }
 }
 
 class MemoryStorageDriver: StorageDriver {
@@ -87,11 +109,6 @@ class MemoryStorageDriver: StorageDriver {
     }
 }
 
-enum KeychainError: Error {
-    case encoding
-    case unhandledError(status: OSStatus)
-}
-
 class KeychainStorageDriver: StorageDriver {
     func get(key: String) throws -> String? {
         let query: [String: Any] = [
@@ -102,22 +119,18 @@ class KeychainStorageDriver: StorageDriver {
         ]
 
         var result: AnyObject?
-
         let status = withUnsafeMutablePointer(to: &result) {
             SecItemCopyMatching(query as CFDictionary, UnsafeMutablePointer($0))
         }
 
         switch status {
         case errSecSuccess:
-            guard
-                let valueData = result as? Data,
-                let value = String(data: valueData, encoding: .utf8)
-            else { throw KeychainError.encoding }
+            let value = String(data: result as! Data, encoding: .utf8)!
             return value
         case errSecItemNotFound:
             return nil
         default:
-            throw KeychainError.unhandledError(status: status)
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
         }
     }
 
@@ -144,7 +157,7 @@ class KeychainStorageDriver: StorageDriver {
         if status == errSecSuccess {
             return
         } else {
-            throw KeychainError.unhandledError(status: status)
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
         }
     }
 
@@ -158,7 +171,7 @@ class KeychainStorageDriver: StorageDriver {
         case errSecSuccess, errSecItemNotFound:
             return
         default:
-            throw KeychainError.unhandledError(status: status)
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
         }
     }
 }

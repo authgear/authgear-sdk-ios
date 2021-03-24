@@ -1,11 +1,28 @@
 import CommonCrypto
 import Foundation
 
-protocol JWTHeader: Encodable {
-    func encode() throws -> String
+enum JWTHeaderType: String, Encodable {
+    case anonymous = "vnd.authgear.anonymous-request"
+    case biometric = "vnd.authgear.biometric-request"
 }
 
-extension JWTHeader {
+struct JWTHeader: Encodable {
+    let typ: JWTHeaderType
+    let kid: String
+    let alg: String
+    let jwk: JWK?
+
+    init(typ: JWTHeaderType, jwk: JWK, new: Bool) {
+        self.typ = typ
+        kid = jwk.kid
+        alg = jwk.alg
+        if new {
+            self.jwk = jwk
+        } else {
+            self.jwk = nil
+        }
+    }
+
     func encode() throws -> String {
         let jsonEncoder = JSONEncoder()
         let data = try jsonEncoder.encode(self)
@@ -13,15 +30,56 @@ extension JWTHeader {
     }
 }
 
-protocol JWTPayload: Encodable {
-    func encode() throws -> String
+enum AnonymousPayloadAction: String, Encodable {
+    case auth
+    case promote
 }
 
-extension JWTPayload {
+enum BiometricPayloadAction: String, Encodable {
+    case setup
+    case authenticate
+}
+
+struct JWTPayload: Encodable {
+    let iat: Int
+    let exp: Int
+    let challenge: String
+    let action: String
+    let deviceInfo: DeviceInfoRoot
+
+    enum CodingKeys: String, CodingKey {
+        case iat
+        case exp
+        case challenge
+        case action
+        case deviceInfo = "device_info"
+    }
+
+    init(challenge: String, action: String) {
+        let now = Int(Date().timeIntervalSince1970)
+        iat = now
+        exp = now + 60
+        self.challenge = challenge
+        self.action = action
+        self.deviceInfo = getDeviceInfo()
+    }
+
     func encode() throws -> String {
         let jsonEncoder = JSONEncoder()
         let data = try jsonEncoder.encode(self)
         return data.base64urlEncodedString()
+    }
+}
+
+struct JWT {
+    let header: JWTHeader
+    let payload: JWTPayload
+
+    func sign(with signer: JWTSigner) throws -> String {
+        let header = try self.header.encode()
+        let payload = try self.payload.encode()
+        let signature = try signer.sign(header: header, payload: payload)
+        return "\(header).\(payload).\(signature)"
     }
 }
 
@@ -43,62 +101,9 @@ struct JWTSigner {
         var error: Unmanaged<CFError>?
 
         guard let signedData = SecKeyCreateSignature(privateKey, .rsaSignatureDigestPKCS1v15SHA256, Data(buffer) as CFData, &error) else {
-            throw JWKError.keyError(JWKError.keyError(error!
-                    .takeRetainedValue() as Error))
+            throw error!.takeRetainedValue() as Error
         }
 
         return (signedData as Data).base64urlEncodedString()
-    }
-}
-
-struct JWT<Header: JWTHeader, Payload: JWTPayload> {
-    let header: Header
-    let payload: Payload
-
-    func sign(with signer: JWTSigner) throws -> String {
-        let header = try self.header.encode()
-        let payload = try self.payload.encode()
-        let signature = try signer.sign(header: header, payload: payload)
-        return "\(header).\(payload).\(signature)"
-    }
-}
-
-typealias AnonymousJWT = JWT<AnonymousJWTHeader, AnonymousJWYPayload>
-
-struct AnonymousJWTHeader: JWTHeader {
-    let typ = "vnd.authgear.anonymous-request"
-    let kid: String
-    let alg: String
-    let jwk: JWK?
-
-    init(jwk: JWK, new: Bool) {
-        kid = jwk.kid
-        alg = jwk.alg
-
-        if new {
-            self.jwk = jwk
-        } else {
-            self.jwk = nil
-        }
-    }
-}
-
-struct AnonymousJWYPayload: JWTPayload {
-    enum Action: String, Encodable {
-        case auth
-        case promote
-    }
-
-    let iat: Int
-    let exp: Int
-    let challenge: String
-    let action: Action
-
-    init(challenge: String, action: Action) {
-        let now = Int(Date().timeIntervalSince1970)
-        iat = now
-        exp = now + 60
-        self.challenge = challenge
-        self.action = action
     }
 }
