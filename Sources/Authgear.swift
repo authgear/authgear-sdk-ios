@@ -880,6 +880,11 @@ public class Authgear: NSObject {
                 let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
                 let tag = "com.authgear.keys.biometric.\(kid)"
                 guard let privateKey = try getPrivateKey(tag: tag) else {
+                    // If the constraint was biometryCurrentSet,
+                    // then the private key may be deleted by the system
+                    // when biometric has been changed by the device owner.
+                    // In this case, perform cleanup.
+                    try self.disableBiometric()
                     throw NSError(domain: NSOSStatusErrorDomain, code: Int(errSecItemNotFound), userInfo: nil)
                 }
                 let publicKey = SecKeyCopyPublicKey(privateKey)!
