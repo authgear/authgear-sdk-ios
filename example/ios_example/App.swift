@@ -19,7 +19,6 @@ class App: ObservableObject {
     @Published var page: String = ""
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
-    @Published var biometricSupported: Bool = false
     @Published var biometricEnabled: Bool = false
 
     func configure(clientId: String, endpoint: String, isThirdParty: Bool, page: String) {
@@ -42,25 +41,18 @@ class App: ObservableObject {
     }
 
     private func updateBiometricState() {
+        var supported = false
         do {
             try self.container?.checkBiometricSupported()
-            self.biometricSupported = true
-        } catch {
-            authgearActionErrorMessage = "\(error)"
-        }
-
-        if self.biometricSupported {
-            do {
-                if let enabled = try self.container?.isBiometricEnabled() {
-                    self.biometricEnabled = enabled
-                }
-            } catch {
-                authgearActionErrorMessage = "\(error)"
-            }
+            supported = true
+        } catch {}
+        self.biometricEnabled = false
+        if supported {
+            self.biometricEnabled = (try? self.container?.isBiometricEnabled()) ?? false
         }
     }
 
-    private func handleAuthorizeResult(_ result: Result<AuthorizeResult, Error>, errorMessage: String) -> Bool {
+    private func handleAuthorizeResult(_ result: Result<AuthorizeResult, Error>) -> Bool {
         self.updateBiometricState()
         switch result {
         case let .success(authResult):
@@ -73,7 +65,7 @@ class App: ObservableObject {
             return true
         case let .failure(error):
             print(error)
-            authgearActionErrorMessage = errorMessage
+            authgearActionErrorMessage = "\(error)"
             return false
         }
     }
@@ -85,7 +77,7 @@ class App: ObservableObject {
             weChatRedirectURI: App.weChatRedirectURI,
             page: page
         ) { result in
-            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login")
+            let success = self.handleAuthorizeResult(result)
             if success {
                 self.successAlertMessage = "Logged in successfully"
             }
@@ -117,7 +109,7 @@ class App: ObservableObject {
 
     func loginBiometric() {
         container?.authenticateBiometric { result in
-            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login with biometric")
+            let success = self.handleAuthorizeResult(result)
             if success {
                 self.successAlertMessage = "Logged in with biometric"
             }
@@ -126,7 +118,7 @@ class App: ObservableObject {
 
     func loginAnonymously() {
         container?.authenticateAnonymously { result in
-            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to login anonymously")
+            let success = self.handleAuthorizeResult(result)
             if success {
                 self.successAlertMessage = "Logged in anonymously"
             }
@@ -145,7 +137,7 @@ class App: ObservableObject {
             redirectURI: App.redirectURI,
             weChatRedirectURI: App.weChatRedirectURI
         ) { result in
-            let success = self.handleAuthorizeResult(result, errorMessage: "Failed to promote anonymous user")
+            let success = self.handleAuthorizeResult(result)
             if success {
                 self.successAlertMessage = "Successfully promoted to normal authenticated user"
             }
@@ -171,7 +163,7 @@ class App: ObservableObject {
                 ].joined(separator: "\n")
             case let .failure(error):
                 print(error)
-                self.authgearActionErrorMessage = "Failed to fetch user info"
+                self.authgearActionErrorMessage = "\(error)"
             }
         }
     }
@@ -184,7 +176,7 @@ class App: ObservableObject {
                 self.successAlertMessage = "Logged out successfully"
             case let .failure(error):
                 print(error)
-                self.authgearActionErrorMessage = "Failed to logout"
+                self.authgearActionErrorMessage = "\(error)"
             }
         }
     }

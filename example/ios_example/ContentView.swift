@@ -108,10 +108,6 @@ struct ActionButtonList: View {
         app.sessionState == SessionState.authenticated
     }
 
-    private var biometricSupported: Bool {
-        app.biometricSupported
-    }
-
     private var biometricEnabled: Bool {
         app.biometricEnabled
     }
