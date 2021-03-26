@@ -38,6 +38,10 @@ extension AppDelegate: AuthgearDelegate {
         req.state = state
         WXApi.send(req)
     }
+
+    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {
+        appContainer.sessionState = container.sessionState
+    }
 }
 
 extension AppDelegate: WXApiDelegate {

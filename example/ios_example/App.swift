@@ -14,6 +14,7 @@ class App: ObservableObject {
     static let weChatAppID = "wxa2f631873c63add1"
 
     @Published var container: Authgear?
+    @Published var sessionState = SessionState.unknown
     @Published var user: UserInfo?
     @Published var page: String = ""
     @Published var authgearActionErrorMessage: String?
