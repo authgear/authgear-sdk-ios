@@ -105,19 +105,11 @@ struct ActionButtonList: View {
     }
 
     private var loggedIn: Bool {
-        app.user != nil
-    }
-
-    private var biometricSupported: Bool {
-        app.biometricSupported
+        app.sessionState == SessionState.authenticated
     }
 
     private var biometricEnabled: Bool {
         app.biometricEnabled
-    }
-
-    private var canBePromotedFromAnonymous: Bool {
-        configured && loggedIn && app.user?.isAnonymous == true
     }
 
     var body: some View {
@@ -162,7 +154,7 @@ struct ActionButtonList: View {
                 self.app.promoteAnonymousUser()
             }) {
                 ActionButton(text: "Promote Anonymous User")
-            }.disabled(!canBePromotedFromAnonymous)
+            }.disabled(!(configured && loggedIn && app.user?.isAnonymous == true))
 
             Button(action: {
                 self.app.fetchUserInfo()
