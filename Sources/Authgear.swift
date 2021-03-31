@@ -121,7 +121,6 @@ public class Authgear: NSObject {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     let clientId: String
-    let isThirdParty: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -140,10 +139,9 @@ public class Authgear: NSObject {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, name: String? = nil, isThirdParty: Bool = true) {
+    public init(clientId: String, endpoint: String, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
-        self.isThirdParty = isThirdParty
         let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.apiClient = client
 
@@ -195,17 +193,11 @@ public class Authgear: NSObject {
                 URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
             ])
         }
-        if isThirdParty {
-            queryItems.append(URLQueryItem(
-                name: "scope",
-                value: "openid offline_access"
-            ))
-        } else {
-            queryItems.append(URLQueryItem(
-                name: "scope",
-                value: "openid offline_access https://authgear.com/scopes/full-access"
-            ))
-        }
+
+        queryItems.append(URLQueryItem(
+            name: "scope",
+            value: "openid offline_access https://authgear.com/scopes/full-access"
+        ))
 
         queryItems.append(URLQueryItem(name: "client_id", value: clientId))
         queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
