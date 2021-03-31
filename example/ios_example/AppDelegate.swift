@@ -5,8 +5,8 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var appContainer = App()
 
-    func configureAuthgear(clientId: String, endpoint: String, isThirdParty: Bool) {
-        appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, isThirdParty: isThirdParty)
+    func configureAuthgear(clientId: String, endpoint: String) {
+        appContainer.container = Authgear(clientId: clientId, endpoint: endpoint)
         appContainer.container?.configure()
         appContainer.container?.delegate = self
 
