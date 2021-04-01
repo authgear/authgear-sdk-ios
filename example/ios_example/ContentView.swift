@@ -49,7 +49,6 @@ struct AuthgearConfigurationForm: View {
 
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
-    @State private var isThirdParty: Bool = !UserDefaults.standard.bool(forKey: "authgear.demo.isFirstParty")
     @State private var page: String = UserDefaults.standard.string(forKey: "authgear.demo.page") ?? ""
 
     var body: some View {
@@ -75,12 +74,8 @@ struct AuthgearConfigurationForm: View {
                     text: $page
                 )
             )
-            AuthgearConfigurationInput(
-                label: "Is Third-party app",
-                input: Toggle(isOn: $isThirdParty) { EmptyView() }
-            )
             Button(action: {
-                self.app.configure(clientId: self.clientID, endpoint: self.endpoint, isThirdParty: self.isThirdParty, page: self.page)
+                self.app.configure(clientId: self.clientID, endpoint: self.endpoint, page: self.page)
             }) {
                 ActionButton(text: "Configure")
             }
