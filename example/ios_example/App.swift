@@ -21,7 +21,7 @@ class App: ObservableObject {
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
 
-    func configure(clientId: String, endpoint: String, page: String) {
+    func configure(clientId: String, endpoint: String, page: String, transientSession: Bool) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -33,7 +33,8 @@ class App: ObservableObject {
         UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
         UserDefaults.standard.set(page, forKey: "authgear.demo.page")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint)
+        UserDefaults.standard.set(transientSession, forKey: "authgear.demo.transientSession")
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, transientSession: transientSession)
         successAlertMessage = "Configured Authgear successfully"
         self.page = page
         self.updateBiometricState()
