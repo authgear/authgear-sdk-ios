@@ -120,6 +120,8 @@ public class Authgear: NSObject {
     let name: String
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
+    // refreshTokenStorage driver will be changed by config, it could be persistent or in memory
+    var refreshTokenStorage: ContainerStorage
     let clientId: String
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
@@ -146,6 +148,7 @@ public class Authgear: NSObject {
         self.apiClient = client
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+        refreshTokenStorage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
 
         super.init()
@@ -154,10 +157,16 @@ public class Authgear: NSObject {
 
     public func configure(
         skipRefreshAccessToken: Bool = false,
+        transientSession: Bool = false,
         handler: VoidCompletionHandler? = nil
     ) {
+        if transientSession {
+            self.refreshTokenStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
+        } else {
+            self.refreshTokenStorage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+        }
         workerQueue.async {
-            let refreshToken = Result { try self.storage.getRefreshToken(namespace: self.name) }
+            let refreshToken = Result { try self.refreshTokenStorage.getRefreshToken(namespace: self.name) }
             switch refreshToken {
             case let .success(token):
                 if self.shouldRefreshAccessToken() && !skipRefreshAccessToken {
@@ -356,7 +365,7 @@ public class Authgear: NSObject {
 
     private func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason) -> Result<Void, Error> {
         if let refreshToken = oidcTokenResponse.refreshToken {
-            let result = Result { try self.storage.setRefreshToken(namespace: self.name, token: refreshToken) }
+            let result = Result { try self.refreshTokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
             guard case .success = result else {
                 return result
             }
@@ -372,7 +381,7 @@ public class Authgear: NSObject {
     }
 
     private func cleanupSession(force: Bool, reason: SessionStateChangeReason) -> Result<Void, Error> {
-        if case let .failure(error) = Result(catching: { try storage.delRefreshToken(namespace: name) }) {
+        if case let .failure(error) = Result(catching: { try refreshTokenStorage.delRefreshToken(namespace: name) }) {
             if !force {
                 return .failure(error)
             }
@@ -616,7 +625,7 @@ public class Authgear: NSObject {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
             do {
-                let token = try self.storage.getRefreshToken(
+                let token = try self.refreshTokenStorage.getRefreshToken(
                     namespace: self.name
                 )
                 try self.apiClient.syncRequestOIDCRevocation(
@@ -643,7 +652,7 @@ public class Authgear: NSObject {
 
         workerQueue.async {
             do {
-                guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
+                guard let refreshToken = try self.refreshTokenStorage.getRefreshToken(namespace: self.name) else {
                     handler?(.failure(AuthgearError.unauthenticatedUser))
                     return
                 }
@@ -729,7 +738,7 @@ public class Authgear: NSObject {
         let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
             do {
-                guard let refreshToken = try self.storage.getRefreshToken(namespace: self.name) else {
+                guard let refreshToken = try self.refreshTokenStorage.getRefreshToken(namespace: self.name) else {
                     let result = self.cleanupSession(force: true, reason: .noToken)
                     handler?(result)
                     return
