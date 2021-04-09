@@ -141,6 +141,8 @@ public class Authgear: NSObject {
 
     public weak var delegate: AuthgearDelegate?
 
+    static let globalMemoryStore: ContainerStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
+
     public init(clientId: String, endpoint: String, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
@@ -148,7 +150,7 @@ public class Authgear: NSObject {
         self.apiClient = client
 
         storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
-        refreshTokenStorage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+        refreshTokenStorage = storage
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
 
         super.init()
@@ -161,9 +163,9 @@ public class Authgear: NSObject {
         handler: VoidCompletionHandler? = nil
     ) {
         if transientSession {
-            self.refreshTokenStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
+            self.refreshTokenStorage = Authgear.globalMemoryStore
         } else {
-            self.refreshTokenStorage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+            self.refreshTokenStorage = self.storage
         }
         workerQueue.async {
             let refreshToken = Result { try self.refreshTokenStorage.getRefreshToken(namespace: self.name) }
