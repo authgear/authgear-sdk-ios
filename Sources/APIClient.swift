@@ -108,6 +108,7 @@ protocol AuthAPIClient: AnyObject {
     func requestOIDCToken(
         grantType: GrantType,
         clientId: String,
+        deviceInfo: DeviceInfoRoot,
         redirectURI: String?,
         code: String?,
         codeVerifier: String?,
@@ -168,6 +169,7 @@ extension AuthAPIClient {
     func syncRequestOIDCToken(
         grantType: GrantType,
         clientId: String,
+        deviceInfo: DeviceInfoRoot,
         redirectURI: String?,
         code: String?,
         codeVerifier: String?,
@@ -178,6 +180,7 @@ extension AuthAPIClient {
             self.requestOIDCToken(
                 grantType: grantType,
                 clientId: clientId,
+                deviceInfo: deviceInfo,
                 redirectURI: redirectURI,
                 code: code,
                 codeVerifier: codeVerifier,
@@ -377,6 +380,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
     func requestOIDCToken(
         grantType: GrantType,
         clientId: String,
+        deviceInfo: DeviceInfoRoot,
         redirectURI: String? = nil,
         code: String? = nil,
         codeVerifier: String? = nil,
@@ -387,9 +391,13 @@ class DefaultAuthAPIClient: AuthAPIClient {
         fetchOIDCConfiguration { [weak self] result in
             switch result {
             case let .success(config):
+                let deviceInfoJSON = try! JSONEncoder().encode(deviceInfo)
+                let xDeviceInfo = deviceInfoJSON.base64urlEncodedString()
+
                 var queryParams = [String: String]()
                 queryParams["client_id"] = clientId
                 queryParams["grant_type"] = grantType.rawValue
+                queryParams["x_device_info"] = xDeviceInfo
 
                 if let code = code {
                     queryParams["code"] = code

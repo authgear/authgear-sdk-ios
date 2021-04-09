@@ -340,6 +340,7 @@ public class Authgear: NSObject {
             let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
                 grantType: GrantType.authorizationCode,
                 clientId: clientId,
+                deviceInfo: getDeviceInfo(),
                 redirectURI: redirectURI,
                 code: code,
                 codeVerifier: verifier.value,
@@ -527,6 +528,7 @@ public class Authgear: NSObject {
                 let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                     grantType: .anonymous,
                     clientId: self.clientId,
+                    deviceInfo: getDeviceInfo(),
                     redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
@@ -749,6 +751,7 @@ public class Authgear: NSObject {
                 let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                     grantType: GrantType.refreshToken,
                     clientId: self.clientId,
+                    deviceInfo: getDeviceInfo(),
                     redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
@@ -899,6 +902,7 @@ public class Authgear: NSObject {
                 let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                     grantType: .biometric,
                     clientId: self.clientId,
+                    deviceInfo: getDeviceInfo(),
                     redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
