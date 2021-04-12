@@ -720,14 +720,17 @@ public class Authgear: NSObject {
     }
 
     private func shouldRefreshAccessToken() -> Bool {
-        if refreshToken == nil {
-            return false
+        // 1. We must have refresh token.
+        guard refreshToken != nil else { return false }
+
+        // 2.1 Either the access token is not present, e.g. just right after configure()
+        if case .none = self.accessToken, case .none = self.expireAt {
+            return true
         }
 
-        guard accessToken != nil,
-              let expireAt = self.expireAt,
-              expireAt.timeIntervalSinceNow.sign == .minus else {
-            return true
+        // 2.2 Or the access token is about to expire.
+        if let _ = self.accessToken, let expireAt = self.expireAt {
+            return expireAt.timeIntervalSinceNow.sign == .minus
         }
 
         return false
