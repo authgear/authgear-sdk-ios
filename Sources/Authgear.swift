@@ -158,7 +158,6 @@ public class Authgear: NSObject {
     }
 
     public func configure(
-        skipRefreshAccessToken: Bool = false,
         transientSession: Bool = false,
         handler: VoidCompletionHandler? = nil
     ) {
@@ -171,10 +170,6 @@ public class Authgear: NSObject {
             let refreshToken = Result { try self.refreshTokenStorage.getRefreshToken(namespace: self.name) }
             switch refreshToken {
             case let .success(token):
-                if self.shouldRefreshAccessToken() && !skipRefreshAccessToken {
-                    return self.refreshAccessToken(handler: handler)
-                }
-
                 DispatchQueue.main.async {
                     self.refreshToken = token
                     self.setSessionState(token == nil ? .noSession : .authenticated, reason: .foundToken)
