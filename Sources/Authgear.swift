@@ -717,7 +717,7 @@ public class Authgear: NSObject {
         openUrl(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
     }
 
-    public func shouldRefreshAccessToken() -> Bool {
+    private func shouldRefreshAccessToken() -> Bool {
         if refreshToken == nil {
             return false
         }
@@ -731,7 +731,7 @@ public class Authgear: NSObject {
         return false
     }
 
-    public func refreshAccessToken(handler: VoidCompletionHandler? = nil) {
+    private func refreshAccessToken(handler: VoidCompletionHandler? = nil) {
         let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
             do {
@@ -765,6 +765,25 @@ public class Authgear: NSObject {
                 handler?(.failure(error))
             }
         }
+    }
+
+    public func refreshAccessTokenIfNeeded(
+        handler: @escaping VoidCompletionHandler
+    ) {
+        if shouldRefreshAccessToken() {
+            refreshAccessToken { result in
+                handler(result)
+            }
+        } else {
+            handler(.success(()))
+        }
+    }
+
+    public func clearRefreshToken(
+        handler: @escaping VoidCompletionHandler
+    ) {
+        let result = self.cleanupSession(force: true, reason: .clear)
+        handler(result)
     }
 
     public func fetchUserInfo(handler: @escaping UserInfoCompletionHandler) {
