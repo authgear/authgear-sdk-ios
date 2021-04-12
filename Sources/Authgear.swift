@@ -795,12 +795,8 @@ public class Authgear: NSObject {
             }
         }
 
-        if shouldRefreshAccessToken() {
-            refreshAccessToken { _ in
-                fetchUserInfo(self.accessToken ?? "")
-            }
-        } else {
-            fetchUserInfo(accessToken ?? "")
+        refreshAccessTokenIfNeeded { _ in
+            fetchUserInfo(self.accessToken ?? "")
         }
     }
 
@@ -863,25 +859,31 @@ public class Authgear: NSObject {
                 return
             }
 
-            self.workerQueue.async {
-                do {
-                    let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
-                    let kid = UUID().uuidString
-                    let tag = "com.authgear.keys.biometric.\(kid)"
-                    let privateKey = try generatePrivateKey()
-                    try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint)
-                    let publicKey = SecKeyCopyPublicKey(privateKey)!
-                    let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-                    let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
-                    let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.setup.rawValue)
-                    let jwt = JWT(header: header, payload: payload)
-                    let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
-                    _ = try self.apiClient.syncRequestBiometricSetup(clientId: self.clientId, jwt: signedJWT)
-                    try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
-                    handler(.success(()))
-                } catch {
-                    handler(.failure(error))
+            let biometricSetup = { (accessToken: String) in
+                self.workerQueue.async {
+                    do {
+                        let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
+                        let kid = UUID().uuidString
+                        let tag = "com.authgear.keys.biometric.\(kid)"
+                        let privateKey = try generatePrivateKey()
+                        try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint)
+                        let publicKey = SecKeyCopyPublicKey(privateKey)!
+                        let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
+                        let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
+                        let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.setup.rawValue)
+                        let jwt = JWT(header: header, payload: payload)
+                        let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
+                        _ = try self.apiClient.syncRequestBiometricSetup(clientId: self.clientId, accessToken: accessToken, jwt: signedJWT)
+                        try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
+                        handler(.success(()))
+                    } catch {
+                        handler(.failure(error))
+                    }
                 }
+            }
+
+            self.refreshAccessTokenIfNeeded { _ in
+                biometricSetup(self.accessToken ?? "")
             }
         }
     }
