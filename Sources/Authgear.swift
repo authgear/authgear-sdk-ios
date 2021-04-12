@@ -90,6 +90,7 @@ public enum SessionStateChangeReason: String {
     case authenticated = "AUTHENTICATED"
     case logout = "LOGOUT"
     case invalid = "INVALID"
+    case clear = "CLEAR"
 }
 
 public protocol AuthgearDelegate: AnyObject {
@@ -154,7 +155,6 @@ public class Authgear: NSObject {
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
 
         super.init()
-        client.delegate = self
     }
 
     public func configure(
@@ -936,12 +936,6 @@ public class Authgear: NSObject {
                 handler(.failure(error))
             }
         }
-    }
-}
-
-extension Authgear: AuthAPIClientDelegate {
-    func getAccessToken() -> String? {
-        accessToken
     }
 }
 
