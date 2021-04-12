@@ -370,7 +370,9 @@ public class Authgear: NSObject {
 
         DispatchQueue.main.async {
             self.accessToken = oidcTokenResponse.accessToken
-            self.refreshToken = oidcTokenResponse.refreshToken
+            if let refreshToken = oidcTokenResponse.refreshToken {
+                self.refreshToken = refreshToken
+            }
             self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn) * Authgear.ExpireInPercentage))
             self.setSessionState(.authenticated, reason: reason)
         }
