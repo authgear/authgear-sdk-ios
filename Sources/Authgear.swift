@@ -90,6 +90,7 @@ public enum SessionStateChangeReason: String {
     case authenticated = "AUTHENTICATED"
     case logout = "LOGOUT"
     case invalid = "INVALID"
+    case clear = "CLEAR"
 }
 
 public protocol AuthgearDelegate: AnyObject {
@@ -154,11 +155,9 @@ public class Authgear: NSObject {
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
 
         super.init()
-        client.delegate = self
     }
 
     public func configure(
-        skipRefreshAccessToken: Bool = false,
         transientSession: Bool = false,
         handler: VoidCompletionHandler? = nil
     ) {
@@ -171,10 +170,6 @@ public class Authgear: NSObject {
             let refreshToken = Result { try self.refreshTokenStorage.getRefreshToken(namespace: self.name) }
             switch refreshToken {
             case let .success(token):
-                if self.shouldRefreshAccessToken() && !skipRefreshAccessToken {
-                    return self.refreshAccessToken(handler: handler)
-                }
-
                 DispatchQueue.main.async {
                     self.refreshToken = token
                     self.setSessionState(token == nil ? .noSession : .authenticated, reason: .foundToken)
@@ -376,7 +371,9 @@ public class Authgear: NSObject {
 
         DispatchQueue.main.async {
             self.accessToken = oidcTokenResponse.accessToken
-            self.refreshToken = oidcTokenResponse.refreshToken
+            if let refreshToken = oidcTokenResponse.refreshToken {
+                self.refreshToken = refreshToken
+            }
             self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn) * Authgear.ExpireInPercentage))
             self.setSessionState(.authenticated, reason: reason)
         }
@@ -724,21 +721,24 @@ public class Authgear: NSObject {
         openUrl(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
     }
 
-    public func shouldRefreshAccessToken() -> Bool {
-        if refreshToken == nil {
-            return false
+    private func shouldRefreshAccessToken() -> Bool {
+        // 1. We must have refresh token.
+        guard refreshToken != nil else { return false }
+
+        // 2.1 Either the access token is not present, e.g. just right after configure()
+        if case .none = self.accessToken, case .none = self.expireAt {
+            return true
         }
 
-        guard accessToken != nil,
-              let expireAt = self.expireAt,
-              expireAt.timeIntervalSinceNow.sign == .minus else {
-            return true
+        // 2.2 Or the access token is about to expire.
+        if let _ = self.accessToken, let expireAt = self.expireAt {
+            return expireAt.timeIntervalSinceNow.sign == .minus
         }
 
         return false
     }
 
-    public func refreshAccessToken(handler: VoidCompletionHandler? = nil) {
+    private func refreshAccessToken(handler: VoidCompletionHandler? = nil) {
         let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
             do {
@@ -775,6 +775,25 @@ public class Authgear: NSObject {
         }
     }
 
+    public func refreshAccessTokenIfNeeded(
+        handler: @escaping VoidCompletionHandler
+    ) {
+        if shouldRefreshAccessToken() {
+            refreshAccessToken { result in
+                handler(result)
+            }
+        } else {
+            handler(.success(()))
+        }
+    }
+
+    public func clearRefreshToken(
+        handler: @escaping VoidCompletionHandler
+    ) {
+        let result = self.cleanupSession(force: true, reason: .clear)
+        handler(result)
+    }
+
     public func fetchUserInfo(handler: @escaping UserInfoCompletionHandler) {
         let handler = withMainQueueHandler(handler)
         let fetchUserInfo = { (accessToken: String) in
@@ -784,12 +803,8 @@ public class Authgear: NSObject {
             }
         }
 
-        if shouldRefreshAccessToken() {
-            refreshAccessToken { _ in
-                fetchUserInfo(self.accessToken ?? "")
-            }
-        } else {
-            fetchUserInfo(accessToken ?? "")
+        refreshAccessTokenIfNeeded { _ in
+            fetchUserInfo(self.accessToken ?? "")
         }
     }
 
@@ -852,25 +867,31 @@ public class Authgear: NSObject {
                 return
             }
 
-            self.workerQueue.async {
-                do {
-                    let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
-                    let kid = UUID().uuidString
-                    let tag = "com.authgear.keys.biometric.\(kid)"
-                    let privateKey = try generatePrivateKey()
-                    try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint)
-                    let publicKey = SecKeyCopyPublicKey(privateKey)!
-                    let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-                    let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
-                    let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.setup.rawValue)
-                    let jwt = JWT(header: header, payload: payload)
-                    let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
-                    _ = try self.apiClient.syncRequestBiometricSetup(clientId: self.clientId, jwt: signedJWT)
-                    try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
-                    handler(.success(()))
-                } catch {
-                    handler(.failure(error))
+            let biometricSetup = { (accessToken: String) in
+                self.workerQueue.async {
+                    do {
+                        let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
+                        let kid = UUID().uuidString
+                        let tag = "com.authgear.keys.biometric.\(kid)"
+                        let privateKey = try generatePrivateKey()
+                        try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint)
+                        let publicKey = SecKeyCopyPublicKey(privateKey)!
+                        let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
+                        let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
+                        let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.setup.rawValue)
+                        let jwt = JWT(header: header, payload: payload)
+                        let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
+                        _ = try self.apiClient.syncRequestBiometricSetup(clientId: self.clientId, accessToken: accessToken, jwt: signedJWT)
+                        try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
+                        handler(.success(()))
+                    } catch {
+                        handler(.failure(error))
+                    }
                 }
+            }
+
+            self.refreshAccessTokenIfNeeded { _ in
+                biometricSetup(self.accessToken ?? "")
             }
         }
     }
@@ -924,12 +945,6 @@ public class Authgear: NSObject {
                 handler(.failure(error))
             }
         }
-    }
-}
-
-extension Authgear: AuthAPIClientDelegate {
-    func getAccessToken() -> String? {
-        accessToken
     }
 }
 

@@ -118,6 +118,7 @@ protocol AuthAPIClient: AnyObject {
     )
     func requestBiometricSetup(
         clientId: String,
+        accessToken: String,
         jwt: String,
         handler: @escaping (Result<Void, Error>) -> Void
     )
@@ -193,11 +194,13 @@ extension AuthAPIClient {
 
     func syncRequestBiometricSetup(
         clientId: String,
+        accessToken: String,
         jwt: String
     ) throws {
         try withSemaphore { handler in
             self.requestBiometricSetup(
                 clientId: clientId,
+                accessToken: accessToken,
                 jwt: jwt,
                 handler: handler
             )
@@ -258,12 +261,6 @@ extension AuthAPIClient {
     }
 }
 
-protocol AuthAPIClientDelegate: AnyObject {
-    func getAccessToken() -> String?
-    func shouldRefreshAccessToken() -> Bool
-    func refreshAccessToken(handler: VoidCompletionHandler?)
-}
-
 class DefaultAuthAPIClient: AuthAPIClient {
     public let endpoint: URL
 
@@ -273,8 +270,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
     private let defaultSession = URLSession(configuration: .default)
     private var oidcConfiguration: OIDCConfiguration?
-
-    weak var delegate: AuthAPIClientDelegate?
 
     private func buildFetchOIDCConfigurationRequest() -> URLRequest {
         URLRequest(url: endpoint.appendingPathComponent("/.well-known/openid-configuration"))
@@ -343,40 +338,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
         }
     }
 
-    func refreshAccessTokenIfNeeded(handler: @escaping (Result<Void, Error>) -> Void) {
-        if let delegate = self.delegate,
-           delegate.shouldRefreshAccessToken() {
-            delegate.refreshAccessToken { result in
-                switch result {
-                case .success:
-                    return handler(.success(()))
-                case let .failure(error):
-                    return handler(.failure(error))
-                }
-            }
-        }
-        return handler(.success(()))
-    }
-
-    func fetchWithRefreshToken(
-        request: URLRequest,
-        handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
-    ) {
-        refreshAccessTokenIfNeeded { [weak self] result in
-            switch result {
-            case .success:
-                var request = request
-                if let accessToken = self?.delegate?.getAccessToken() {
-                    request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
-                }
-
-                self?.fetch(request: request, handler: handler)
-            case let .failure(error):
-                return handler(.failure(error))
-            }
-        }
-    }
-
     func requestOIDCToken(
         grantType: GrantType,
         clientId: String,
@@ -442,6 +403,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
     func requestBiometricSetup(
         clientId: String,
+        accessToken: String,
         jwt: String,
         handler: @escaping (Result<Void, Error>) -> Void
     ) {
@@ -460,9 +422,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
                 var urlRequest = URLRequest(url: config.tokenEndpoint)
                 urlRequest.httpMethod = "POST"
-                if let accessToken = self?.delegate?.getAccessToken() {
-                    urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
-                }
+                urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
                 urlRequest.setValue(
                     "application/x-www-form-urlencoded",
                     forHTTPHeaderField: "content-type"
