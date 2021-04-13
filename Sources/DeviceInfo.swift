@@ -30,11 +30,13 @@ struct DeviceInfoIOS: Encodable {
     var uname: DeviceInfoUname
     var uiDevice: DeviceInfoUIDevice
     var nsProcessInfo: DeviceInfoNSProcessInfo
+    var nsBundle: DeviceInfoNSBundle
 
     enum CodingKeys: String, CodingKey {
         case uname
         case uiDevice = "UIDevice"
         case nsProcessInfo = "NSProcessInfo"
+        case nsBundle = "NSBundle"
     }
 }
 
@@ -57,6 +59,22 @@ struct DeviceInfoUIDevice: Encodable {
 struct DeviceInfoNSProcessInfo: Encodable {
     var isMacCatalystApp: Bool
     var isiOSAppOnMac: Bool
+}
+
+struct DeviceInfoNSBundle: Encodable {
+    var cfBundleIdentifier: String
+    var cfBundleDisplayName: String
+    var cfBundleExecutable: String
+    var cfBundleShortVersionString: String
+    var cfBundleVersion: String
+
+    enum CodingKeys: String, CodingKey {
+        case cfBundleIdentifier = "CFBundleIdentifier"
+        case cfBundleDisplayName = "CFBundleDisplayName"
+        case cfBundleExecutable = "CFBundleExecutable"
+        case cfBundleShortVersionString = "CFBundleShortVersionString"
+        case cfBundleVersion = "CFBundleVersion"
+    }
 }
 
 func getDeviceInfo() -> DeviceInfoRoot {
@@ -93,6 +111,14 @@ func getDeviceInfo() -> DeviceInfoRoot {
     // UIDevice
     let currentDevice = UIDevice.current
 
+    // NSBundle
+    let infoDict = Bundle.main.infoDictionary!
+    let cfBundleIdentifier = infoDict["CFBundleIdentifier"] as! String
+    let cfBundleDisplayName = infoDict["CFBundleDisplayName"] as! String
+    let cfBundleExecutable = infoDict["CFBundleExecutable"] as! String
+    let cfBundleShortVersionString = infoDict["CFBundleShortVersionString"] as! String
+    let cfBundleVersion = infoDict["CFBundleVersion"] as! String
+
     var root = DeviceInfoRoot(
         ios: DeviceInfoIOS(
             uname: DeviceInfoUname(
@@ -112,6 +138,13 @@ func getDeviceInfo() -> DeviceInfoRoot {
             nsProcessInfo: DeviceInfoNSProcessInfo(
                 isMacCatalystApp: false,
                 isiOSAppOnMac: false
+            ),
+            nsBundle: DeviceInfoNSBundle(
+                cfBundleIdentifier: cfBundleIdentifier,
+                cfBundleDisplayName: cfBundleDisplayName,
+                cfBundleExecutable: cfBundleExecutable,
+                cfBundleShortVersionString: cfBundleShortVersionString,
+                cfBundleVersion: cfBundleVersion
             )
         )
     )
