@@ -787,7 +787,7 @@ public class Authgear: NSObject {
         }
     }
 
-    public func clearRefreshToken(
+    public func clearSessionState(
         handler: @escaping VoidCompletionHandler
     ) {
         let result = self.cleanupSession(force: true, reason: .clear)
