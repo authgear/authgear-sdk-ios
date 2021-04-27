@@ -15,8 +15,10 @@ jobs:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      # Install swiftformat@0.47.0
-      - run: curl https://raw.githubusercontent.com/Homebrew/homebrew-core/ecf0ff050adb374d845c7875c9a9b0524e616abd/Formula/swiftformat.rb --output swiftformat.rb && brew install swiftformat.rb
+      # Install the latest version of swiftformat.
+      # Latest compatiable version with our codebase is 0.48.0
+      - run: brew update
+      - run: brew upgrade swiftformat || brew install swiftformat
       - run: sudo xcode-select -s /Applications/Xcode_12.3.app/Contents/Developer
       - run: make lint
       - run: pod install --project-directory=example

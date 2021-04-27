@@ -9,6 +9,7 @@
 --disable wrapMultilineStatementBraces
 --disable redundantSelf
 --disable typeSugar
+--disable redundantParens
 
 # format options
 
@@ -27,4 +28,3 @@
 --wraparguments before-first
 --wrapcollections before-first
 --wrapparameters before-first
-
