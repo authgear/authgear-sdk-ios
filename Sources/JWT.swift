@@ -101,7 +101,7 @@ struct JWTSigner {
         var error: Unmanaged<CFError>?
 
         guard let signedData = SecKeyCreateSignature(privateKey, .rsaSignatureDigestPKCS1v15SHA256, Data(buffer) as CFData, &error) else {
-            throw error!.takeRetainedValue() as Error
+            throw AuthgearError.error(error!.takeRetainedValue() as Error)
         }
 
         return (signedData as Data).base64urlEncodedString()

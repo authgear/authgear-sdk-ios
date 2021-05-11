@@ -12,7 +12,7 @@ struct JWK: Encodable {
 func publicKeyToJWK(kid: String, publicKey: SecKey) throws -> JWK {
     var error: Unmanaged<CFError>?
     guard let keyData = SecKeyCopyExternalRepresentation(publicKey, &error) else {
-        throw error!.takeRetainedValue() as Error
+        throw AuthgearError.error(error!.takeRetainedValue() as Error)
     }
     let data = keyData as Data
 

@@ -28,7 +28,7 @@ func generatePrivateKey() throws -> SecKey {
         kSecAttrKeySizeInBits as String: 2048
     ]
     guard let privateKey = SecKeyCreateRandomKey(query as CFDictionary, &error) else {
-        throw error!.takeRetainedValue() as Error
+        throw AuthgearError.error(error!.takeRetainedValue() as Error)
     }
     return privateKey
 }
@@ -43,7 +43,7 @@ func removePrivateKey(tag: String) throws {
 
     let status = SecItemDelete(query as CFDictionary)
     guard status == errSecSuccess || status == errSecItemNotFound else {
-        throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+        throw AuthgearError.osStatus(status)
     }
 }
 
@@ -65,7 +65,7 @@ func getPrivateKey(tag: String) throws -> SecKey? {
     }
 
     guard status == errSecSuccess else {
-        throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+        throw AuthgearError.osStatus(status)
     }
 
     let privateKey = item as! SecKey
@@ -83,7 +83,7 @@ func addPrivateKey(privateKey: SecKey, tag: String, constraint: BiometricAccessC
         constraint.secAccessControlCreateFlags,
         &error
     ) else {
-        throw error!.takeRetainedValue() as Error
+        throw AuthgearError.error(error!.takeRetainedValue() as Error)
     }
 
     let context = LAContext()
@@ -98,6 +98,6 @@ func addPrivateKey(privateKey: SecKey, tag: String, constraint: BiometricAccessC
 
     let status = SecItemAdd(query as CFDictionary, nil)
     guard status == errSecSuccess else {
-        throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+        throw AuthgearError.osStatus(status)
     }
 }
