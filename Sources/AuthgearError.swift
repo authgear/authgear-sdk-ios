@@ -1,11 +1,20 @@
 import Foundation
+import LocalAuthentication
 
 public enum AuthgearError: Error {
     case cancel
     case unexpectedHttpStatusCode(Int, Data?)
     case serverError(ServerError)
     case oauthError(OAuthError)
+
     case anonymousUserNotFound
+
+    case biometricPrivateKeyNotFound
+    case biometricNotSupportedOrPermissionDenied(Error)
+    case biometricNoPasscode(Error)
+    case biometricNoEnrollment(Error)
+    case biometricLockout(Error)
+
     case unauthenticatedUser
     case publicKeyNotFound
     case error(Error)
@@ -38,4 +47,34 @@ public struct ServerError: Error, Decodable {
         reason = try values.decode(String.self, forKey: .reason)
         info = try values.decode([String: Any].self, forKey: .info)
     }
+}
+
+func wrapError(error: Error) -> Error {
+    let nsError = error as NSError
+
+    // Cancel
+    if (nsError.domain == kLAErrorDomain && nsError.code == kLAErrorUserCancel) {
+        return AuthgearError.cancel
+    }
+    if (nsError.domain == NSOSStatusErrorDomain && nsError.code == errSecUserCanceled) {
+        return AuthgearError.cancel
+    }
+
+    if (nsError.domain == kLAErrorDomain && nsError.code == kLAErrorBiometryNotAvailable) {
+        return AuthgearError.biometricNotSupportedOrPermissionDenied(error)
+    }
+
+    if (nsError.domain == kLAErrorDomain && nsError.code == kLAErrorBiometryNotEnrolled) {
+        return AuthgearError.biometricNoEnrollment(error)
+    }
+
+    if (nsError.domain == kLAErrorDomain && nsError.code == kLAErrorPasscodeNotSet) {
+        return AuthgearError.biometricNoPasscode(error)
+    }
+
+    if (nsError.domain == kLAErrorDomain && nsError.code == kLAErrorBiometryLockout) {
+        return AuthgearError.biometricLockout(error)
+    }
+
+    return AuthgearError.error(error)
 }

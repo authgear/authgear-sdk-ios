@@ -830,7 +830,7 @@ public class Authgear: NSObject {
         var error: NSError?
         _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
         if let error = error {
-            throw error
+            throw wrapError(error: error)
         }
     }
 
@@ -864,7 +864,7 @@ public class Authgear: NSObject {
             localizedReason: localizedReason
         ) { _, error in
             if let error = error {
-                handler(.failure(error))
+                handler(.failure(wrapError(error: error)))
                 return
             }
 
@@ -903,7 +903,7 @@ public class Authgear: NSObject {
         workerQueue.async {
             do {
                 guard let kid = try self.storage.getBiometricKeyId(namespace: self.name) else {
-                    throw NSError(domain: NSOSStatusErrorDomain, code: Int(errSecItemNotFound), userInfo: nil)
+                    throw AuthgearError.biometricPrivateKeyNotFound
                 }
                 let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
                 let tag = "com.authgear.keys.biometric.\(kid)"
@@ -913,7 +913,7 @@ public class Authgear: NSObject {
                     // when biometric has been changed by the device owner.
                     // In this case, perform cleanup.
                     try self.disableBiometric()
-                    throw NSError(domain: NSOSStatusErrorDomain, code: Int(errSecItemNotFound), userInfo: nil)
+                    throw AuthgearError.biometricPrivateKeyNotFound
                 }
                 let publicKey = SecKeyCopyPublicKey(privateKey)!
                 let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
