@@ -1,46 +1,10 @@
 import Foundation
 
-public enum AuthAPIClientError: Error {
-    case invalidResponse
-    case dataTaskError(Error)
-    case decodeError(Error)
-    case serverError(ServerError)
-    case statusCode(Int, Data?)
-    case oidcError(OIDCError)
-}
-
 enum GrantType: String {
     case authorizationCode = "authorization_code"
     case refreshToken = "refresh_token"
     case anonymous = "urn:authgear:params:oauth:grant-type:anonymous-request"
     case biometric = "urn:authgear:params:oauth:grant-type:biometric-request"
-}
-
-public struct OIDCError: Error, Decodable {
-    let error: String
-    let errorDescription: String
-}
-
-public struct ServerError: Error, Decodable {
-    let name: String
-    let message: String
-    let reason: String
-    let info: [String: Any]?
-
-    enum CodingKeys: String, CodingKey {
-        case name
-        case message
-        case reason
-        case info
-    }
-
-    public init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        name = try values.decode(String.self, forKey: .name)
-        message = try values.decode(String.self, forKey: .message)
-        reason = try values.decode(String.self, forKey: .reason)
-        info = try values.decode([String: Any].self, forKey: .info)
-    }
 }
 
 enum APIResponse<T: Decodable>: Decodable {
@@ -67,7 +31,7 @@ enum APIResponse<T: Decodable>: Decodable {
         case let .result(value):
             return .success(value)
         case let .error(error):
-            return .failure(AuthAPIClientError.serverError(error))
+            return .failure(AuthgearError.serverError(error))
         }
     }
 }
@@ -293,24 +257,21 @@ class DefaultAuthAPIClient: AuthAPIClient {
         handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
     ) {
         let dataTaslk = defaultSession.dataTask(with: request) { data, response, error in
-
-            guard let response = response as? HTTPURLResponse else {
-                return handler(.failure(AuthAPIClientError.invalidResponse))
-            }
+            let response = response as! HTTPURLResponse
 
             if response.statusCode < 200 || response.statusCode >= 300 {
                 if let data = data {
                     let decorder = JSONDecoder()
                     decorder.keyDecodingStrategy = .convertFromSnakeCase
-                    if let error = try? decorder.decode(OIDCError.self, from: data) {
-                        return handler(.failure(AuthAPIClientError.oidcError(error)))
+                    if let error = try? decorder.decode(OAuthError.self, from: data) {
+                        return handler(.failure(AuthgearError.oauthError(error)))
                     }
                 }
-                return handler(.failure(AuthAPIClientError.statusCode(response.statusCode, data)))
+                return handler(.failure(AuthgearError.unexpectedHttpStatusCode(response.statusCode, data)))
             }
 
             if let error = error {
-                return handler(.failure(AuthAPIClientError.dataTaskError(error)))
+                return handler(.failure(AuthgearError.error(error)))
             }
 
             return handler(.success((data, response)))
@@ -332,7 +293,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     let response = try decorder.decode(T.self, from: data!)
                     return .success(response)
                 } catch {
-                    return .failure(AuthAPIClientError.decodeError(error))
+                    return .failure(AuthgearError.error(error))
                 }
             })
         }

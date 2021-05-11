@@ -272,12 +272,7 @@ public class Authgear: NSObject {
                                 self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
                             }
                         case let .failure(error):
-                            switch error {
-                            case .canceledLogin:
-                                return handler(.failure(AuthgearError.canceledLogin))
-                            case let .sessionError(error):
-                                return handler(.failure(AuthgearError.unexpectedError(error)))
-                            }
+                            return handler(.failure(error))
                         }
                     }
                 )
@@ -309,8 +304,11 @@ public class Authgear: NSObject {
         if let errorParams = params["error"] {
             return handler(
                 .failure(AuthgearError.oauthError(
-                    error: errorParams,
-                    description: params["error_description"]
+                    OAuthError(
+                        error: errorParams,
+                        errorDescription: params["error_description"],
+                        errorUri: params["error_uri"]
+                    )
                 ))
             )
         }
@@ -318,8 +316,11 @@ public class Authgear: NSObject {
         guard let code = params["code"] else {
             return handler(
                 .failure(AuthgearError.oauthError(
-                    error: "invalid_request",
-                    description: "Missing parameter: code"
+                    OAuthError(
+                        error: "invalid_request",
+                        errorDescription: "Missing parameter: code",
+                        errorUri: nil
+                    )
                 ))
             )
         }
@@ -762,9 +763,9 @@ public class Authgear: NSObject {
                 let result = self.persistSession(oidcTokenResponse, reason: .foundToken)
                 handler?(result)
             } catch {
-                if let error = error as? AuthAPIClientError,
-                   case let .oidcError(oidcError) = error,
-                   oidcError.error == "invalid_grant" {
+                if let error = error as? AuthgearError,
+                   case let .oauthError(oauthError) = error,
+                   oauthError.error == "invalid_grant" {
                     return DispatchQueue.main.async {
                         let result = self.cleanupSession(force: true, reason: .invalid)
                         handler?(result)
@@ -937,8 +938,8 @@ public class Authgear: NSObject {
                 return handler(result)
             } catch {
                 // In case the biometric was removed remotely.
-                if case let AuthAPIClientError.oidcError(error) = error {
-                    if error.error == "invalid_grant" && error.errorDescription == "InvalidCredentials" {
+                if case let AuthgearError.oauthError(oauthError) = error {
+                    if oauthError.error == "invalid_grant" && oauthError.errorDescription == "InvalidCredentials" {
                         try? self.disableBiometric()
                     }
                 }

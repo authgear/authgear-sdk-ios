@@ -1,11 +1,6 @@
 import Foundation
 import Security
 
-enum JWKError: Error {
-    case publicKeyNotFound
-    case unknownError(OSStatus)
-}
-
 struct JWK: Encodable {
     let kid: String
     let alg: String = "RS256"
@@ -37,7 +32,7 @@ struct JWKStore {
             if let publicKey = SecKeyCopyPublicKey(privateKey) {
                 return try publicKeyToJWK(kid: keyId, publicKey: publicKey)
             }
-            throw JWKError.publicKeyNotFound
+            throw AuthgearError.publicKeyNotFound
         } else {
             return nil
         }
@@ -64,7 +59,7 @@ struct JWKStore {
         case errSecItemNotFound:
             return nil
         default:
-            throw JWKError.unknownError(status)
+            throw AuthgearError.osStatus(status)
         }
     }
 
@@ -83,7 +78,7 @@ struct JWKStore {
         case errSecSuccess:
             return try publicKeyToJWK(kid: keyId, publicKey: publicKeySec!)
         default:
-            throw JWKError.unknownError(status)
+            throw AuthgearError.osStatus(status)
         }
     }
 }
