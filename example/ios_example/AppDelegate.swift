@@ -11,7 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         appContainer.container?.delegate = self
 
         // configure WeChat SDK
-        WXApi.registerApp(App.weChatAppID, universalLink: App.weChatUniversalLink)
+        WXApi.registerApp(App.wechatAppID, universalLink: App.wechatUniversalLink)
         WXApi.startLog(by: .detail) { log in
             print(#line, "wechat sdk wxapi: " + log)
         }
@@ -30,10 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate: AuthgearDelegate {
-    func sendWeChatAuthRequest(_ state: String) {
-        print(#line, "sendWeChatAuthRequest: \(state)")
+    func sendWechatAuthRequest(_ state: String) {
+        print(#line, "sendWechatAuthRequest: \(state)")
         let req = SendAuthReq()
-        req.openID = App.weChatAppID
+        req.openID = App.wechatAppID
         req.scope = "snsapi_userinfo"
         req.state = state
         WXApi.send(req)
@@ -49,12 +49,12 @@ extension AppDelegate: WXApiDelegate {
 
     func onResp(_ resp: BaseResp) {
         // Receive code from WeChat, send callback to authgear
-        // by calling `authgear.weChatAuthCallback`
+        // by calling `authgear.wechatAuthCallback`
         if resp.isKind(of: SendAuthResp.self) {
             if resp.errCode == 0 {
                 let _resp = resp as! SendAuthResp
                 if let code = _resp.code, let state = _resp.state {
-                    appContainer.container?.weChatAuthCallback(code: code, state: state) { result in
+                    appContainer.container?.wechatAuthCallback(code: code, state: state) { result in
                         switch result {
                         case .success():
                             print(#line, "wechat callback received")

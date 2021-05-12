@@ -16,7 +16,7 @@ struct AuthorizeOptions {
     let prompt: String?
     let loginHint: String?
     let uiLocales: [String]?
-    let weChatRedirectURI: String?
+    let wechatRedirectURI: String?
     let page: String?
 
     var urlScheme: String {
@@ -33,7 +33,7 @@ struct AuthorizeOptions {
         prompt: String?,
         loginHint: String?,
         uiLocales: [String]?,
-        weChatRedirectURI: String?,
+        wechatRedirectURI: String?,
         page: String?
     ) {
         self.redirectURI = redirectURI
@@ -42,7 +42,7 @@ struct AuthorizeOptions {
         self.prompt = prompt
         self.loginHint = loginHint
         self.uiLocales = uiLocales
-        self.weChatRedirectURI = weChatRedirectURI
+        self.wechatRedirectURI = wechatRedirectURI
         self.page = page
     }
 }
@@ -95,12 +95,12 @@ public enum SessionStateChangeReason: String {
 
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
-    func sendWeChatAuthRequest(_ state: String)
+    func sendWechatAuthRequest(_ state: String)
 }
 
 public extension AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
-    func sendWeChatAuthRequest(_ state: String) {}
+    func sendWechatAuthRequest(_ state: String) {}
 }
 
 public class Authgear: NSObject {
@@ -136,7 +136,7 @@ public class Authgear: NSObject {
     private let jwkStore = JWKStore()
     private let workerQueue: DispatchQueue
 
-    private var currentWeChatRedirectURI: String?
+    private var currentWechatRedirectURI: String?
 
     public private(set) var sessionState: SessionState = .unknown
 
@@ -227,10 +227,10 @@ public class Authgear: NSObject {
             ))
         }
 
-        if let weChatRedirectURI = options.weChatRedirectURI {
+        if let wechatRedirectURI = options.wechatRedirectURI {
             queryItems.append(URLQueryItem(
                 name: "x_wechat_redirect_uri",
-                value: weChatRedirectURI
+                value: wechatRedirectURI
             ))
         }
 
@@ -260,12 +260,12 @@ public class Authgear: NSObject {
         DispatchQueue.main.async {
             switch url {
             case let .success(url):
-                self.registerCurrentWeChatRedirectURI(uri: options.weChatRedirectURI)
+                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: options.urlScheme,
                     completionHandler: { [weak self] result in
-                        self?.unregisterCurrentWeChatRedirectURI()
+                        self?.unregisterCurrentWechatRedirectURI()
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
@@ -411,16 +411,16 @@ public class Authgear: NSObject {
         }
     }
 
-    private func registerCurrentWeChatRedirectURI(uri: String?) {
-        currentWeChatRedirectURI = uri
+    private func registerCurrentWechatRedirectURI(uri: String?) {
+        currentWechatRedirectURI = uri
     }
 
-    private func unregisterCurrentWeChatRedirectURI() {
-        currentWeChatRedirectURI = nil
+    private func unregisterCurrentWechatRedirectURI() {
+        currentWechatRedirectURI = nil
     }
 
-    private func handleWeChatRedirectURI(_ url: URL) -> Bool {
-        if currentWeChatRedirectURI == nil {
+    private func handleWechatRedirectURI(_ url: URL) -> Bool {
+        if currentWechatRedirectURI == nil {
             return false
         }
 
@@ -442,8 +442,8 @@ public class Authgear: NSObject {
             return false
         }
 
-        if urlWithoutQuery == currentWeChatRedirectURI {
-            delegate?.sendWeChatAuthRequest(state!)
+        if urlWithoutQuery == currentWechatRedirectURI {
+            delegate?.sendWechatAuthRequest(state!)
             return true
         }
 
@@ -457,7 +457,7 @@ public class Authgear: NSObject {
     ) -> Bool {
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
            let url = userActivity.webpageURL {
-            _ = handleWeChatRedirectURI(url)
+            _ = handleWechatRedirectURI(url)
         }
         return true
     }
@@ -468,7 +468,7 @@ public class Authgear: NSObject {
               let url = userActivity.webpageURL else {
             return
         }
-        _ = handleWeChatRedirectURI(url)
+        _ = handleWechatRedirectURI(url)
     }
 
     public func authorize(
@@ -477,7 +477,7 @@ public class Authgear: NSObject {
         prompt: String? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
-        weChatRedirectURI: String? = nil,
+        wechatRedirectURI: String? = nil,
         page: String? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -489,7 +489,7 @@ public class Authgear: NSObject {
                 prompt: prompt,
                 loginHint: loginHint,
                 uiLocales: uiLocales,
-                weChatRedirectURI: weChatRedirectURI,
+                wechatRedirectURI: wechatRedirectURI,
                 page: page
             ),
             handler: withMainQueueHandler(handler)
@@ -557,7 +557,7 @@ public class Authgear: NSObject {
         redirectURI: String,
         state: String? = nil,
         uiLocales: [String]? = nil,
-        weChatRedirectURI: String? = nil,
+        wechatRedirectURI: String? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
@@ -596,7 +596,7 @@ public class Authgear: NSObject {
                         prompt: "login",
                         loginHint: loginHint,
                         uiLocales: uiLocales,
-                        weChatRedirectURI: weChatRedirectURI,
+                        wechatRedirectURI: wechatRedirectURI,
                         page: nil
                     )
                 ) { [weak self] result in
@@ -670,7 +670,7 @@ public class Authgear: NSObject {
                         prompt: "none",
                         loginHint: loginHint,
                         uiLocales: nil,
-                        weChatRedirectURI: wechatRedirectURI,
+                        wechatRedirectURI: wechatRedirectURI,
                         page: nil
                     ),
                     verifier: nil
@@ -684,7 +684,7 @@ public class Authgear: NSObject {
                     // new authorize section (authorize or setting page)
                     // registerCurrentWeChatRedirectURI will be called and overwrite
                     // previous registered wechatRedirectURI
-                    self.registerCurrentWeChatRedirectURI(uri: wechatRedirectURI)
+                    self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
 
                     let vc = UIViewController()
                     let wv = WKWebView(frame: vc.view.bounds)
@@ -808,11 +808,11 @@ public class Authgear: NSObject {
         }
     }
 
-    public func weChatAuthCallback(code: String, state: String, handler: VoidCompletionHandler? = nil) {
+    public func wechatAuthCallback(code: String, state: String, handler: VoidCompletionHandler? = nil) {
         let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
             do {
-                try self.apiClient.syncRequestWeChatAuthCallback(
+                try self.apiClient.syncRequestWechatAuthCallback(
                     code: code,
                     state: state
                 )
@@ -951,8 +951,8 @@ public class Authgear: NSObject {
 extension Authgear: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url {
-            let isWeChatRedirectURI = handleWeChatRedirectURI(url)
-            if isWeChatRedirectURI {
+            let isWechatRedirectURI = handleWechatRedirectURI(url)
+            if isWechatRedirectURI {
                 decisionHandler(.cancel)
                 return
             }

@@ -9,9 +9,9 @@ struct UserInfo {
 
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
-    static let weChatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
-    static let weChatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
-    static let weChatAppID = "wxa2f631873c63add1"
+    static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
+    static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
+    static let wechatAppID = "wxa2f631873c63add1"
 
     @Published var container: Authgear?
     @Published var sessionState = SessionState.unknown
@@ -74,7 +74,7 @@ class App: ObservableObject {
         container?.authorize(
             redirectURI: App.redirectURI,
             prompt: "login",
-            weChatRedirectURI: App.weChatRedirectURI,
+            wechatRedirectURI: App.wechatRedirectURI,
             page: page
         ) { result in
             let success = self.handleAuthorizeResult(result)
@@ -128,14 +128,14 @@ class App: ObservableObject {
     func openSetting() {
         container?.open(
             page: .settings,
-            wechatRedirectURI: App.weChatRedirectURI
+            wechatRedirectURI: App.wechatRedirectURI
         )
     }
 
     func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,
-            weChatRedirectURI: App.weChatRedirectURI
+            wechatRedirectURI: App.wechatRedirectURI
         ) { result in
             let success = self.handleAuthorizeResult(result)
             if success {
