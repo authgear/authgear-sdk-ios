@@ -138,7 +138,7 @@ protocol AuthAPIClient: AnyObject {
         refreshToken: String,
         handler: @escaping (Result<AppSessionTokenResponse, Error>) -> Void
     )
-    func requestWeChatAuthCallback(
+    func requestWechatAuthCallback(
         code: String,
         state: String,
         handler: @escaping (Result<Void, Error>) -> Void
@@ -251,9 +251,9 @@ extension AuthAPIClient {
         }
     }
 
-    func syncRequestWeChatAuthCallback(code: String, state: String) throws {
+    func syncRequestWechatAuthCallback(code: String, state: String) throws {
         try withSemaphore { handler in
-            self.requestWeChatAuthCallback(
+            self.requestWechatAuthCallback(
                 code: code, state: state,
                 handler: handler
             )
@@ -516,7 +516,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         })
     }
 
-    func requestWeChatAuthCallback(code: String, state: String, handler: @escaping (Result<Void, Error>) -> Void) {
+    func requestWechatAuthCallback(code: String, state: String, handler: @escaping (Result<Void, Error>) -> Void) {
         let queryItems = [
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "state", value: state),
