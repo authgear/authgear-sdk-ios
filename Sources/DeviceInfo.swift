@@ -63,6 +63,7 @@ struct DeviceInfoNSProcessInfo: Encodable {
 
 struct DeviceInfoNSBundle: Encodable {
     var cfBundleIdentifier: String
+    var cfBundleName: String
     var cfBundleDisplayName: String
     var cfBundleExecutable: String
     var cfBundleShortVersionString: String
@@ -70,6 +71,7 @@ struct DeviceInfoNSBundle: Encodable {
 
     enum CodingKeys: String, CodingKey {
         case cfBundleIdentifier = "CFBundleIdentifier"
+        case cfBundleName = "CFBundleName"
         case cfBundleDisplayName = "CFBundleDisplayName"
         case cfBundleExecutable = "CFBundleExecutable"
         case cfBundleShortVersionString = "CFBundleShortVersionString"
@@ -113,11 +115,12 @@ func getDeviceInfo() -> DeviceInfoRoot {
 
     // NSBundle
     let infoDict = Bundle.main.infoDictionary!
-    let cfBundleIdentifier = infoDict["CFBundleIdentifier"] as! String
-    let cfBundleDisplayName = infoDict["CFBundleDisplayName"] as! String
-    let cfBundleExecutable = infoDict["CFBundleExecutable"] as! String
-    let cfBundleShortVersionString = infoDict["CFBundleShortVersionString"] as! String
-    let cfBundleVersion = infoDict["CFBundleVersion"] as! String
+    let cfBundleIdentifier = infoDict["CFBundleIdentifier"] as? String ?? ""
+    let cfBundleName = infoDict["CFBundleName"] as? String ?? ""
+    let cfBundleDisplayName = infoDict["CFBundleDisplayName"] as? String ?? ""
+    let cfBundleExecutable = infoDict["CFBundleExecutable"] as? String ?? ""
+    let cfBundleShortVersionString = infoDict["CFBundleShortVersionString"] as? String ?? ""
+    let cfBundleVersion = infoDict["CFBundleVersion"] as? String ?? ""
 
     var root = DeviceInfoRoot(
         ios: DeviceInfoIOS(
@@ -141,6 +144,7 @@ func getDeviceInfo() -> DeviceInfoRoot {
             ),
             nsBundle: DeviceInfoNSBundle(
                 cfBundleIdentifier: cfBundleIdentifier,
+                cfBundleName: cfBundleName,
                 cfBundleDisplayName: cfBundleDisplayName,
                 cfBundleExecutable: cfBundleExecutable,
                 cfBundleShortVersionString: cfBundleShortVersionString,
