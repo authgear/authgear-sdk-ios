@@ -2,7 +2,7 @@ import AuthenticationServices
 import SafariServices
 
 protocol AuthenticationSession {
-    typealias CompletionHandler = (Result<URL, AuthenticationSessionError>) -> Void
+    typealias CompletionHandler = (Result<URL, Error>) -> Void
     @discardableResult func start() -> Bool
     func cancel()
 }
@@ -11,11 +11,6 @@ extension SFAuthenticationSession: AuthenticationSession {}
 
 @available(iOS 12.0, *)
 extension ASWebAuthenticationSession: AuthenticationSession {}
-
-public enum AuthenticationSessionError: Error {
-    case sessionError(Error)
-    case canceledLogin
-}
 
 class AuthenticationSessionProvider: NSObject {
     func makeAuthenticationSession(
@@ -28,15 +23,15 @@ class AuthenticationSessionProvider: NSObject {
                 if #available(iOS 12.0, *) {
                     if let asError = error as? ASWebAuthenticationSessionError,
                        asError.code == ASWebAuthenticationSessionError.canceledLogin {
-                        return completionHandler(.failure(AuthenticationSessionError.canceledLogin))
+                        return completionHandler(.failure(AuthgearError.cancel))
                     }
                 } else {
                     if let sfError = error as? SFAuthenticationError,
                        sfError.code == SFAuthenticationError.canceledLogin {
-                        return completionHandler(.failure(AuthenticationSessionError.canceledLogin))
+                        return completionHandler(.failure(AuthgearError.cancel))
                     }
                 }
-                return completionHandler(.failure(AuthenticationSessionError.sessionError(error)))
+                return completionHandler(.failure(AuthgearError.error(error)))
             }
 
             if let url = url {

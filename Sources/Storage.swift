@@ -130,7 +130,7 @@ class KeychainStorageDriver: StorageDriver {
         case errSecItemNotFound:
             return nil
         default:
-            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+            throw AuthgearError.osStatus(status)
         }
     }
 
@@ -157,7 +157,7 @@ class KeychainStorageDriver: StorageDriver {
         if status == errSecSuccess {
             return
         } else {
-            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+            throw AuthgearError.osStatus(status)
         }
     }
 
@@ -171,7 +171,7 @@ class KeychainStorageDriver: StorageDriver {
         case errSecSuccess, errSecItemNotFound:
             return
         default:
-            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status), userInfo: nil)
+            throw AuthgearError.osStatus(status)
         }
     }
 }

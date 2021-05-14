@@ -64,9 +64,31 @@ class App: ObservableObject {
             )
             return true
         case let .failure(error):
-            print(error)
-            authgearActionErrorMessage = "\(error)"
+            self.setError(error)
             return false
+        }
+    }
+
+    private func setError(_ error: Error) {
+        if let authgearError = error as? AuthgearError {
+            switch authgearError {
+            case .cancel:
+                break
+            case .biometricPrivateKeyNotFound:
+                self.authgearActionErrorMessage = "Your Touch ID or Face ID has changed. For security reason, you have to set up biometric authentication again."
+            case .biometricNotSupportedOrPermissionDenied:
+                self.authgearActionErrorMessage = "If the developer should performed checking, then it is likely that you have denied the permission of Face ID. Please enable it in Settings"
+            case .biometricNoPasscode:
+                self.authgearActionErrorMessage = "You device does not have passcode set up. Please set up a passcode"
+            case .biometricNoEnrollment:
+                self.authgearActionErrorMessage = "You do not have Face ID or Touch ID set up yet. Please set it up first"
+            case .biometricLockout:
+                self.authgearActionErrorMessage = "The biometric is locked out due to too many failed attempts. The developer should handle this error by using normal authentication as a fallback. So normally you should not see this error"
+            default:
+                self.authgearActionErrorMessage = "\(error)"
+            }
+        } else {
+            self.authgearActionErrorMessage = "\(error)"
         }
     }
 
@@ -90,8 +112,7 @@ class App: ObservableObject {
             constraint: .biometryCurrentSet
         ) { result in
             if case let .failure(error) = result {
-                print(error)
-                self.authgearActionErrorMessage = "\(error)"
+                self.setError(error)
             }
             self.updateBiometricState()
         }
@@ -101,8 +122,7 @@ class App: ObservableObject {
         do {
             try container?.disableBiometric()
         } catch {
-            print(error)
-            self.authgearActionErrorMessage = "\(error)"
+            self.setError(error)
         }
         self.updateBiometricState()
     }
@@ -162,8 +182,7 @@ class App: ObservableObject {
                     "ISS: \(userInfo.iss)"
                 ].joined(separator: "\n")
             case let .failure(error):
-                print(error)
-                self.authgearActionErrorMessage = "\(error)"
+                self.setError(error)
             }
         }
     }
@@ -175,8 +194,7 @@ class App: ObservableObject {
                 self.user = nil
                 self.successAlertMessage = "Logged out successfully"
             case let .failure(error):
-                print(error)
-                self.authgearActionErrorMessage = "\(error)"
+                self.setError(error)
             }
         }
     }
