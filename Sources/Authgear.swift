@@ -9,11 +9,18 @@ public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
+public enum PromptOption: String {
+    case none
+    case login
+    case consent
+    case selectAccount = "select_account"
+}
+
 struct AuthorizeOptions {
     let redirectURI: String
     let responseType: String?
     let state: String?
-    let prompt: String?
+    let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
     let wechatRedirectURI: String?
@@ -30,7 +37,7 @@ struct AuthorizeOptions {
         redirectURI: String,
         responseType: String,
         state: String?,
-        prompt: String?,
+        prompt: [PromptOption]?,
         loginHint: String?,
         uiLocales: [String]?,
         wechatRedirectURI: String?,
@@ -213,7 +220,7 @@ public class Authgear: NSObject {
         }
 
         if let prompt = options.prompt {
-            queryItems.append(URLQueryItem(name: "prompt", value: prompt))
+            queryItems.append(URLQueryItem(name: "prompt", value: prompt.map { $0.rawValue }.joined(separator: " ")))
         }
 
         if let loginHint = options.loginHint {
@@ -472,10 +479,24 @@ public class Authgear: NSObject {
         _ = handleWechatRedirectURI(url)
     }
 
+    /**
+      Authorize a user by directing the user to Authgear with ASWebAuthenticationSession.
+
+      - Parameters:
+         - redirectURI: Redirect uri. Redirection URI to which the response will be sent after authorization.
+         - state: OAuth 2.0 state value.
+         - prompt: Prompt parameter will be used for Authgear authorization, it will also be forwarded to the underlying SSO providers. For Authgear, currently, only login is supported, other unsupported values will be ignored. For the underlying SSO providers, some providers only support a single value rather than a list. The first supported value will be used for that case. e.g. Azure Active Directory.
+         - loginHint: OIDC login hint parameter
+         - uiLocales: UI locale tags
+         - wechatRedirectURI: The wechatRedirectURI will be called when user click the login with WeChat button
+         - page: Initial page to open. Valid values are 'login' and 'signup'.
+         - handler: Authorize completion handler
+
+     */
     public func authorize(
         redirectURI: String,
         state: String? = nil,
-        prompt: String? = nil,
+        prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
@@ -594,7 +615,7 @@ public class Authgear: NSObject {
                         redirectURI: redirectURI,
                         responseType: "code",
                         state: state,
-                        prompt: "login",
+                        prompt: [.login],
                         loginHint: loginHint,
                         uiLocales: uiLocales,
                         wechatRedirectURI: wechatRedirectURI,
@@ -668,7 +689,7 @@ public class Authgear: NSObject {
                         redirectURI: url.absoluteString,
                         responseType: "none",
                         state: nil,
-                        prompt: "none",
+                        prompt: [.none],
                         loginHint: loginHint,
                         uiLocales: nil,
                         wechatRedirectURI: wechatRedirectURI,
