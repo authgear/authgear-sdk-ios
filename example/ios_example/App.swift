@@ -95,7 +95,7 @@ class App: ObservableObject {
     func login() {
         container?.authorize(
             redirectURI: App.redirectURI,
-            prompt: "login",
+            prompt: [.login],
             wechatRedirectURI: App.wechatRedirectURI,
             page: page
         ) { result in
