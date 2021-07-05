@@ -45,6 +45,8 @@ struct OIDCAuthenticationRequest {
     let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
+    let idTokenHint: String?
+    let maxAge: Int?
     let wechatRedirectURI: String?
     let page: String?
 
@@ -86,10 +88,21 @@ struct OIDCAuthenticationRequest {
             queryItems.append(URLQueryItem(name: "login_hint", value: loginHint))
         }
 
+        if let idTokenHint = self.idTokenHint {
+            queryItems.append(URLQueryItem(name: "id_token_hint", value: idTokenHint))
+        }
+
         if let uiLocales = self.uiLocales {
             queryItems.append(URLQueryItem(
                 name: "ui_locales",
                 value: uiLocales.joined(separator: " ")
+            ))
+        }
+
+        if let maxAge = self.maxAge {
+            queryItems.append(URLQueryItem(
+                name: "max_age",
+                value: String(format: "%d", maxAge)
             ))
         }
 

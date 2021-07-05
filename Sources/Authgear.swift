@@ -6,6 +6,7 @@ import Security
 import WebKit
 
 public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
+public typealias ReauthenticateCompletionHandler = (Result<ReauthenticateResult, Error>) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
@@ -25,7 +26,7 @@ struct AuthorizeOptions {
     let wechatRedirectURI: String?
     let page: String?
 
-    var oidcAuthenticateRequest: OIDCAuthenticationRequest {
+    var request: OIDCAuthenticationRequest {
         return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
@@ -34,8 +35,34 @@ struct AuthorizeOptions {
             prompt: self.prompt,
             loginHint: self.loginHint,
             uiLocales: self.uiLocales,
+            idTokenHint: nil,
+            maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
             page: self.page
+        )
+    }
+}
+
+struct ReauthenticateOptions {
+    let redirectURI: String
+    let state: String?
+    let uiLocales: [String]?
+    let wechatRedirectURI: String?
+    let maxAge: Int?
+
+    func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
+        return OIDCAuthenticationRequest(
+            redirectURI: self.redirectURI,
+            responseType: "code",
+            scope: ["openid", "https://authgear.com/scopes/full-access"],
+            state: self.state,
+            prompt: nil,
+            loginHint: nil,
+            uiLocales: self.uiLocales,
+            idTokenHint: idTokenHint,
+            maxAge: self.maxAge ?? 0,
+            wechatRedirectURI: self.wechatRedirectURI,
+            page: nil
         )
     }
 }
@@ -62,6 +89,11 @@ public struct UserInfo: Decodable {
 }
 
 public struct AuthorizeResult {
+    public let userInfo: UserInfo
+    public let state: String?
+}
+
+public struct ReauthenticateResult {
     public let userInfo: UserInfo
     public let state: String?
 }
@@ -231,12 +263,48 @@ public class Authgear: NSObject {
         return urlComponents.url!
     }
 
+    private func reauthenticateWithSession(
+        _ options: ReauthenticateOptions,
+        handler: @escaping ReauthenticateCompletionHandler
+    ) {
+        do {
+            guard let idTokenHint = self.idTokenHint else {
+                throw AuthgearError.unauthenticatedUser
+            }
+            let request = options.toRequest(idTokenHint: idTokenHint)
+            let verifier = CodeVerifier()
+            let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
+
+            DispatchQueue.main.async {
+                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
+                self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
+                    url: url,
+                    callbackURLSchema: request.redirectURIScheme,
+                    completionHandler: { [weak self] result in
+                        self?.unregisterCurrentWechatRedirectURI()
+                        switch result {
+                        case let .success(url):
+                            self?.workerQueue.async {
+                                self?.finishReauthentication(url: url, verifier: verifier, handler: handler)
+                            }
+                        case let .failure(error):
+                            return handler(.failure(error))
+                        }
+                    }
+                )
+                self.authenticationSession?.start()
+            }
+        } catch {
+            handler(.failure(error))
+        }
+    }
+
     private func authorizeWithSession(
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let verifier = CodeVerifier()
-        let request = options.oidcAuthenticateRequest
+        let request = options.request
         let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
 
         DispatchQueue.main.async {
@@ -262,15 +330,6 @@ public class Authgear: NSObject {
             case let .failure(error):
                 handler(.failure(error))
             }
-        }
-    }
-
-    private func authorize(
-        _ options: AuthorizeOptions,
-        handler: @escaping AuthorizeCompletionHandler
-    ) {
-        workerQueue.async {
-            self.authorizeWithSession(options, handler: handler)
         }
     }
 
@@ -339,6 +398,70 @@ public class Authgear: NSObject {
                 .map { AuthorizeResult(userInfo: userInfo, state: state) }
             return handler(result)
 
+        } catch {
+            return handler(.failure(error))
+        }
+    }
+
+    private func finishReauthentication(
+        url: URL,
+        verifier: CodeVerifier,
+        handler: @escaping ReauthenticateCompletionHandler
+    ) {
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        let params = urlComponents.queryParams
+        let state = params["state"]
+
+        if let errorParams = params["error"] {
+            return handler(
+                .failure(AuthgearError.oauthError(
+                    OAuthError(
+                        error: errorParams,
+                        errorDescription: params["error_description"],
+                        errorUri: params["error_uri"]
+                    )
+                ))
+            )
+        }
+
+        guard let code = params["code"] else {
+            return handler(
+                .failure(AuthgearError.oauthError(
+                    OAuthError(
+                        error: "invalid_request",
+                        errorDescription: "Missing parameter: code",
+                        errorUri: nil
+                    )
+                ))
+            )
+        }
+        let redirectURI = { () -> String in
+            var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+            urlComponents.fragment = nil
+            urlComponents.query = nil
+
+            return urlComponents.url!.absoluteString
+        }()
+
+        do {
+            let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
+                grantType: GrantType.authorizationCode,
+                clientId: clientId,
+                deviceInfo: getDeviceInfo(),
+                redirectURI: redirectURI,
+                code: code,
+                codeVerifier: verifier.value,
+                refreshToken: nil,
+                jwt: nil
+            )
+
+            let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
+
+            if let idToken = oidcTokenResponse.idToken {
+                self.idToken = idToken
+            }
+
+            return handler(.success(ReauthenticateResult(userInfo: userInfo, state: state)))
         } catch {
             return handler(.failure(error))
         }
@@ -482,18 +605,41 @@ public class Authgear: NSObject {
         page: String? = nil,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        authorize(
-            AuthorizeOptions(
-                redirectURI: redirectURI,
-                state: state,
-                prompt: prompt,
-                loginHint: loginHint,
-                uiLocales: uiLocales,
-                wechatRedirectURI: wechatRedirectURI,
-                page: page
-            ),
-            handler: withMainQueueHandler(handler)
-        )
+        self.authorize(AuthorizeOptions(
+            redirectURI: redirectURI,
+            state: state,
+            prompt: prompt,
+            loginHint: loginHint,
+            uiLocales: uiLocales,
+            wechatRedirectURI: wechatRedirectURI,
+            page: page
+        ), handler: handler)
+    }
+
+    private func authorize(
+        _ options: AuthorizeOptions,
+        handler: @escaping AuthorizeCompletionHandler
+    ) {
+        let handler = self.withMainQueueHandler(handler)
+        self.workerQueue.async {
+            self.authorizeWithSession(options, handler: handler)
+        }
+    }
+
+    public func reauthenticate(
+        redirectURI: String,
+        state: String? = nil,
+        uiLocales: [String]? = nil,
+        wechatRedirectURI: String? = nil,
+        maxAge: Int? = nil,
+        handler: @escaping ReauthenticateCompletionHandler
+    ) {
+        let handler = self.withMainQueueHandler(handler)
+        self.workerQueue.async {
+            self.reauthenticateWithSession(ReauthenticateOptions(
+                redirectURI: redirectURI, state: state, uiLocales: uiLocales, wechatRedirectURI: wechatRedirectURI, maxAge: maxAge
+            ), handler: handler)
+        }
     }
 
     public func authenticateAnonymously(
@@ -669,6 +815,8 @@ public class Authgear: NSObject {
                     prompt: [.none],
                     loginHint: loginHint,
                     uiLocales: nil,
+                    idTokenHint: nil,
+                    maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
                     page: nil
                 ), verifier: nil)
