@@ -106,39 +106,53 @@ class App: ObservableObject {
     }
 
     func reauthenticate() {
-        container?.reauthenticate(redirectURI: App.redirectURI) { result in
-            self.updateBiometricState()
+        container?.refreshIDToken(handler: { result in
             switch result {
-            case let .success(authResult):
-                let userInfo = authResult.userInfo
-                self.user = UserInfo(
-                    userID: userInfo.sub,
-                    isAnonymous: userInfo.isAnonymous,
-                    isVerified: userInfo.isVerified
-                )
-                self.successAlertMessage = "Reauthenticated successfully"
+            case .success:
+                self.container?.reauthenticate(redirectURI: App.redirectURI) { result in
+                    self.updateBiometricState()
+                    switch result {
+                    case let .success(authResult):
+                        let userInfo = authResult.userInfo
+                        self.user = UserInfo(
+                            userID: userInfo.sub,
+                            isAnonymous: userInfo.isAnonymous,
+                            isVerified: userInfo.isVerified
+                        )
+                        self.successAlertMessage = "Reauthenticated successfully"
+                    case let .failure(error):
+                        self.setError(error)
+                    }
+                }
             case let .failure(error):
                 self.setError(error)
             }
-        }
+        })
     }
 
     func reauthenticateWebOnly() {
-        container?.reauthenticate(redirectURI: App.redirectURI, skipUsingBiometric: true) { result in
-            self.updateBiometricState()
+        container?.refreshIDToken(handler: { result in
             switch result {
-            case let .success(authResult):
-                let userInfo = authResult.userInfo
-                self.user = UserInfo(
-                    userID: userInfo.sub,
-                    isAnonymous: userInfo.isAnonymous,
-                    isVerified: userInfo.isVerified
-                )
-                self.successAlertMessage = "Reauthenticated successfully"
+            case .success:
+                self.container?.reauthenticate(redirectURI: App.redirectURI, skipUsingBiometric: true) { result in
+                    self.updateBiometricState()
+                    switch result {
+                    case let .success(authResult):
+                        let userInfo = authResult.userInfo
+                        self.user = UserInfo(
+                            userID: userInfo.sub,
+                            isAnonymous: userInfo.isAnonymous,
+                            isVerified: userInfo.isVerified
+                        )
+                        self.successAlertMessage = "Reauthenticated successfully"
+                    case let .failure(error):
+                        self.setError(error)
+                    }
+                }
             case let .failure(error):
                 self.setError(error)
             }
-        }
+        })
     }
 
     func enableBiometric() {
