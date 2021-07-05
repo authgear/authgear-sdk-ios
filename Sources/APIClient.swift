@@ -329,6 +329,10 @@ class DefaultAuthAPIClient: AuthAPIClient {
         handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
     ) {
         let dataTaslk = defaultSession.dataTask(with: request) { data, response, error in
+            if let error = error {
+                return handler(.failure(AuthgearError.error(error)))
+            }
+
             let response = response as! HTTPURLResponse
 
             if response.statusCode < 200 || response.statusCode >= 300 {
@@ -340,10 +344,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     }
                 }
                 return handler(.failure(AuthgearError.unexpectedHttpStatusCode(response.statusCode, data)))
-            }
-
-            if let error = error {
-                return handler(.failure(AuthgearError.error(error)))
             }
 
             return handler(.success((data, response)))
