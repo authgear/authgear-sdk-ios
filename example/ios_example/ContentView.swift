@@ -112,6 +112,10 @@ struct ActionButtonList: View {
         app.sessionState == SessionState.authenticated
     }
 
+    private var isAnonymous: Bool {
+        app.user?.isAnonymous == true
+    }
+
     private var biometricEnabled: Bool {
         app.biometricEnabled
     }
@@ -131,10 +135,22 @@ struct ActionButtonList: View {
             }.disabled(!configured || loggedIn)
 
             Button(action: {
+                self.app.promoteAnonymousUser()
+            }) {
+                ActionButton(text: "Promote Anonymous User")
+            }.disabled(!(configured && loggedIn && isAnonymous))
+
+            Button(action: {
+                self.app.reauthenticate()
+            }) {
+                ActionButton(text: "Reauthenticate")
+            }.disabled(!configured || !loggedIn || isAnonymous)
+
+            Button(action: {
                 self.app.enableBiometric()
             }) {
                 ActionButton(text: "Enable Biometric")
-            }.disabled(!configured || !loggedIn || biometricEnabled)
+            }.disabled(!configured || !loggedIn || isAnonymous || biometricEnabled)
 
             Button(action: {
                 self.app.disableBiometric()
@@ -152,13 +168,7 @@ struct ActionButtonList: View {
                 self.app.openSetting()
             }) {
                 ActionButton(text: "Open Setting Page")
-            }.disabled(!configured || !loggedIn)
-
-            Button(action: {
-                self.app.promoteAnonymousUser()
-            }) {
-                ActionButton(text: "Promote Anonymous User")
-            }.disabled(!(configured && loggedIn && app.user?.isAnonymous == true))
+            }.disabled(!configured || !loggedIn || isAnonymous)
 
             Button(action: {
                 self.app.fetchUserInfo()
