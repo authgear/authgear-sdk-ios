@@ -195,6 +195,12 @@ struct ActionButtonList: View {
                 }.disabled(!configured || !loggedIn)
 
                 Button(action: {
+                    self.app.showAuthTime()
+                }) {
+                    ActionButton(text: "Show auth_time")
+                }.disabled(!configured || !loggedIn)
+
+                Button(action: {
                     self.app.logout()
                 }) {
                     ActionButton(text: "Logout")

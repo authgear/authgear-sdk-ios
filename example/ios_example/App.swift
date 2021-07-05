@@ -222,6 +222,15 @@ class App: ObservableObject {
         }
     }
 
+    func showAuthTime() {
+        let f = DateFormatter()
+        f.dateStyle = .long
+        f.timeStyle = .long
+        if let authTime = container?.authTime {
+            self.successAlertMessage = "auth_time: \(f.string(from: authTime))"
+        }
+    }
+
     func logout() {
         container?.logout { result in
             switch result {
