@@ -15,6 +15,8 @@ public enum AuthgearError: Error {
     case biometricNoEnrollment(Error)
     case biometricLockout(Error)
 
+    case invalidJWT(String)
+
     case unauthenticatedUser
     case publicKeyNotFound
     case error(Error)

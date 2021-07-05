@@ -148,6 +148,36 @@ public class Authgear: NSObject {
         }
     }
 
+    public var canReauthenticate: Bool {
+        get {
+            guard let idToken = self.idToken else { return false }
+            do {
+                let payload = try JWT.decode(jwt: idToken)
+                if let can = payload["https://authgear.com/claims/user/can_reauthenticate"] as? Bool {
+                    return can
+                }
+                return false
+            } catch {
+                return false
+            }
+        }
+    }
+
+    public var authTime: Date? {
+        get {
+            guard let idToken = self.idToken else { return nil }
+            do {
+                let payload = try JWT.decode(jwt: idToken)
+                if let unixEpoch = payload["auth_time"] as? NSNumber {
+                    return Date(timeIntervalSince1970: unixEpoch.doubleValue)
+                }
+                return nil
+            } catch {
+                return nil
+            }
+        }
+    }
+
     private let jwkStore = JWKStore()
     private let workerQueue: DispatchQueue
 
