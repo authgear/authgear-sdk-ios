@@ -37,6 +37,77 @@ enum APIResponse<T: Decodable>: Decodable {
     }
 }
 
+struct OIDCAuthenticationRequest {
+    let redirectURI: String
+    let responseType: String
+    let scope: [String]
+    let state: String?
+    let prompt: [PromptOption]?
+    let loginHint: String?
+    let uiLocales: [String]?
+    let wechatRedirectURI: String?
+    let page: String?
+
+    var redirectURIScheme: String {
+        if let index = redirectURI.firstIndex(of: ":") {
+            return String(redirectURI[..<index])
+        }
+        return redirectURI
+    }
+
+    func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
+        var queryItems = [
+            URLQueryItem(name: "response_type", value: self.responseType),
+            URLQueryItem(name: "client_id", value: clientID),
+            URLQueryItem(name: "redirect_uri", value: self.redirectURI),
+            URLQueryItem(
+                name: "scope",
+                value: scope.joined(separator: " ")
+            ),
+            URLQueryItem(name: "x_platform", value: "ios")
+        ]
+
+        if let verifier = verifier {
+            queryItems.append(contentsOf: [
+                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
+            ])
+        }
+
+        if let state = self.state {
+            queryItems.append(URLQueryItem(name: "state", value: state))
+        }
+
+        if let prompt = self.prompt {
+            queryItems.append(URLQueryItem(name: "prompt", value: prompt.map { $0.rawValue }.joined(separator: " ")))
+        }
+
+        if let loginHint = self.loginHint {
+            queryItems.append(URLQueryItem(name: "login_hint", value: loginHint))
+        }
+
+        if let uiLocales = self.uiLocales {
+            queryItems.append(URLQueryItem(
+                name: "ui_locales",
+                value: uiLocales.joined(separator: " ")
+            ))
+        }
+
+        if let wechatRedirectURI = self.wechatRedirectURI {
+            queryItems.append(URLQueryItem(
+                name: "x_wechat_redirect_uri",
+                value: wechatRedirectURI
+            ))
+        }
+
+        if let page = self.page {
+            queryItems.append(URLQueryItem(name: "x_page", value: page))
+        }
+
+        return queryItems
+    }
+}
+
 struct OIDCTokenResponse: Decodable {
     let idToken: String?
     let tokenType: String?

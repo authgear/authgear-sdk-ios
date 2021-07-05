@@ -18,7 +18,6 @@ public enum PromptOption: String {
 
 struct AuthorizeOptions {
     let redirectURI: String
-    let responseType: String?
     let state: String?
     let prompt: [PromptOption]?
     let loginHint: String?
@@ -26,31 +25,18 @@ struct AuthorizeOptions {
     let wechatRedirectURI: String?
     let page: String?
 
-    var urlScheme: String {
-        if let index = redirectURI.firstIndex(of: ":") {
-            return String(redirectURI[..<index])
-        }
-        return redirectURI
-    }
-
-    public init(
-        redirectURI: String,
-        responseType: String,
-        state: String?,
-        prompt: [PromptOption]?,
-        loginHint: String?,
-        uiLocales: [String]?,
-        wechatRedirectURI: String?,
-        page: String?
-    ) {
-        self.redirectURI = redirectURI
-        self.responseType = responseType
-        self.state = state
-        self.prompt = prompt
-        self.loginHint = loginHint
-        self.uiLocales = uiLocales
-        self.wechatRedirectURI = wechatRedirectURI
-        self.page = page
+    var oidcAuthenticateRequest: OIDCAuthenticationRequest {
+        return OIDCAuthenticationRequest(
+            redirectURI: self.redirectURI,
+            responseType: "code",
+            scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+            state: self.state,
+            prompt: self.prompt,
+            loginHint: self.loginHint,
+            uiLocales: self.uiLocales,
+            wechatRedirectURI: self.wechatRedirectURI,
+            page: self.page
+        )
     }
 }
 
@@ -234,64 +220,14 @@ public class Authgear: NSObject {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    private func authorizeEndpoint(_ options: AuthorizeOptions, verifier: CodeVerifier?) throws -> URL {
+    private func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
-        var queryItems = [URLQueryItem(name: "response_type", value: options.responseType)]
-
-        if let verifier = verifier {
-            queryItems.append(contentsOf: [
-                URLQueryItem(name: "code_challenge_method", value: "S256"),
-                URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
-            ])
-        }
-
-        queryItems.append(URLQueryItem(
-            name: "scope",
-            value: "openid offline_access https://authgear.com/scopes/full-access"
-        ))
-
-        queryItems.append(URLQueryItem(name: "client_id", value: clientId))
-        queryItems.append(URLQueryItem(name: "redirect_uri", value: options.redirectURI))
-
-        if let state = options.state {
-            queryItems.append(URLQueryItem(name: "state", value: state))
-        }
-
-        if let prompt = options.prompt {
-            queryItems.append(URLQueryItem(name: "prompt", value: prompt.map { $0.rawValue }.joined(separator: " ")))
-        }
-
-        if let loginHint = options.loginHint {
-            queryItems.append(URLQueryItem(name: "login_hint", value: loginHint))
-        }
-
-        if let uiLocales = options.uiLocales {
-            queryItems.append(URLQueryItem(
-                name: "ui_locales",
-                value: uiLocales.joined(separator: " ")
-            ))
-        }
-
-        if let wechatRedirectURI = options.wechatRedirectURI {
-            queryItems.append(URLQueryItem(
-                name: "x_wechat_redirect_uri",
-                value: wechatRedirectURI
-            ))
-        }
-
-        queryItems.append(URLQueryItem(name: "x_platform", value: "ios"))
-
-        if let page = options.page {
-            queryItems.append(URLQueryItem(name: "x_page", value: page))
-        }
-
+        let queryItems = request.toQueryItems(clientID: self.clientId, verifier: verifier)
         var urlComponents = URLComponents(
             url: configuration.authorizationEndpoint,
             resolvingAgainstBaseURL: false
         )!
-
         urlComponents.queryItems = queryItems
-
         return urlComponents.url!
     }
 
@@ -300,7 +236,8 @@ public class Authgear: NSObject {
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let verifier = CodeVerifier()
-        let url = Result { try authorizeEndpoint(options, verifier: verifier) }
+        let request = options.oidcAuthenticateRequest
+        let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
 
         DispatchQueue.main.async {
             switch url {
@@ -308,7 +245,7 @@ public class Authgear: NSObject {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
-                    callbackURLSchema: options.urlScheme,
+                    callbackURLSchema: request.redirectURIScheme,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -548,7 +485,6 @@ public class Authgear: NSObject {
         authorize(
             AuthorizeOptions(
                 redirectURI: redirectURI,
-                responseType: "code",
                 state: state,
                 prompt: prompt,
                 loginHint: loginHint,
@@ -655,7 +591,6 @@ public class Authgear: NSObject {
                 self.authorize(
                     AuthorizeOptions(
                         redirectURI: redirectURI,
-                        responseType: "code",
                         state: state,
                         prompt: [.login],
                         loginHint: loginHint,
@@ -726,19 +661,17 @@ public class Authgear: NSObject {
 
                 let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
 
-                let endpoint = try self.authorizeEndpoint(
-                    AuthorizeOptions(
-                        redirectURI: url.absoluteString,
-                        responseType: "none",
-                        state: nil,
-                        prompt: [.none],
-                        loginHint: loginHint,
-                        uiLocales: nil,
-                        wechatRedirectURI: wechatRedirectURI,
-                        page: nil
-                    ),
-                    verifier: nil
-                )
+                let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
+                    redirectURI: url.absoluteString,
+                    responseType: "none",
+                    scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+                    state: nil,
+                    prompt: [.none],
+                    loginHint: loginHint,
+                    uiLocales: nil,
+                    wechatRedirectURI: wechatRedirectURI,
+                    page: nil
+                ), verifier: nil)
 
                 DispatchQueue.main.async {
                     // For opening setting page, sdk will not know when user end
