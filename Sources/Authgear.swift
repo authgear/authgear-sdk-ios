@@ -632,9 +632,34 @@ public class Authgear: NSObject {
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
+        skipUsingBiometric: Bool? = nil,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
+
+        do {
+            if #available(iOS 11.3, *) {
+                let biometricEnabled = try self.isBiometricEnabled()
+                let skipUsingBiometric = skipUsingBiometric ?? false
+                if biometricEnabled && !skipUsingBiometric {
+                    self.authenticateBiometric { result in
+                        switch result {
+                        case .success(let authzResult):
+                            handler(.success(ReauthenticateResult(userInfo: authzResult.userInfo, state: state)))
+                        case .failure(let error):
+                            handler(.failure(error))
+                        }
+                    }
+                    // Return here to prevent us from continue
+                    return
+                }
+            }
+        } catch {
+            handler(.failure(error))
+            // Return here to prevent us from continue
+            return
+        }
+
         self.workerQueue.async {
             self.reauthenticateWithSession(ReauthenticateOptions(
                 redirectURI: redirectURI, state: state, uiLocales: uiLocales, wechatRedirectURI: wechatRedirectURI, maxAge: maxAge

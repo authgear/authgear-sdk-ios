@@ -123,6 +123,24 @@ class App: ObservableObject {
         }
     }
 
+    func reauthenticateWebOnly() {
+        container?.reauthenticate(redirectURI: App.redirectURI, skipUsingBiometric: true) { result in
+            self.updateBiometricState()
+            switch result {
+            case let .success(authResult):
+                let userInfo = authResult.userInfo
+                self.user = UserInfo(
+                    userID: userInfo.sub,
+                    isAnonymous: userInfo.isAnonymous,
+                    isVerified: userInfo.isVerified
+                )
+                self.successAlertMessage = "Reauthenticated successfully"
+            case let .failure(error):
+                self.setError(error)
+            }
+        }
+    }
+
     func enableBiometric() {
         container?.enableBiometric(
             localizedReason: "Enable biometric!",

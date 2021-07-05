@@ -122,65 +122,84 @@ struct ActionButtonList: View {
 
     var body: some View {
         VStack(spacing: 30) {
-            Button(action: {
-                self.app.login()
-            }) {
-                ActionButton(text: "Login")
-            }.disabled(!configured || loggedIn)
+            // We have to start using Group here because
+            // Each block can only have 0 to 10 items.
+            // When there are more than 10 items, the compiler will start complaining too many arguments.
+            // The suggested way to work around this limitation is to use Group.
 
-            Button(action: {
-                self.app.loginAnonymously()
-            }) {
-                ActionButton(text: "Login Anonymously")
-            }.disabled(!configured || loggedIn)
+            Group {
+                Button(action: {
+                    self.app.login()
+                }) {
+                    ActionButton(text: "Login")
+                }.disabled(!configured || loggedIn)
 
-            Button(action: {
-                self.app.promoteAnonymousUser()
-            }) {
-                ActionButton(text: "Promote Anonymous User")
-            }.disabled(!(configured && loggedIn && isAnonymous))
+                Button(action: {
+                    self.app.loginAnonymously()
+                }) {
+                    ActionButton(text: "Login Anonymously")
+                }.disabled(!configured || loggedIn)
 
-            Button(action: {
-                self.app.reauthenticate()
-            }) {
-                ActionButton(text: "Reauthenticate")
-            }.disabled(!configured || !loggedIn || isAnonymous)
+                Button(action: {
+                    self.app.promoteAnonymousUser()
+                }) {
+                    ActionButton(text: "Promote Anonymous User")
+                }.disabled(!(configured && loggedIn && isAnonymous))
+            }
 
-            Button(action: {
-                self.app.enableBiometric()
-            }) {
-                ActionButton(text: "Enable Biometric")
-            }.disabled(!configured || !loggedIn || isAnonymous || biometricEnabled)
+            Group {
+                Button(action: {
+                    self.app.reauthenticateWebOnly()
+                }) {
+                    ActionButton(text: "Reauthenticate (web only)")
+                }.disabled(!configured || !loggedIn || isAnonymous)
 
-            Button(action: {
-                self.app.disableBiometric()
-            }) {
-                ActionButton(text: "Disable Biometric")
-            }.disabled(!biometricEnabled)
+                Button(action: {
+                    self.app.reauthenticate()
+                }) {
+                    ActionButton(text: "Reauthenticate (biometric or web)")
+                }.disabled(!configured || !loggedIn || isAnonymous)
+            }
 
-            Button(action: {
-                self.app.loginBiometric()
-            }) {
-                ActionButton(text: "Login with Biometric")
-            }.disabled(!configured || loggedIn || !biometricEnabled)
+            Group {
+                Button(action: {
+                    self.app.enableBiometric()
+                }) {
+                    ActionButton(text: "Enable Biometric")
+                }.disabled(!configured || !loggedIn || isAnonymous || biometricEnabled)
 
-            Button(action: {
-                self.app.openSetting()
-            }) {
-                ActionButton(text: "Open Setting Page")
-            }.disabled(!configured || !loggedIn || isAnonymous)
+                Button(action: {
+                    self.app.disableBiometric()
+                }) {
+                    ActionButton(text: "Disable Biometric")
+                }.disabled(!biometricEnabled)
 
-            Button(action: {
-                self.app.fetchUserInfo()
-            }) {
-                ActionButton(text: "Fetch User Info")
-            }.disabled(!configured || !loggedIn)
+                Button(action: {
+                    self.app.loginBiometric()
+                }) {
+                    ActionButton(text: "Login with Biometric")
+                }.disabled(!configured || loggedIn || !biometricEnabled)
+            }
 
-            Button(action: {
-                self.app.logout()
-            }) {
-                ActionButton(text: "Logout")
-            }.disabled(!configured || !loggedIn)
+            Group {
+                Button(action: {
+                    self.app.openSetting()
+                }) {
+                    ActionButton(text: "Open Setting Page")
+                }.disabled(!configured || !loggedIn || isAnonymous)
+
+                Button(action: {
+                    self.app.fetchUserInfo()
+                }) {
+                    ActionButton(text: "Fetch User Info")
+                }.disabled(!configured || !loggedIn)
+
+                Button(action: {
+                    self.app.logout()
+                }) {
+                    ActionButton(text: "Logout")
+                }.disabled(!configured || !loggedIn)
+            }
         }
     }
 }
