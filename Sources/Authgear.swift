@@ -359,7 +359,7 @@ public class Authgear: NSObject {
                 jwt: nil
             )
 
-            let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
+            let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
 
             let result = persistSession(oidcTokenResponse, reason: .authenticated)
                 .flatMap {
@@ -393,7 +393,7 @@ public class Authgear: NSObject {
             if let idToken = oidcTokenResponse.idToken {
                 self.idToken = idToken
             }
-            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn) * Authgear.ExpireInPercentage))
+            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn!) * Authgear.ExpireInPercentage))
             self.setSessionState(.authenticated, reason: reason)
         }
         return .success(())
@@ -567,7 +567,7 @@ public class Authgear: NSObject {
                     jwt: signedJWT
                 )
 
-                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
+                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
 
                 let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
                     .flatMap {
@@ -842,6 +842,30 @@ public class Authgear: NSObject {
         }
     }
 
+    public func refreshIDToken(handler: @escaping VoidCompletionHandler) {
+        let handler = withMainQueueHandler(handler)
+        self.workerQueue.async {
+            do {
+                let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
+                    grantType: .idToken,
+                    clientId: self.clientId,
+                    deviceInfo: getDeviceInfo(),
+                    redirectURI: nil,
+                    code: nil,
+                    codeVerifier: nil,
+                    refreshToken: nil,
+                    jwt: nil
+                )
+                if let idToken = oidcTokenResponse.idToken {
+                    self.idToken = idToken
+                }
+                handler(.success(()))
+            } catch {
+                handler(.failure(error))
+            }
+        }
+    }
+
     public func wechatAuthCallback(code: String, state: String, handler: VoidCompletionHandler? = nil) {
         let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
@@ -965,7 +989,7 @@ public class Authgear: NSObject {
                     jwt: signedJWT
                 )
 
-                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken)
+                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
                 let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
                     .map { AuthorizeResult(userInfo: userInfo, state: nil) }
                 return handler(result)

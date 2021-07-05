@@ -5,6 +5,7 @@ enum GrantType: String {
     case refreshToken = "refresh_token"
     case anonymous = "urn:authgear:params:oauth:grant-type:anonymous-request"
     case biometric = "urn:authgear:params:oauth:grant-type:biometric-request"
+    case idToken = "urn:authgear:params:oauth:grant-type:id-token"
 }
 
 enum APIResponse<T: Decodable>: Decodable {
@@ -38,9 +39,9 @@ enum APIResponse<T: Decodable>: Decodable {
 
 struct OIDCTokenResponse: Decodable {
     let idToken: String?
-    let tokenType: String
-    let accessToken: String
-    let expiresIn: Int
+    let tokenType: String?
+    let accessToken: String?
+    let expiresIn: Int?
     let refreshToken: String?
 }
 
