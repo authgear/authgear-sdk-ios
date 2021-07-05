@@ -140,6 +140,14 @@ public class Authgear: NSObject {
     private var refreshToken: String?
     private var expireAt: Date?
 
+    private var idToken: String?
+
+    public var idTokenHint: String? {
+        get {
+            return self.idToken
+        }
+    }
+
     private let jwkStore = JWKStore()
     private let workerQueue: DispatchQueue
 
@@ -382,6 +390,9 @@ public class Authgear: NSObject {
             if let refreshToken = oidcTokenResponse.refreshToken {
                 self.refreshToken = refreshToken
             }
+            if let idToken = oidcTokenResponse.idToken {
+                self.idToken = idToken
+            }
             self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn) * Authgear.ExpireInPercentage))
             self.setSessionState(.authenticated, reason: reason)
         }
@@ -403,6 +414,7 @@ public class Authgear: NSObject {
         DispatchQueue.main.async {
             self.accessToken = nil
             self.refreshToken = nil
+            self.idToken = nil
             self.expireAt = nil
             self.setSessionState(.noSession, reason: reason)
         }
