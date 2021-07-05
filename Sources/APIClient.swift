@@ -163,6 +163,7 @@ protocol AuthAPIClient: AnyObject {
         codeVerifier: String?,
         refreshToken: String?,
         jwt: String?,
+        accessToken: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
     func requestBiometricSetup(
@@ -224,7 +225,8 @@ extension AuthAPIClient {
         code: String?,
         codeVerifier: String?,
         refreshToken: String?,
-        jwt: String?
+        jwt: String?,
+        accessToken: String?
     ) throws -> OIDCTokenResponse {
         try withSemaphore { handler in
             self.requestOIDCToken(
@@ -236,6 +238,7 @@ extension AuthAPIClient {
                 codeVerifier: codeVerifier,
                 refreshToken: refreshToken,
                 jwt: jwt,
+                accessToken: accessToken,
                 handler: handler
             )
         }
@@ -393,6 +396,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         codeVerifier: String? = nil,
         refreshToken: String? = nil,
         jwt: String? = nil,
+        accessToken: String? = nil,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     ) {
         fetchOIDCConfiguration { [weak self] result in
@@ -432,6 +436,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 let body = urlComponents.query?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)?.data(using: .utf8)
 
                 var urlRequest = URLRequest(url: config.tokenEndpoint)
+                if let accessToken = accessToken {
+                    urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
+                }
                 urlRequest.httpMethod = "POST"
                 urlRequest.setValue(
                     "application/x-www-form-urlencoded",

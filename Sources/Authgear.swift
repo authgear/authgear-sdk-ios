@@ -382,7 +382,8 @@ public class Authgear: NSObject {
                 code: code,
                 codeVerifier: verifier.value,
                 refreshToken: nil,
-                jwt: nil
+                jwt: nil,
+                accessToken: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -452,7 +453,8 @@ public class Authgear: NSObject {
                 code: code,
                 codeVerifier: verifier.value,
                 refreshToken: nil,
-                jwt: nil
+                jwt: nil,
+                accessToken: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -701,7 +703,8 @@ public class Authgear: NSObject {
                     code: nil,
                     codeVerifier: nil,
                     refreshToken: nil,
-                    jwt: signedJWT
+                    jwt: signedJWT,
+                    accessToken: nil
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -926,7 +929,8 @@ public class Authgear: NSObject {
                     code: nil,
                     codeVerifier: nil,
                     refreshToken: refreshToken,
-                    jwt: nil
+                    jwt: nil,
+                    accessToken: nil
                 )
 
                 let result = self.persistSession(oidcTokenResponse, reason: .foundToken)
@@ -990,7 +994,8 @@ public class Authgear: NSObject {
                     code: nil,
                     codeVerifier: nil,
                     refreshToken: nil,
-                    jwt: nil
+                    jwt: nil,
+                    accessToken: self.accessToken
                 )
                 if let idToken = oidcTokenResponse.idToken {
                     self.idToken = idToken
@@ -1122,7 +1127,8 @@ public class Authgear: NSObject {
                     code: nil,
                     codeVerifier: nil,
                     refreshToken: nil,
-                    jwt: signedJWT
+                    jwt: signedJWT,
+                    accessToken: nil
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
