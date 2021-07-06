@@ -656,6 +656,11 @@ public class Authgear: NSObject {
             return
         }
 
+        if !self.canReauthenticate {
+            handler(.failure(AuthgearError.cannotReauthenticate))
+            return
+        }
+
         self.workerQueue.async {
             self.reauthenticateWithSession(ReauthenticateOptions(
                 redirectURI: redirectURI, state: state, uiLocales: uiLocales, wechatRedirectURI: wechatRedirectURI, maxAge: maxAge
