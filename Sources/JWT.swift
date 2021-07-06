@@ -89,8 +89,7 @@ struct JWT {
         }
         let payloadStr = parts[1]
         let base64 = base64urlToBase64(base64url: payloadStr)
-        let data = Data(base64Encoded: base64)
-        guard let data = data else {
+        guard let data = Data(base64Encoded: base64) else {
             throw AuthgearError.invalidJWT(jwt)
         }
         let anything = try JSONSerialization.jsonObject(with: data, options: [])
