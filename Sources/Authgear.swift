@@ -27,7 +27,7 @@ struct AuthorizeOptions {
     let page: String?
 
     var request: OIDCAuthenticationRequest {
-        return OIDCAuthenticationRequest(
+        OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
             scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
@@ -51,7 +51,7 @@ struct ReauthenticateOptions {
     let maxAge: Int?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
-        return OIDCAuthenticationRequest(
+        OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
             scope: ["openid", "https://authgear.com/scopes/full-access"],
@@ -161,38 +161,32 @@ public class Authgear: NSObject {
     private var idToken: String?
 
     public var idTokenHint: String? {
-        get {
-            return self.idToken
-        }
+        self.idToken
     }
 
     public var canReauthenticate: Bool {
-        get {
-            guard let idToken = self.idToken else { return false }
-            do {
-                let payload = try JWT.decode(jwt: idToken)
-                if let can = payload["https://authgear.com/claims/user/can_reauthenticate"] as? Bool {
-                    return can
-                }
-                return false
-            } catch {
-                return false
+        guard let idToken = self.idToken else { return false }
+        do {
+            let payload = try JWT.decode(jwt: idToken)
+            if let can = payload["https://authgear.com/claims/user/can_reauthenticate"] as? Bool {
+                return can
             }
+            return false
+        } catch {
+            return false
         }
     }
 
     public var authTime: Date? {
-        get {
-            guard let idToken = self.idToken else { return nil }
-            do {
-                let payload = try JWT.decode(jwt: idToken)
-                if let unixEpoch = payload["auth_time"] as? NSNumber {
-                    return Date(timeIntervalSince1970: unixEpoch.doubleValue)
-                }
-                return nil
-            } catch {
-                return nil
+        guard let idToken = self.idToken else { return nil }
+        do {
+            let payload = try JWT.decode(jwt: idToken)
+            if let unixEpoch = payload["auth_time"] as? NSNumber {
+                return Date(timeIntervalSince1970: unixEpoch.doubleValue)
             }
+            return nil
+        } catch {
+            return nil
         }
     }
 
@@ -646,9 +640,9 @@ public class Authgear: NSObject {
                 if biometricEnabled && !skipUsingBiometric {
                     self.authenticateBiometric { result in
                         switch result {
-                        case .success(let authzResult):
+                        case let .success(authzResult):
                             handler(.success(ReauthenticateResult(userInfo: authzResult.userInfo, state: state)))
-                        case .failure(let error):
+                        case let .failure(error):
                             handler(.failure(error))
                         }
                     }
