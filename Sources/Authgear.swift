@@ -983,26 +983,32 @@ public class Authgear: NSObject {
 
     public func refreshIDToken(handler: @escaping VoidCompletionHandler) {
         let handler = withMainQueueHandler(handler)
-        self.workerQueue.async {
-            do {
-                let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
-                    grantType: .idToken,
-                    clientId: self.clientId,
-                    deviceInfo: getDeviceInfo(),
-                    redirectURI: nil,
-                    code: nil,
-                    codeVerifier: nil,
-                    refreshToken: nil,
-                    jwt: nil,
-                    accessToken: self.accessToken
-                )
-                if let idToken = oidcTokenResponse.idToken {
-                    self.idToken = idToken
+        let task = {
+            self.workerQueue.async {
+                do {
+                    let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
+                        grantType: .idToken,
+                        clientId: self.clientId,
+                        deviceInfo: getDeviceInfo(),
+                        redirectURI: nil,
+                        code: nil,
+                        codeVerifier: nil,
+                        refreshToken: nil,
+                        jwt: nil,
+                        accessToken: self.accessToken
+                    )
+                    if let idToken = oidcTokenResponse.idToken {
+                        self.idToken = idToken
+                    }
+                    handler(.success(()))
+                } catch {
+                    handler(.failure(error))
                 }
-                handler(.success(()))
-            } catch {
-                handler(.failure(error))
             }
+        }
+
+        refreshAccessTokenIfNeeded { _ in
+            task()
         }
     }
 
