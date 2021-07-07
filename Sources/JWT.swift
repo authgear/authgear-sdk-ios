@@ -81,6 +81,23 @@ struct JWT {
         let signature = try signer.sign(header: header, payload: payload)
         return "\(header).\(payload).\(signature)"
     }
+
+    static func decode(jwt: String) throws -> [String: Any] {
+        let parts = jwt.components(separatedBy: ".")
+        if parts.count != 3 {
+            throw AuthgearError.invalidJWT(jwt)
+        }
+        let payloadStr = parts[1]
+        let base64 = base64urlToBase64(base64url: payloadStr)
+        guard let data = Data(base64Encoded: base64) else {
+            throw AuthgearError.invalidJWT(jwt)
+        }
+        let anything = try JSONSerialization.jsonObject(with: data, options: [])
+        guard let payload = anything as? [String: Any] else {
+            throw AuthgearError.invalidJWT(jwt)
+        }
+        return payload
+    }
 }
 
 struct JWTSigner {

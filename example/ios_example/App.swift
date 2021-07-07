@@ -95,7 +95,6 @@ class App: ObservableObject {
     func login() {
         container?.authorize(
             redirectURI: App.redirectURI,
-            prompt: [.login],
             wechatRedirectURI: App.wechatRedirectURI,
             page: page
         ) { result in
@@ -104,6 +103,56 @@ class App: ObservableObject {
                 self.successAlertMessage = "Logged in successfully"
             }
         }
+    }
+
+    func reauthenticate() {
+        container?.refreshIDToken(handler: { result in
+            switch result {
+            case .success:
+                self.container?.reauthenticate(redirectURI: App.redirectURI) { result in
+                    self.updateBiometricState()
+                    switch result {
+                    case let .success(authResult):
+                        let userInfo = authResult.userInfo
+                        self.user = UserInfo(
+                            userID: userInfo.sub,
+                            isAnonymous: userInfo.isAnonymous,
+                            isVerified: userInfo.isVerified
+                        )
+                        self.successAlertMessage = "Reauthenticated successfully"
+                    case let .failure(error):
+                        self.setError(error)
+                    }
+                }
+            case let .failure(error):
+                self.setError(error)
+            }
+        })
+    }
+
+    func reauthenticateWebOnly() {
+        container?.refreshIDToken(handler: { result in
+            switch result {
+            case .success:
+                self.container?.reauthenticate(redirectURI: App.redirectURI, skipUsingBiometric: true) { result in
+                    self.updateBiometricState()
+                    switch result {
+                    case let .success(authResult):
+                        let userInfo = authResult.userInfo
+                        self.user = UserInfo(
+                            userID: userInfo.sub,
+                            isAnonymous: userInfo.isAnonymous,
+                            isVerified: userInfo.isVerified
+                        )
+                        self.successAlertMessage = "Reauthenticated successfully"
+                    case let .failure(error):
+                        self.setError(error)
+                    }
+                }
+            case let .failure(error):
+                self.setError(error)
+            }
+        })
     }
 
     func enableBiometric() {
@@ -184,6 +233,15 @@ class App: ObservableObject {
             case let .failure(error):
                 self.setError(error)
             }
+        }
+    }
+
+    func showAuthTime() {
+        let f = DateFormatter()
+        f.dateStyle = .long
+        f.timeStyle = .long
+        if let authTime = container?.authTime {
+            self.successAlertMessage = "auth_time: \(f.string(from: authTime))"
         }
     }
 

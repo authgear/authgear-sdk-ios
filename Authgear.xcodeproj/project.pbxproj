@@ -20,7 +20,7 @@
 		F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A22501845D0027888F /* Decodable+Any.swift */; };
 		F8A657A52501D31E0027888F /* JWK.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A42501D31E0027888F /* JWK.swift */; };
 		F8A657A7250551ED0027888F /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A6250551ED0027888F /* JWT.swift */; };
-		F8A657A925055A7C0027888F /* Data+Base64URLEncoded.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A825055A7C0027888F /* Data+Base64URLEncoded.swift */; };
+		F8A657A925055A7C0027888F /* Base64.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A657A825055A7C0027888F /* Base64.swift */; };
 		OBJ_41 /* AuthgearTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* AuthgearTests.swift */; };
 		OBJ_42 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* XCTestManifests.swift */; };
 		OBJ_44 /* Authgear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "Authgear::Authgear::Product" /* Authgear.framework */; };
@@ -60,7 +60,7 @@
 		F8A657A22501845D0027888F /* Decodable+Any.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decodable+Any.swift"; sourceTree = "<group>"; };
 		F8A657A42501D31E0027888F /* JWK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWK.swift; sourceTree = "<group>"; };
 		F8A657A6250551ED0027888F /* JWT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWT.swift; sourceTree = "<group>"; };
-		F8A657A825055A7C0027888F /* Data+Base64URLEncoded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Base64URLEncoded.swift"; sourceTree = "<group>"; };
+		F8A657A825055A7C0027888F /* Base64.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base64.swift; sourceTree = "<group>"; };
 		OBJ_11 /* AuthgearTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthgearTests.swift; sourceTree = "<group>"; };
 		OBJ_12 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
 		OBJ_17 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -141,7 +141,7 @@
 				F8A657A42501D31E0027888F /* JWK.swift */,
 				775FF7292603649500B81ECD /* Biometric.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
-				F8A657A825055A7C0027888F /* Data+Base64URLEncoded.swift */,
+				F8A657A825055A7C0027888F /* Base64.swift */,
 			);
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -242,7 +242,7 @@
 				F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */,
 				F83392EF24FC344D00A69D3C /* Storage.swift in Sources */,
 				F83D84AE24F6A93600B4393C /* CodeVerifier.swift in Sources */,
-				F8A657A925055A7C0027888F /* Data+Base64URLEncoded.swift in Sources */,
+				F8A657A925055A7C0027888F /* Base64.swift in Sources */,
 				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
 				775FF72A2603649500B81ECD /* Biometric.swift in Sources */,
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,

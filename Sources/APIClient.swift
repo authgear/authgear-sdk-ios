@@ -5,6 +5,7 @@ enum GrantType: String {
     case refreshToken = "refresh_token"
     case anonymous = "urn:authgear:params:oauth:grant-type:anonymous-request"
     case biometric = "urn:authgear:params:oauth:grant-type:biometric-request"
+    case idToken = "urn:authgear:params:oauth:grant-type:id-token"
 }
 
 enum APIResponse<T: Decodable>: Decodable {
@@ -36,11 +37,95 @@ enum APIResponse<T: Decodable>: Decodable {
     }
 }
 
+struct OIDCAuthenticationRequest {
+    let redirectURI: String
+    let responseType: String
+    let scope: [String]
+    let state: String?
+    let prompt: [PromptOption]?
+    let loginHint: String?
+    let uiLocales: [String]?
+    let idTokenHint: String?
+    let maxAge: Int?
+    let wechatRedirectURI: String?
+    let page: String?
+
+    var redirectURIScheme: String {
+        if let index = redirectURI.firstIndex(of: ":") {
+            return String(redirectURI[..<index])
+        }
+        return redirectURI
+    }
+
+    func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
+        var queryItems = [
+            URLQueryItem(name: "response_type", value: self.responseType),
+            URLQueryItem(name: "client_id", value: clientID),
+            URLQueryItem(name: "redirect_uri", value: self.redirectURI),
+            URLQueryItem(
+                name: "scope",
+                value: scope.joined(separator: " ")
+            ),
+            URLQueryItem(name: "x_platform", value: "ios")
+        ]
+
+        if let verifier = verifier {
+            queryItems.append(contentsOf: [
+                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
+            ])
+        }
+
+        if let state = self.state {
+            queryItems.append(URLQueryItem(name: "state", value: state))
+        }
+
+        if let prompt = self.prompt {
+            queryItems.append(URLQueryItem(name: "prompt", value: prompt.map { $0.rawValue }.joined(separator: " ")))
+        }
+
+        if let loginHint = self.loginHint {
+            queryItems.append(URLQueryItem(name: "login_hint", value: loginHint))
+        }
+
+        if let idTokenHint = self.idTokenHint {
+            queryItems.append(URLQueryItem(name: "id_token_hint", value: idTokenHint))
+        }
+
+        if let uiLocales = self.uiLocales {
+            queryItems.append(URLQueryItem(
+                name: "ui_locales",
+                value: uiLocales.joined(separator: " ")
+            ))
+        }
+
+        if let maxAge = self.maxAge {
+            queryItems.append(URLQueryItem(
+                name: "max_age",
+                value: String(format: "%d", maxAge)
+            ))
+        }
+
+        if let wechatRedirectURI = self.wechatRedirectURI {
+            queryItems.append(URLQueryItem(
+                name: "x_wechat_redirect_uri",
+                value: wechatRedirectURI
+            ))
+        }
+
+        if let page = self.page {
+            queryItems.append(URLQueryItem(name: "x_page", value: page))
+        }
+
+        return queryItems
+    }
+}
+
 struct OIDCTokenResponse: Decodable {
     let idToken: String?
-    let tokenType: String
-    let accessToken: String
-    let expiresIn: Int
+    let tokenType: String?
+    let accessToken: String?
+    let expiresIn: Int?
     let refreshToken: String?
 }
 
@@ -78,6 +163,7 @@ protocol AuthAPIClient: AnyObject {
         codeVerifier: String?,
         refreshToken: String?,
         jwt: String?,
+        accessToken: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
     func requestBiometricSetup(
@@ -139,7 +225,8 @@ extension AuthAPIClient {
         code: String?,
         codeVerifier: String?,
         refreshToken: String?,
-        jwt: String?
+        jwt: String?,
+        accessToken: String?
     ) throws -> OIDCTokenResponse {
         try withSemaphore { handler in
             self.requestOIDCToken(
@@ -151,6 +238,7 @@ extension AuthAPIClient {
                 codeVerifier: codeVerifier,
                 refreshToken: refreshToken,
                 jwt: jwt,
+                accessToken: accessToken,
                 handler: handler
             )
         }
@@ -257,6 +345,10 @@ class DefaultAuthAPIClient: AuthAPIClient {
         handler: @escaping (Result<(Data?, HTTPURLResponse), Error>) -> Void
     ) {
         let dataTaslk = defaultSession.dataTask(with: request) { data, response, error in
+            if let error = error {
+                return handler(.failure(AuthgearError.error(error)))
+            }
+
             let response = response as! HTTPURLResponse
 
             if response.statusCode < 200 || response.statusCode >= 300 {
@@ -268,10 +360,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     }
                 }
                 return handler(.failure(AuthgearError.unexpectedHttpStatusCode(response.statusCode, data)))
-            }
-
-            if let error = error {
-                return handler(.failure(AuthgearError.error(error)))
             }
 
             return handler(.success((data, response)))
@@ -308,6 +396,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         codeVerifier: String? = nil,
         refreshToken: String? = nil,
         jwt: String? = nil,
+        accessToken: String? = nil,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     ) {
         fetchOIDCConfiguration { [weak self] result in
@@ -347,6 +436,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 let body = urlComponents.query?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)?.data(using: .utf8)
 
                 var urlRequest = URLRequest(url: config.tokenEndpoint)
+                if let accessToken = accessToken {
+                    urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
+                }
                 urlRequest.httpMethod = "POST"
                 urlRequest.setValue(
                     "application/x-www-form-urlencoded",
