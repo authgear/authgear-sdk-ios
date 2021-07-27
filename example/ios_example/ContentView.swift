@@ -51,6 +51,7 @@ struct AuthgearConfigurationForm: View {
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var page: String = UserDefaults.standard.string(forKey: "authgear.demo.page") ?? ""
     @State private var transientSession: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.transientSession")
+    @State private var useWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWebView")
 
     var body: some View {
         VStack {
@@ -79,11 +80,17 @@ struct AuthgearConfigurationForm: View {
                 label: "Transient Session",
                 input: Toggle(isOn: $transientSession) { EmptyView() }
             )
+            AuthgearConfigurationInput(
+                label: "Use WebView",
+                input: Toggle(isOn: $useWebView) { EmptyView() }
+            )
             Button(action: {
                 self.app.configure(
                     clientId: self.clientID,
                     endpoint: self.endpoint,
-                    page: self.page, transientSession: self.transientSession
+                    page: self.page,
+                    transientSession: self.transientSession,
+                    useWebView: self.useWebView
                 )
             }) {
                 ActionButton(text: "Configure")

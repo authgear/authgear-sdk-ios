@@ -17,11 +17,12 @@ class App: ObservableObject {
     @Published var sessionState = SessionState.unknown
     @Published var user: UserInfo?
     @Published var page: String = ""
+    @Published var useWebView: Bool = false
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
 
-    func configure(clientId: String, endpoint: String, page: String, transientSession: Bool) {
+    func configure(clientId: String, endpoint: String, page: String, transientSession: Bool, useWebView: Bool) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -34,9 +35,11 @@ class App: ObservableObject {
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
         UserDefaults.standard.set(page, forKey: "authgear.demo.page")
         UserDefaults.standard.set(transientSession, forKey: "authgear.demo.transientSession")
+        UserDefaults.standard.set(useWebView, forKey: "authgear.demo.useWebView")
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, transientSession: transientSession)
         successAlertMessage = "Configured Authgear successfully"
         self.page = page
+        self.useWebView = useWebView
         self.updateBiometricState()
     }
 
@@ -96,7 +99,8 @@ class App: ObservableObject {
         container?.authorize(
             redirectURI: App.redirectURI,
             wechatRedirectURI: App.wechatRedirectURI,
-            page: page
+            page: page,
+            useWebView: useWebView
         ) { result in
             let success = self.handleAuthorizeResult(result)
             if success {
@@ -109,7 +113,7 @@ class App: ObservableObject {
         container?.refreshIDToken(handler: { result in
             switch result {
             case .success:
-                self.container?.reauthenticate(redirectURI: App.redirectURI) { result in
+                self.container?.reauthenticate(redirectURI: App.redirectURI, useWebView: self.useWebView) { result in
                     self.updateBiometricState()
                     switch result {
                     case let .success(authResult):
@@ -204,7 +208,8 @@ class App: ObservableObject {
     func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,
-            wechatRedirectURI: App.wechatRedirectURI
+            wechatRedirectURI: App.wechatRedirectURI,
+            useWebView: useWebView
         ) { result in
             let success = self.handleAuthorizeResult(result)
             if success {
