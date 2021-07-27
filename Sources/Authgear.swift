@@ -25,6 +25,7 @@ struct AuthorizeOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let page: String?
+    let prefersEphemeralWebBrowserSession: Bool?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -49,6 +50,7 @@ struct ReauthenticateOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let maxAge: Int?
+    let prefersEphemeralWebBrowserSession: Bool?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -274,6 +276,7 @@ public class Authgear: NSObject {
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
+                    prefersEphemeralWebBrowserSession: options.prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -308,6 +311,7 @@ public class Authgear: NSObject {
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
+                    prefersEphemeralWebBrowserSession: options.prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -588,6 +592,7 @@ public class Authgear: NSObject {
          - uiLocales: UI locale tags
          - wechatRedirectURI: The wechatRedirectURI will be called when user click the login with WeChat button
          - page: Initial page to open. Valid values are 'login' and 'signup'.
+         - prefersEphemeralWebBrowserSession: ASWebAuthenticationSession's prefersEphemeralWebBrowserSession config. Set prefersEphemeralWebBrowserSession to true to request that the browser doesn’t share cookies or other browsing data between the authentication session and the user’s normal browser session.
          - handler: Authorize completion handler
 
      */
@@ -599,6 +604,7 @@ public class Authgear: NSObject {
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
         page: String? = nil,
+        prefersEphemeralWebBrowserSession: Bool? = true,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         self.authorize(AuthorizeOptions(
@@ -608,7 +614,8 @@ public class Authgear: NSObject {
             loginHint: loginHint,
             uiLocales: uiLocales,
             wechatRedirectURI: wechatRedirectURI,
-            page: page
+            page: page,
+            prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession
         ), handler: handler)
     }
 
@@ -629,6 +636,7 @@ public class Authgear: NSObject {
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
         skipUsingBiometric: Bool? = nil,
+        prefersEphemeralWebBrowserSession: Bool? = true,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
@@ -663,7 +671,7 @@ public class Authgear: NSObject {
 
         self.workerQueue.async {
             self.reauthenticateWithSession(ReauthenticateOptions(
-                redirectURI: redirectURI, state: state, uiLocales: uiLocales, wechatRedirectURI: wechatRedirectURI, maxAge: maxAge
+                redirectURI: redirectURI, state: state, uiLocales: uiLocales, wechatRedirectURI: wechatRedirectURI, maxAge: maxAge, prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession
             ), handler: handler)
         }
     }
@@ -731,6 +739,7 @@ public class Authgear: NSObject {
         state: String? = nil,
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
+        prefersEphemeralWebBrowserSession: Bool? = true,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
@@ -769,7 +778,8 @@ public class Authgear: NSObject {
                         loginHint: loginHint,
                         uiLocales: uiLocales,
                         wechatRedirectURI: wechatRedirectURI,
-                        page: nil
+                        page: nil,
+                        prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
