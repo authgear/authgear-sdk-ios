@@ -265,7 +265,7 @@ public class Authgear: NSObject {
         return urlComponents.url!
     }
 
-    private func reauthenticateWithSession(
+    private func reauthenticateWithASWebAuthenticationSession(
         _ options: ReauthenticateOptions,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
@@ -302,7 +302,7 @@ public class Authgear: NSObject {
         }
     }
 
-    private func reauthenticateWithoutSession(
+    private func reauthenticateWithWKWebView(
         _ options: ReauthenticateOptions,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
@@ -347,7 +347,7 @@ public class Authgear: NSObject {
         }
     }
 
-    private func authorizeWithSession(
+    private func authorizeWithASWebAuthenticationSession(
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -382,7 +382,7 @@ public class Authgear: NSObject {
         }
     }
 
-    private func authorizeWithoutSession(
+    private func authorizeWithWKWebView(
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -753,11 +753,11 @@ public class Authgear: NSObject {
         handler: @escaping AuthorizeCompletionHandler
     ) {
         if options.useWebView == true {
-            self.authorizeWithoutSession(options, handler: handler)
+            self.authorizeWithWKWebView(options, handler: handler)
         } else {
             let handler = self.withMainQueueHandler(handler)
             self.workerQueue.async {
-                self.authorizeWithSession(options, handler: handler)
+                self.authorizeWithASWebAuthenticationSession(options, handler: handler)
             }
         }
     }
@@ -814,10 +814,10 @@ public class Authgear: NSObject {
         )
 
         if options.useWebView == true {
-            self.reauthenticateWithoutSession(options, handler: handler)
+            self.reauthenticateWithWKWebView(options, handler: handler)
         } else {
             self.workerQueue.async {
-                self.reauthenticateWithSession(options, handler: handler)
+                self.reauthenticateWithASWebAuthenticationSession(options, handler: handler)
             }
         }
     }
