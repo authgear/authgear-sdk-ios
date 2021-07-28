@@ -18,11 +18,12 @@ class App: ObservableObject {
     @Published var user: UserInfo?
     @Published var page: String = ""
     @Published var useWebView: Bool = false
+    @Published var preferPrivateWebBrowserSession: Bool = false
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
 
-    func configure(clientId: String, endpoint: String, page: String, transientSession: Bool, useWebView: Bool) {
+    func configure(clientId: String, endpoint: String, page: String, transientSession: Bool, useWebView: Bool, preferPrivateWebBrowserSession: Bool) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -36,10 +37,12 @@ class App: ObservableObject {
         UserDefaults.standard.set(page, forKey: "authgear.demo.page")
         UserDefaults.standard.set(transientSession, forKey: "authgear.demo.transientSession")
         UserDefaults.standard.set(useWebView, forKey: "authgear.demo.useWebView")
+        UserDefaults.standard.set(preferPrivateWebBrowserSession, forKey: "authgear.demo.preferPrivateWebBrowserSession")
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, transientSession: transientSession)
         successAlertMessage = "Configured Authgear successfully"
         self.page = page
         self.useWebView = useWebView
+        self.preferPrivateWebBrowserSession = preferPrivateWebBrowserSession
         self.updateBiometricState()
     }
 
@@ -100,6 +103,7 @@ class App: ObservableObject {
             redirectURI: App.redirectURI,
             wechatRedirectURI: App.wechatRedirectURI,
             page: page,
+            preferPrivateWebBrowserSession: preferPrivateWebBrowserSession,
             useWebView: useWebView
         ) { result in
             let success = self.handleAuthorizeResult(result)
@@ -113,7 +117,11 @@ class App: ObservableObject {
         container?.refreshIDToken(handler: { result in
             switch result {
             case .success:
-                self.container?.reauthenticate(redirectURI: App.redirectURI, useWebView: self.useWebView) { result in
+                self.container?.reauthenticate(
+                    redirectURI: App.redirectURI,
+                    preferPrivateWebBrowserSession: self.preferPrivateWebBrowserSession,
+                    useWebView: self.useWebView
+                ) { result in
                     self.updateBiometricState()
                     switch result {
                     case let .success(authResult):
@@ -209,6 +217,7 @@ class App: ObservableObject {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,
             wechatRedirectURI: App.wechatRedirectURI,
+            preferPrivateWebBrowserSession: preferPrivateWebBrowserSession,
             useWebView: useWebView
         ) { result in
             let success = self.handleAuthorizeResult(result)
