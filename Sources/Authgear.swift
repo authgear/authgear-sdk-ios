@@ -26,7 +26,7 @@ struct AuthorizeOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let page: String?
-    let prefersEphemeralWebBrowserSession: Bool?
+    let preferPrivateWebBrowserSession: Bool?
     let useWebView: Bool?
 
     var request: OIDCAuthenticationRequest {
@@ -52,7 +52,7 @@ struct ReauthenticateOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let maxAge: Int?
-    let prefersEphemeralWebBrowserSession: Bool?
+    let preferPrivateWebBrowserSession: Bool?
     let useWebView: Bool?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
@@ -282,7 +282,7 @@ public class Authgear: NSObject {
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
-                    prefersEphemeralWebBrowserSession: options.prefersEphemeralWebBrowserSession,
+                    preferPrivateWebBrowserSession: options.preferPrivateWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -362,7 +362,7 @@ public class Authgear: NSObject {
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
-                    prefersEphemeralWebBrowserSession: options.prefersEphemeralWebBrowserSession,
+                    preferPrivateWebBrowserSession: options.preferPrivateWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -718,7 +718,7 @@ public class Authgear: NSObject {
          - uiLocales: UI locale tags
          - wechatRedirectURI: The wechatRedirectURI will be called when user click the login with WeChat button
          - page: Initial page to open. Valid values are 'login' and 'signup'.
-         - prefersEphemeralWebBrowserSession: ASWebAuthenticationSession's prefersEphemeralWebBrowserSession config. Set prefersEphemeralWebBrowserSession to true to request that the browser doesn’t share cookies or other browsing data between the authentication session and the user’s normal browser session.
+         - preferPrivateWebBrowserSession: Set preferPrivateWebBrowserSession to true to request the browser for a private authentication session.
          - useWebView: A Boolean value that indicates whether WKWebView should be used for authorization. ASWebAuthenticationSession is used by default.
          - handler: Authorize completion handler
 
@@ -731,7 +731,7 @@ public class Authgear: NSObject {
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
         page: String? = nil,
-        prefersEphemeralWebBrowserSession: Bool? = true,
+        preferPrivateWebBrowserSession: Bool? = true,
         useWebView: Bool? = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -743,7 +743,7 @@ public class Authgear: NSObject {
             uiLocales: uiLocales,
             wechatRedirectURI: wechatRedirectURI,
             page: page,
-            prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
+            preferPrivateWebBrowserSession: preferPrivateWebBrowserSession,
             useWebView: useWebView
         ), handler: handler)
     }
@@ -769,7 +769,7 @@ public class Authgear: NSObject {
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
         skipUsingBiometric: Bool? = nil,
-        prefersEphemeralWebBrowserSession: Bool? = true,
+        preferPrivateWebBrowserSession: Bool? = true,
         useWebView: Bool? = false,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
@@ -809,7 +809,7 @@ public class Authgear: NSObject {
             uiLocales: uiLocales,
             wechatRedirectURI: wechatRedirectURI,
             maxAge: maxAge,
-            prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
+            preferPrivateWebBrowserSession: preferPrivateWebBrowserSession,
             useWebView: useWebView
         )
 
@@ -885,7 +885,7 @@ public class Authgear: NSObject {
         state: String? = nil,
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
-        prefersEphemeralWebBrowserSession: Bool? = true,
+        preferPrivateWebBrowserSession: Bool? = true,
         useWebView: Bool? = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -926,7 +926,7 @@ public class Authgear: NSObject {
                         uiLocales: uiLocales,
                         wechatRedirectURI: wechatRedirectURI,
                         page: nil,
-                        prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
+                        preferPrivateWebBrowserSession: preferPrivateWebBrowserSession,
                         useWebView: useWebView
                     )
                 ) { [weak self] result in
