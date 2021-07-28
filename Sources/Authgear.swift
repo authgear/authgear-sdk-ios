@@ -319,7 +319,14 @@ public class Authgear: NSObject {
                 self.registerCurrentWebViewRedirectURI(uri: options.redirectURI)
 
                 let vc = UIViewController()
-                let wv = WKWebView(frame: vc.view.bounds)
+                var wv: WKWebView
+                if options.preferPrivateWebBrowserSession == true {
+                    let webConfiguration = WKWebViewConfiguration()
+                    webConfiguration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    wv = WKWebView(frame: vc.view.bounds, configuration: webConfiguration)
+                } else {
+                    wv = WKWebView(frame: vc.view.bounds)
+                }
                 wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 wv.navigationDelegate = self
                 wv.load(URLRequest(url: url))
@@ -397,7 +404,14 @@ public class Authgear: NSObject {
                 self.registerCurrentWebViewRedirectURI(uri: options.redirectURI)
 
                 let vc = UIViewController()
-                let wv = WKWebView(frame: vc.view.bounds)
+                var wv: WKWebView
+                if options.preferPrivateWebBrowserSession == true {
+                    let webConfiguration = WKWebViewConfiguration()
+                    webConfiguration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    wv = WKWebView(frame: vc.view.bounds, configuration: webConfiguration)
+                } else {
+                    wv = WKWebView(frame: vc.view.bounds)
+                }
                 wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 wv.navigationDelegate = self
                 wv.load(URLRequest(url: url))
@@ -731,7 +745,7 @@ public class Authgear: NSObject {
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
         page: String? = nil,
-        preferPrivateWebBrowserSession: Bool? = true,
+        preferPrivateWebBrowserSession: Bool? = false,
         useWebView: Bool? = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -769,7 +783,7 @@ public class Authgear: NSObject {
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
         skipUsingBiometric: Bool? = nil,
-        preferPrivateWebBrowserSession: Bool? = true,
+        preferPrivateWebBrowserSession: Bool? = false,
         useWebView: Bool? = false,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
@@ -885,7 +899,7 @@ public class Authgear: NSObject {
         state: String? = nil,
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
-        preferPrivateWebBrowserSession: Bool? = true,
+        preferPrivateWebBrowserSession: Bool? = false,
         useWebView: Bool? = false,
         handler: @escaping AuthorizeCompletionHandler
     ) {
