@@ -32,6 +32,7 @@ struct AuthorizeOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let page: String?
+    let suppressIDPSessionCookie: Bool?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -45,7 +46,8 @@ struct AuthorizeOptions {
             idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: self.page
+            page: self.page,
+            suppressIDPSessionCookie: suppressIDPSessionCookie
         )
     }
 }
@@ -56,6 +58,7 @@ struct ReauthenticateOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let maxAge: Int?
+    let suppressIDPSessionCookie: Bool?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -69,7 +72,8 @@ struct ReauthenticateOptions {
             idTokenHint: idTokenHint,
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: nil
+            page: nil,
+            suppressIDPSessionCookie: suppressIDPSessionCookie
         )
     }
 }
@@ -745,7 +749,8 @@ public class Authgear: NSObject {
             loginHint: loginHint,
             uiLocales: uiLocales,
             wechatRedirectURI: wechatRedirectURI,
-            page: page
+            page: page,
+            suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
         ), handler: handler)
     }
 
@@ -808,7 +813,8 @@ public class Authgear: NSObject {
             state: state,
             uiLocales: uiLocales,
             wechatRedirectURI: wechatRedirectURI,
-            maxAge: maxAge
+            maxAge: maxAge,
+            suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
         )
 
         let useWebView = self.sessionType == SessionType.app
@@ -922,7 +928,8 @@ public class Authgear: NSObject {
                         loginHint: loginHint,
                         uiLocales: uiLocales,
                         wechatRedirectURI: wechatRedirectURI,
-                        page: nil
+                        page: nil,
+                        suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -998,7 +1005,8 @@ public class Authgear: NSObject {
                     idTokenHint: nil,
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
-                    page: nil
+                    page: nil,
+                    suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
                 ), verifier: nil)
 
                 DispatchQueue.main.async {
@@ -1044,6 +1052,10 @@ public class Authgear: NSObject {
         wechatRedirectURI: String? = nil
     ) {
         openUrl(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
+    }
+
+    private func shouldSuppressIDPSessionCookie() -> Bool {
+        self.sessionType == SessionType.transient
     }
 
     private func shouldRefreshAccessToken() -> Bool {
