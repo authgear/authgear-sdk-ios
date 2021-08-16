@@ -17,6 +17,12 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
+public enum SessionType: String {
+    case transient
+    case app
+    case device
+}
+
 struct AuthorizeOptions {
     let redirectURI: String
     let state: String?
@@ -149,6 +155,7 @@ public class Authgear: NSObject {
     // refreshTokenStorage driver will be changed by config, it could be persistent or in memory
     var refreshTokenStorage: ContainerStorage
     let clientId: String
+    var sessionType: SessionType
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -204,6 +211,7 @@ public class Authgear: NSObject {
     public init(clientId: String, endpoint: String, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
+        self.sessionType = SessionType.app
         let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.apiClient = client
 
@@ -215,10 +223,11 @@ public class Authgear: NSObject {
     }
 
     public func configure(
-        transientSession: Bool = false,
+        sessionType: SessionType = SessionType.app,
         handler: VoidCompletionHandler? = nil
     ) {
-        if transientSession {
+        self.sessionType = sessionType
+        if self.sessionType == SessionType.transient {
             self.refreshTokenStorage = Authgear.globalMemoryStore
         } else {
             self.refreshTokenStorage = self.storage
@@ -268,12 +277,14 @@ public class Authgear: NSObject {
             let request = options.toRequest(idTokenHint: idTokenHint)
             let verifier = CodeVerifier()
             let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
+            let prefersEphemeralWebBrowserSession = self.sessionType == SessionType.transient
 
             DispatchQueue.main.async {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
+                    prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -300,6 +311,7 @@ public class Authgear: NSObject {
         let verifier = CodeVerifier()
         let request = options.request
         let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
+        let prefersEphemeralWebBrowserSession = self.sessionType == SessionType.transient
 
         DispatchQueue.main.async {
             switch url {
@@ -308,6 +320,7 @@ public class Authgear: NSObject {
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
+                    prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {

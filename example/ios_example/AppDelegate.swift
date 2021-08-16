@@ -5,9 +5,14 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var appContainer = App()
 
-    func configureAuthgear(clientId: String, endpoint: String, transientSession: Bool) {
+    func configureAuthgear(clientId: String, endpoint: String, sessionType: String) {
         appContainer.container = Authgear(clientId: clientId, endpoint: endpoint)
-        appContainer.container?.configure(transientSession: transientSession)
+        if let st = SessionType(rawValue: sessionType) {
+            appContainer.container?.configure(sessionType: st)
+        } else {
+            appContainer.container?.configure()
+        }
+
         appContainer.container?.delegate = self
 
         // configure WeChat SDK
