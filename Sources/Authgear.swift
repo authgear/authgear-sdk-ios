@@ -266,7 +266,7 @@ public class Authgear: NSObject {
         return urlComponents.url!
     }
 
-    private func reauthenticateWithSession(
+    private func reauthenticateWithASWebAuthenticationSession(
         _ options: ReauthenticateOptions,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
@@ -304,7 +304,7 @@ public class Authgear: NSObject {
         }
     }
 
-    private func authorizeWithSession(
+    private func authorizeWithASWebAuthenticationSession(
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
@@ -631,7 +631,7 @@ public class Authgear: NSObject {
     ) {
         let handler = self.withMainQueueHandler(handler)
         self.workerQueue.async {
-            self.authorizeWithSession(options, handler: handler)
+            self.authorizeWithASWebAuthenticationSession(options, handler: handler)
         }
     }
 
@@ -675,7 +675,7 @@ public class Authgear: NSObject {
         }
 
         self.workerQueue.async {
-            self.reauthenticateWithSession(ReauthenticateOptions(
+            self.reauthenticateWithASWebAuthenticationSession(ReauthenticateOptions(
                 redirectURI: redirectURI, state: state, uiLocales: uiLocales, wechatRedirectURI: wechatRedirectURI, maxAge: maxAge
             ), handler: handler)
         }
