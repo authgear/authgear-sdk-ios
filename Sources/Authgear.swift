@@ -160,7 +160,7 @@ public class Authgear: NSObject {
     // refreshTokenStorage driver will be changed by config, it could be persistent or in memory
     var refreshTokenStorage: ContainerStorage
     let clientId: String
-    var sessionType: SessionType
+    public let sessionType: SessionType
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -216,30 +216,27 @@ public class Authgear: NSObject {
 
     static let globalMemoryStore: ContainerStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
 
-    public init(clientId: String, endpoint: String, name: String? = nil) {
+    public init(clientId: String, endpoint: String, sessionType: SessionType = SessionType.app, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
-        self.sessionType = SessionType.app
+        self.sessionType = sessionType
         let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.apiClient = client
 
-        storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
-        refreshTokenStorage = storage
+        self.storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+        if self.sessionType == SessionType.transient {
+            self.refreshTokenStorage = Authgear.globalMemoryStore
+        } else {
+            self.refreshTokenStorage = self.storage
+        }
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
 
         super.init()
     }
 
     public func configure(
-        sessionType: SessionType = SessionType.app,
         handler: VoidCompletionHandler? = nil
     ) {
-        self.sessionType = sessionType
-        if self.sessionType == SessionType.transient {
-            self.refreshTokenStorage = Authgear.globalMemoryStore
-        } else {
-            self.refreshTokenStorage = self.storage
-        }
         workerQueue.async {
             let refreshToken = Result { try self.refreshTokenStorage.getRefreshToken(namespace: self.name) }
             switch refreshToken {
