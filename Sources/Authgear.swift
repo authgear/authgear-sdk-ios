@@ -9,12 +9,19 @@ public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -
 public typealias ReauthenticateCompletionHandler = (Result<ReauthenticateResult, Error>) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
+private typealias AuthorizeRedirectionHandler = (URL) -> Void
 
 public enum PromptOption: String {
     case none
     case login
     case consent
     case selectAccount = "select_account"
+}
+
+public enum SessionType: String {
+    case transient
+    case app
+    case device
 }
 
 struct AuthorizeOptions {
@@ -25,6 +32,7 @@ struct AuthorizeOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let page: String?
+    let suppressIDPSessionCookie: Bool?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -38,7 +46,8 @@ struct AuthorizeOptions {
             idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: self.page
+            page: self.page,
+            suppressIDPSessionCookie: suppressIDPSessionCookie
         )
     }
 }
@@ -49,6 +58,7 @@ struct ReauthenticateOptions {
     let uiLocales: [String]?
     let wechatRedirectURI: String?
     let maxAge: Int?
+    let suppressIDPSessionCookie: Bool?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -62,7 +72,8 @@ struct ReauthenticateOptions {
             idTokenHint: idTokenHint,
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: nil
+            page: nil,
+            suppressIDPSessionCookie: suppressIDPSessionCookie
         )
     }
 }
@@ -149,6 +160,7 @@ public class Authgear: NSObject {
     // refreshTokenStorage driver will be changed by config, it could be persistent or in memory
     var refreshTokenStorage: ContainerStorage
     let clientId: String
+    public let sessionType: SessionType
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -197,32 +209,34 @@ public class Authgear: NSObject {
 
     public private(set) var sessionState: SessionState = .unknown
 
+    private var currentWebViewRedirectURI: String?
+    private var authorizeRedirectionHandler: AuthorizeRedirectionHandler = { _ in }
+
     public weak var delegate: AuthgearDelegate?
 
     static let globalMemoryStore: ContainerStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
 
-    public init(clientId: String, endpoint: String, name: String? = nil) {
+    public init(clientId: String, endpoint: String, sessionType: SessionType = SessionType.app, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
+        self.sessionType = sessionType
         let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.apiClient = client
 
-        storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
-        refreshTokenStorage = storage
+        self.storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
+        if self.sessionType == SessionType.transient {
+            self.refreshTokenStorage = Authgear.globalMemoryStore
+        } else {
+            self.refreshTokenStorage = self.storage
+        }
         workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
 
         super.init()
     }
 
     public func configure(
-        transientSession: Bool = false,
         handler: VoidCompletionHandler? = nil
     ) {
-        if transientSession {
-            self.refreshTokenStorage = Authgear.globalMemoryStore
-        } else {
-            self.refreshTokenStorage = self.storage
-        }
         workerQueue.async {
             let refreshToken = Result { try self.refreshTokenStorage.getRefreshToken(namespace: self.name) }
             switch refreshToken {
@@ -257,7 +271,7 @@ public class Authgear: NSObject {
         return urlComponents.url!
     }
 
-    private func reauthenticateWithSession(
+    private func reauthenticateWithASWebAuthenticationSession(
         _ options: ReauthenticateOptions,
         handler: @escaping ReauthenticateCompletionHandler
     ) {
@@ -268,12 +282,14 @@ public class Authgear: NSObject {
             let request = options.toRequest(idTokenHint: idTokenHint)
             let verifier = CodeVerifier()
             let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
+            let prefersEphemeralWebBrowserSession = self.shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession()
 
             DispatchQueue.main.async {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
+                    prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -293,13 +309,59 @@ public class Authgear: NSObject {
         }
     }
 
-    private func authorizeWithSession(
+    private func reauthenticateWithWKWebView(
+        _ options: ReauthenticateOptions,
+        handler: @escaping ReauthenticateCompletionHandler
+    ) {
+        do {
+            guard let idTokenHint = self.idTokenHint else {
+                throw AuthgearError.unauthenticatedUser
+            }
+            let request = options.toRequest(idTokenHint: idTokenHint)
+            let verifier = CodeVerifier()
+            let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
+
+            DispatchQueue.main.async {
+                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
+                self.registerCurrentWebViewRedirectURI(uri: options.redirectURI)
+
+                let vc = UIViewController()
+                let wv = WKWebView(frame: vc.view.bounds)
+                wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                wv.navigationDelegate = self
+                wv.load(URLRequest(url: url))
+                vc.view.addSubview(wv)
+                vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.dismissWebView))
+                self.webViewViewController = vc
+
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .pageSheet
+
+                let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
+                window?.rootViewController?.present(nav, animated: true) {}
+
+                self.authorizeRedirectionHandler = { [weak self] url in
+                    vc.dismiss(animated: true)
+                    self?.unregisterCurrentWechatRedirectURI()
+                    self?.unregisterCurrentWebViewRedirectURI()
+                    self?.workerQueue.async {
+                        self?.finishReauthentication(url: url, verifier: verifier, handler: handler)
+                    }
+                }
+            }
+        } catch {
+            handler(.failure(error))
+        }
+    }
+
+    private func authorizeWithASWebAuthenticationSession(
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
         let verifier = CodeVerifier()
         let request = options.request
         let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
+        let prefersEphemeralWebBrowserSession = self.shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession()
 
         DispatchQueue.main.async {
             switch url {
@@ -308,6 +370,7 @@ public class Authgear: NSObject {
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
                     callbackURLSchema: request.redirectURIScheme,
+                    prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -321,6 +384,49 @@ public class Authgear: NSObject {
                     }
                 )
                 self.authenticationSession?.start()
+            case let .failure(error):
+                handler(.failure(error))
+            }
+        }
+    }
+
+    private func authorizeWithWKWebView(
+        _ options: AuthorizeOptions,
+        handler: @escaping AuthorizeCompletionHandler
+    ) {
+        let verifier = CodeVerifier()
+        let request = options.request
+        let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
+
+        DispatchQueue.main.async {
+            switch url {
+            case let .success(url):
+                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
+                self.registerCurrentWebViewRedirectURI(uri: options.redirectURI)
+
+                let vc = UIViewController()
+                let wv = WKWebView(frame: vc.view.bounds)
+                wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                wv.navigationDelegate = self
+                wv.load(URLRequest(url: url))
+                vc.view.addSubview(wv)
+                vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.dismissWebView))
+                self.webViewViewController = vc
+
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .pageSheet
+
+                let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
+                window?.rootViewController?.present(nav, animated: true) {}
+
+                self.authorizeRedirectionHandler = { [weak self] url in
+                    vc.dismiss(animated: true)
+                    self?.unregisterCurrentWechatRedirectURI()
+                    self?.unregisterCurrentWebViewRedirectURI()
+                    self?.workerQueue.async {
+                        self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
+                    }
+                }
             case let .failure(error):
                 handler(.failure(error))
             }
@@ -556,6 +662,38 @@ public class Authgear: NSObject {
         return false
     }
 
+    private func registerCurrentWebViewRedirectURI(uri: String?) {
+        currentWebViewRedirectURI = uri
+    }
+
+    private func unregisterCurrentWebViewRedirectURI() {
+        currentWebViewRedirectURI = nil
+    }
+
+    private func handleRedirectURIForWebView(_ url: URL) -> Bool {
+        if currentWebViewRedirectURI == nil {
+            return false
+        }
+
+        guard var uc = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return false
+        }
+
+        // construct and compare url without query
+        uc.query = nil
+        uc.fragment = nil
+        guard let urlWithoutQuery = uc.string else {
+            return false
+        }
+
+        if urlWithoutQuery == currentWebViewRedirectURI {
+            authorizeRedirectionHandler(url)
+            return true
+        }
+
+        return false
+    }
+
     public func application(
         _ application: UIApplication,
         continue userActivity: NSUserActivity,
@@ -608,7 +746,8 @@ public class Authgear: NSObject {
             loginHint: loginHint,
             uiLocales: uiLocales,
             wechatRedirectURI: wechatRedirectURI,
-            page: page
+            page: page,
+            suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
         ), handler: handler)
     }
 
@@ -616,9 +755,13 @@ public class Authgear: NSObject {
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        let handler = self.withMainQueueHandler(handler)
-        self.workerQueue.async {
-            self.authorizeWithSession(options, handler: handler)
+        if self.shouldUseWebView() == true {
+            self.authorizeWithWKWebView(options, handler: handler)
+        } else {
+            let handler = self.withMainQueueHandler(handler)
+            self.workerQueue.async {
+                self.authorizeWithASWebAuthenticationSession(options, handler: handler)
+            }
         }
     }
 
@@ -661,10 +804,21 @@ public class Authgear: NSObject {
             return
         }
 
-        self.workerQueue.async {
-            self.reauthenticateWithSession(ReauthenticateOptions(
-                redirectURI: redirectURI, state: state, uiLocales: uiLocales, wechatRedirectURI: wechatRedirectURI, maxAge: maxAge
-            ), handler: handler)
+        let options = ReauthenticateOptions(
+            redirectURI: redirectURI,
+            state: state,
+            uiLocales: uiLocales,
+            wechatRedirectURI: wechatRedirectURI,
+            maxAge: maxAge,
+            suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
+        )
+
+        if self.shouldUseWebView() == true {
+            self.reauthenticateWithWKWebView(options, handler: handler)
+        } else {
+            self.workerQueue.async {
+                self.reauthenticateWithASWebAuthenticationSession(options, handler: handler)
+            }
         }
     }
 
@@ -769,7 +923,8 @@ public class Authgear: NSObject {
                         loginHint: loginHint,
                         uiLocales: uiLocales,
                         wechatRedirectURI: wechatRedirectURI,
-                        page: nil
+                        page: nil,
+                        suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -845,7 +1000,8 @@ public class Authgear: NSObject {
                     idTokenHint: nil,
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
-                    page: nil
+                    page: nil,
+                    suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
                 ), verifier: nil)
 
                 DispatchQueue.main.async {
@@ -891,6 +1047,18 @@ public class Authgear: NSObject {
         wechatRedirectURI: String? = nil
     ) {
         openUrl(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
+    }
+
+    private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
+        self.sessionType == SessionType.transient
+    }
+
+    private func shouldUseWebView() -> Bool {
+        self.sessionType == SessionType.app
+    }
+
+    private func shouldSuppressIDPSessionCookie() -> Bool {
+        self.sessionType == SessionType.transient
     }
 
     private func shouldRefreshAccessToken() -> Bool {
@@ -1156,6 +1324,12 @@ public class Authgear: NSObject {
 extension Authgear: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url {
+            let isRedirectURIForWebView = handleRedirectURIForWebView(url)
+            if isRedirectURIForWebView {
+                decisionHandler(.cancel)
+                return
+            }
+
             let isWechatRedirectURI = handleWechatRedirectURI(url)
             if isWechatRedirectURI {
                 decisionHandler(.cancel)

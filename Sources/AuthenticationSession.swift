@@ -16,6 +16,7 @@ class AuthenticationSessionProvider: NSObject {
     func makeAuthenticationSession(
         url: URL,
         callbackURLSchema: String,
+        prefersEphemeralWebBrowserSession: Bool?,
         completionHandler: @escaping AuthenticationSession.CompletionHandler
     ) -> AuthenticationSession {
         let handler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
@@ -46,6 +47,7 @@ class AuthenticationSessionProvider: NSObject {
             )
 
             if #available(iOS 13.0, *) {
+                session.prefersEphemeralWebBrowserSession = prefersEphemeralWebBrowserSession ?? false
                 session.presentationContextProvider = self
             }
 
