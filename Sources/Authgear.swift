@@ -285,7 +285,7 @@ public class Authgear: NSObject {
             let request = options.toRequest(idTokenHint: idTokenHint)
             let verifier = CodeVerifier()
             let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
-            let prefersEphemeralWebBrowserSession = self.sessionType == SessionType.transient
+            let prefersEphemeralWebBrowserSession = self.shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession()
 
             DispatchQueue.main.async {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
@@ -364,7 +364,7 @@ public class Authgear: NSObject {
         let verifier = CodeVerifier()
         let request = options.request
         let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
-        let prefersEphemeralWebBrowserSession = self.sessionType == SessionType.transient
+        let prefersEphemeralWebBrowserSession = self.shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession()
 
         DispatchQueue.main.async {
             switch url {
@@ -758,8 +758,7 @@ public class Authgear: NSObject {
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        let useWebView = self.sessionType == SessionType.app
-        if useWebView == true {
+        if self.shouldUseWebView() == true {
             self.authorizeWithWKWebView(options, handler: handler)
         } else {
             let handler = self.withMainQueueHandler(handler)
@@ -817,8 +816,7 @@ public class Authgear: NSObject {
             suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
         )
 
-        let useWebView = self.sessionType == SessionType.app
-        if useWebView == true {
+        if self.shouldUseWebView() == true {
             self.reauthenticateWithWKWebView(options, handler: handler)
         } else {
             self.workerQueue.async {
@@ -1052,6 +1050,14 @@ public class Authgear: NSObject {
         wechatRedirectURI: String? = nil
     ) {
         openUrl(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
+    }
+
+    private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
+        self.sessionType == SessionType.transient
+    }
+
+    private func shouldUseWebView() -> Bool {
+        self.sessionType == SessionType.app
     }
 
     private func shouldSuppressIDPSessionCookie() -> Bool {
