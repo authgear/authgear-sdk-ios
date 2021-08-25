@@ -18,6 +18,7 @@ struct AuthgearConfigurationInput<Input: View>: View {
             Text(label)
                 .minimumScaleFactor(0.8)
                 .frame(width: 150, height: nil, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
             input
         }
     }
@@ -50,7 +51,8 @@ struct AuthgearConfigurationForm: View {
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var page: String = UserDefaults.standard.string(forKey: "authgear.demo.page") ?? ""
-    @State private var sessionType: String = UserDefaults.standard.string(forKey: "authgear.demo.sessionType") ?? ""
+    @State private var storageType: String = UserDefaults.standard.string(forKey: "authgear.demo.storageType") ?? ""
+    @State private var shareSessionWithDeviceBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithDeviceBrowser") ?? false
 
     var body: some View {
         VStack {
@@ -76,18 +78,23 @@ struct AuthgearConfigurationForm: View {
                 )
             )
             AuthgearConfigurationInput(
-                label: "Session Type",
+                label: "Storage Type",
                 input: AuthgearConfigurationTextField(
-                    placeHolder: "'transient' / 'app' / 'device'",
-                    text: $sessionType
+                    placeHolder: "'transient' / 'app'",
+                    text: $storageType
                 )
+            )
+            AuthgearConfigurationInput(
+                label: "Share Session With Device Browser",
+                input: Toggle(isOn: $shareSessionWithDeviceBrowser) { EmptyView() }
             )
             Button(action: {
                 self.app.configure(
                     clientId: self.clientID,
                     endpoint: self.endpoint,
                     page: self.page,
-                    sessionType: self.sessionType
+                    storageType: self.storageType,
+                    shareSessionWithDeviceBrowser: self.shareSessionWithDeviceBrowser
                 )
             }) {
                 ActionButton(text: "Configure")

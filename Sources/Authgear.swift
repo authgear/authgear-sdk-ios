@@ -18,10 +18,9 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
-public enum SessionType: String {
+public enum StorageType: String {
     case transient
     case app
-    case device
 }
 
 struct AuthorizeOptions {
@@ -160,7 +159,8 @@ public class Authgear: NSObject {
     // refreshTokenStorage driver will be changed by config, it could be persistent or in memory
     var refreshTokenStorage: ContainerStorage
     let clientId: String
-    public let sessionType: SessionType
+    public let storageType: StorageType
+    public let shareSessionWithDeviceBrowser: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -216,15 +216,16 @@ public class Authgear: NSObject {
 
     static let globalMemoryStore: ContainerStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
 
-    public init(clientId: String, endpoint: String, sessionType: SessionType = SessionType.app, name: String? = nil) {
+    public init(clientId: String, endpoint: String, storageType: StorageType = StorageType.app, shareSessionWithDeviceBrowser: Bool = false, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
-        self.sessionType = sessionType
+        self.storageType = storageType
+        self.shareSessionWithDeviceBrowser = shareSessionWithDeviceBrowser
         let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.apiClient = client
 
         self.storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
-        if self.sessionType == SessionType.transient {
+        if self.storageType == StorageType.transient {
             self.refreshTokenStorage = Authgear.globalMemoryStore
         } else {
             self.refreshTokenStorage = self.storage
@@ -1050,15 +1051,15 @@ public class Authgear: NSObject {
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
-        self.sessionType == SessionType.transient
+        !self.shareSessionWithDeviceBrowser
     }
 
     private func shouldUseWebView() -> Bool {
-        self.sessionType == SessionType.app
+        false
     }
 
     private func shouldSuppressIDPSessionCookie() -> Bool {
-        self.sessionType == SessionType.transient
+        !self.shareSessionWithDeviceBrowser
     }
 
     private func shouldRefreshAccessToken() -> Bool {
