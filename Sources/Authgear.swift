@@ -9,7 +9,6 @@ public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -
 public typealias ReauthenticateCompletionHandler = (Result<ReauthenticateResult, Error>) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
-private typealias AuthorizeRedirectionHandler = (URL) -> Void
 
 public enum PromptOption: String {
     case none
@@ -209,9 +208,6 @@ public class Authgear: NSObject {
 
     public private(set) var sessionState: SessionState = .unknown
 
-    private var currentWebViewRedirectURI: String?
-    private var authorizeRedirectionHandler: AuthorizeRedirectionHandler = { _ in }
-
     public weak var delegate: AuthgearDelegate?
 
     static let globalMemoryStore: ContainerStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
@@ -310,51 +306,6 @@ public class Authgear: NSObject {
         }
     }
 
-    private func reauthenticateWithWKWebView(
-        _ options: ReauthenticateOptions,
-        handler: @escaping ReauthenticateCompletionHandler
-    ) {
-        do {
-            guard let idTokenHint = self.idTokenHint else {
-                throw AuthgearError.unauthenticatedUser
-            }
-            let request = options.toRequest(idTokenHint: idTokenHint)
-            let verifier = CodeVerifier()
-            let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
-
-            DispatchQueue.main.async {
-                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
-                self.registerCurrentWebViewRedirectURI(uri: options.redirectURI)
-
-                let vc = UIViewController()
-                let wv = WKWebView(frame: vc.view.bounds)
-                wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                wv.navigationDelegate = self
-                wv.load(URLRequest(url: url))
-                vc.view.addSubview(wv)
-                vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.dismissWebView))
-                self.webViewViewController = vc
-
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .pageSheet
-
-                let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
-                window?.rootViewController?.present(nav, animated: true) {}
-
-                self.authorizeRedirectionHandler = { [weak self] url in
-                    vc.dismiss(animated: true)
-                    self?.unregisterCurrentWechatRedirectURI()
-                    self?.unregisterCurrentWebViewRedirectURI()
-                    self?.workerQueue.async {
-                        self?.finishReauthentication(url: url, verifier: verifier, handler: handler)
-                    }
-                }
-            }
-        } catch {
-            handler(.failure(error))
-        }
-    }
-
     private func authorizeWithASWebAuthenticationSession(
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
@@ -385,49 +336,6 @@ public class Authgear: NSObject {
                     }
                 )
                 self.authenticationSession?.start()
-            case let .failure(error):
-                handler(.failure(error))
-            }
-        }
-    }
-
-    private func authorizeWithWKWebView(
-        _ options: AuthorizeOptions,
-        handler: @escaping AuthorizeCompletionHandler
-    ) {
-        let verifier = CodeVerifier()
-        let request = options.request
-        let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
-
-        DispatchQueue.main.async {
-            switch url {
-            case let .success(url):
-                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
-                self.registerCurrentWebViewRedirectURI(uri: options.redirectURI)
-
-                let vc = UIViewController()
-                let wv = WKWebView(frame: vc.view.bounds)
-                wv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                wv.navigationDelegate = self
-                wv.load(URLRequest(url: url))
-                vc.view.addSubview(wv)
-                vc.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.dismissWebView))
-                self.webViewViewController = vc
-
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .pageSheet
-
-                let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
-                window?.rootViewController?.present(nav, animated: true) {}
-
-                self.authorizeRedirectionHandler = { [weak self] url in
-                    vc.dismiss(animated: true)
-                    self?.unregisterCurrentWechatRedirectURI()
-                    self?.unregisterCurrentWebViewRedirectURI()
-                    self?.workerQueue.async {
-                        self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
-                    }
-                }
             case let .failure(error):
                 handler(.failure(error))
             }
@@ -663,38 +571,6 @@ public class Authgear: NSObject {
         return false
     }
 
-    private func registerCurrentWebViewRedirectURI(uri: String?) {
-        currentWebViewRedirectURI = uri
-    }
-
-    private func unregisterCurrentWebViewRedirectURI() {
-        currentWebViewRedirectURI = nil
-    }
-
-    private func handleRedirectURIForWebView(_ url: URL) -> Bool {
-        if currentWebViewRedirectURI == nil {
-            return false
-        }
-
-        guard var uc = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return false
-        }
-
-        // construct and compare url without query
-        uc.query = nil
-        uc.fragment = nil
-        guard let urlWithoutQuery = uc.string else {
-            return false
-        }
-
-        if urlWithoutQuery == currentWebViewRedirectURI {
-            authorizeRedirectionHandler(url)
-            return true
-        }
-
-        return false
-    }
-
     public func application(
         _ application: UIApplication,
         continue userActivity: NSUserActivity,
@@ -756,13 +632,9 @@ public class Authgear: NSObject {
         _ options: AuthorizeOptions,
         handler: @escaping AuthorizeCompletionHandler
     ) {
-        if self.shouldUseWebView() == true {
-            self.authorizeWithWKWebView(options, handler: handler)
-        } else {
-            let handler = self.withMainQueueHandler(handler)
-            self.workerQueue.async {
-                self.authorizeWithASWebAuthenticationSession(options, handler: handler)
-            }
+        let handler = self.withMainQueueHandler(handler)
+        self.workerQueue.async {
+            self.authorizeWithASWebAuthenticationSession(options, handler: handler)
         }
     }
 
@@ -814,12 +686,8 @@ public class Authgear: NSObject {
             suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
         )
 
-        if self.shouldUseWebView() == true {
-            self.reauthenticateWithWKWebView(options, handler: handler)
-        } else {
-            self.workerQueue.async {
-                self.reauthenticateWithASWebAuthenticationSession(options, handler: handler)
-            }
+        self.workerQueue.async {
+            self.reauthenticateWithASWebAuthenticationSession(options, handler: handler)
         }
     }
 
@@ -1052,10 +920,6 @@ public class Authgear: NSObject {
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
         !self.shareSessionWithDeviceBrowser
-    }
-
-    private func shouldUseWebView() -> Bool {
-        false
     }
 
     private func shouldSuppressIDPSessionCookie() -> Bool {
@@ -1325,12 +1189,6 @@ public class Authgear: NSObject {
 extension Authgear: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url {
-            let isRedirectURIForWebView = handleRedirectURIForWebView(url)
-            if isRedirectURIForWebView {
-                decisionHandler(.cancel)
-                return
-            }
-
             let isWechatRedirectURI = handleWechatRedirectURI(url)
             if isWechatRedirectURI {
                 decisionHandler(.cancel)
