@@ -838,7 +838,7 @@ public class Authgear: NSObject {
         }
     }
 
-    public func openUrl(
+    public func openURL(
         path: String,
         wechatRedirectURI: String? = nil,
         handler: VoidCompletionHandler? = nil
@@ -917,7 +917,7 @@ public class Authgear: NSObject {
         page: AuthgearPage,
         wechatRedirectURI: String? = nil
     ) {
-        openUrl(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
+        openURL(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
