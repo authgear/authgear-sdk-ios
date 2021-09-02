@@ -883,7 +883,7 @@ public class Authgear: NSObject {
                     self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
                     self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                         url: endpoint,
-                        // Opening an arbitrary does not have a clear goal.
+                        // Opening an arbitrary URL does not have a clear goal.
                         // So here we pass a placeholder callbackURL scheme.
                         callbackURLSchema: "nocallback",
                         // prefersEphemeralWebBrowserSession is true so that
@@ -897,7 +897,11 @@ public class Authgear: NSObject {
                                 // This branch is unreachable.
                                 handler?(.success(()))
                             case let .failure(error):
-                                handler?(.failure(error))
+                                if case AuthgearError.cancel = error {
+                                    handler?(.success(()))
+                                } else {
+                                    handler?(.failure(error))
+                                }
                             }
                         }
                     )
