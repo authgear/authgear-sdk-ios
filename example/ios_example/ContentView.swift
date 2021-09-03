@@ -52,7 +52,7 @@ struct AuthgearConfigurationForm: View {
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var page: String = UserDefaults.standard.string(forKey: "authgear.demo.page") ?? ""
     @State private var storageType: String = UserDefaults.standard.string(forKey: "authgear.demo.storageType") ?? ""
-    @State private var shareSessionWithDeviceBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithDeviceBrowser") ?? false
+    @State private var shareSessionWithSystemBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithSystemBrowser") ?? false
 
     var body: some View {
         VStack {
@@ -85,8 +85,8 @@ struct AuthgearConfigurationForm: View {
                 )
             )
             AuthgearConfigurationInput(
-                label: "Share Session With Device Browser",
-                input: Toggle(isOn: $shareSessionWithDeviceBrowser) { EmptyView() }
+                label: "Share Session With System Browser",
+                input: Toggle(isOn: $shareSessionWithSystemBrowser) { EmptyView() }
             )
             Button(action: {
                 self.app.configure(
@@ -94,7 +94,7 @@ struct AuthgearConfigurationForm: View {
                     endpoint: self.endpoint,
                     page: self.page,
                     storageType: self.storageType,
-                    shareSessionWithDeviceBrowser: self.shareSessionWithDeviceBrowser
+                    shareSessionWithSystemBrowser: self.shareSessionWithSystemBrowser
                 )
             }) {
                 ActionButton(text: "Configure")

@@ -159,7 +159,7 @@ public class Authgear: NSObject {
     var refreshTokenStorage: ContainerStorage
     let clientId: String
     public let storageType: StorageType
-    public let shareSessionWithDeviceBrowser: Bool
+    public let shareSessionWithSystemBrowser: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -211,11 +211,11 @@ public class Authgear: NSObject {
 
     static let globalMemoryStore: ContainerStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
 
-    public init(clientId: String, endpoint: String, storageType: StorageType = StorageType.app, shareSessionWithDeviceBrowser: Bool = false, name: String? = nil) {
+    public init(clientId: String, endpoint: String, storageType: StorageType = StorageType.app, shareSessionWithSystemBrowser: Bool = false, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.storageType = storageType
-        self.shareSessionWithDeviceBrowser = shareSessionWithDeviceBrowser
+        self.shareSessionWithSystemBrowser = shareSessionWithSystemBrowser
         let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.apiClient = client
 
@@ -921,11 +921,11 @@ public class Authgear: NSObject {
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
-        !self.shareSessionWithDeviceBrowser
+        !self.shareSessionWithSystemBrowser
     }
 
     private func shouldSuppressIDPSessionCookie() -> Bool {
-        !self.shareSessionWithDeviceBrowser
+        !self.shareSessionWithSystemBrowser
     }
 
     private func shouldRefreshAccessToken() -> Bool {

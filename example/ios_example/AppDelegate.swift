@@ -5,11 +5,11 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var appContainer = App()
 
-    func configureAuthgear(clientId: String, endpoint: String, storageType: String, shareSessionWithDeviceBrowser: Bool) {
+    func configureAuthgear(clientId: String, endpoint: String, storageType: String, shareSessionWithSystemBrowser: Bool) {
         if let st = StorageType(rawValue: storageType) {
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, storageType: st, shareSessionWithDeviceBrowser: shareSessionWithDeviceBrowser)
+            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, storageType: st, shareSessionWithSystemBrowser: shareSessionWithSystemBrowser)
         } else {
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, shareSessionWithDeviceBrowser: shareSessionWithDeviceBrowser)
+            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, shareSessionWithSystemBrowser: shareSessionWithSystemBrowser)
         }
         appContainer.container?.configure()
         appContainer.container?.delegate = self
