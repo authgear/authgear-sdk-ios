@@ -17,11 +17,6 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
-public enum StorageType: String {
-    case transient
-    case app
-}
-
 struct AuthorizeOptions {
     let redirectURI: String
     let state: String?
@@ -152,13 +147,12 @@ public class Authgear: NSObject {
      * @internal
      */
     private static let ExpireInPercentage = 0.9
+
     let name: String
+    let clientId: String
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
-    // refreshTokenStorage driver will be changed by config, it could be persistent or in memory
-    var refreshTokenStorage: ContainerStorage
-    let clientId: String
-    public let storageType: StorageType
+    var tokenStorage: TokenStorage
     public let shareSessionWithSystemBrowser: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
@@ -209,24 +203,14 @@ public class Authgear: NSObject {
 
     public weak var delegate: AuthgearDelegate?
 
-    static let globalMemoryStore: ContainerStorage = DefaultContainerStorage(storageDriver: MemoryStorageDriver())
-
-    public init(clientId: String, endpoint: String, storageType: StorageType = StorageType.app, shareSessionWithSystemBrowser: Bool = false, name: String? = nil) {
+    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), shareSessionWithSystemBrowser: Bool = false, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
-        self.storageType = storageType
+        self.tokenStorage = tokenStorage
+        self.storage = PersistentContainerStorage()
         self.shareSessionWithSystemBrowser = shareSessionWithSystemBrowser
-        let client = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
-        self.apiClient = client
-
-        self.storage = DefaultContainerStorage(storageDriver: KeychainStorageDriver())
-        if self.storageType == StorageType.transient {
-            self.refreshTokenStorage = Authgear.globalMemoryStore
-        } else {
-            self.refreshTokenStorage = self.storage
-        }
-        workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
-
+        self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
+        self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         super.init()
     }
 
@@ -234,7 +218,7 @@ public class Authgear: NSObject {
         handler: VoidCompletionHandler? = nil
     ) {
         workerQueue.async {
-            let refreshToken = Result { try self.refreshTokenStorage.getRefreshToken(namespace: self.name) }
+            let refreshToken = Result { try self.tokenStorage.getRefreshToken(namespace: self.name) }
             switch refreshToken {
             case let .success(token):
                 DispatchQueue.main.async {
@@ -479,7 +463,7 @@ public class Authgear: NSObject {
 
     private func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason) -> Result<Void, Error> {
         if let refreshToken = oidcTokenResponse.refreshToken {
-            let result = Result { try self.refreshTokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
+            let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
             guard case .success = result else {
                 return result
             }
@@ -500,7 +484,7 @@ public class Authgear: NSObject {
     }
 
     private func cleanupSession(force: Bool, reason: SessionStateChangeReason) -> Result<Void, Error> {
-        if case let .failure(error) = Result(catching: { try refreshTokenStorage.delRefreshToken(namespace: name) }) {
+        if case let .failure(error) = Result(catching: { try tokenStorage.delRefreshToken(namespace: name) }) {
             if !force {
                 return .failure(error)
             }
@@ -821,7 +805,7 @@ public class Authgear: NSObject {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
             do {
-                let token = try self.refreshTokenStorage.getRefreshToken(
+                let token = try self.tokenStorage.getRefreshToken(
                     namespace: self.name
                 )
                 try self.apiClient.syncRequestOIDCRevocation(
@@ -848,7 +832,7 @@ public class Authgear: NSObject {
 
         workerQueue.async {
             do {
-                guard let refreshToken = try self.refreshTokenStorage.getRefreshToken(namespace: self.name) else {
+                guard let refreshToken = try self.tokenStorage.getRefreshToken(namespace: self.name) else {
                     handler?(.failure(AuthgearError.unauthenticatedUser))
                     return
                 }
@@ -949,7 +933,7 @@ public class Authgear: NSObject {
         let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
             do {
-                guard let refreshToken = try self.refreshTokenStorage.getRefreshToken(namespace: self.name) else {
+                guard let refreshToken = try self.tokenStorage.getRefreshToken(namespace: self.name) else {
                     let result = self.cleanupSession(force: true, reason: .noToken)
                     handler?(result)
                     return

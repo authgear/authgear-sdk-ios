@@ -1,99 +1,108 @@
 import Foundation
 import Security
 
-protocol ContainerStorage {
+public protocol TokenStorage {
     func setRefreshToken(namespace: String, token: String) throws
-    func setAnonymousKeyId(namespace: String, kid: String) throws
-    func setBiometricKeyId(namespace: String, kid: String) throws
-
     func getRefreshToken(namespace: String) throws -> String?
-    func getAnonymousKeyId(namespace: String) throws -> String?
-    func getBiometricKeyId(namespace: String) throws -> String?
-
     func delRefreshToken(namespace: String) throws
+}
+
+protocol ContainerStorage {
+    func setAnonymousKeyId(namespace: String, kid: String) throws
+    func getAnonymousKeyId(namespace: String) throws -> String?
     func delAnonymousKeyId(namespace: String) throws
+
+    func setBiometricKeyId(namespace: String, kid: String) throws
+    func getBiometricKeyId(namespace: String) throws -> String?
     func delBiometricKeyId(namespace: String) throws
 }
 
-protocol StorageDriver {
-    func get(key: String) throws -> String?
-    func set(key: String, value: String) throws
-    func del(key: String) throws
-}
+public class TransientTokenStorage: TokenStorage {
+    private let driver = MemoryStorageDriver()
+    private let keyMaker = KeyMaker()
 
-protocol HasStorageDriver {
-    var storageDriver: StorageDriver { get }
-}
+    public init() {}
 
-protocol StorageKeyConvertible {
-    func keyRefreshToken(namespace: String) -> String
-    func keyAnonymousKeyId(namespace: String) -> String
-    func keyBiometricKeyId(namespace: String) -> String
-}
-
-extension ContainerStorage where Self: HasStorageDriver & StorageKeyConvertible {
-    func setRefreshToken(namespace: String, token: String) throws {
-        try storageDriver.set(key: keyRefreshToken(namespace: namespace), value: token)
+    public func setRefreshToken(namespace: String, token: String) throws {
+        try self.driver.set(key: self.keyMaker.keyRefreshToken(namespace: namespace), value: token)
     }
 
+    public func getRefreshToken(namespace: String) throws -> String? {
+        try self.driver.get(key: self.keyMaker.keyRefreshToken(namespace: namespace))
+    }
+
+    public func delRefreshToken(namespace: String) throws {
+        try self.driver.del(key: self.keyMaker.keyRefreshToken(namespace: namespace))
+    }
+}
+
+public class PersistentTokenStorage: TokenStorage {
+    private let driver = KeychainStorageDriver()
+    private let keyMaker = KeyMaker()
+
+    public init() {}
+
+    public func setRefreshToken(namespace: String, token: String) throws {
+        try self.driver.set(key: self.keyMaker.keyRefreshToken(namespace: namespace), value: token)
+    }
+
+    public func getRefreshToken(namespace: String) throws -> String? {
+        try self.driver.get(key: self.keyMaker.keyRefreshToken(namespace: namespace))
+    }
+
+    public func delRefreshToken(namespace: String) throws {
+        try self.driver.del(key: self.keyMaker.keyRefreshToken(namespace: namespace))
+    }
+}
+
+class PersistentContainerStorage: ContainerStorage {
+    private let driver = KeychainStorageDriver()
+    private let keyMaker = KeyMaker()
+
     func setAnonymousKeyId(namespace: String, kid: String) throws {
-        try storageDriver.set(key: keyAnonymousKeyId(namespace: namespace), value: kid)
+        try self.driver.set(key: self.keyMaker.keyAnonymousKeyId(namespace: namespace), value: kid)
     }
 
     func setBiometricKeyId(namespace: String, kid: String) throws {
-        try storageDriver.set(key: keyBiometricKeyId(namespace: namespace), value: kid)
-    }
-
-    func getRefreshToken(namespace: String) throws -> String? {
-        try storageDriver.get(key: keyRefreshToken(namespace: namespace))
+        try self.driver.set(key: self.keyMaker.keyBiometricKeyId(namespace: namespace), value: kid)
     }
 
     func getAnonymousKeyId(namespace: String) throws -> String? {
-        try storageDriver.get(key: keyAnonymousKeyId(namespace: namespace))
+        try self.driver.get(key: self.keyMaker.keyAnonymousKeyId(namespace: namespace))
     }
 
     func getBiometricKeyId(namespace: String) throws -> String? {
-        try storageDriver.get(key: keyBiometricKeyId(namespace: namespace))
-    }
-
-    func delRefreshToken(namespace: String) throws {
-        try storageDriver.del(key: keyRefreshToken(namespace: namespace))
+        try self.driver.get(key: self.keyMaker.keyBiometricKeyId(namespace: namespace))
     }
 
     func delAnonymousKeyId(namespace: String) throws {
-        try storageDriver.del(key: keyAnonymousKeyId(namespace: namespace))
+        try self.driver.del(key: self.keyMaker.keyAnonymousKeyId(namespace: namespace))
     }
 
     func delBiometricKeyId(namespace: String) throws {
-        try storageDriver.del(key: keyBiometricKeyId(namespace: namespace))
+        try self.driver.del(key: self.keyMaker.keyBiometricKeyId(namespace: namespace))
     }
 }
 
-class DefaultContainerStorage: ContainerStorage, HasStorageDriver, StorageKeyConvertible {
-    let storageDriver: StorageDriver
-
-    init(storageDriver: StorageDriver) {
-        self.storageDriver = storageDriver
-    }
-
-    private func scopedKey(_ key: String) -> String {
+class KeyMaker {
+    func scopedKey(_ key: String) -> String {
         "authgear_\(key)"
     }
 
-    public func keyRefreshToken(namespace: String) -> String {
+    func keyRefreshToken(namespace: String) -> String {
         scopedKey("\(namespace)_refreshToken")
     }
 
-    public func keyAnonymousKeyId(namespace: String) -> String {
+    func keyAnonymousKeyId(namespace: String) -> String {
         scopedKey("\(namespace)_anonymousKeyID")
     }
 
-    public func keyBiometricKeyId(namespace: String) -> String {
+    func keyBiometricKeyId(namespace: String) -> String {
         scopedKey("\(namespace)_biometricKeyID")
     }
 }
 
-class MemoryStorageDriver: StorageDriver {
+class MemoryStorageDriver {
     private var backingStorage = [String: String]()
 
     func get(key: String) throws -> String? {
@@ -109,7 +118,7 @@ class MemoryStorageDriver: StorageDriver {
     }
 }
 
-class KeychainStorageDriver: StorageDriver {
+class KeychainStorageDriver {
     func get(key: String) throws -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
