@@ -21,7 +21,7 @@ class App: ObservableObject {
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
 
-    func configure(clientId: String, endpoint: String, page: String, storageType: String, shareSessionWithDeviceBrowser: Bool) {
+    func configure(clientId: String, endpoint: String, page: String, tokenStorage: String, shareSessionWithSystemBrowser: Bool) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -33,9 +33,9 @@ class App: ObservableObject {
         UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
         UserDefaults.standard.set(page, forKey: "authgear.demo.page")
-        UserDefaults.standard.set(storageType, forKey: "authgear.demo.storageType")
-        UserDefaults.standard.set(shareSessionWithDeviceBrowser, forKey: "authgear.demo.shareSessionWithDeviceBrowser")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, storageType: storageType, shareSessionWithDeviceBrowser: shareSessionWithDeviceBrowser)
+        UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
+        UserDefaults.standard.set(shareSessionWithSystemBrowser, forKey: "authgear.demo.shareSessionWithSystemBrowser")
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, shareSessionWithSystemBrowser: shareSessionWithSystemBrowser)
         successAlertMessage = "Configured Authgear successfully"
         self.page = page
         self.updateBiometricState()

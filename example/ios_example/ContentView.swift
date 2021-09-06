@@ -45,14 +45,21 @@ struct ActionButton: View {
     }
 }
 
+enum TokenStorageClassName: String, CaseIterable, Identifiable {
+    case TransientTokenStorage
+    case PersistentTokenStorage
+
+    var id: String { self.rawValue }
+}
+
 struct AuthgearConfigurationForm: View {
     @EnvironmentObject private var app: App
 
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var page: String = UserDefaults.standard.string(forKey: "authgear.demo.page") ?? ""
-    @State private var storageType: String = UserDefaults.standard.string(forKey: "authgear.demo.storageType") ?? ""
-    @State private var shareSessionWithDeviceBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithDeviceBrowser") ?? false
+    @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
+    @State private var shareSessionWithSystemBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithSystemBrowser") ?? false
 
     var body: some View {
         VStack {
@@ -77,24 +84,21 @@ struct AuthgearConfigurationForm: View {
                     text: $page
                 )
             )
+            Picker("Token Storage", selection: $tokenStorage) {
+                Text(TokenStorageClassName.TransientTokenStorage.rawValue).tag(TokenStorageClassName.TransientTokenStorage.rawValue)
+                Text(TokenStorageClassName.PersistentTokenStorage.rawValue).tag(TokenStorageClassName.PersistentTokenStorage.rawValue)
+            }.pickerStyle(SegmentedPickerStyle())
             AuthgearConfigurationInput(
-                label: "Storage Type",
-                input: AuthgearConfigurationTextField(
-                    placeHolder: "'transient' / 'app'",
-                    text: $storageType
-                )
-            )
-            AuthgearConfigurationInput(
-                label: "Share Session With Device Browser",
-                input: Toggle(isOn: $shareSessionWithDeviceBrowser) { EmptyView() }
+                label: "Share Session With System Browser",
+                input: Toggle(isOn: $shareSessionWithSystemBrowser) { EmptyView() }
             )
             Button(action: {
                 self.app.configure(
                     clientId: self.clientID,
                     endpoint: self.endpoint,
                     page: self.page,
-                    storageType: self.storageType,
-                    shareSessionWithDeviceBrowser: self.shareSessionWithDeviceBrowser
+                    tokenStorage: self.tokenStorage,
+                    shareSessionWithSystemBrowser: self.shareSessionWithSystemBrowser
                 )
             }) {
                 ActionButton(text: "Configure")
