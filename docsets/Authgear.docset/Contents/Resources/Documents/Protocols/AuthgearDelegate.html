@@ -17,7 +17,7 @@
     <a title="AuthgearDelegate Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear 0.0.1 Docs</a> (4% documented)</p>
+        <p><a href="../index.html">Authgear 0.0.1 Docs</a> (3% documented)</p>
         <p class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -41,22 +41,28 @@
               <li class="nav-group-task">
                 <a href="../Classes/Authgear.html">Authgear</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Classes/PersistentTokenStorage.html">PersistentTokenStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransientTokenStorage.html">TransientTokenStorage</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Enums/AuthAPIClientError.html">AuthAPIClientError</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Enums/AuthenticationSessionError.html">AuthenticationSessionError</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="../Enums/AuthgearError.html">AuthgearError</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/AuthgearPage.html">AuthgearPage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/BiometricAccessConstraint.html">BiometricAccessConstraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/PromptOption.html">PromptOption</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/SessionState.html">SessionState</a>
@@ -72,6 +78,9 @@
               <li class="nav-group-task">
                 <a href="../Protocols/AuthgearDelegate.html">AuthgearDelegate</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TokenStorage.html">TokenStorage</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -81,7 +90,10 @@
                 <a href="../Structs/AuthorizeResult.html">AuthorizeResult</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Structs.html#/s:8Authgear9OIDCErrorV">OIDCError</a>
+                <a href="../Structs.html#/s:8Authgear10OAuthErrorV">OAuthError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/ReauthenticateResult.html">ReauthenticateResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/ServerError.html">ServerError</a>
@@ -98,7 +110,7 @@
                 <a href="../Typealiases.html#/s:8Authgear26AuthorizeCompletionHandlera">AuthorizeCompletionHandler</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:8Authgear27AuthorizeRedirectionHandlera">AuthorizeRedirectionHandler</a>
+                <a href="../Typealiases.html#/s:8Authgear31ReauthenticateCompletionHandlera">ReauthenticateCompletionHandler</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a>
@@ -130,10 +142,13 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A8DelegateP29authgearRefreshTokenDidExpireyyA2ACF"></a>
-                    <a name="//apple_ref/swift/Method/authgearRefreshTokenDidExpire(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A8DelegateP29authgearRefreshTokenDidExpireyyA2ACF">authgearRefreshTokenDidExpire(_:<wbr>)</a>
+                    <a name="/s:8Authgear0A8DelegateP29authgearSessionStateDidChange_6reasonyA2AC_AA0deG6ReasonOtF"></a>
+                    <a name="//apple_ref/swift/Method/authgearSessionStateDidChange(_:reason:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A8DelegateP29authgearSessionStateDidChange_6reasonyA2AC_AA0deG6ReasonOtF">authgearSessionStateDidChange(_:<wbr>reason:<wbr>)</a>
                     </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
                   </div>
                   <div class="height-container">
                     <div class="pointer-container"></div>
@@ -143,30 +158,8 @@
                         <p>Undocumented</p>
 
                       </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">authgearRefreshTokenDidExpire</span><span class="p">(</span><span class="n">_</span> <span class="nv">container</span><span class="p">:</span> <span class="kt"><a href="../Classes/Authgear.html">Authgear</a></span><span class="p">)</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:8Authgear0A8DelegateP29authgearSessionStateDidChange_6reasonyA2AC_AA0deG6ReasonOtF"></a>
-                    <a name="//apple_ref/swift/Method/authgearSessionStateDidChange(_:reason:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A8DelegateP29authgearSessionStateDidChange_6reasonyA2AC_AA0deG6ReasonOtF">authgearSessionStateDidChange(_:<wbr>reason:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
                         <p>Undocumented</p>
 
                       </div>
@@ -181,13 +174,48 @@
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A8DelegateP21sendWechatAuthRequestyySSF"></a>
+                    <a name="//apple_ref/swift/Method/sendWechatAuthRequest(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A8DelegateP21sendWechatAuthRequestyySSF">sendWechatAuthRequest(_:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">sendWechatAuthRequest</span><span class="p">(</span><span class="n">_</span> <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2020 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external">Authgear</a>. All rights reserved. (Last updated: 2020-11-19)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.5</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2021 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="noopener" rel="external">Authgear</a>. All rights reserved. (Last updated: 2021-09-08)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="noopener" rel="external">jazzy ♪♫ v0.14.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="noopener" rel="external">Realm</a> project.</p>
         </section>
       </article>
     </div>

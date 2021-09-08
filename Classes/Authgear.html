@@ -17,7 +17,7 @@
     <a title="Authgear Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear 0.0.1 Docs</a> (4% documented)</p>
+        <p><a href="../index.html">Authgear 0.0.1 Docs</a> (3% documented)</p>
         <p class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -41,22 +41,28 @@
               <li class="nav-group-task">
                 <a href="../Classes/Authgear.html">Authgear</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Classes/PersistentTokenStorage.html">PersistentTokenStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransientTokenStorage.html">TransientTokenStorage</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Enums/AuthAPIClientError.html">AuthAPIClientError</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Enums/AuthenticationSessionError.html">AuthenticationSessionError</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="../Enums/AuthgearError.html">AuthgearError</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/AuthgearPage.html">AuthgearPage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/BiometricAccessConstraint.html">BiometricAccessConstraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/PromptOption.html">PromptOption</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/SessionState.html">SessionState</a>
@@ -72,6 +78,9 @@
               <li class="nav-group-task">
                 <a href="../Protocols/AuthgearDelegate.html">AuthgearDelegate</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TokenStorage.html">TokenStorage</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -81,7 +90,10 @@
                 <a href="../Structs/AuthorizeResult.html">AuthorizeResult</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Structs.html#/s:8Authgear9OIDCErrorV">OIDCError</a>
+                <a href="../Structs.html#/s:8Authgear10OAuthErrorV">OAuthError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/ReauthenticateResult.html">ReauthenticateResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/ServerError.html">ServerError</a>
@@ -98,7 +110,7 @@
                 <a href="../Typealiases.html#/s:8Authgear26AuthorizeCompletionHandlera">AuthorizeCompletionHandler</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:8Authgear27AuthorizeRedirectionHandlera">AuthorizeRedirectionHandler</a>
+                <a href="../Typealiases.html#/s:8Authgear31ReauthenticateCompletionHandlera">ReauthenticateCompletionHandler</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a>
@@ -117,7 +129,7 @@
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">Authgear</span> <span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">SFSafariViewControllerDelegate</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">Authgear</span> <span class="p">:</span> <span class="kt">NSObject</span></code></pre>
 
                 </div>
               </div>
@@ -127,6 +139,33 @@
           <section class="section task-group-section">
             <div class="task-group">
               <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC29shareSessionWithSystemBrowserSbvp"></a>
+                    <a name="//apple_ref/swift/Property/shareSessionWithSystemBrowser" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC29shareSessionWithSystemBrowserSbvp">shareSessionWithSystemBrowser</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">shareSessionWithSystemBrowser</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
                 <li class="item">
                   <div>
                     <code>
@@ -147,7 +186,88 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">accessToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">accessToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC11idTokenHintSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/idTokenHint" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC11idTokenHintSSSgvp">idTokenHint</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">idTokenHint</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC17canReauthenticateSbvp"></a>
+                    <a name="//apple_ref/swift/Property/canReauthenticate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC17canReauthenticateSbvp">canReauthenticate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">canReauthenticate</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC8authTime10Foundation4DateVSgvp"></a>
+                    <a name="//apple_ref/swift/Property/authTime" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC8authTime10Foundation4DateVSgvp">authTime</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">authTime</span><span class="p">:</span> <span class="kt">Date</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
 
                         </div>
                       </div>
@@ -174,34 +294,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">sessionState</span><span class="p">:</span> <span class="kt"><a href="../Enums/SessionState.html">SessionState</a></span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:8AuthgearAAC27authorizeRedirectionHandlery10Foundation3URLVcSgvp"></a>
-                    <a name="//apple_ref/swift/Property/authorizeRedirectionHandler" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC27authorizeRedirectionHandlery10Foundation3URLVcSgvp">authorizeRedirectionHandler</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">authorizeRedirectionHandler</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear27AuthorizeRedirectionHandlera">AuthorizeRedirectionHandler</a></span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">sessionState</span><span class="p">:</span> <span class="kt"><a href="../Enums/SessionState.html">SessionState</a></span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
 
                         </div>
                       </div>
@@ -238,9 +331,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC8clientId8endpoint4nameABSS_S2SSgtcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(clientId:endpoint:name:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC8clientId8endpoint4nameABSS_S2SSgtcfc">init(clientId:<wbr>endpoint:<wbr>name:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC8clientId8endpoint12tokenStorage29shareSessionWithSystemBrowser4nameABSS_SSAA05TokenF0_pSbSSSgtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(clientId:endpoint:tokenStorage:shareSessionWithSystemBrowser:name:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC8clientId8endpoint12tokenStorage29shareSessionWithSystemBrowser4nameABSS_SSAA05TokenF0_pSbSSSgtcfc">init(clientId:<wbr>endpoint:<wbr>tokenStorage:<wbr>shareSessionWithSystemBrowser:<wbr>name:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -255,7 +348,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">endpoint</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">clientId</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">endpoint</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">tokenStorage</span><span class="p">:</span> <span class="kt"><a href="../Protocols/TokenStorage.html">TokenStorage</a></span> <span class="o">=</span> <span class="kt"><a href="../Classes/PersistentTokenStorage.html">PersistentTokenStorage</a></span><span class="p">(),</span> <span class="nv">shareSessionWithSystemBrowser</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -265,9 +358,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC9configure22skipRefreshAccessToken7handlerySb_ys6ResultOyyts5Error_pGcSgtF"></a>
-                    <a name="//apple_ref/swift/Method/configure(skipRefreshAccessToken:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC9configure22skipRefreshAccessToken7handlerySb_ys6ResultOyyts5Error_pGcSgtF">configure(skipRefreshAccessToken:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC9configure7handleryys6ResultOyyts5Error_pGcSg_tF"></a>
+                    <a name="//apple_ref/swift/Method/configure(handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC9configure7handleryys6ResultOyyts5Error_pGcSg_tF">configure(handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -283,7 +376,6 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">configure</span><span class="p">(</span>
-    <span class="nv">skipRefreshAccessToken</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
 <span class="p">)</span></code></pre>
 
@@ -295,9 +387,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:@M@Authgear@objc(cs)Authgear(im)safariViewControllerDidFinish:"></a>
-                    <a name="//apple_ref/swift/Method/safariViewControllerDidFinish(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@Authgear@objc(cs)Authgear(im)safariViewControllerDidFinish:">safariViewControllerDidFinish(_:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC11application_8continue18restorationHandlerSbSo13UIApplicationC_So14NSUserActivityCySaySo06UIUserH9Restoring_pGSgctF"></a>
+                    <a name="//apple_ref/swift/Method/application(_:continue:restorationHandler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC11application_8continue18restorationHandlerSbSo13UIApplicationC_So14NSUserActivityCySaySo06UIUserH9Restoring_pGSgctF">application(_:<wbr>continue:<wbr>restorationHandler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -312,7 +404,11 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">safariViewControllerDidFinish</span><span class="p">(</span><span class="n">_</span> <span class="nv">controller</span><span class="p">:</span> <span class="kt">SFSafariViewController</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span>
+    <span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span>
+    <span class="k">continue</span> <span class="nv">userActivity</span><span class="p">:</span> <span class="kt">NSUserActivity</span><span class="p">,</span>
+    <span class="nv">restorationHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">([</span><span class="kt">UIUserActivityRestoring</span><span class="p">]?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -322,9 +418,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC11application_4open7optionsSbSo13UIApplicationC_10Foundation3URLVSDySo0E17OpenURLOptionsKeyaypGtF"></a>
-                    <a name="//apple_ref/swift/Method/application(_:open:options:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC11application_4open7optionsSbSo13UIApplicationC_10Foundation3URLVSDySo0E17OpenURLOptionsKeyaypGtF">application(_:<wbr>open:<wbr>options:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC5scene_8continueySo7UISceneC_So14NSUserActivityCtF"></a>
+                    <a name="//apple_ref/swift/Method/scene(_:continue:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC5scene_8continueySo7UISceneC_So14NSUserActivityCtF">scene(_:<wbr>continue:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -339,7 +435,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">app</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="kd">open</span> <span class="nv">url</span><span class="p">:</span> <span class="kt">URL</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">OpenURLOptionsKey</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[:])</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">scene</span><span class="p">(</span><span class="n">_</span> <span class="nv">scene</span><span class="p">:</span> <span class="kt">UIScene</span><span class="p">,</span> <span class="k">continue</span> <span class="nv">userActivity</span><span class="p">:</span> <span class="kt">NSUserActivity</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -349,9 +445,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC9authorize11redirectURI5state6prompt9loginHint9uiLocales29prefersSFSafariViewController7handlerySS_SSSgA2KSaySSGSgSbys6ResultOyAA09AuthorizeP0Vs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/authorize(redirectURI:state:prompt:loginHint:uiLocales:prefersSFSafariViewController:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC9authorize11redirectURI5state6prompt9loginHint9uiLocales29prefersSFSafariViewController7handlerySS_SSSgA2KSaySSGSgSbys6ResultOyAA09AuthorizeP0Vs5Error_pGctF">authorize(redirectURI:<wbr>state:<wbr>prompt:<wbr>loginHint:<wbr>uiLocales:<wbr>prefersSFSafariViewController:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC9authorize11redirectURI5state6prompt9loginHint9uiLocales014wechatRedirectD04page7handlerySS_SSSgSayAA12PromptOptionOGSgALSaySSGSgA2Lys6ResultOyAA09AuthorizeQ0Vs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/authorize(redirectURI:state:prompt:loginHint:uiLocales:wechatRedirectURI:page:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC9authorize11redirectURI5state6prompt9loginHint9uiLocales014wechatRedirectD04page7handlerySS_SSSgSayAA12PromptOptionOGSgALSaySSGSgA2Lys6ResultOyAA09AuthorizeQ0Vs5Error_pGctF">authorize(redirectURI:<wbr>state:<wbr>prompt:<wbr>loginHint:<wbr>uiLocales:<wbr>wechatRedirectURI:<wbr>page:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -359,7 +455,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Authorize a user by directing the user to Authgear with ASWebAuthenticationSession.</p>
 
                       </div>
                       <div class="declaration">
@@ -369,11 +465,150 @@
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authorize</span><span class="p">(</span>
     <span class="nv">redirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
     <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-    <span class="nv">prompt</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="s">"login"</span><span class="p">,</span>
+    <span class="nv">prompt</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Enums/PromptOption.html">PromptOption</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">loginHint</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">uiLocales</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-    <span class="nv">prefersSFSafariViewController</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nv">wechatRedirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">page</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear26AuthorizeCompletionHandlera">AuthorizeCompletionHandler</a></span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>redirectURI</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Redirect uri. Redirection URI to which the response will be sent after authorization.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>state</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>OAuth 2.0 state value.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>prompt</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Prompt parameter will be used for Authgear authorization, it will also be forwarded to the underlying SSO providers. For Authgear, currently, only login is supported, other unsupported values will be ignored. For the underlying SSO providers, some providers only support a single value rather than a list. The first supported value will be used for that case. e.g. Azure Active Directory.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>loginHint</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>OIDC login hint parameter</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>uiLocales</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>UI locale tags</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>wechatRedirectURI</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The wechatRedirectURI will be called when user click the login with WeChat button</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>page</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Initial page to open. Valid values are &lsquo;login&rsquo; and &lsquo;signup&rsquo;.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>handler</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Authorize completion handler</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC14reauthenticate11redirectURI5state9uiLocales014wechatRedirectD06maxAge18skipUsingBiometric7handlerySS_SSSgSaySSGSgAKSiSgSbSgys6ResultOyAA014ReauthenticateP0Vs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/reauthenticate(redirectURI:state:uiLocales:wechatRedirectURI:maxAge:skipUsingBiometric:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC14reauthenticate11redirectURI5state9uiLocales014wechatRedirectD06maxAge18skipUsingBiometric7handlerySS_SSSgSaySSGSgAKSiSgSbSgys6ResultOyAA014ReauthenticateP0Vs5Error_pGctF">reauthenticate(redirectURI:<wbr>state:<wbr>uiLocales:<wbr>wechatRedirectURI:<wbr>maxAge:<wbr>skipUsingBiometric:<wbr>handler:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">reauthenticate</span><span class="p">(</span>
+    <span class="nv">redirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+    <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">uiLocales</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">wechatRedirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">maxAge</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">skipUsingBiometric</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear31ReauthenticateCompletionHandlera">ReauthenticateCompletionHandler</a></span>
 <span class="p">)</span></code></pre>
 
                         </div>
@@ -413,9 +648,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC20promoteAnonymousUser11redirectURI5state9uiLocales29prefersSFSafariViewController7handlerySS_SSSgSaySSGSgSbys6ResultOyAA09AuthorizeO0Vs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/promoteAnonymousUser(redirectURI:state:uiLocales:prefersSFSafariViewController:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC20promoteAnonymousUser11redirectURI5state9uiLocales29prefersSFSafariViewController7handlerySS_SSSgSaySSGSgSbys6ResultOyAA09AuthorizeO0Vs5Error_pGctF">promoteAnonymousUser(redirectURI:<wbr>state:<wbr>uiLocales:<wbr>prefersSFSafariViewController:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC20promoteAnonymousUser11redirectURI5state9uiLocales014wechatRedirectF07handlerySS_SSSgSaySSGSgAIys6ResultOyAA09AuthorizeM0Vs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/promoteAnonymousUser(redirectURI:state:uiLocales:wechatRedirectURI:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC20promoteAnonymousUser11redirectURI5state9uiLocales014wechatRedirectF07handlerySS_SSSgSaySSGSgAIys6ResultOyAA09AuthorizeM0Vs5Error_pGctF">promoteAnonymousUser(redirectURI:<wbr>state:<wbr>uiLocales:<wbr>wechatRedirectURI:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -434,7 +669,7 @@
     <span class="nv">redirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
     <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">uiLocales</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-    <span class="nv">prefersSFSafariViewController</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nv">wechatRedirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear26AuthorizeCompletionHandlera">AuthorizeCompletionHandler</a></span>
 <span class="p">)</span></code></pre>
 
@@ -477,9 +712,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC7openUrl4path7handlerySS_ys6ResultOyyts5Error_pGcSgtF"></a>
-                    <a name="//apple_ref/swift/Method/openUrl(path:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC7openUrl4path7handlerySS_ys6ResultOyyts5Error_pGcSgtF">openUrl(path:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC7openURL4path17wechatRedirectURI7handlerySS_SSSgys6ResultOyyts5Error_pGcSgtF"></a>
+                    <a name="//apple_ref/swift/Method/openURL(path:wechatRedirectURI:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC7openURL4path17wechatRedirectURI7handlerySS_SSSgys6ResultOyyts5Error_pGcSgtF">openURL(path:<wbr>wechatRedirectURI:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -494,8 +729,9 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">openUrl</span><span class="p">(</span>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">openURL</span><span class="p">(</span>
     <span class="nv">path</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+    <span class="nv">wechatRedirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
 <span class="p">)</span></code></pre>
 
@@ -507,9 +743,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC4open4pageyAA0A4PageO_tF"></a>
-                    <a name="//apple_ref/swift/Method/open(page:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC4open4pageyAA0A4PageO_tF">open(page:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC4open4page17wechatRedirectURIyAA0A4PageO_SSSgtF"></a>
+                    <a name="//apple_ref/swift/Method/open(page:wechatRedirectURI:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC4open4page17wechatRedirectURIyAA0A4PageO_SSSgtF">open(page:<wbr>wechatRedirectURI:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -524,7 +760,10 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">open</span><span class="p">(</span><span class="nv">page</span><span class="p">:</span> <span class="kt"><a href="../Enums/AuthgearPage.html">AuthgearPage</a></span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">open</span><span class="p">(</span>
+    <span class="nv">page</span><span class="p">:</span> <span class="kt"><a href="../Enums/AuthgearPage.html">AuthgearPage</a></span><span class="p">,</span>
+    <span class="nv">wechatRedirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
+<span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -534,9 +773,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC24shouldRefreshAccessTokenSbyF"></a>
-                    <a name="//apple_ref/swift/Method/shouldRefreshAccessToken()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC24shouldRefreshAccessTokenSbyF">shouldRefreshAccessToken()</a>
+                    <a name="/s:8AuthgearAAC26refreshAccessTokenIfNeeded7handleryys6ResultOyyts5Error_pGc_tF"></a>
+                    <a name="//apple_ref/swift/Method/refreshAccessTokenIfNeeded(handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC26refreshAccessTokenIfNeeded7handleryys6ResultOyyts5Error_pGc_tF">refreshAccessTokenIfNeeded(handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -551,7 +790,9 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">shouldRefreshAccessToken</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">refreshAccessTokenIfNeeded</span><span class="p">(</span>
+    <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span>
+<span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -561,9 +802,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC18refreshAccessToken7handleryys6ResultOyyts5Error_pGcSg_tF"></a>
-                    <a name="//apple_ref/swift/Method/refreshAccessToken(handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC18refreshAccessToken7handleryys6ResultOyyts5Error_pGcSg_tF">refreshAccessToken(handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC17clearSessionState7handleryys6ResultOyyts5Error_pGc_tF"></a>
+                    <a name="//apple_ref/swift/Method/clearSessionState(handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC17clearSessionState7handleryys6ResultOyyts5Error_pGc_tF">clearSessionState(handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -578,7 +819,9 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">refreshAccessToken</span><span class="p">(</span><span class="nv">handler</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">clearSessionState</span><span class="p">(</span>
+    <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span>
+<span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -612,13 +855,202 @@
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC14refreshIDToken7handleryys6ResultOyyts5Error_pGc_tF"></a>
+                    <a name="//apple_ref/swift/Method/refreshIDToken(handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC14refreshIDToken7handleryys6ResultOyyts5Error_pGc_tF">refreshIDToken(handler:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">refreshIDToken</span><span class="p">(</span><span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC18wechatAuthCallback4code5state7handlerySS_SSys6ResultOyyts5Error_pGcSgtF"></a>
+                    <a name="//apple_ref/swift/Method/wechatAuthCallback(code:state:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC18wechatAuthCallback4code5state7handlerySS_SSys6ResultOyyts5Error_pGcSgtF">wechatAuthCallback(code:<wbr>state:<wbr>handler:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">wechatAuthCallback</span><span class="p">(</span><span class="nv">code</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">handler</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC23checkBiometricSupportedyyKF"></a>
+                    <a name="//apple_ref/swift/Method/checkBiometricSupported()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC23checkBiometricSupportedyyKF">checkBiometricSupported()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">checkBiometricSupported</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC18isBiometricEnabledSbyKF"></a>
+                    <a name="//apple_ref/swift/Method/isBiometricEnabled()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC18isBiometricEnabledSbyKF">isBiometricEnabled()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">isBiometricEnabled</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC16disableBiometricyyKF"></a>
+                    <a name="//apple_ref/swift/Method/disableBiometric()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC16disableBiometricyyKF">disableBiometric()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">disableBiometric</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC15enableBiometric15localizedReason10constraint7handlerySS_AA0C16AccessConstraintOys6ResultOyyts5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/enableBiometric(localizedReason:constraint:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC15enableBiometric15localizedReason10constraint7handlerySS_AA0C16AccessConstraintOys6ResultOyyts5Error_pGctF">enableBiometric(localizedReason:<wbr>constraint:<wbr>handler:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">enableBiometric</span><span class="p">(</span><span class="nv">localizedReason</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">constraint</span><span class="p">:</span> <span class="kt"><a href="../Enums/BiometricAccessConstraint.html">BiometricAccessConstraint</a></span><span class="p">,</span> <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC21authenticateBiometric7handleryys6ResultOyAA09AuthorizeE0Vs5Error_pGc_tF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateBiometric(handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC21authenticateBiometric7handleryys6ResultOyAA09AuthorizeE0Vs5Error_pGc_tF">authenticateBiometric(handler:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateBiometric</span><span class="p">(</span><span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear26AuthorizeCompletionHandlera">AuthorizeCompletionHandler</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2020 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external">Authgear</a>. All rights reserved. (Last updated: 2020-11-19)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.5</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2021 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="noopener" rel="external">Authgear</a>. All rights reserved. (Last updated: 2021-09-08)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="noopener" rel="external">jazzy ♪♫ v0.14.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="noopener" rel="external">Realm</a> project.</p>
         </section>
       </article>
     </div>

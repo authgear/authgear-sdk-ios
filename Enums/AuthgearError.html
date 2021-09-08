@@ -17,7 +17,7 @@
     <a title="AuthgearError Enumeration Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear 0.0.1 Docs</a> (4% documented)</p>
+        <p><a href="../index.html">Authgear 0.0.1 Docs</a> (3% documented)</p>
         <p class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -41,22 +41,28 @@
               <li class="nav-group-task">
                 <a href="../Classes/Authgear.html">Authgear</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Classes/PersistentTokenStorage.html">PersistentTokenStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/TransientTokenStorage.html">TransientTokenStorage</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Enums/AuthAPIClientError.html">AuthAPIClientError</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Enums/AuthenticationSessionError.html">AuthenticationSessionError</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="../Enums/AuthgearError.html">AuthgearError</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/AuthgearPage.html">AuthgearPage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/BiometricAccessConstraint.html">BiometricAccessConstraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/PromptOption.html">PromptOption</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/SessionState.html">SessionState</a>
@@ -72,6 +78,9 @@
               <li class="nav-group-task">
                 <a href="../Protocols/AuthgearDelegate.html">AuthgearDelegate</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/TokenStorage.html">TokenStorage</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -81,7 +90,10 @@
                 <a href="../Structs/AuthorizeResult.html">AuthorizeResult</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Structs.html#/s:8Authgear9OIDCErrorV">OIDCError</a>
+                <a href="../Structs.html#/s:8Authgear10OAuthErrorV">OAuthError</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/ReauthenticateResult.html">ReauthenticateResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/ServerError.html">ServerError</a>
@@ -98,7 +110,7 @@
                 <a href="../Typealiases.html#/s:8Authgear26AuthorizeCompletionHandlera">AuthorizeCompletionHandler</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:8Authgear27AuthorizeRedirectionHandlera">AuthorizeRedirectionHandler</a>
+                <a href="../Typealiases.html#/s:8Authgear31ReauthenticateCompletionHandlera">ReauthenticateCompletionHandler</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a>
@@ -130,9 +142,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A5ErrorO13canceledLoginyA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/canceledLogin" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A5ErrorO13canceledLoginyA2CmF">canceledLogin</a>
+                    <a name="/s:8Authgear0A5ErrorO6cancelyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/cancel" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO6cancelyA2CmF">cancel</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -147,7 +159,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">canceledLogin</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">cancel</span></code></pre>
 
                         </div>
                       </div>
@@ -157,9 +169,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A5ErrorO05oauthB0yACSS_SSSgtcACmF"></a>
-                    <a name="//apple_ref/swift/Element/oauthError(error:description:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A5ErrorO05oauthB0yACSS_SSSgtcACmF">oauthError(error:<wbr>description:<wbr>)</a>
+                    <a name="/s:8Authgear0A5ErrorO24unexpectedHttpStatusCodeyACSi_10Foundation4DataVSgtcACmF"></a>
+                    <a name="//apple_ref/swift/Element/unexpectedHttpStatusCode(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO24unexpectedHttpStatusCodeyACSi_10Foundation4DataVSgtcACmF">unexpectedHttpStatusCode(_:<wbr>_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -174,7 +186,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">oauthError</span><span class="p">(</span><span class="nv">error</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span><span class="p">?)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">unexpectedHttpStatusCode</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Data</span><span class="p">?)</span></code></pre>
 
                         </div>
                       </div>
@@ -184,9 +196,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear0A5ErrorO010unexpectedB0yACs0B0_pcACmF"></a>
-                    <a name="//apple_ref/swift/Element/unexpectedError(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear0A5ErrorO010unexpectedB0yACs0B0_pcACmF">unexpectedError(_:<wbr>)</a>
+                    <a name="/s:8Authgear0A5ErrorO06serverB0yAcA06ServerB0VcACmF"></a>
+                    <a name="//apple_ref/swift/Element/serverError(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO06serverB0yAcA06ServerB0VcACmF">serverError(_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -201,7 +213,34 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">unexpectedError</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">serverError</span><span class="p">(</span><span class="kt"><a href="../Structs/ServerError.html">ServerError</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO05oauthB0yAcA05OAuthB0VcACmF"></a>
+                    <a name="//apple_ref/swift/Element/oauthError(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO05oauthB0yAcA05OAuthB0VcACmF">oauthError(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">oauthError</span><span class="p">(</span><span class="kt"><a href="../Structs.html#/s:8Authgear10OAuthErrorV">OAuthError</a></span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -235,13 +274,310 @@
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO27biometricPrivateKeyNotFoundyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/biometricPrivateKeyNotFound" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO27biometricPrivateKeyNotFoundyA2CmF">biometricPrivateKeyNotFound</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">biometricPrivateKeyNotFound</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO39biometricNotSupportedOrPermissionDeniedyACs0B0_pcACmF"></a>
+                    <a name="//apple_ref/swift/Element/biometricNotSupportedOrPermissionDenied(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO39biometricNotSupportedOrPermissionDeniedyACs0B0_pcACmF">biometricNotSupportedOrPermissionDenied(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">biometricNotSupportedOrPermissionDenied</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO19biometricNoPasscodeyACs0B0_pcACmF"></a>
+                    <a name="//apple_ref/swift/Element/biometricNoPasscode(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO19biometricNoPasscodeyACs0B0_pcACmF">biometricNoPasscode(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">biometricNoPasscode</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO21biometricNoEnrollmentyACs0B0_pcACmF"></a>
+                    <a name="//apple_ref/swift/Element/biometricNoEnrollment(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO21biometricNoEnrollmentyACs0B0_pcACmF">biometricNoEnrollment(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">biometricNoEnrollment</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO16biometricLockoutyACs0B0_pcACmF"></a>
+                    <a name="//apple_ref/swift/Element/biometricLockout(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO16biometricLockoutyACs0B0_pcACmF">biometricLockout(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">biometricLockout</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO20cannotReauthenticateyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/cannotReauthenticate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO20cannotReauthenticateyA2CmF">cannotReauthenticate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">cannotReauthenticate</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO10invalidJWTyACSScACmF"></a>
+                    <a name="//apple_ref/swift/Element/invalidJWT(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO10invalidJWTyACSScACmF">invalidJWT(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">invalidJWT</span><span class="p">(</span><span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO19unauthenticatedUseryA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/unauthenticatedUser" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO19unauthenticatedUseryA2CmF">unauthenticatedUser</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">unauthenticatedUser</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO17publicKeyNotFoundyA2CmF"></a>
+                    <a name="//apple_ref/swift/Element/publicKeyNotFound" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO17publicKeyNotFoundyA2CmF">publicKeyNotFound</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">publicKeyNotFound</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO5erroryACs0B0_pcACmF"></a>
+                    <a name="//apple_ref/swift/Element/error(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO5erroryACs0B0_pcACmF">error(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">error</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear0A5ErrorO8osStatusyACs5Int32VcACmF"></a>
+                    <a name="//apple_ref/swift/Element/osStatus(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear0A5ErrorO8osStatusyACs5Int32VcACmF">osStatus(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">osStatus</span><span class="p">(</span><span class="kt">OSStatus</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2020 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external">Authgear</a>. All rights reserved. (Last updated: 2020-11-19)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.5</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2021 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="noopener" rel="external">Authgear</a>. All rights reserved. (Last updated: 2021-09-08)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="noopener" rel="external">jazzy ♪♫ v0.14.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="noopener" rel="external">Realm</a> project.</p>
         </section>
       </article>
     </div>
