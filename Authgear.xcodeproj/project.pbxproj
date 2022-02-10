@@ -89,7 +89,7 @@
 		CC20D6F125BAA3C400E579DD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CC20D6F525BAA3C400E579DD /* Pods_ios_example.framework */,
+				CC20D6F525BAA3C400E579DD /* Pods-ios_example */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -224,9 +224,10 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		CC20D6F525BAA3C400E579DD /* Pods_ios_example.framework */ = {
+		CC20D6F525BAA3C400E579DD /* Pods-ios_example */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
+			name = "Pods-ios_example";
 			path = Pods_ios_example.framework;
 			remoteRef = CC20D6F425BAA3C400E579DD /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
