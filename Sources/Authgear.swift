@@ -382,7 +382,7 @@ public class Authgear: NSObject {
 
             let result = persistSession(oidcTokenResponse, reason: .authenticated)
                 .flatMap {
-                    Result { () -> Void in
+                    Result { () in
                         if #available(iOS 11.3, *) {
                             try self.disableBiometric()
                         }
@@ -716,7 +716,7 @@ public class Authgear: NSObject {
 
                 let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
                     .flatMap {
-                        Result { () -> Void in
+                        Result { () in
                             try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId)
                             if #available(iOS 11.3, *) {
                                 try self.disableBiometric()
