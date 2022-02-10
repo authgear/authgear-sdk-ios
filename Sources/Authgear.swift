@@ -132,7 +132,7 @@ public extension AuthgearDelegate {
     func sendWechatAuthRequest(_ state: String) {}
 }
 
-public class Authgear: NSObject {
+public class Authgear {
     /**
      * To prevent user from using expired access token, we have to check in advance
      * whether it had expired in `shouldRefreshAccessToken`. If we
@@ -211,7 +211,6 @@ public class Authgear: NSObject {
         self.shareSessionWithSystemBrowser = shareSessionWithSystemBrowser
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
-        super.init()
     }
 
     public func configure(
