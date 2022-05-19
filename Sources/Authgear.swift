@@ -5,8 +5,6 @@ import SafariServices
 import Security
 import WebKit
 
-public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
-public typealias ReauthenticateCompletionHandler = (Result<ReauthenticateResult, Error>) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
@@ -87,16 +85,6 @@ public struct UserInfo: Decodable {
         self.isVerified = isVerified
         self.sub = sub
     }
-}
-
-public struct AuthorizeResult {
-    public let userInfo: UserInfo
-    public let state: String?
-}
-
-public struct ReauthenticateResult {
-    public let userInfo: UserInfo
-    public let state: String?
 }
 
 public enum SessionState: String {
@@ -249,7 +237,7 @@ public class Authgear {
 
     private func reauthenticateWithASWebAuthenticationSession(
         _ options: ReauthenticateOptions,
-        handler: @escaping ReauthenticateCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         do {
             guard let idTokenHint = self.idTokenHint else {
@@ -287,7 +275,7 @@ public class Authgear {
 
     private func authorizeWithASWebAuthenticationSession(
         _ options: AuthorizeOptions,
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let verifier = CodeVerifier()
         let request = options.request
@@ -324,11 +312,10 @@ public class Authgear {
     private func finishAuthorization(
         url: URL,
         verifier: CodeVerifier,
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
         let params = urlComponents.queryParams
-        let state = params["state"]
 
         if let errorParams = params["error"] {
             return handler(
@@ -384,7 +371,7 @@ public class Authgear {
                         }
                     }
                 }
-                .map { AuthorizeResult(userInfo: userInfo, state: state) }
+                .map { userInfo }
             return handler(result)
 
         } catch {
@@ -395,11 +382,10 @@ public class Authgear {
     private func finishReauthentication(
         url: URL,
         verifier: CodeVerifier,
-        handler: @escaping ReauthenticateCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
         let params = urlComponents.queryParams
-        let state = params["state"]
 
         if let errorParams = params["error"] {
             return handler(
@@ -451,7 +437,7 @@ public class Authgear {
                 self.idToken = idToken
             }
 
-            return handler(.success(ReauthenticateResult(userInfo: userInfo, state: state)))
+            return handler(.success(userInfo))
         } catch {
             return handler(.failure(error))
         }
@@ -593,7 +579,7 @@ public class Authgear {
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
         page: String? = nil,
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         self.authorize(AuthorizeOptions(
             redirectURI: redirectURI,
@@ -609,7 +595,7 @@ public class Authgear {
 
     private func authorize(
         _ options: AuthorizeOptions,
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
         self.workerQueue.async {
@@ -624,7 +610,7 @@ public class Authgear {
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
         skipUsingBiometric: Bool? = nil,
-        handler: @escaping ReauthenticateCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
 
@@ -635,8 +621,8 @@ public class Authgear {
                 if biometricEnabled && !skipUsingBiometric {
                     self.authenticateBiometric { result in
                         switch result {
-                        case let .success(authzResult):
-                            handler(.success(ReauthenticateResult(userInfo: authzResult.userInfo, state: state)))
+                        case let .success(userInfo):
+                            handler(.success(userInfo))
                         case let .failure(error):
                             handler(.failure(error))
                         }
@@ -671,7 +657,7 @@ public class Authgear {
     }
 
     public func authenticateAnonymously(
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
@@ -719,7 +705,7 @@ public class Authgear {
                             }
                         }
                     }
-                    .map { AuthorizeResult(userInfo: userInfo, state: nil) }
+                    .map { userInfo }
                 handler(result)
 
             } catch {
@@ -733,7 +719,7 @@ public class Authgear {
         state: String? = nil,
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
@@ -1116,7 +1102,7 @@ public class Authgear {
     }
 
     @available(iOS 11.3, *)
-    public func authenticateBiometric(handler: @escaping AuthorizeCompletionHandler) {
+    public func authenticateBiometric(handler: @escaping UserInfoCompletionHandler) {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
             do {
@@ -1153,7 +1139,7 @@ public class Authgear {
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
                 let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
-                    .map { AuthorizeResult(userInfo: userInfo, state: nil) }
+                    .map { userInfo }
                 return handler(result)
             } catch {
                 // In case the biometric was removed remotely.

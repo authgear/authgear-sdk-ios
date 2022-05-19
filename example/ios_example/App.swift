@@ -1,12 +1,6 @@
 import Authgear
 import SwiftUI
 
-struct UserInfo {
-    var userID: String
-    var isAnonymous: Bool
-    var isVerified: Bool
-}
-
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
     static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
@@ -52,20 +46,13 @@ class App: ObservableObject {
         }
     }
 
-    private func handleAuthorizeResult(_ result: Result<AuthorizeResult, Error>) -> Bool {
+    private func handleAuthorizeResult(_ result: Result<UserInfo, Error>) {
         self.updateBiometricState()
         switch result {
-        case let .success(authResult):
-            let userInfo = authResult.userInfo
-            user = UserInfo(
-                userID: userInfo.sub,
-                isAnonymous: userInfo.isAnonymous,
-                isVerified: userInfo.isVerified
-            )
-            return true
+        case let .success(userInfo):
+            user = userInfo
         case let .failure(error):
             self.setError(error)
-            return false
         }
     }
 
@@ -96,10 +83,9 @@ class App: ObservableObject {
         container?.authorize(
             redirectURI: App.redirectURI,
             wechatRedirectURI: App.wechatRedirectURI,
-            page: page
-        ) { result in
-            let success = self.handleAuthorizeResult(result)
-        }
+            page: page,
+            handler: self.handleAuthorizeResult
+        )
     }
 
     func reauthenticate() {
@@ -109,13 +95,8 @@ class App: ObservableObject {
                 self.container?.reauthenticate(redirectURI: App.redirectURI) { result in
                     self.updateBiometricState()
                     switch result {
-                    case let .success(authResult):
-                        let userInfo = authResult.userInfo
-                        self.user = UserInfo(
-                            userID: userInfo.sub,
-                            isAnonymous: userInfo.isAnonymous,
-                            isVerified: userInfo.isVerified
-                        )
+                    case let .success(userInfo):
+                        self.user = userInfo
                     case let .failure(error):
                         self.setError(error)
                     }
@@ -133,13 +114,8 @@ class App: ObservableObject {
                 self.container?.reauthenticate(redirectURI: App.redirectURI, skipUsingBiometric: true) { result in
                     self.updateBiometricState()
                     switch result {
-                    case let .success(authResult):
-                        let userInfo = authResult.userInfo
-                        self.user = UserInfo(
-                            userID: userInfo.sub,
-                            isAnonymous: userInfo.isAnonymous,
-                            isVerified: userInfo.isVerified
-                        )
+                    case let .success(userInfo):
+                        self.user = userInfo
                     case let .failure(error):
                         self.setError(error)
                     }
@@ -172,15 +148,11 @@ class App: ObservableObject {
     }
 
     func loginBiometric() {
-        container?.authenticateBiometric { result in
-            let success = self.handleAuthorizeResult(result)
-        }
+        container?.authenticateBiometric(handler: self.handleAuthorizeResult)
     }
 
     func loginAnonymously() {
-        container?.authenticateAnonymously { result in
-            let success = self.handleAuthorizeResult(result)
-        }
+        container?.authenticateAnonymously(handler: self.handleAuthorizeResult)
     }
 
     func openSetting() {
@@ -193,21 +165,16 @@ class App: ObservableObject {
     func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,
-            wechatRedirectURI: App.wechatRedirectURI
-        ) { result in
-            let success = self.handleAuthorizeResult(result)
-        }
+            wechatRedirectURI: App.wechatRedirectURI,
+            handler: self.handleAuthorizeResult
+        )
     }
 
     func fetchUserInfo() {
         container?.fetchUserInfo { userInfoResult in
             switch userInfoResult {
             case let .success(userInfo):
-                self.user = UserInfo(
-                    userID: userInfo.sub,
-                    isAnonymous: userInfo.isAnonymous,
-                    isVerified: userInfo.isVerified
-                )
+                self.user = userInfo
                 self.successAlertMessage = [
                     "User Info:",
                     "",
