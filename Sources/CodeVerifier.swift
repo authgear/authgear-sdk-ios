@@ -2,17 +2,17 @@ import CommonCrypto
 import Foundation
 
 struct CodeVerifier {
-    let value: String = {
+    static func generateValue() -> String {
         var buffer = [UInt8](repeating: 0, count: 32)
-        let status = SecRandomCopyBytes(kSecRandomDefault, buffer.count, &buffer)
+        _ = SecRandomCopyBytes(kSecRandomDefault, buffer.count, &buffer)
 
         return buffer
             .map { $0 & 0xFF }
             .map { String(format: "%02X", $0) }
             .joined()
-    }()
+    }
 
-    func computeCodeChallenge() -> String {
+    static func computeCodeChallenge(_ value: String) -> String {
         let data = value.data(using: .utf8)!
         var buffer = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
 
@@ -23,5 +23,13 @@ struct CodeVerifier {
         let hash = Data(buffer.map { $0 & 0xFF })
 
         return hash.base64urlEncodedString()
+    }
+
+    let value: String
+    let codeChallenge: String
+
+    init() {
+        self.value = CodeVerifier.generateValue()
+        self.codeChallenge = CodeVerifier.computeCodeChallenge(value)
     }
 }
