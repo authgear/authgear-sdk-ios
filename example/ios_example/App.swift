@@ -80,7 +80,7 @@ class App: ObservableObject {
     }
 
     func login() {
-        container?.authorize(
+        container?.authenticate(
             redirectURI: App.redirectURI,
             wechatRedirectURI: App.wechatRedirectURI,
             page: page,

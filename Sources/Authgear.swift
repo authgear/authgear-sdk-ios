@@ -15,7 +15,7 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
-struct AuthorizeOptions {
+struct AuthenticateOptions {
     let redirectURI: String
     let state: String?
     let prompt: [PromptOption]?
@@ -273,8 +273,8 @@ public class Authgear {
         }
     }
 
-    private func authorizeWithASWebAuthenticationSession(
-        _ options: AuthorizeOptions,
+    private func authenticateWithASWebAuthenticationSession(
+        _ options: AuthenticateOptions,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let verifier = CodeVerifier()
@@ -295,7 +295,7 @@ public class Authgear {
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
-                                self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
+                                self?.finishAuthentication(url: url, verifier: verifier, handler: handler)
                             }
                         case let .failure(error):
                             return handler(.failure(error))
@@ -309,7 +309,7 @@ public class Authgear {
         }
     }
 
-    private func finishAuthorization(
+    private func finishAuthentication(
         url: URL,
         verifier: CodeVerifier,
         handler: @escaping UserInfoCompletionHandler
@@ -557,21 +557,7 @@ public class Authgear {
         _ = handleWechatRedirectURI(url)
     }
 
-    /**
-      Authorize a user by directing the user to Authgear with ASWebAuthenticationSession.
-
-      - Parameters:
-         - redirectURI: Redirect uri. Redirection URI to which the response will be sent after authorization.
-         - state: OAuth 2.0 state value.
-         - prompt: Prompt parameter will be used for Authgear authorization, it will also be forwarded to the underlying SSO providers. For Authgear, currently, only login is supported, other unsupported values will be ignored. For the underlying SSO providers, some providers only support a single value rather than a list. The first supported value will be used for that case. e.g. Azure Active Directory.
-         - loginHint: OIDC login hint parameter
-         - uiLocales: UI locale tags
-         - wechatRedirectURI: The wechatRedirectURI will be called when user click the login with WeChat button
-         - page: Initial page to open. Valid values are 'login' and 'signup'.
-         - handler: Authorize completion handler
-
-     */
-    public func authorize(
+    public func authenticate(
         redirectURI: String,
         state: String? = nil,
         prompt: [PromptOption]? = nil,
@@ -581,7 +567,7 @@ public class Authgear {
         page: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
-        self.authorize(AuthorizeOptions(
+        self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
             state: state,
             prompt: prompt,
@@ -593,13 +579,13 @@ public class Authgear {
         ), handler: handler)
     }
 
-    private func authorize(
-        _ options: AuthorizeOptions,
+    private func authenticate(
+        _ options: AuthenticateOptions,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
         self.workerQueue.async {
-            self.authorizeWithASWebAuthenticationSession(options, handler: handler)
+            self.authenticateWithASWebAuthenticationSession(options, handler: handler)
         }
     }
 
@@ -749,8 +735,8 @@ public class Authgear {
 
                 let loginHint = "https://authgear.com/login_hint?type=anonymous&jwt=\(signedJWT.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
 
-                self.authorize(
-                    AuthorizeOptions(
+                self.authenticate(
+                    AuthenticateOptions(
                         redirectURI: redirectURI,
                         state: state,
                         prompt: [.login],
