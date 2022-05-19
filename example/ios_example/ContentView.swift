@@ -146,13 +146,13 @@ struct ActionButtonList: View {
                 Button(action: {
                     self.app.login()
                 }) {
-                    ActionButton(text: "Login")
+                    ActionButton(text: "Authenticate")
                 }.disabled(!configured || loggedIn)
 
                 Button(action: {
                     self.app.loginAnonymously()
                 }) {
-                    ActionButton(text: "Login Anonymously")
+                    ActionButton(text: "Authenticate Anonymously")
                 }.disabled(!configured || loggedIn)
 
                 Button(action: {
@@ -160,13 +160,19 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Promote Anonymous User")
                 }.disabled(!(configured && loggedIn && isAnonymous))
+
+                Button(action: {
+                    self.app.loginBiometric()
+                }) {
+                    ActionButton(text: "Authenticate Biometric")
+                }.disabled(!configured || loggedIn || !biometricEnabled)
             }
 
             Group {
                 Button(action: {
                     self.app.reauthenticateWebOnly()
                 }) {
-                    ActionButton(text: "Reauthenticate (web only)")
+                    ActionButton(text: "Reauthenticate (web-only)")
                 }.disabled(!configured || !loggedIn || isAnonymous)
 
                 Button(action: {
@@ -188,26 +194,20 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Disable Biometric")
                 }.disabled(!biometricEnabled)
-
-                Button(action: {
-                    self.app.loginBiometric()
-                }) {
-                    ActionButton(text: "Login with Biometric")
-                }.disabled(!configured || loggedIn || !biometricEnabled)
             }
 
             Group {
                 Button(action: {
-                    self.app.openSetting()
-                }) {
-                    ActionButton(text: "Open Setting Page")
-                }.disabled(!configured || !loggedIn || isAnonymous)
-
-                Button(action: {
                     self.app.fetchUserInfo()
                 }) {
-                    ActionButton(text: "Fetch User Info")
+                    ActionButton(text: "Get UserInfo")
                 }.disabled(!configured || !loggedIn)
+
+                Button(action: {
+                    self.app.openSetting()
+                }) {
+                    ActionButton(text: "Open Setting")
+                }.disabled(!configured || !loggedIn || isAnonymous)
 
                 Button(action: {
                     self.app.showAuthTime()
