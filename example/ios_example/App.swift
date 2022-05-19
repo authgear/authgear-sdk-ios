@@ -228,8 +228,7 @@ class App: ObservableObject {
                     "",
                     "User ID: \(userInfo.sub)",
                     "Is Verified: \(userInfo.isVerified)",
-                    "Is Anonymous: \(userInfo.isAnonymous)",
-                    "ISS: \(userInfo.iss)"
+                    "Is Anonymous: \(userInfo.isAnonymous)"
                 ].joined(separator: "\n")
             case let .failure(error):
                 self.setError(error)

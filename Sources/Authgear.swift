@@ -75,19 +75,16 @@ public struct UserInfo: Decodable {
     enum CodingKeys: String, CodingKey {
         case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
         case isVerified = "https://authgear.com/claims/user/is_verified"
-        case iss
         case sub
     }
 
     public let isAnonymous: Bool
     public let isVerified: Bool
-    public let iss: String
     public let sub: String
 
-    public init(isAnonymous: Bool, isVerified: Bool, iss: String, sub: String) {
+    public init(isAnonymous: Bool, isVerified: Bool, sub: String) {
         self.isAnonymous = isAnonymous
         self.isVerified = isVerified
-        self.iss = iss
         self.sub = sub
     }
 }
