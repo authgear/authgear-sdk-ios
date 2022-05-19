@@ -57,9 +57,9 @@ struct AuthgearConfigurationForm: View {
 
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
-    @State private var page: String = UserDefaults.standard.string(forKey: "authgear.demo.page") ?? ""
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
-    @State private var shareSessionWithSystemBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithSystemBrowser") ?? false
+    @State private var shareSessionWithSystemBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithSystemBrowser")
+    @State private var authenticationPage: String = ""
 
     var body: some View {
         VStack {
@@ -77,17 +77,15 @@ struct AuthgearConfigurationForm: View {
                     text: $endpoint
                 )
             )
-            AuthgearConfigurationInput(
-                label: "Page",
-                input: AuthgearConfigurationTextField(
-                    placeHolder: "'login' or 'signup'",
-                    text: $page
-                )
-            )
+            Picker("Authentication Page", selection: $authenticationPage) {
+                Text("Unset").tag("")
+                Text("Login").tag(AuthenticationPage.login.rawValue)
+                Text("Signup").tag(AuthenticationPage.signup.rawValue)
+            }.pickerStyle(.segmented)
             Picker("Token Storage", selection: $tokenStorage) {
                 Text(TokenStorageClassName.TransientTokenStorage.rawValue).tag(TokenStorageClassName.TransientTokenStorage.rawValue)
                 Text(TokenStorageClassName.PersistentTokenStorage.rawValue).tag(TokenStorageClassName.PersistentTokenStorage.rawValue)
-            }.pickerStyle(SegmentedPickerStyle())
+            }.pickerStyle(.segmented)
             AuthgearConfigurationInput(
                 label: "Share Session With System Browser",
                 input: Toggle(isOn: $shareSessionWithSystemBrowser) { EmptyView() }
@@ -96,7 +94,7 @@ struct AuthgearConfigurationForm: View {
                 self.app.configure(
                     clientId: self.clientID,
                     endpoint: self.endpoint,
-                    page: self.page,
+                    authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
                     tokenStorage: self.tokenStorage,
                     shareSessionWithSystemBrowser: self.shareSessionWithSystemBrowser
                 )

@@ -48,7 +48,7 @@ struct OIDCAuthenticationRequest {
     let idTokenHint: String?
     let maxAge: Int?
     let wechatRedirectURI: String?
-    let page: String?
+    let page: AuthenticationPage?
     let suppressIDPSessionCookie: Bool?
 
     var redirectURIScheme: String {
@@ -115,7 +115,7 @@ struct OIDCAuthenticationRequest {
         }
 
         if let page = self.page {
-            queryItems.append(URLQueryItem(name: "x_page", value: page))
+            queryItems.append(URLQueryItem(name: "x_page", value: page.rawValue))
         }
 
         if self.suppressIDPSessionCookie == true {

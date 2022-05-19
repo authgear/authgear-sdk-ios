@@ -22,7 +22,7 @@ struct AuthenticateOptions {
     let loginHint: String?
     let uiLocales: [String]?
     let wechatRedirectURI: String?
-    let page: String?
+    let page: AuthenticationPage?
     let suppressIDPSessionCookie: Bool?
 
     var request: OIDCAuthenticationRequest {
@@ -93,7 +93,12 @@ public enum SessionState: String {
     case authenticated = "AUTHENTICATED"
 }
 
-public enum AuthgearPage: String {
+public enum AuthenticationPage: String {
+    case login
+    case signup
+}
+
+public enum SettingsPage: String {
     case settings = "/settings"
     case identity = "/settings/identities"
 }
@@ -564,7 +569,7 @@ public class Authgear {
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
         wechatRedirectURI: String? = nil,
-        page: String? = nil,
+        page: AuthenticationPage? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         self.authenticate(AuthenticateOptions(
@@ -866,7 +871,7 @@ public class Authgear {
     }
 
     public func open(
-        page: AuthgearPage,
+        page: SettingsPage,
         wechatRedirectURI: String? = nil
     ) {
         openURL(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)

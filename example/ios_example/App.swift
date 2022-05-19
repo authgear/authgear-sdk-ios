@@ -10,12 +10,12 @@ class App: ObservableObject {
     @Published var container: Authgear?
     @Published var sessionState = SessionState.unknown
     @Published var user: UserInfo?
-    @Published var page: String = ""
+    @Published var authenticationPage: AuthenticationPage?
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
 
-    func configure(clientId: String, endpoint: String, page: String, tokenStorage: String, shareSessionWithSystemBrowser: Bool) {
+    func configure(clientId: String, endpoint: String, authenticationPage: AuthenticationPage?, tokenStorage: String, shareSessionWithSystemBrowser: Bool) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -26,11 +26,10 @@ class App: ObservableObject {
         }
         UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
-        UserDefaults.standard.set(page, forKey: "authgear.demo.page")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(shareSessionWithSystemBrowser, forKey: "authgear.demo.shareSessionWithSystemBrowser")
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, shareSessionWithSystemBrowser: shareSessionWithSystemBrowser)
-        self.page = page
+        self.authenticationPage = authenticationPage
         self.updateBiometricState()
     }
 
@@ -83,7 +82,7 @@ class App: ObservableObject {
         container?.authenticate(
             redirectURI: App.redirectURI,
             wechatRedirectURI: App.wechatRedirectURI,
-            page: page,
+            page: self.authenticationPage,
             handler: self.handleAuthorizeResult
         )
     }
