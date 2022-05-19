@@ -98,8 +98,8 @@ public enum SessionState: String {
 }
 
 public enum ColorScheme: String {
-    case light = "light"
-    case dark = "dark"
+    case light
+    case dark
 }
 
 public enum AuthenticationPage: String {

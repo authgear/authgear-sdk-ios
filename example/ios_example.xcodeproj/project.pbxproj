@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		25D3CE61D191A5A941AE7822 /* Pods_ios_example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 334D39BA4EECBD0957B18F9D /* Pods_ios_example.framework */; };
+		77E1D5EC2836353900C2D78B /* ColorScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E1D5EB2836353900C2D78B /* ColorScheme.swift */; };
 		7A0B543F255512F800718C05 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B543E255512F800718C05 /* SceneDelegate.swift */; };
 		7A0B54412555135300718C05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B54402555135300718C05 /* ContentView.swift */; };
 		7A0B544525554CB300718C05 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B544425554CB300718C05 /* App.swift */; };
@@ -54,6 +55,7 @@
 /* Begin PBXFileReference section */
 		0BF7FAA64028E5C1E5B4FFD9 /* Pods-ios_example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_example.release.xcconfig"; path = "Target Support Files/Pods-ios_example/Pods-ios_example.release.xcconfig"; sourceTree = "<group>"; };
 		334D39BA4EECBD0957B18F9D /* Pods_ios_example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		77E1D5EB2836353900C2D78B /* ColorScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorScheme.swift; sourceTree = "<group>"; };
 		7A0B543E255512F800718C05 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7A0B54402555135300718C05 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7A0B544425554CB300718C05 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 				7A0B544425554CB300718C05 /* App.swift */,
 				7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */,
 				CCC8F73925AC35D9000358F1 /* WechatOpenSDK-Bridging-Header.h */,
+				77E1D5EB2836353900C2D78B /* ColorScheme.swift */,
 			);
 			path = ios_example;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 				7A60D1052559571C00357B6D /* KeyboardAvoidingView.swift in Sources */,
 				7A0B544525554CB300718C05 /* App.swift in Sources */,
 				7A0B54412555135300718C05 /* ContentView.swift in Sources */,
+				77E1D5EC2836353900C2D78B /* ColorScheme.swift in Sources */,
 				7A0B543F255512F800718C05 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
