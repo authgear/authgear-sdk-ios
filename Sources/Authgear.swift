@@ -21,6 +21,7 @@ struct AuthenticateOptions {
     let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
+    let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
     let suppressIDPSessionCookie: Bool?
@@ -34,6 +35,7 @@ struct AuthenticateOptions {
             prompt: self.prompt,
             loginHint: self.loginHint,
             uiLocales: self.uiLocales,
+            colorScheme: self.colorScheme,
             idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
@@ -47,6 +49,7 @@ struct ReauthenticateOptions {
     let redirectURI: String
     let state: String?
     let uiLocales: [String]?
+    let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let maxAge: Int?
     let suppressIDPSessionCookie: Bool?
@@ -60,6 +63,7 @@ struct ReauthenticateOptions {
             prompt: nil,
             loginHint: nil,
             uiLocales: self.uiLocales,
+            colorScheme: self.colorScheme,
             idTokenHint: idTokenHint,
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
@@ -91,6 +95,11 @@ public enum SessionState: String {
     case unknown = "UNKNOWN"
     case noSession = "NO_SESSION"
     case authenticated = "AUTHENTICATED"
+}
+
+public enum ColorScheme: String {
+    case light = "light"
+    case dark = "dark"
 }
 
 public enum AuthenticationPage: String {
@@ -568,6 +577,7 @@ public class Authgear {
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         page: AuthenticationPage? = nil,
         handler: @escaping UserInfoCompletionHandler
@@ -578,6 +588,7 @@ public class Authgear {
             prompt: prompt,
             loginHint: loginHint,
             uiLocales: uiLocales,
+            colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             page: page,
             suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
@@ -598,6 +609,7 @@ public class Authgear {
         redirectURI: String,
         state: String? = nil,
         uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
         skipUsingBiometric: Bool? = nil,
@@ -637,6 +649,7 @@ public class Authgear {
             redirectURI: redirectURI,
             state: state,
             uiLocales: uiLocales,
+            colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             maxAge: maxAge,
             suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
@@ -709,6 +722,7 @@ public class Authgear {
         redirectURI: String,
         state: String? = nil,
         uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
@@ -747,6 +761,7 @@ public class Authgear {
                         prompt: [.login],
                         loginHint: loginHint,
                         uiLocales: uiLocales,
+                        colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
                         page: nil,
                         suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
@@ -797,11 +812,26 @@ public class Authgear {
 
     public func openURL(
         path: String,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         handler: VoidCompletionHandler? = nil
     ) {
         let handler = handler.map { h in withMainQueueHandler(h) }
-        let url = apiClient.endpoint.appendingPathComponent(path)
+
+        var urlComponents = URLComponents(url: apiClient.endpoint.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        var queryItems = urlComponents.queryItems ?? []
+        if let uiLocales = uiLocales {
+            queryItems.append(URLQueryItem(
+                name: "ui_locales",
+                value: uiLocales.joined(separator: " ")
+            ))
+        }
+        if let colorScheme = colorScheme {
+            queryItems.append(URLQueryItem(name: "x_color_scheme", value: colorScheme.rawValue))
+        }
+        urlComponents.queryItems = queryItems
+        let url = urlComponents.url!
 
         workerQueue.async {
             do {
@@ -821,7 +851,8 @@ public class Authgear {
                     state: nil,
                     prompt: [.none],
                     loginHint: loginHint,
-                    uiLocales: nil,
+                    uiLocales: uiLocales,
+                    colorScheme: colorScheme,
                     idTokenHint: nil,
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
@@ -872,9 +903,16 @@ public class Authgear {
 
     public func open(
         page: SettingsPage,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil
     ) {
-        openURL(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
+        openURL(
+            path: page.rawValue,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme,
+            wechatRedirectURI: wechatRedirectURI
+        )
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {

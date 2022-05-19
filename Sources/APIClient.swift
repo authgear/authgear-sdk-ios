@@ -45,6 +45,7 @@ struct OIDCAuthenticationRequest {
     let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
+    let colorScheme: ColorScheme?
     let idTokenHint: String?
     let maxAge: Int?
     let wechatRedirectURI: String?
@@ -97,6 +98,13 @@ struct OIDCAuthenticationRequest {
             queryItems.append(URLQueryItem(
                 name: "ui_locales",
                 value: uiLocales.joined(separator: " ")
+            ))
+        }
+
+        if let colorScheme = colorScheme {
+            queryItems.append(URLQueryItem(
+                name: "x_color_scheme",
+                value: colorScheme.rawValue
             ))
         }
 
