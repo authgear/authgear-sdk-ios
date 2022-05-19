@@ -36,7 +36,6 @@ class App: ObservableObject {
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(shareSessionWithSystemBrowser, forKey: "authgear.demo.shareSessionWithSystemBrowser")
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, shareSessionWithSystemBrowser: shareSessionWithSystemBrowser)
-        successAlertMessage = "Configured Authgear successfully"
         self.page = page
         self.updateBiometricState()
     }
@@ -100,9 +99,6 @@ class App: ObservableObject {
             page: page
         ) { result in
             let success = self.handleAuthorizeResult(result)
-            if success {
-                self.successAlertMessage = "Logged in successfully"
-            }
         }
     }
 
@@ -120,7 +116,6 @@ class App: ObservableObject {
                             isAnonymous: userInfo.isAnonymous,
                             isVerified: userInfo.isVerified
                         )
-                        self.successAlertMessage = "Reauthenticated successfully"
                     case let .failure(error):
                         self.setError(error)
                     }
@@ -145,7 +140,6 @@ class App: ObservableObject {
                             isAnonymous: userInfo.isAnonymous,
                             isVerified: userInfo.isVerified
                         )
-                        self.successAlertMessage = "Reauthenticated successfully"
                     case let .failure(error):
                         self.setError(error)
                     }
@@ -180,18 +174,12 @@ class App: ObservableObject {
     func loginBiometric() {
         container?.authenticateBiometric { result in
             let success = self.handleAuthorizeResult(result)
-            if success {
-                self.successAlertMessage = "Logged in with biometric"
-            }
         }
     }
 
     func loginAnonymously() {
         container?.authenticateAnonymously { result in
             let success = self.handleAuthorizeResult(result)
-            if success {
-                self.successAlertMessage = "Logged in anonymously"
-            }
         }
     }
 
@@ -208,9 +196,6 @@ class App: ObservableObject {
             wechatRedirectURI: App.wechatRedirectURI
         ) { result in
             let success = self.handleAuthorizeResult(result)
-            if success {
-                self.successAlertMessage = "Successfully promoted to normal authenticated user"
-            }
         }
     }
 
@@ -250,7 +235,6 @@ class App: ObservableObject {
             switch result {
             case .success():
                 self.user = nil
-                self.successAlertMessage = "Logged out successfully"
             case let .failure(error):
                 self.setError(error)
             }
