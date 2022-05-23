@@ -45,10 +45,11 @@ struct OIDCAuthenticationRequest {
     let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
+    let colorScheme: ColorScheme?
     let idTokenHint: String?
     let maxAge: Int?
     let wechatRedirectURI: String?
-    let page: String?
+    let page: AuthenticationPage?
     let suppressIDPSessionCookie: Bool?
 
     var redirectURIScheme: String {
@@ -73,7 +74,7 @@ struct OIDCAuthenticationRequest {
         if let verifier = verifier {
             queryItems.append(contentsOf: [
                 URLQueryItem(name: "code_challenge_method", value: "S256"),
-                URLQueryItem(name: "code_challenge", value: verifier.computeCodeChallenge())
+                URLQueryItem(name: "code_challenge", value: verifier.codeChallenge)
             ])
         }
 
@@ -100,6 +101,13 @@ struct OIDCAuthenticationRequest {
             ))
         }
 
+        if let colorScheme = colorScheme {
+            queryItems.append(URLQueryItem(
+                name: "x_color_scheme",
+                value: colorScheme.rawValue
+            ))
+        }
+
         if let maxAge = self.maxAge {
             queryItems.append(URLQueryItem(
                 name: "max_age",
@@ -115,7 +123,7 @@ struct OIDCAuthenticationRequest {
         }
 
         if let page = self.page {
-            queryItems.append(URLQueryItem(name: "x_page", value: page))
+            queryItems.append(URLQueryItem(name: "x_page", value: page.rawValue))
         }
 
         if self.suppressIDPSessionCookie == true {

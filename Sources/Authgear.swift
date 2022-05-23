@@ -5,8 +5,6 @@ import SafariServices
 import Security
 import WebKit
 
-public typealias AuthorizeCompletionHandler = (Result<AuthorizeResult, Error>) -> Void
-public typealias ReauthenticateCompletionHandler = (Result<ReauthenticateResult, Error>) -> Void
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
 
@@ -17,14 +15,15 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
-struct AuthorizeOptions {
+struct AuthenticateOptions {
     let redirectURI: String
     let state: String?
     let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
+    let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
-    let page: String?
+    let page: AuthenticationPage?
     let suppressIDPSessionCookie: Bool?
 
     var request: OIDCAuthenticationRequest {
@@ -36,6 +35,7 @@ struct AuthorizeOptions {
             prompt: self.prompt,
             loginHint: self.loginHint,
             uiLocales: self.uiLocales,
+            colorScheme: self.colorScheme,
             idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
@@ -49,6 +49,7 @@ struct ReauthenticateOptions {
     let redirectURI: String
     let state: String?
     let uiLocales: [String]?
+    let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let maxAge: Int?
     let suppressIDPSessionCookie: Bool?
@@ -62,6 +63,7 @@ struct ReauthenticateOptions {
             prompt: nil,
             loginHint: nil,
             uiLocales: self.uiLocales,
+            colorScheme: self.colorScheme,
             idTokenHint: idTokenHint,
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
@@ -75,31 +77,18 @@ public struct UserInfo: Decodable {
     enum CodingKeys: String, CodingKey {
         case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
         case isVerified = "https://authgear.com/claims/user/is_verified"
-        case iss
         case sub
     }
 
     public let isAnonymous: Bool
     public let isVerified: Bool
-    public let iss: String
     public let sub: String
 
-    public init(isAnonymous: Bool, isVerified: Bool, iss: String, sub: String) {
+    public init(isAnonymous: Bool, isVerified: Bool, sub: String) {
         self.isAnonymous = isAnonymous
         self.isVerified = isVerified
-        self.iss = iss
         self.sub = sub
     }
-}
-
-public struct AuthorizeResult {
-    public let userInfo: UserInfo
-    public let state: String?
-}
-
-public struct ReauthenticateResult {
-    public let userInfo: UserInfo
-    public let state: String?
 }
 
 public enum SessionState: String {
@@ -108,7 +97,17 @@ public enum SessionState: String {
     case authenticated = "AUTHENTICATED"
 }
 
-public enum AuthgearPage: String {
+public enum ColorScheme: String {
+    case light
+    case dark
+}
+
+public enum AuthenticationPage: String {
+    case login
+    case signup
+}
+
+public enum SettingsPage: String {
     case settings = "/settings"
     case identity = "/settings/identities"
 }
@@ -252,7 +251,7 @@ public class Authgear {
 
     private func reauthenticateWithASWebAuthenticationSession(
         _ options: ReauthenticateOptions,
-        handler: @escaping ReauthenticateCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         do {
             guard let idTokenHint = self.idTokenHint else {
@@ -288,9 +287,9 @@ public class Authgear {
         }
     }
 
-    private func authorizeWithASWebAuthenticationSession(
-        _ options: AuthorizeOptions,
-        handler: @escaping AuthorizeCompletionHandler
+    private func authenticateWithASWebAuthenticationSession(
+        _ options: AuthenticateOptions,
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let verifier = CodeVerifier()
         let request = options.request
@@ -310,7 +309,7 @@ public class Authgear {
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
-                                self?.finishAuthorization(url: url, verifier: verifier, handler: handler)
+                                self?.finishAuthentication(url: url, verifier: verifier, handler: handler)
                             }
                         case let .failure(error):
                             return handler(.failure(error))
@@ -324,14 +323,13 @@ public class Authgear {
         }
     }
 
-    private func finishAuthorization(
+    private func finishAuthentication(
         url: URL,
         verifier: CodeVerifier,
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
         let params = urlComponents.queryParams
-        let state = params["state"]
 
         if let errorParams = params["error"] {
             return handler(
@@ -387,7 +385,7 @@ public class Authgear {
                         }
                     }
                 }
-                .map { AuthorizeResult(userInfo: userInfo, state: state) }
+                .map { userInfo }
             return handler(result)
 
         } catch {
@@ -398,11 +396,10 @@ public class Authgear {
     private func finishReauthentication(
         url: URL,
         verifier: CodeVerifier,
-        handler: @escaping ReauthenticateCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
         let params = urlComponents.queryParams
-        let state = params["state"]
 
         if let errorParams = params["error"] {
             return handler(
@@ -454,7 +451,7 @@ public class Authgear {
                 self.idToken = idToken
             }
 
-            return handler(.success(ReauthenticateResult(userInfo: userInfo, state: state)))
+            return handler(.success(userInfo))
         } catch {
             return handler(.failure(error))
         }
@@ -574,49 +571,37 @@ public class Authgear {
         _ = handleWechatRedirectURI(url)
     }
 
-    /**
-      Authorize a user by directing the user to Authgear with ASWebAuthenticationSession.
-
-      - Parameters:
-         - redirectURI: Redirect uri. Redirection URI to which the response will be sent after authorization.
-         - state: OAuth 2.0 state value.
-         - prompt: Prompt parameter will be used for Authgear authorization, it will also be forwarded to the underlying SSO providers. For Authgear, currently, only login is supported, other unsupported values will be ignored. For the underlying SSO providers, some providers only support a single value rather than a list. The first supported value will be used for that case. e.g. Azure Active Directory.
-         - loginHint: OIDC login hint parameter
-         - uiLocales: UI locale tags
-         - wechatRedirectURI: The wechatRedirectURI will be called when user click the login with WeChat button
-         - page: Initial page to open. Valid values are 'login' and 'signup'.
-         - handler: Authorize completion handler
-
-     */
-    public func authorize(
+    public func authenticate(
         redirectURI: String,
         state: String? = nil,
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
-        page: String? = nil,
-        handler: @escaping AuthorizeCompletionHandler
+        page: AuthenticationPage? = nil,
+        handler: @escaping UserInfoCompletionHandler
     ) {
-        self.authorize(AuthorizeOptions(
+        self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
             state: state,
             prompt: prompt,
             loginHint: loginHint,
             uiLocales: uiLocales,
+            colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             page: page,
             suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
         ), handler: handler)
     }
 
-    private func authorize(
-        _ options: AuthorizeOptions,
-        handler: @escaping AuthorizeCompletionHandler
+    private func authenticate(
+        _ options: AuthenticateOptions,
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
         self.workerQueue.async {
-            self.authorizeWithASWebAuthenticationSession(options, handler: handler)
+            self.authenticateWithASWebAuthenticationSession(options, handler: handler)
         }
     }
 
@@ -624,10 +609,11 @@ public class Authgear {
         redirectURI: String,
         state: String? = nil,
         uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
         skipUsingBiometric: Bool? = nil,
-        handler: @escaping ReauthenticateCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
 
@@ -638,8 +624,8 @@ public class Authgear {
                 if biometricEnabled && !skipUsingBiometric {
                     self.authenticateBiometric { result in
                         switch result {
-                        case let .success(authzResult):
-                            handler(.success(ReauthenticateResult(userInfo: authzResult.userInfo, state: state)))
+                        case let .success(userInfo):
+                            handler(.success(userInfo))
                         case let .failure(error):
                             handler(.failure(error))
                         }
@@ -663,6 +649,7 @@ public class Authgear {
             redirectURI: redirectURI,
             state: state,
             uiLocales: uiLocales,
+            colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             maxAge: maxAge,
             suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
@@ -674,7 +661,7 @@ public class Authgear {
     }
 
     public func authenticateAnonymously(
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
@@ -722,7 +709,7 @@ public class Authgear {
                             }
                         }
                     }
-                    .map { AuthorizeResult(userInfo: userInfo, state: nil) }
+                    .map { userInfo }
                 handler(result)
 
             } catch {
@@ -735,8 +722,9 @@ public class Authgear {
         redirectURI: String,
         state: String? = nil,
         uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
-        handler: @escaping AuthorizeCompletionHandler
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
@@ -766,13 +754,14 @@ public class Authgear {
 
                 let loginHint = "https://authgear.com/login_hint?type=anonymous&jwt=\(signedJWT.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
 
-                self.authorize(
-                    AuthorizeOptions(
+                self.authenticate(
+                    AuthenticateOptions(
                         redirectURI: redirectURI,
                         state: state,
                         prompt: [.login],
                         loginHint: loginHint,
                         uiLocales: uiLocales,
+                        colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
                         page: nil,
                         suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
@@ -823,11 +812,26 @@ public class Authgear {
 
     public func openURL(
         path: String,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         handler: VoidCompletionHandler? = nil
     ) {
         let handler = handler.map { h in withMainQueueHandler(h) }
-        let url = apiClient.endpoint.appendingPathComponent(path)
+
+        var urlComponents = URLComponents(url: apiClient.endpoint.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        var queryItems = urlComponents.queryItems ?? []
+        if let uiLocales = uiLocales {
+            queryItems.append(URLQueryItem(
+                name: "ui_locales",
+                value: uiLocales.joined(separator: " ")
+            ))
+        }
+        if let colorScheme = colorScheme {
+            queryItems.append(URLQueryItem(name: "x_color_scheme", value: colorScheme.rawValue))
+        }
+        urlComponents.queryItems = queryItems
+        let url = urlComponents.url!
 
         workerQueue.async {
             do {
@@ -847,7 +851,8 @@ public class Authgear {
                     state: nil,
                     prompt: [.none],
                     loginHint: loginHint,
-                    uiLocales: nil,
+                    uiLocales: uiLocales,
+                    colorScheme: colorScheme,
                     idTokenHint: nil,
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
@@ -897,10 +902,17 @@ public class Authgear {
     }
 
     public func open(
-        page: AuthgearPage,
+        page: SettingsPage,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil
     ) {
-        openURL(path: page.rawValue, wechatRedirectURI: wechatRedirectURI)
+        openURL(
+            path: page.rawValue,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme,
+            wechatRedirectURI: wechatRedirectURI
+        )
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
@@ -1119,7 +1131,7 @@ public class Authgear {
     }
 
     @available(iOS 11.3, *)
-    public func authenticateBiometric(handler: @escaping AuthorizeCompletionHandler) {
+    public func authenticateBiometric(handler: @escaping UserInfoCompletionHandler) {
         let handler = withMainQueueHandler(handler)
         workerQueue.async {
             do {
@@ -1156,7 +1168,7 @@ public class Authgear {
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
                 let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
-                    .map { AuthorizeResult(userInfo: userInfo, state: nil) }
+                    .map { userInfo }
                 return handler(result)
             } catch {
                 // In case the biometric was removed remotely.
