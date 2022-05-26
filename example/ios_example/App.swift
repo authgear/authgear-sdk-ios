@@ -7,7 +7,7 @@ class App: ObservableObject {
     static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
     static let wechatAppID = "wxa2f631873c63add1"
 
-    var colorScheme: SwiftUI.ColorScheme {
+    var systemColorScheme: SwiftUI.ColorScheme? {
         let s = UIApplication.shared.keyWindow?.rootViewController?.traitCollection.userInterfaceStyle
         switch s {
         case .light:
@@ -19,15 +19,27 @@ class App: ObservableObject {
         }
     }
 
+    var colorScheme: AuthgearColorScheme? {
+        self.explicitColorScheme ?? self.systemColorScheme?.authgear
+    }
+
     @Published var container: Authgear?
     @Published var sessionState = SessionState.unknown
     @Published var user: UserInfo?
     @Published var authenticationPage: AuthenticationPage?
+    @Published var explicitColorScheme: AuthgearColorScheme?
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
 
-    func configure(clientId: String, endpoint: String, authenticationPage: AuthenticationPage?, tokenStorage: String, shareSessionWithSystemBrowser: Bool) {
+    func configure(
+        clientId: String,
+        endpoint: String,
+        authenticationPage: AuthenticationPage?,
+        colorScheme: AuthgearColorScheme?,
+        tokenStorage: String,
+        shareSessionWithSystemBrowser: Bool
+    ) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
             return
@@ -42,6 +54,7 @@ class App: ObservableObject {
         UserDefaults.standard.set(shareSessionWithSystemBrowser, forKey: "authgear.demo.shareSessionWithSystemBrowser")
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, shareSessionWithSystemBrowser: shareSessionWithSystemBrowser)
         self.authenticationPage = authenticationPage
+        self.explicitColorScheme = colorScheme
         self.updateBiometricState()
     }
 
@@ -93,7 +106,7 @@ class App: ObservableObject {
     func login() {
         container?.authenticate(
             redirectURI: App.redirectURI,
-            colorScheme: self.colorScheme.authgear,
+            colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI,
             page: self.authenticationPage,
             handler: self.handleAuthorizeResult
@@ -106,7 +119,7 @@ class App: ObservableObject {
             case .success:
                 self.container?.reauthenticate(
                     redirectURI: App.redirectURI,
-                    colorScheme: self.colorScheme.authgear
+                    colorScheme: self.colorScheme
                 ) { result in
                     self.updateBiometricState()
                     switch result {
@@ -128,7 +141,7 @@ class App: ObservableObject {
             case .success:
                 self.container?.reauthenticate(
                     redirectURI: App.redirectURI,
-                    colorScheme: self.colorScheme.authgear,
+                    colorScheme: self.colorScheme,
                     skipUsingBiometric: true
                 ) { result in
                     self.updateBiometricState()
@@ -177,7 +190,7 @@ class App: ObservableObject {
     func openSetting() {
         container?.open(
             page: .settings,
-            colorScheme: self.colorScheme.authgear,
+            colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI
         )
     }
@@ -185,7 +198,7 @@ class App: ObservableObject {
     func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,
-            colorScheme: self.colorScheme.authgear,
+            colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI,
             handler: self.handleAuthorizeResult
         )

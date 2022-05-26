@@ -60,6 +60,7 @@ struct AuthgearConfigurationForm: View {
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var shareSessionWithSystemBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithSystemBrowser")
     @State private var authenticationPage: String = ""
+    @State private var explicitColorSchemeString: String = ""
 
     var body: some View {
         VStack {
@@ -82,6 +83,11 @@ struct AuthgearConfigurationForm: View {
                 Text("Login").tag(AuthenticationPage.login.rawValue)
                 Text("Signup").tag(AuthenticationPage.signup.rawValue)
             }.pickerStyle(.segmented)
+            Picker("Color Scheme", selection: $explicitColorSchemeString) {
+                Text("Use system").tag("")
+                Text("Light").tag(ColorScheme.light.rawValue)
+                Text("Dark").tag(ColorScheme.dark.rawValue)
+            }.pickerStyle(.segmented)
             Picker("Token Storage", selection: $tokenStorage) {
                 Text(TokenStorageClassName.TransientTokenStorage.rawValue).tag(TokenStorageClassName.TransientTokenStorage.rawValue)
                 Text(TokenStorageClassName.PersistentTokenStorage.rawValue).tag(TokenStorageClassName.PersistentTokenStorage.rawValue)
@@ -95,6 +101,7 @@ struct AuthgearConfigurationForm: View {
                     clientId: self.clientID,
                     endpoint: self.endpoint,
                     authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
+                    colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
                     shareSessionWithSystemBrowser: self.shareSessionWithSystemBrowser
                 )
