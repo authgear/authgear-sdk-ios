@@ -73,21 +73,104 @@ struct ReauthenticateOptions {
     }
 }
 
-public struct UserInfo: Decodable {
+public struct UserInfoAddress: Decodable {
     enum CodingKeys: String, CodingKey {
-        case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
-        case isVerified = "https://authgear.com/claims/user/is_verified"
-        case sub
+        case formatted
+        case streetAddress = "street_address"
+        case locality
+        case region
+        case postalCode = "postal_code"
+        case country
     }
 
+    public let formatted: String?
+    public let streetAddress: String?
+    public let locality: String?
+    public let region: String?
+    public let postalCode: String?
+    public let country: String?
+}
+
+public struct UserInfo: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case sub
+        case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
+        case isVerified = "https://authgear.com/claims/user/is_verified"
+        case canReauthenticate = "https://authgear.com/claims/user/can_reauthenticate"
+        case customAttributes = "custom_attributes"
+        case email
+        case emailVerified = "email_verified"
+        case phoneNumber = "phone_number"
+        case phoneNumberVerified = "phone_number_verified"
+        case preferredUsername = "preferred_username"
+        case familyName = "family_name"
+        case givenName = "given_name"
+        case middleName = "middle_name"
+        case name
+        case nickname
+        case picture
+        case profile
+        case website
+        case gender
+        case birthdate
+        case zoneinfo
+        case locale
+        case address
+    }
+
+    public let sub: String
     public let isAnonymous: Bool
     public let isVerified: Bool
-    public let sub: String
+    public let canReauthenticate: Bool
 
-    public init(isAnonymous: Bool, isVerified: Bool, sub: String) {
-        self.isAnonymous = isAnonymous
-        self.isVerified = isVerified
-        self.sub = sub
+    public let customAttributes: [String: Any]
+
+    public let email: String?
+    public let emailVerified: Bool?
+    public let phoneNumber: String?
+    public let phoneNumberVerified: Bool?
+    public let preferredUsername: String?
+    public let familyName: String?
+    public let givenName: String?
+    public let middleName: String?
+    public let name: String?
+    public let nickname: String?
+    public let picture: String?
+    public let profile: String?
+    public let website: String?
+    public let gender: String?
+    public let birthdate: String?
+    public let zoneinfo: String?
+    public let locale: String?
+    public let address: UserInfoAddress?
+
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.sub = try values.decode(String.self, forKey: .sub)
+        self.isAnonymous = try values.decode(Bool.self, forKey: .isAnonymous)
+        self.isVerified = try values.decode(Bool.self, forKey: .isVerified)
+        self.canReauthenticate = try values.decode(Bool.self, forKey: .canReauthenticate)
+
+        self.email = try values.decodeIfPresent(String.self, forKey: .email)
+        self.emailVerified = try values.decodeIfPresent(Bool.self, forKey: .emailVerified)
+        self.phoneNumber = try values.decodeIfPresent(String.self, forKey: .phoneNumber)
+        self.phoneNumberVerified = try values.decodeIfPresent(Bool.self, forKey: .phoneNumberVerified)
+        self.preferredUsername = try values.decodeIfPresent(String.self, forKey: .preferredUsername)
+        self.familyName = try values.decodeIfPresent(String.self, forKey: .familyName)
+        self.givenName = try values.decodeIfPresent(String.self, forKey: .givenName)
+        self.middleName = try values.decodeIfPresent(String.self, forKey: .middleName)
+        self.name = try values.decodeIfPresent(String.self, forKey: .name)
+        self.nickname = try values.decodeIfPresent(String.self, forKey: .nickname)
+        self.picture = try values.decodeIfPresent(String.self, forKey: .picture)
+        self.profile = try values.decodeIfPresent(String.self, forKey: .profile)
+        self.website = try values.decodeIfPresent(String.self, forKey: .website)
+        self.gender = try values.decodeIfPresent(String.self, forKey: .gender)
+        self.birthdate = try values.decodeIfPresent(String.self, forKey: .birthdate)
+        self.zoneinfo = try values.decodeIfPresent(String.self, forKey: .zoneinfo)
+        self.locale = try values.decodeIfPresent(String.self, forKey: .locale)
+        self.address = try values.decodeIfPresent(UserInfoAddress.self, forKey: .address)
+        self.customAttributes = try values.decode([String: Any].self, forKey: .customAttributes)
     }
 }
 
