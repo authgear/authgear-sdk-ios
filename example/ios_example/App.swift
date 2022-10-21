@@ -119,7 +119,9 @@ class App: ObservableObject {
             case .success:
                 self.container?.reauthenticate(
                     redirectURI: App.redirectURI,
-                    colorScheme: self.colorScheme
+                    colorScheme: self.colorScheme,
+                    localizedReason: "Authenticate with biometric",
+                    policy: .deviceOwnerAuthenticationWithBiometrics
                 ) { result in
                     self.updateBiometricState()
                     switch result {
@@ -136,13 +138,12 @@ class App: ObservableObject {
     }
 
     func reauthenticateWebOnly() {
-        container?.refreshIDToken(handler: { result in
+        container?.refreshIDToken { result in
             switch result {
             case .success:
                 self.container?.reauthenticate(
                     redirectURI: App.redirectURI,
-                    colorScheme: self.colorScheme,
-                    skipUsingBiometric: true
+                    colorScheme: self.colorScheme
                 ) { result in
                     self.updateBiometricState()
                     switch result {
@@ -155,7 +156,7 @@ class App: ObservableObject {
             case let .failure(error):
                 self.setError(error)
             }
-        })
+        }
     }
 
     func enableBiometric() {
@@ -180,7 +181,11 @@ class App: ObservableObject {
     }
 
     func loginBiometric() {
-        container?.authenticateBiometric(handler: self.handleAuthorizeResult)
+        container?.authenticateBiometric(
+            localizedReason: "Authenticate with biometric",
+            policy: .deviceOwnerAuthenticationWithBiometrics,
+            handler: self.handleAuthorizeResult
+        )
     }
 
     func loginAnonymously() {

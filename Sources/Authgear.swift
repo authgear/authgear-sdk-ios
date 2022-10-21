@@ -695,7 +695,8 @@ public class Authgear {
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
-        skipUsingBiometric: Bool? = nil,
+        localizedReason: String? = nil,
+        policy: BiometricLAPolicy? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
@@ -703,9 +704,8 @@ public class Authgear {
         do {
             if #available(iOS 11.3, *) {
                 let biometricEnabled = try self.isBiometricEnabled()
-                let skipUsingBiometric = skipUsingBiometric ?? false
-                if biometricEnabled && !skipUsingBiometric {
-                    self.authenticateBiometric { result in
+                if let localizedReason = localizedReason, let policy = policy, biometricEnabled {
+                    self.authenticateBiometric(localizedReason: localizedReason, policy: policy) { result in
                         switch result {
                         case let .success(userInfo):
                             handler(.success(userInfo))
@@ -1142,9 +1142,10 @@ public class Authgear {
 
     @available(iOS 11.3, *)
     public func checkBiometricSupported() throws {
-        let context = LAContext()
+        let policy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
+        let context = LAContext(policy: policy)
         var error: NSError?
-        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        _ = context.canEvaluatePolicy(policy, error: &error)
         if let error = error {
             throw wrapError(error: error)
         }
@@ -1169,14 +1170,19 @@ public class Authgear {
     }
 
     @available(iOS 11.3, *)
-    public func enableBiometric(localizedReason: String, constraint: BiometricAccessConstraint, handler: @escaping VoidCompletionHandler) {
+    public func enableBiometric(
+        localizedReason: String,
+        constraint: BiometricAccessConstraint,
+        handler: @escaping VoidCompletionHandler
+    ) {
         let handler = withMainQueueHandler(handler)
 
-        let context = LAContext()
+        let laPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
+        let context = LAContext(policy: laPolicy)
         // First we perform a biometric authentication first.
         // But this actually is just a test to ensure biometric authentication works.
         context.evaluatePolicy(
-            .deviceOwnerAuthenticationWithBiometrics,
+            laPolicy,
             localizedReason: localizedReason
         ) { _, error in
             if let error = error {
@@ -1191,7 +1197,7 @@ public class Authgear {
                         let kid = UUID().uuidString
                         let tag = "com.authgear.keys.biometric.\(kid)"
                         let privateKey = try generatePrivateKey()
-                        try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint)
+                        try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint, laContext: context)
                         let publicKey = SecKeyCopyPublicKey(privateKey)!
                         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
                         let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
@@ -1214,53 +1220,70 @@ public class Authgear {
     }
 
     @available(iOS 11.3, *)
-    public func authenticateBiometric(handler: @escaping UserInfoCompletionHandler) {
+    public func authenticateBiometric(
+        localizedReason: String,
+        policy: BiometricLAPolicy,
+        handler: @escaping UserInfoCompletionHandler
+    ) {
+        let laPolicy = policy.laPolicy
         let handler = withMainQueueHandler(handler)
-        workerQueue.async {
-            do {
-                guard let kid = try self.storage.getBiometricKeyId(namespace: self.name) else {
-                    throw AuthgearError.biometricPrivateKeyNotFound
-                }
-                let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
-                let tag = "com.authgear.keys.biometric.\(kid)"
-                guard let privateKey = try getPrivateKey(tag: tag) else {
-                    // If the constraint was biometryCurrentSet,
-                    // then the private key may be deleted by the system
-                    // when biometric has been changed by the device owner.
-                    // In this case, perform cleanup.
-                    try self.disableBiometric()
-                    throw AuthgearError.biometricPrivateKeyNotFound
-                }
-                let publicKey = SecKeyCopyPublicKey(privateKey)!
-                let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-                let header = JWTHeader(typ: .biometric, jwk: jwk, new: false)
-                let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.authenticate.rawValue)
-                let jwt = JWT(header: header, payload: payload)
-                let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
-                let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
-                    grantType: .biometric,
-                    clientId: self.clientId,
-                    deviceInfo: getDeviceInfo(),
-                    redirectURI: nil,
-                    code: nil,
-                    codeVerifier: nil,
-                    refreshToken: nil,
-                    jwt: signedJWT,
-                    accessToken: nil
-                )
+        let context = LAContext(policy: laPolicy)
 
-                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
-                let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
-                    .map { userInfo }
-                return handler(result)
-            } catch {
-                // In case the biometric was removed remotely.
-                if case let AuthgearError.oauthError(oauthError) = error {
-                    if oauthError.error == "invalid_grant" && oauthError.errorDescription == "InvalidCredentials" {
-                        try? self.disableBiometric()
+        context.evaluatePolicy(
+            laPolicy,
+            localizedReason: localizedReason
+        ) { _, error in
+            if let error = error {
+                handler(.failure(wrapError(error: error)))
+                return
+            }
+
+            self.workerQueue.async {
+                do {
+                    guard let kid = try self.storage.getBiometricKeyId(namespace: self.name) else {
+                        throw AuthgearError.biometricPrivateKeyNotFound
                     }
+                    let challenge = try self.apiClient.syncRequestOAuthChallenge(purpose: "biometric_request").token
+                    let tag = "com.authgear.keys.biometric.\(kid)"
+                    guard let privateKey = try getPrivateKey(tag: tag, laContext: context) else {
+                        // If the constraint was biometryCurrentSet,
+                        // then the private key may be deleted by the system
+                        // when biometric has been changed by the device owner.
+                        // In this case, perform cleanup.
+                        try self.disableBiometric()
+                        throw AuthgearError.biometricPrivateKeyNotFound
+                    }
+                    let publicKey = SecKeyCopyPublicKey(privateKey)!
+                    let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
+                    let header = JWTHeader(typ: .biometric, jwk: jwk, new: false)
+                    let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.authenticate.rawValue)
+                    let jwt = JWT(header: header, payload: payload)
+                    let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
+                    let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
+                        grantType: .biometric,
+                        clientId: self.clientId,
+                        deviceInfo: getDeviceInfo(),
+                        redirectURI: nil,
+                        code: nil,
+                        codeVerifier: nil,
+                        refreshToken: nil,
+                        jwt: signedJWT,
+                        accessToken: nil
+                    )
+
+                    let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
+                    let result = self.persistSession(oidcTokenResponse, reason: .authenticated)
+                        .map { userInfo }
+                    return handler(result)
+                } catch {
+                    // In case the biometric was removed remotely.
+                    if case let AuthgearError.oauthError(oauthError) = error {
+                        if oauthError.error == "invalid_grant" && oauthError.errorDescription == "InvalidCredentials" {
+                            try? self.disableBiometric()
+                        }
+                    }
+                    handler(.failure(error))
                 }
-                handler(.failure(error))
             }
         }
     }
