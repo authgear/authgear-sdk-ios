@@ -359,7 +359,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
     ) {
         let dataTaslk = defaultSession.dataTask(with: request) { data, response, error in
             if let error = error {
-                return handler(.failure(AuthgearError.error(error)))
+                return handler(.failure(wrapError(error: error)))
             }
 
             let response = response as! HTTPURLResponse
@@ -394,7 +394,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     let response = try decorder.decode(T.self, from: data!)
                     return .success(response)
                 } catch {
-                    return .failure(AuthgearError.error(error))
+                    return .failure(wrapError(error: error))
                 }
             })
         }
@@ -462,7 +462,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 self?.fetch(request: urlRequest, handler: handler)
 
             case let .failure(error):
-                return handler(.failure(error))
+                return handler(.failure(wrapError(error: error)))
             }
         }
     }
@@ -499,7 +499,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     handler(result.map { _ in () })
                 })
             case let .failure(error):
-                return handler(.failure(error))
+                return handler(.failure(wrapError(error: error)))
             }
         }
     }
@@ -519,7 +519,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 self?.fetch(request: urlRequest, keyDecodingStrategy: .useDefaultKeys, handler: handler)
 
             case let .failure(error):
-                return handler(.failure(error))
+                return handler(.failure(wrapError(error: error)))
             }
         }
     }
@@ -549,7 +549,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     handler(result.map { _ in () })
                 })
             case let .failure(error):
-                return handler(.failure(error))
+                return handler(.failure(wrapError(error: error)))
             }
         }
     }

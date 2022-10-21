@@ -59,7 +59,7 @@ struct JWKStore {
         case errSecItemNotFound:
             return nil
         default:
-            throw AuthgearError.osStatus(status)
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
         }
     }
 
@@ -78,7 +78,7 @@ struct JWKStore {
         case errSecSuccess:
             return try publicKeyToJWK(kid: keyId, publicKey: publicKeySec!)
         default:
-            throw AuthgearError.osStatus(status)
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
         }
     }
 }

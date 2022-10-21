@@ -310,7 +310,7 @@ public class Authgear {
 
             case let .failure(error):
                 DispatchQueue.main.async {
-                    handler?(.failure(error))
+                    handler?(.failure(wrapError(error: error)))
                 }
             }
         }
@@ -359,14 +359,14 @@ public class Authgear {
                                 self?.finishReauthentication(url: url, verifier: verifier, handler: handler)
                             }
                         case let .failure(error):
-                            return handler(.failure(error))
+                            return handler(.failure(wrapError(error: error)))
                         }
                     }
                 )
                 self.authenticationSession?.start()
             }
         } catch {
-            handler(.failure(error))
+            handler(.failure(wrapError(error: error)))
         }
     }
 
@@ -395,13 +395,13 @@ public class Authgear {
                                 self?.finishAuthentication(url: url, verifier: verifier, handler: handler)
                             }
                         case let .failure(error):
-                            return handler(.failure(error))
+                            return handler(.failure(wrapError(error: error)))
                         }
                     }
                 )
                 self.authenticationSession?.start()
             case let .failure(error):
-                handler(.failure(error))
+                handler(.failure(wrapError(error: error)))
             }
         }
     }
@@ -472,7 +472,7 @@ public class Authgear {
             return handler(result)
 
         } catch {
-            return handler(.failure(error))
+            return handler(.failure(wrapError(error: error)))
         }
     }
 
@@ -536,7 +536,7 @@ public class Authgear {
 
             return handler(.success(userInfo))
         } catch {
-            return handler(.failure(error))
+            return handler(.failure(wrapError(error: error)))
         }
     }
 
@@ -565,12 +565,12 @@ public class Authgear {
     private func cleanupSession(force: Bool, reason: SessionStateChangeReason) -> Result<Void, Error> {
         if case let .failure(error) = Result(catching: { try tokenStorage.delRefreshToken(namespace: name) }) {
             if !force {
-                return .failure(error)
+                return .failure(wrapError(error: error))
             }
         }
         if case let .failure(error) = Result(catching: { try storage.delAnonymousKeyId(namespace: name) }) {
             if !force {
-                return .failure(error)
+                return .failure(wrapError(error: error))
             }
         }
 
@@ -710,7 +710,7 @@ public class Authgear {
                         case let .success(userInfo):
                             handler(.success(userInfo))
                         case let .failure(error):
-                            handler(.failure(error))
+                            handler(.failure(wrapError(error: error)))
                         }
                     }
                     // Return here to prevent us from continue
@@ -718,7 +718,7 @@ public class Authgear {
                 }
             }
         } catch {
-            handler(.failure(error))
+            handler(.failure(wrapError(error: error)))
             // Return here to prevent us from continue
             return
         }
@@ -796,7 +796,7 @@ public class Authgear {
                 handler(result)
 
             } catch {
-                handler(.failure(error))
+                handler(.failure(wrapError(error: error)))
             }
         }
     }
@@ -859,11 +859,11 @@ public class Authgear {
                             handler(result.map { response })
                         }
                     case let .failure(error):
-                        handler(.failure(error))
+                        handler(.failure(wrapError(error: error)))
                     }
                 }
             } catch {
-                handler(.failure(error))
+                handler(.failure(wrapError(error: error)))
             }
         }
     }
@@ -888,7 +888,7 @@ public class Authgear {
                 if force {
                     return handler(self.cleanupSession(force: true, reason: .logout))
                 }
-                return handler(.failure(error))
+                return handler(.failure(wrapError(error: error)))
             }
         }
     }
@@ -971,7 +971,7 @@ public class Authgear {
                                 if case AuthgearError.cancel = error {
                                     handler?(.success(()))
                                 } else {
-                                    handler?(.failure(error))
+                                    handler?(.failure(wrapError(error: error)))
                                 }
                             }
                         }
@@ -979,7 +979,7 @@ public class Authgear {
                     self.authenticationSession?.start()
                 }
             } catch {
-                handler?(.failure(error))
+                handler?(.failure(wrapError(error: error)))
             }
         }
     }
@@ -1056,7 +1056,7 @@ public class Authgear {
                         handler?(result)
                     }
                 }
-                handler?(.failure(error))
+                handler?(.failure(wrapError(error: error)))
             }
         }
     }
@@ -1115,7 +1115,7 @@ public class Authgear {
                     }
                     handler(.success(()))
                 } catch {
-                    handler(.failure(error))
+                    handler(.failure(wrapError(error: error)))
                 }
             }
         }
@@ -1135,7 +1135,7 @@ public class Authgear {
                 )
                 handler?(.success(()))
             } catch {
-                handler?(.failure(error))
+                handler?(.failure(wrapError(error: error)))
             }
         }
     }
@@ -1208,7 +1208,7 @@ public class Authgear {
                         try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
                         handler(.success(()))
                     } catch {
-                        handler(.failure(error))
+                        handler(.failure(wrapError(error: error)))
                     }
                 }
             }
@@ -1282,7 +1282,7 @@ public class Authgear {
                             try? self.disableBiometric()
                         }
                     }
-                    handler(.failure(error))
+                    handler(.failure(wrapError(error: error)))
                 }
             }
         }
