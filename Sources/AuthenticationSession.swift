@@ -21,18 +21,7 @@ class AuthenticationSessionProvider: NSObject {
     ) -> AuthenticationSession {
         let handler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
             if let error = error {
-                if #available(iOS 12.0, *) {
-                    if let asError = error as? ASWebAuthenticationSessionError,
-                       asError.code == ASWebAuthenticationSessionError.canceledLogin {
-                        return completionHandler(.failure(AuthgearError.cancel))
-                    }
-                } else {
-                    if let sfError = error as? SFAuthenticationError,
-                       sfError.code == SFAuthenticationError.canceledLogin {
-                        return completionHandler(.failure(AuthgearError.cancel))
-                    }
-                }
-                return completionHandler(.failure(AuthgearError.error(error)))
+                return completionHandler(.failure(wrapError(error: error)))
             }
 
             if let url = url {

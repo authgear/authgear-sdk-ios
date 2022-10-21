@@ -1,5 +1,7 @@
+import AuthenticationServices
 import Foundation
 import LocalAuthentication
+import SafariServices
 
 public enum AuthgearError: Error {
     case cancel
@@ -22,7 +24,6 @@ public enum AuthgearError: Error {
     case unauthenticatedUser
     case publicKeyNotFound
     case error(Error)
-    case osStatus(OSStatus)
 }
 
 public struct OAuthError: Error, Decodable {
@@ -54,6 +55,23 @@ public struct ServerError: Error, Decodable {
 }
 
 func wrapError(error: Error) -> Error {
+    // No need to wrap.
+    if let error = error as? AuthgearError {
+        return error
+    }
+
+    if #available(iOS 12.0, *) {
+        if let asError = error as? ASWebAuthenticationSessionError,
+           asError.code == ASWebAuthenticationSessionError.canceledLogin {
+            return AuthgearError.cancel
+        }
+    }
+
+    if let sfError = error as? SFAuthenticationError,
+       sfError.code == SFAuthenticationError.canceledLogin {
+        return AuthgearError.cancel
+    }
+
     let nsError = error as NSError
 
     // Cancel

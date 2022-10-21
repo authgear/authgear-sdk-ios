@@ -20,6 +20,31 @@ public enum BiometricAccessConstraint {
     }
 }
 
+public enum BiometricLAPolicy {
+    case deviceOwnerAuthenticationWithBiometrics
+    case deviceOwnerAuthentication
+
+    var laPolicy: LAPolicy {
+        switch self {
+        case .deviceOwnerAuthenticationWithBiometrics:
+            return .deviceOwnerAuthenticationWithBiometrics
+        case .deviceOwnerAuthentication:
+            return .deviceOwnerAuthentication
+        }
+    }
+}
+
+extension LAContext {
+    convenience init(policy: LAPolicy) {
+        self.init()
+        if case .deviceOwnerAuthenticationWithBiometrics = policy {
+            // Hide the fallback button
+            // https://developer.apple.com/documentation/localauthentication/lacontext/1514183-localizedfallbacktitle
+            self.localizedFallbackTitle = ""
+        }
+    }
+}
+
 @available(iOS 11.3, *)
 func generatePrivateKey() throws -> SecKey {
     var error: Unmanaged<CFError>?
@@ -43,17 +68,18 @@ func removePrivateKey(tag: String) throws {
 
     let status = SecItemDelete(query as CFDictionary)
     guard status == errSecSuccess || status == errSecItemNotFound else {
-        throw AuthgearError.osStatus(status)
+        throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
     }
 }
 
 @available(iOS 11.3, *)
-func getPrivateKey(tag: String) throws -> SecKey? {
+func getPrivateKey(tag: String, laContext: LAContext) throws -> SecKey? {
     let query: [String: Any] = [
         kSecClass as String: kSecClassKey,
         kSecMatchLimit as String: kSecMatchLimitOne,
         kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
         kSecAttrApplicationTag as String: tag,
+        kSecUseAuthenticationContext as String: laContext,
         kSecReturnRef as String: true
     ]
 
@@ -65,7 +91,7 @@ func getPrivateKey(tag: String) throws -> SecKey? {
     }
 
     guard status == errSecSuccess else {
-        throw AuthgearError.osStatus(status)
+        throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
     }
 
     let privateKey = item as! SecKey
@@ -73,7 +99,7 @@ func getPrivateKey(tag: String) throws -> SecKey? {
 }
 
 @available(iOS 11.3, *)
-func addPrivateKey(privateKey: SecKey, tag: String, constraint: BiometricAccessConstraint) throws {
+func addPrivateKey(privateKey: SecKey, tag: String, constraint: BiometricAccessConstraint, laContext: LAContext) throws {
     try removePrivateKey(tag: tag)
 
     var error: Unmanaged<CFError>?
@@ -86,18 +112,16 @@ func addPrivateKey(privateKey: SecKey, tag: String, constraint: BiometricAccessC
         throw AuthgearError.error(error!.takeRetainedValue() as Error)
     }
 
-    let context = LAContext()
-
     let query: [String: Any] = [
         kSecValueRef as String: privateKey,
         kSecClass as String: kSecClassKey,
         kSecAttrApplicationTag as String: tag,
         kSecAttrAccessControl as String: accessControl,
-        kSecUseAuthenticationContext as String: context
+        kSecUseAuthenticationContext as String: laContext
     ]
 
     let status = SecItemAdd(query as CFDictionary, nil)
     guard status == errSecSuccess else {
-        throw AuthgearError.osStatus(status)
+        throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
     }
 }
