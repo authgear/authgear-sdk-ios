@@ -414,8 +414,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ios_example/ios_example.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = E2F6KNYMR6;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M7HB6C3N6X;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = ios_example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -441,9 +443,10 @@
 					"-ObjC",
 					"-all_load",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.exampleapp.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.sdk.exampleapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS development";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Authgear Demo iOS Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "ios_example/WechatOpenSDK-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -459,6 +462,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = E2F6KNYMR6;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M7HB6C3N6X;
 				INFOPLIST_FILE = ios_example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -483,9 +487,10 @@
 					"-ObjC",
 					"-all_load",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.exampleapp.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.sdk.exampleapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Authgear Demo iOS";
 				SWIFT_OBJC_BRIDGING_HEADER = "ios_example/WechatOpenSDK-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
