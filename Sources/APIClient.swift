@@ -41,6 +41,7 @@ struct OIDCAuthenticationRequest {
     let redirectURI: String
     let responseType: String
     let scope: [String]
+    let ssoEnabled: Bool
     let state: String?
     let prompt: [PromptOption]?
     let loginHint: String?
@@ -50,7 +51,6 @@ struct OIDCAuthenticationRequest {
     let maxAge: Int?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
-    let suppressIDPSessionCookie: Bool?
 
     var redirectURIScheme: String {
         if let index = redirectURI.firstIndex(of: ":") {
@@ -126,9 +126,13 @@ struct OIDCAuthenticationRequest {
             queryItems.append(URLQueryItem(name: "x_page", value: page.rawValue))
         }
 
-        if self.suppressIDPSessionCookie == true {
+        if self.ssoEnabled == false {
+            // For backward compatibility
+            // If the developer updates the SDK but not the server
             queryItems.append(URLQueryItem(name: "x_suppress_idp_session_cookie", value: "true"))
         }
+
+        queryItems.append(URLQueryItem(name: "x_sso_enabled", value: self.ssoEnabled ? "true" : "false"))
 
         return queryItems
     }
