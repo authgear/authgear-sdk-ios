@@ -17,6 +17,7 @@ public enum PromptOption: String {
 
 struct AuthenticateOptions {
     let redirectURI: String
+    let ssoEnabled: Bool
     let state: String?
     let prompt: [PromptOption]?
     let loginHint: String?
@@ -24,13 +25,13 @@ struct AuthenticateOptions {
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
-    let suppressIDPSessionCookie: Bool?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
             scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+            ssoEnabled: ssoEnabled,
             state: self.state,
             prompt: self.prompt,
             loginHint: self.loginHint,
@@ -39,26 +40,26 @@ struct AuthenticateOptions {
             idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: self.page,
-            suppressIDPSessionCookie: suppressIDPSessionCookie
+            page: self.page
         )
     }
 }
 
 struct ReauthenticateOptions {
     let redirectURI: String
+    let ssoEnabled: Bool
     let state: String?
     let uiLocales: [String]?
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let maxAge: Int?
-    let suppressIDPSessionCookie: Bool?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
             scope: ["openid", "https://authgear.com/scopes/full-access"],
+            ssoEnabled: ssoEnabled,
             state: self.state,
             prompt: nil,
             loginHint: nil,
@@ -67,8 +68,7 @@ struct ReauthenticateOptions {
             idTokenHint: idTokenHint,
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: nil,
-            suppressIDPSessionCookie: suppressIDPSessionCookie
+            page: nil
         )
     }
 }
@@ -235,7 +235,7 @@ public class Authgear {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
-    public let shareSessionWithSystemBrowser: Bool
+    public let ssoEnabled: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -285,12 +285,12 @@ public class Authgear {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), shareSessionWithSystemBrowser: Bool = false, name: String? = nil) {
+    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), ssoEnabled: Bool = false, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
         self.storage = PersistentContainerStorage()
-        self.shareSessionWithSystemBrowser = shareSessionWithSystemBrowser
+        self.ssoEnabled = ssoEnabled
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
@@ -667,14 +667,14 @@ public class Authgear {
     ) {
         self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
+            ssoEnabled: self.ssoEnabled,
             state: state,
             prompt: prompt,
             loginHint: loginHint,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            page: page,
-            suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
+            page: page
         ), handler: handler)
     }
 
@@ -730,12 +730,12 @@ public class Authgear {
 
         let options = ReauthenticateOptions(
             redirectURI: redirectURI,
+            ssoEnabled: self.ssoEnabled,
             state: state,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            maxAge: maxAge,
-            suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
+            maxAge: maxAge
         )
 
         self.workerQueue.async {
@@ -840,14 +840,14 @@ public class Authgear {
                 self.authenticate(
                     AuthenticateOptions(
                         redirectURI: redirectURI,
+                        ssoEnabled: self.ssoEnabled,
                         state: state,
                         prompt: [.login],
                         loginHint: loginHint,
                         uiLocales: uiLocales,
                         colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
-                        page: nil,
-                        suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
+                        page: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -931,6 +931,7 @@ public class Authgear {
                     redirectURI: url.absoluteString,
                     responseType: "none",
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+                    ssoEnabled: self.ssoEnabled,
                     state: nil,
                     prompt: [.none],
                     loginHint: loginHint,
@@ -939,8 +940,7 @@ public class Authgear {
                     idTokenHint: nil,
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
-                    page: nil,
-                    suppressIDPSessionCookie: self.shouldSuppressIDPSessionCookie()
+                    page: nil
                 ), verifier: nil)
 
                 DispatchQueue.main.async {
@@ -999,11 +999,7 @@ public class Authgear {
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
-        !self.shareSessionWithSystemBrowser
-    }
-
-    private func shouldSuppressIDPSessionCookie() -> Bool {
-        !self.shareSessionWithSystemBrowser
+        !self.ssoEnabled
     }
 
     private func shouldRefreshAccessToken() -> Bool {

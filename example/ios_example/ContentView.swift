@@ -58,7 +58,7 @@ struct AuthgearConfigurationForm: View {
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
-    @State private var shareSessionWithSystemBrowser: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.shareSessionWithSystemBrowser")
+    @State private var ssoEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.ssoEnabled")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
 
@@ -93,8 +93,8 @@ struct AuthgearConfigurationForm: View {
                 Text(TokenStorageClassName.PersistentTokenStorage.rawValue).tag(TokenStorageClassName.PersistentTokenStorage.rawValue)
             }.pickerStyle(.segmented)
             AuthgearConfigurationInput(
-                label: "Share Session With System Browser",
-                input: Toggle(isOn: $shareSessionWithSystemBrowser) { EmptyView() }
+                label: "SSO Enabled",
+                input: Toggle(isOn: $ssoEnabled) { EmptyView() }
             )
             Button(action: {
                 self.app.configure(
@@ -103,7 +103,7 @@ struct AuthgearConfigurationForm: View {
                     authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
-                    shareSessionWithSystemBrowser: self.shareSessionWithSystemBrowser
+                    ssoEnabled: self.ssoEnabled
                 )
             }) {
                 ActionButton(text: "Configure")
