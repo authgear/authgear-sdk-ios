@@ -17,7 +17,7 @@ public enum PromptOption: String {
 
 struct AuthenticateOptions {
     let redirectURI: String
-    let ssoEnabled: Bool
+    let isSSOEnabled: Bool
     let state: String?
     let prompt: [PromptOption]?
     let loginHint: String?
@@ -31,7 +31,7 @@ struct AuthenticateOptions {
             redirectURI: self.redirectURI,
             responseType: "code",
             scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
-            ssoEnabled: ssoEnabled,
+            isSSOEnabled: isSSOEnabled,
             state: self.state,
             prompt: self.prompt,
             loginHint: self.loginHint,
@@ -47,7 +47,7 @@ struct AuthenticateOptions {
 
 struct ReauthenticateOptions {
     let redirectURI: String
-    let ssoEnabled: Bool
+    let isSSOEnabled: Bool
     let state: String?
     let uiLocales: [String]?
     let colorScheme: ColorScheme?
@@ -59,7 +59,7 @@ struct ReauthenticateOptions {
             redirectURI: self.redirectURI,
             responseType: "code",
             scope: ["openid", "https://authgear.com/scopes/full-access"],
-            ssoEnabled: ssoEnabled,
+            isSSOEnabled: isSSOEnabled,
             state: self.state,
             prompt: nil,
             loginHint: nil,
@@ -235,7 +235,7 @@ public class Authgear {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
-    public let ssoEnabled: Bool
+    public let isSSOEnabled: Bool
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -285,12 +285,12 @@ public class Authgear {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), ssoEnabled: Bool = false, name: String? = nil) {
+    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
         self.storage = PersistentContainerStorage()
-        self.ssoEnabled = ssoEnabled
+        self.isSSOEnabled = isSSOEnabled
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
@@ -667,7 +667,7 @@ public class Authgear {
     ) {
         self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
-            ssoEnabled: self.ssoEnabled,
+            isSSOEnabled: self.isSSOEnabled,
             state: state,
             prompt: prompt,
             loginHint: loginHint,
@@ -730,7 +730,7 @@ public class Authgear {
 
         let options = ReauthenticateOptions(
             redirectURI: redirectURI,
-            ssoEnabled: self.ssoEnabled,
+            isSSOEnabled: self.isSSOEnabled,
             state: state,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
@@ -840,7 +840,7 @@ public class Authgear {
                 self.authenticate(
                     AuthenticateOptions(
                         redirectURI: redirectURI,
-                        ssoEnabled: self.ssoEnabled,
+                        isSSOEnabled: self.isSSOEnabled,
                         state: state,
                         prompt: [.login],
                         loginHint: loginHint,
@@ -931,7 +931,7 @@ public class Authgear {
                     redirectURI: url.absoluteString,
                     responseType: "none",
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
-                    ssoEnabled: self.ssoEnabled,
+                    isSSOEnabled: self.isSSOEnabled,
                     state: nil,
                     prompt: [.none],
                     loginHint: loginHint,
@@ -999,7 +999,7 @@ public class Authgear {
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
-        !self.ssoEnabled
+        !self.isSSOEnabled
     }
 
     private func shouldRefreshAccessToken() -> Bool {
