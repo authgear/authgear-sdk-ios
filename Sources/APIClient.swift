@@ -41,7 +41,7 @@ struct OIDCAuthenticationRequest {
     let redirectURI: String
     let responseType: String
     let scope: [String]
-    let ssoEnabled: Bool
+    let isSSOEnabled: Bool
     let state: String?
     let prompt: [PromptOption]?
     let loginHint: String?
@@ -126,13 +126,13 @@ struct OIDCAuthenticationRequest {
             queryItems.append(URLQueryItem(name: "x_page", value: page.rawValue))
         }
 
-        if self.ssoEnabled == false {
+        if self.isSSOEnabled == false {
             // For backward compatibility
             // If the developer updates the SDK but not the server
             queryItems.append(URLQueryItem(name: "x_suppress_idp_session_cookie", value: "true"))
         }
 
-        queryItems.append(URLQueryItem(name: "x_sso_enabled", value: self.ssoEnabled ? "true" : "false"))
+        queryItems.append(URLQueryItem(name: "x_sso_enabled", value: self.isSSOEnabled ? "true" : "false"))
 
         return queryItems
     }
