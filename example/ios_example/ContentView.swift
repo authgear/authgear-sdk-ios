@@ -38,6 +38,23 @@ struct AuthgearConfigurationTextField: View {
     }
 }
 
+struct TextLabelValue: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack(spacing: 15) {
+            Text(label)
+                .minimumScaleFactor(0.8)
+                .frame(width: 150, height: nil, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer()
+            Text(value)
+                .frame(width: nil, height: nil, alignment: .trailing)
+        }
+    }
+}
+
 struct ActionButton: View {
     var text: String
     var body: some View {
@@ -95,6 +112,10 @@ struct AuthgearConfigurationForm: View {
             AuthgearConfigurationInput(
                 label: "Is SSO Enabled",
                 input: Toggle(isOn: $isSSOEnabled) { EmptyView() }
+            )
+            TextLabelValue(
+                label: "SessionState",
+                value: app.sessionState.rawValue
             )
             Button(action: {
                 self.app.configure(
