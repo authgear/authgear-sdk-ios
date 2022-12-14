@@ -923,7 +923,14 @@ public class Authgear {
                     return
                 }
 
-                let token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
+                var token = ""
+                do {
+                    token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
+                } catch {
+                    _ = self._handleInvalidGrantException(error: error)
+                    handler?(.failure(wrapError(error: error)))
+                    return
+                }
 
                 let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
 
@@ -1044,13 +1051,12 @@ public class Authgear {
                 let result = self.persistSession(oidcTokenResponse, reason: .foundToken)
                 handler?(result)
             } catch {
+                let result = self._handleInvalidGrantException(error: error)
                 if let error = error as? AuthgearError,
                    case let .oauthError(oauthError) = error,
                    oauthError.error == "invalid_grant" {
-                    return DispatchQueue.main.async {
-                        let result = self.cleanupSession(force: true, reason: .invalid)
-                        handler?(result)
-                    }
+                    handler?(result)
+                    return
                 }
                 handler?(.failure(wrapError(error: error)))
             }
@@ -1081,6 +1087,9 @@ public class Authgear {
         let fetchUserInfo = { (accessToken: String) in
             self.workerQueue.async {
                 let result = Result { try self.apiClient.syncRequestOIDCUserInfo(accessToken: accessToken) }
+                if case let .failure(error) = result {
+                    _ = self._handleInvalidGrantException(error: error)
+                }
                 handler(result)
             }
         }
@@ -1111,6 +1120,7 @@ public class Authgear {
                     }
                     handler(.success(()))
                 } catch {
+                    _ = self._handleInvalidGrantException(error: error)
                     handler(.failure(wrapError(error: error)))
                 }
             }
@@ -1204,6 +1214,7 @@ public class Authgear {
                         try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
                         handler(.success(()))
                     } catch {
+                        _ = self._handleInvalidGrantException(error: error)
                         handler(.failure(wrapError(error: error)))
                     }
                 }
@@ -1282,5 +1293,18 @@ public class Authgear {
                 }
             }
         }
+    }
+
+    private func _handleInvalidGrantException(error: Error) -> Result<Void, Error> {
+        if let error = error as? AuthgearError,
+           case let .oauthError(oauthError) = error,
+           oauthError.error == "invalid_grant" {
+            return self.cleanupSession(force: true, reason: .invalid)
+        } else if let error = error as? AuthgearError,
+                  case let .serverError(serverError) = error,
+                  serverError.reason == "InvalidGrant" {
+            return self.cleanupSession(force: true, reason: .invalid)
+        }
+        return .success(())
     }
 }
