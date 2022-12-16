@@ -50,7 +50,7 @@ public struct ServerError: Error, Decodable {
         name = try values.decode(String.self, forKey: .name)
         message = try values.decode(String.self, forKey: .message)
         reason = try values.decode(String.self, forKey: .reason)
-        info = try values.decode([String: Any].self, forKey: .info)
+        info = try? values.decode([String: Any].self, forKey: .info)
     }
 }
 

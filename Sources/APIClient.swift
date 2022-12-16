@@ -8,33 +8,16 @@ enum GrantType: String {
     case idToken = "urn:authgear:params:oauth:grant-type:id-token"
 }
 
-enum APIResponse<T: Decodable>: Decodable {
-    case result(T)
-    case error(ServerError)
-
-    enum CodingKeys: String, CodingKey {
-        case result
-        case error
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        if container.contains(.error) {
-            self = .error(try container.decode(ServerError.self, forKey: .error))
-        } else {
-            self = .result(try container.decode(T.self, forKey: .result))
-        }
-    }
+struct APIResponse<T: Decodable>: Decodable {
+    let result: T
 
     func toResult() -> Result<T, Error> {
-        switch self {
-        case let .result(value):
-            return .success(value)
-        case let .error(error):
-            return .failure(AuthgearError.serverError(error))
-        }
+        .success(result)
     }
+}
+
+struct APIErrorResponse: Decodable {
+    let error: ServerError
 }
 
 struct OIDCAuthenticationRequest {
@@ -374,6 +357,9 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     decorder.keyDecodingStrategy = .convertFromSnakeCase
                     if let error = try? decorder.decode(OAuthError.self, from: data) {
                         return handler(.failure(AuthgearError.oauthError(error)))
+                    }
+                    if let errorResp = try? decorder.decode(APIErrorResponse.self, from: data) {
+                        return handler(.failure(AuthgearError.serverError(errorResp.error)))
                     }
                 }
                 return handler(.failure(AuthgearError.unexpectedHttpStatusCode(response.statusCode, data)))
