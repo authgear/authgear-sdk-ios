@@ -38,7 +38,8 @@ class App: ObservableObject {
         authenticationPage: AuthenticationPage?,
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
-        isSSOEnabled: Bool
+        isSSOEnabled: Bool,
+        uiVariant: UIVariant
     ) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
@@ -52,7 +53,8 @@ class App: ObservableObject {
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled)
+        UserDefaults.standard.set(uiVariant.rawValue, forKey: "authgear.demo.uiVariant")
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, uiVariant: uiVariant)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
         self.updateBiometricState()
