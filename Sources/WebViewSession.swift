@@ -1,6 +1,7 @@
 import UIKit
 import WebKit
 
+@available(iOS 13.0, *)
 @objc protocol WebViewSessionDelegate: AnyObject {
     func presentationAnchor(for: WebViewSession) -> UIWindow
     @objc optional func webViewSessionWillPresent(_: WebViewSession)
@@ -11,6 +12,7 @@ enum WebViewSessionError: Error {
     case presentationContextNotProvided
 }
 
+@available(iOS 13.0, *)
 class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDelegate {
     typealias CompletionHandler = (URL?, Error?) -> Void
 
@@ -28,12 +30,13 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
         self.completionHandler = completionHandler
     }
 
-    func start() {
+    func start() -> Bool {
         let viewController = WebViewViewController()
         self.viewController = viewController
         viewController.delegate = self
         viewController.webview.navigationDelegate = self
         self.initialNavigation = viewController.webview.load(URLRequest(url: self.url))
+        return true
     }
 
     func cancel() {
@@ -104,8 +107,12 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
             }
         }
 
-        if navigationAction.shouldPerformDownload {
-            return .download
+        if #available(iOS 14.5, *) {
+            if navigationAction.shouldPerformDownload {
+                return .download
+            } else {
+                return .allow
+            }
         } else {
             return .allow
         }

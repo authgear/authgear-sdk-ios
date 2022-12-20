@@ -12,11 +12,15 @@ extension SFAuthenticationSession: AuthenticationSession {}
 @available(iOS 12.0, *)
 extension ASWebAuthenticationSession: AuthenticationSession {}
 
-class AuthenticationSessionProvider: NSObject {
+@available(iOS 13.0, *)
+extension WebViewSession: AuthenticationSession {}
+
+class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
     func makeAuthenticationSession(
         url: URL,
         redirectURI: String,
         prefersEphemeralWebBrowserSession: Bool?,
+        uiVariant: UIVariant,
         completionHandler: @escaping AuthenticationSession.CompletionHandler
     ) -> AuthenticationSession {
         let handler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
@@ -27,6 +31,17 @@ class AuthenticationSessionProvider: NSObject {
             if let url = url {
                 return completionHandler(.success(url))
             }
+        }
+
+        if #available(iOS 13.0, *),
+           case .wkWebView = uiVariant {
+            let session = WebViewSession(
+                url: url,
+                redirectURI: URL(string: redirectURI)!,
+                completionHandler: handler
+            )
+            session.delegate = self
+            return session
         }
 
         if #available(iOS 12.0, *) {
@@ -58,6 +73,14 @@ class AuthenticationSessionProvider: NSObject {
         }
         return uri
     }
+
+    @available(iOS 13.0, *)
+    func presentationAnchor(for: WebViewSession) -> UIWindow {
+        UIApplication.shared.windows.filter { $0.isKeyWindow }.first!
+    }
+
+    @available(iOS 13.0, *)
+    func webViewSessionWillPresent(_: WebViewSession) {}
 }
 
 extension AuthenticationSessionProvider: ASWebAuthenticationPresentationContextProviding {
