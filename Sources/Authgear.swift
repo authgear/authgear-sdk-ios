@@ -204,6 +204,11 @@ public enum SessionStateChangeReason: String {
     case clear = "CLEAR"
 }
 
+public enum UIVariant: String {
+    case asWebAuthenticationSession
+    case wkWebView
+}
+
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
     func sendWechatAuthRequest(_ state: String)
@@ -236,6 +241,7 @@ public class Authgear {
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
     public let isSSOEnabled: Bool
+    public let uiVariant: UIVariant
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -285,12 +291,13 @@ public class Authgear {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, name: String? = nil) {
+    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, uiVariant: UIVariant = .asWebAuthenticationSession,name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
+        self.uiVariant = uiVariant
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
