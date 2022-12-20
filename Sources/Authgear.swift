@@ -358,6 +358,7 @@ public class Authgear {
                     url: url,
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
+                    uiVariant: self.uiVariant,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -394,6 +395,7 @@ public class Authgear {
                     url: url,
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
+                    uiVariant: self.uiVariant,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -975,6 +977,7 @@ public class Authgear {
                         // the alert dialog is never prompted and
                         // the app session token cookie is forgotten when the webview is closed.
                         prefersEphemeralWebBrowserSession: true,
+                        uiVariant: self.uiVariant,
                         completionHandler: { [weak self] result in
                             self?.unregisterCurrentWechatRedirectURI()
                             switch result {

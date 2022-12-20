@@ -17,6 +17,7 @@ class WebViewViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -27,7 +28,6 @@ class WebViewViewController: UIViewController {
         self.view.addSubview(self.webview)
         self.view.backgroundColor = UIColor.white
 
-        self.navigationItem.title = "Hello"
         self.navigationItem.hidesBackButton = true
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Cancel",
@@ -48,7 +48,7 @@ class WebViewViewController: UIViewController {
 
     func navigationDidFinish(_: WKNavigation) {
         if self.webview.canGoBack {
-            var item = UIBarButtonItem()
+            let item = UIBarButtonItem()
             item.title = "Back"
             item.target = self
             item.action = #selector(WebViewViewController.goBack(_:))
