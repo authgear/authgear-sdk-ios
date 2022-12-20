@@ -35,13 +35,6 @@ struct OIDCAuthenticationRequest {
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
 
-    var redirectURIScheme: String {
-        if let index = redirectURI.firstIndex(of: ":") {
-            return String(redirectURI[..<index])
-        }
-        return redirectURI
-    }
-
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
             URLQueryItem(name: "response_type", value: self.responseType),
