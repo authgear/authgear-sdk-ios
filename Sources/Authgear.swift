@@ -356,7 +356,7 @@ public class Authgear {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
-                    callbackURLSchema: request.redirectURIScheme,
+                    redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
@@ -392,7 +392,7 @@ public class Authgear {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                     url: url,
-                    callbackURLSchema: request.redirectURIScheme,
+                    redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
@@ -969,8 +969,8 @@ public class Authgear {
                     self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
                         url: endpoint,
                         // Opening an arbitrary URL does not have a clear goal.
-                        // So here we pass a placeholder callbackURL scheme.
-                        callbackURLSchema: "nocallback",
+                        // So here we pass a placeholder redirect uri.
+                        redirectURI: "nocallback",
                         // prefersEphemeralWebBrowserSession is true so that
                         // the alert dialog is never prompted and
                         // the app session token cookie is forgotten when the webview is closed.

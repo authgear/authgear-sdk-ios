@@ -15,7 +15,7 @@ extension ASWebAuthenticationSession: AuthenticationSession {}
 class AuthenticationSessionProvider: NSObject {
     func makeAuthenticationSession(
         url: URL,
-        callbackURLSchema: String,
+        redirectURI: String,
         prefersEphemeralWebBrowserSession: Bool?,
         completionHandler: @escaping AuthenticationSession.CompletionHandler
     ) -> AuthenticationSession {
@@ -28,10 +28,11 @@ class AuthenticationSessionProvider: NSObject {
                 return completionHandler(.success(url))
             }
         }
+
         if #available(iOS 12.0, *) {
             let session = ASWebAuthenticationSession(
                 url: url,
-                callbackURLScheme: callbackURLSchema,
+                callbackURLScheme: getURIScheme(uri: redirectURI),
                 completionHandler: handler
             )
 
@@ -44,11 +45,18 @@ class AuthenticationSessionProvider: NSObject {
         } else {
             let session = SFAuthenticationSession(
                 url: url,
-                callbackURLScheme: callbackURLSchema,
+                callbackURLScheme: getURIScheme(uri: redirectURI),
                 completionHandler: handler
             )
             return session
         }
+    }
+
+    private func getURIScheme(uri: String) -> String {
+        if let index = uri.firstIndex(of: ":") {
+            return String(uri[..<index])
+        }
+        return uri
     }
 }
 
