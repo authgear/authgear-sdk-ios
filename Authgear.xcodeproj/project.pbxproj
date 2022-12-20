@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		775FF72A2603649500B81ECD /* Biometric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF7292603649500B81ECD /* Biometric.swift */; };
 		775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF73326047C7700B81ECD /* DeviceInfo.swift */; };
+		CC38CD6429520E8E00C57346 /* WebViewSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC38CD6329520E8E00C57346 /* WebViewSession.swift */; };
+		CC38CD6829520EA000C57346 /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC38CD6729520EA000C57346 /* WebViewViewController.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
 		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
@@ -49,6 +51,8 @@
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20D6F025BAA3C400E579DD /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = example/Pods/Pods.xcodeproj; sourceTree = "<group>"; };
+		CC38CD6329520E8E00C57346 /* WebViewSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewSession.swift; sourceTree = "<group>"; };
+		CC38CD6729520EA000C57346 /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
 		F83392EE24FC344D00A69D3C /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		F83392F024FDA87900A69D3C /* AuthgearError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthgearError.swift; sourceTree = "<group>"; };
 		F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLComponents+QueryParames.swift"; sourceTree = "<group>"; };
@@ -142,6 +146,8 @@
 				775FF7292603649500B81ECD /* Biometric.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
 				F8A657A825055A7C0027888F /* Base64.swift */,
+				CC38CD6329520E8E00C57346 /* WebViewSession.swift */,
+				CC38CD6729520EA000C57346 /* WebViewViewController.swift */,
 			);
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -252,6 +258,8 @@
 				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
 				F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */,
 				F83D84B024F860AA00B4393C /* AuthenticationSession.swift in Sources */,
+				CC38CD6429520E8E00C57346 /* WebViewSession.swift in Sources */,
+				CC38CD6829520EA000C57346 /* WebViewViewController.swift in Sources */,
 				F83D84A824F64D0E00B4393C /* Authgear.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

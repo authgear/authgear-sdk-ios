@@ -291,7 +291,7 @@ public class Authgear {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, uiVariant: UIVariant = .asWebAuthenticationSession,name: String? = nil) {
+    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, uiVariant: UIVariant = .asWebAuthenticationSession, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
