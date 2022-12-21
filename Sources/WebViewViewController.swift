@@ -29,12 +29,16 @@ class WebViewViewController: UIViewController {
         self.view.backgroundColor = UIColor.white
 
         self.navigationItem.hidesBackButton = true
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Cancel",
-            style: .plain,
-            target: self,
-            action: #selector(WebViewViewController.onTapCancel(_:))
-        )
+        let item = UIBarButtonItem()
+        if #available(iOS 13, *) {
+            item.image = UIImage(systemName: "xmark")
+        } else {
+            item.title = "Cancel"
+        }
+        item.style = .plain
+        item.target = self
+        item.action = #selector(WebViewViewController.onTapCancel(_:))
+        self.navigationItem.rightBarButtonItem = item
 
         self.webview.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
         self.webview.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
@@ -49,7 +53,11 @@ class WebViewViewController: UIViewController {
     func navigationDidFinish(_: WKNavigation) {
         if self.webview.canGoBack {
             let item = UIBarButtonItem()
-            item.title = "Back"
+            if #available(iOS 13, *) {
+                item.image = UIImage(systemName: "arrow.left")
+            } else {
+                item.title = "Back"
+            }
             item.target = self
             item.action = #selector(WebViewViewController.goBack(_:))
             self.navigationItem.setLeftBarButton(item, animated: true)
