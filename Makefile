@@ -41,7 +41,3 @@ test:
 .PHONY: docs
 docs:
 	bundle exec jazzy --module Authgear
-
-.PHONY: deploy-docs
-deploy-docs: docs
-	./scripts/deploy_docs.sh
