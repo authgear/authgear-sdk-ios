@@ -2,6 +2,10 @@ DEVICE_SDK=iphoneos15.2
 SIMULATOR_SDK=iphonesimulator15.2
 TEST_DESTINATION="platform=iOS Simulator,name=iPhone 13,OS=15.2"
 
+.PHONY: vendor
+vendor:
+	bundle install
+
 .PHONY: format
 format:
 	swiftformat .
@@ -36,9 +40,7 @@ test:
 
 .PHONY: docs
 docs:
-	@command -v jazzy > /dev/null || \
-	   { echo 'jazzy is required: https://github.com/realm/jazzy'; exit 1; }
-	jazzy --module Authgear
+	bundle exec jazzy --module Authgear
 
 .PHONY: deploy-docs
 deploy-docs: docs

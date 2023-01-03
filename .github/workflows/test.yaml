@@ -15,6 +15,9 @@ jobs:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
       # Install the latest version of swiftformat.
       # Latest compatiable version with our codebase is 0.48.0
       - run: brew update
@@ -24,3 +27,4 @@ jobs:
       - run: pod install --project-directory=example
       - run: make build
       - run: make test
+      - run: make docs
