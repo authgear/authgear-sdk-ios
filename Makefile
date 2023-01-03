@@ -2,6 +2,8 @@ DEVICE_SDK=iphoneos15.2
 SIMULATOR_SDK=iphonesimulator15.2
 TEST_DESTINATION="platform=iOS Simulator,name=iPhone 13,OS=15.2"
 
+GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
+
 .PHONY: vendor
 vendor:
 	bundle install
@@ -40,4 +42,4 @@ test:
 
 .PHONY: docs
 docs:
-	bundle exec jazzy --module Authgear
+	bundle exec jazzy --module Authgear --title "Authgear iOS SDK $(GIT_HASH)" --hide-documentation-coverage
