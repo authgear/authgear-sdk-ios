@@ -111,6 +111,7 @@ struct AuthgearConfigurationForm: View {
             Picker("UI Variant", selection: $uiVariantString) {
                 Text("ASWebAuthenticationSession").tag(UIVariant.asWebAuthenticationSession.rawValue)
                 Text("WKWebView").tag(UIVariant.wkWebView.rawValue)
+                Text("WKWebViewFullScreen").tag(UIVariant.wkWebViewFullScreen.rawValue)
             }.pickerStyle(.segmented)
             Picker("Token Storage", selection: $tokenStorage) {
                 Text(TokenStorageClassName.TransientTokenStorage.rawValue).tag(TokenStorageClassName.TransientTokenStorage.rawValue)

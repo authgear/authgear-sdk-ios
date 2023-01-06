@@ -207,6 +207,7 @@ public enum SessionStateChangeReason: String {
 public enum UIVariant: String {
     case asWebAuthenticationSession
     case wkWebView
+    case wkWebViewFullScreen
 }
 
 public protocol AuthgearDelegate: AnyObject {
