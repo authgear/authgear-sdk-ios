@@ -33,15 +33,17 @@ class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
             }
         }
 
-        if #available(iOS 13.0, *),
-           case .wkWebView = uiVariant {
-            let session = WebViewSession(
-                url: url,
-                redirectURI: URL(string: redirectURI)!,
-                completionHandler: handler
-            )
-            session.delegate = self
-            return session
+        if #available(iOS 13.0, *) {
+            if uiVariant == .wkWebView || uiVariant == .wkWebViewFullScreen {
+                let session = WebViewSession(
+                    url: url,
+                    redirectURI: URL(string: redirectURI)!,
+                    isFullScreenMode: uiVariant == .wkWebViewFullScreen,
+                    completionHandler: handler
+                )
+                session.delegate = self
+                return session
+            }
         }
 
         if #available(iOS 12.0, *) {

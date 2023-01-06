@@ -18,20 +18,22 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
 
     let url: URL
     let redirectURI: URL
+    let isFullScreenMode: Bool
     weak var delegate: WebViewSessionDelegate?
 
     private var completionHandler: CompletionHandler?
     private var viewController: WebViewViewController?
     private var initialNavigation: WKNavigation?
 
-    init(url: URL, redirectURI: URL, completionHandler: @escaping CompletionHandler) {
+    init(url: URL, redirectURI: URL, isFullScreenMode: Bool, completionHandler: @escaping CompletionHandler) {
         self.url = url
         self.redirectURI = redirectURI
+        self.isFullScreenMode = isFullScreenMode
         self.completionHandler = completionHandler
     }
 
     func start() -> Bool {
-        let viewController = WebViewViewController()
+        let viewController = WebViewViewController(isFullScreenMode: isFullScreenMode)
         self.viewController = viewController
         viewController.delegate = self
         viewController.webview.navigationDelegate = self
@@ -62,6 +64,8 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
             appearance.backgroundColor = UIColor.white
             navigationController.navigationBar.standardAppearance = appearance
             navigationController.navigationBar.scrollEdgeAppearance = appearance
+
+            navigationController.isNavigationBarHidden = isFullScreenMode
 
             window.rootViewController?.present(navigationController, animated: true)
         } else {

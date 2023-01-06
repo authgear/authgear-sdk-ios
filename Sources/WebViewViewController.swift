@@ -8,12 +8,16 @@ protocol WebViewViewControllerDelegate: AnyObject {
 class WebViewViewController: UIViewController {
     let webview: WKWebView
 
+    let isFullScreenMode: Bool
     weak var delegate: WebViewViewControllerDelegate?
 
-    init() {
+    init(isFullScreenMode: Bool = false) {
+        self.isFullScreenMode = isFullScreenMode
         self.webview = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
         self.webview.translatesAutoresizingMaskIntoConstraints = false
         self.webview.allowsBackForwardNavigationGestures = true
+        self.webview.scrollView.alwaysBounceVertical = false
+        self.webview.scrollView.alwaysBounceHorizontal = false
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -40,10 +44,19 @@ class WebViewViewController: UIViewController {
         item.action = #selector(WebViewViewController.onTapCancel(_:))
         self.navigationItem.rightBarButtonItem = item
 
-        self.webview.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
-        self.webview.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        self.webview.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        self.webview.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        if isFullScreenMode {
+            self.webview.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+            self.webview.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+            self.webview.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+            self.webview.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+
+            self.webview.scrollView.contentInsetAdjustmentBehavior = .never
+        } else {
+            self.webview.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
+            self.webview.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+            self.webview.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+            self.webview.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        }
     }
 
     @objc func onTapCancel(_: AnyObject) {
