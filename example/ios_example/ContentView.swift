@@ -81,6 +81,7 @@ struct AuthgearConfigurationForm: View {
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
     @State private var uiVariantString = UserDefaults.standard.string(forKey: "authgear.demo.uiVariant") ?? defaultUIVariant.rawValue
+    @State private var customUIQuery = UserDefaults.standard.string(forKey: "authgear.demo.customUIQuery") ?? ""
 
     var body: some View {
         VStack {
@@ -113,6 +114,13 @@ struct AuthgearConfigurationForm: View {
                 Text("WKWebView").tag(UIVariant.wkWebView.rawValue)
                 Text("WKWebViewFullScreen").tag(UIVariant.wkWebViewFullScreen.rawValue)
             }.pickerStyle(.segmented)
+            AuthgearConfigurationInput(
+                label: "Custom UI Query",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "e.g. x=1&y=2&z=3",
+                    text: $customUIQuery
+                )
+            )
             Picker("Token Storage", selection: $tokenStorage) {
                 Text(TokenStorageClassName.TransientTokenStorage.rawValue).tag(TokenStorageClassName.TransientTokenStorage.rawValue)
                 Text(TokenStorageClassName.PersistentTokenStorage.rawValue).tag(TokenStorageClassName.PersistentTokenStorage.rawValue)
@@ -133,7 +141,8 @@ struct AuthgearConfigurationForm: View {
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
                     isSSOEnabled: self.isSSOEnabled,
-                    uiVariant: UIVariant(rawValue: self.uiVariantString) ?? AuthgearConfigurationForm.defaultUIVariant
+                    uiVariant: UIVariant(rawValue: self.uiVariantString) ?? AuthgearConfigurationForm.defaultUIVariant,
+                    customUIQuery: self.customUIQuery
                 )
             }) {
                 ActionButton(text: "Configure")
