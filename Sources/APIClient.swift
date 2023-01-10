@@ -34,6 +34,7 @@ struct OIDCAuthenticationRequest {
     let maxAge: Int?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
+    let customUIQuery: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -100,6 +101,10 @@ struct OIDCAuthenticationRequest {
 
         if let page = self.page {
             queryItems.append(URLQueryItem(name: "x_page", value: page.rawValue))
+        }
+
+        if let customUIQuery = self.customUIQuery, !customUIQuery.isEmpty {
+            queryItems.append(URLQueryItem(name: "x_custom_ui_query", value: customUIQuery))
         }
 
         if self.isSSOEnabled == false {
