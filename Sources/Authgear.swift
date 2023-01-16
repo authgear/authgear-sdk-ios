@@ -1340,6 +1340,35 @@ public class Authgear {
             }
         }
     }
+    
+    public class func makeChooseEmailClientAlertController(items: [EmailClientItem]) -> UIAlertController {
+        let alert = UIAlertController(title: "Open mail app", message: "Which app would you like to open?", preferredStyle: .actionSheet)
+        let openableItems = items.filter({ item in
+            guard let url = URL(string: item.openURL) else {
+                return false
+            }
+            return UIApplication.shared.canOpenURL(url)
+        })
+        for item in openableItems {
+            alert.addAction(UIAlertAction(
+                title: item.title,
+                style: .default,
+                handler: { _ in
+                    guard let url = URL(string: item.openURL) else {
+                        return
+                    }
+                    UIApplication.shared.open(url)
+                }
+            ))
+        }
+        alert.addAction(UIAlertAction(
+            title: "Cancel",
+            style: .cancel,
+            handler: { _ in
+            }
+        ))
+        return alert
+    }
 
     private func _handleInvalidGrantException(error: Error) -> Result<Void, Error> {
         if let error = error as? AuthgearError,

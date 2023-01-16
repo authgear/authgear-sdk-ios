@@ -49,8 +49,12 @@ extension AppDelegate: AuthgearDelegate {
     }
     
     func onOpenEmailClient(_ vc: UIViewController) {
-        // TODO
-        print("onOpenEmailClient!")
+        let items = [
+            EmailClientItem(client: .mail),
+            EmailClientItem(client: .gmail)
+        ]
+        let alert = Authgear.makeChooseEmailClientAlertController(items: items)
+        vc.present(alert, animated: true)
     }
 }
 
