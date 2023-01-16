@@ -2,6 +2,7 @@ import AuthenticationServices
 import SafariServices
 
 protocol AuthenticationSession {
+    typealias OpenEmailClientHandler = (UIViewController) -> Void
     typealias CompletionHandler = (Result<URL, Error>) -> Void
     @discardableResult func start() -> Bool
     func cancel()
@@ -21,9 +22,10 @@ class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
         redirectURI: String,
         prefersEphemeralWebBrowserSession: Bool?,
         uiVariant: UIVariant,
+        openEmailClientHandler: @escaping AuthenticationSession.OpenEmailClientHandler,
         completionHandler: @escaping AuthenticationSession.CompletionHandler
     ) -> AuthenticationSession {
-        let handler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
+        let realCompletionHandler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
             if let error = error {
                 return completionHandler(.failure(wrapError(error: error)))
             }
@@ -39,7 +41,8 @@ class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
                     url: url,
                     redirectURI: URL(string: redirectURI)!,
                     isFullScreenMode: uiVariant == .wkWebViewFullScreen,
-                    completionHandler: handler
+                    openEmailClientHandler: openEmailClientHandler,
+                    completionHandler: realCompletionHandler
                 )
                 session.delegate = self
                 return session
@@ -50,7 +53,7 @@ class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
             let session = ASWebAuthenticationSession(
                 url: url,
                 callbackURLScheme: getURIScheme(uri: redirectURI),
-                completionHandler: handler
+                completionHandler: realCompletionHandler
             )
 
             if #available(iOS 13.0, *) {
@@ -63,7 +66,7 @@ class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
             let session = SFAuthenticationSession(
                 url: url,
                 callbackURLScheme: getURIScheme(uri: redirectURI),
-                completionHandler: handler
+                completionHandler: realCompletionHandler
             )
             return session
         }

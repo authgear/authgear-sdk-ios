@@ -3,9 +3,24 @@ import WebKit
 
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerOnTapCancel(_: WebViewViewController)
+    func webViewViewControllerOnOpenEmailClient(_: WebViewViewController)
 }
 
-class WebViewViewController: UIViewController {
+
+
+enum WebViewMessageName: String {
+    case openEmailClient
+}
+
+let openEmailClientScript = """
+    document.addEventListener('authgear:onOpenEmailClient',
+        function(){
+            window.webkit.messageHandlers.\(WebViewMessageName.openEmailClient.rawValue).postMessage('');
+        }
+    )
+""";
+
+class WebViewViewController: UIViewController, WKScriptMessageHandler {
     let webview: WKWebView
 
     let isFullScreenMode: Bool
@@ -13,12 +28,17 @@ class WebViewViewController: UIViewController {
 
     init(isFullScreenMode: Bool = false) {
         self.isFullScreenMode = isFullScreenMode
-        self.webview = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
+        let config = WKWebViewConfiguration()
+        let userScript = WKUserScript(source: openEmailClientScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        config.userContentController.addUserScript(userScript)
+
+        self.webview = WKWebView(frame: .zero, configuration: config)
         self.webview.translatesAutoresizingMaskIntoConstraints = false
         self.webview.allowsBackForwardNavigationGestures = true
         self.webview.scrollView.alwaysBounceVertical = false
         self.webview.scrollView.alwaysBounceHorizontal = false
         super.init(nibName: nil, bundle: nil)
+        config.userContentController.add(self, name: "openEmailClient")
     }
 
     @available(*, unavailable)
@@ -81,5 +101,14 @@ class WebViewViewController: UIViewController {
 
     @objc func goBack(_: AnyObject) {
         self.webview.goBack()
+    }
+    
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        switch message.name {
+        case WebViewMessageName.openEmailClient.rawValue:
+            self.delegate?.webViewViewControllerOnOpenEmailClient(self)
+        default:
+            break
+        }
     }
 }

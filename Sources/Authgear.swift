@@ -217,11 +217,13 @@ public enum UIVariant: String {
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
     func sendWechatAuthRequest(_ state: String)
+    func onOpenEmailClient(_ vc: UIViewController)
 }
 
 public extension AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
     func sendWechatAuthRequest(_ state: String) {}
+    func onOpenEmailClient(_ vc: UIViewController) {}
 }
 
 public class Authgear {
@@ -332,6 +334,10 @@ public class Authgear {
         sessionState = newState
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
+    
+    private func openEmailClient(_ vc: UIViewController) {
+        delegate?.onOpenEmailClient(vc)
+    }
 
     private func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
@@ -364,6 +370,9 @@ public class Authgear {
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     uiVariant: self.uiVariant,
+                    openEmailClientHandler: { [weak self] vc in
+                        self?.openEmailClient(vc)
+                    },
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -401,6 +410,9 @@ public class Authgear {
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     uiVariant: self.uiVariant,
+                    openEmailClientHandler: { [weak self] vc in
+                        self?.openEmailClient(vc)
+                    },
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -999,6 +1011,9 @@ public class Authgear {
                         // the app session token cookie is forgotten when the webview is closed.
                         prefersEphemeralWebBrowserSession: true,
                         uiVariant: self.uiVariant,
+                        openEmailClientHandler: { [weak self] vc in
+                            self?.openEmailClient(vc)
+                        },
                         completionHandler: { [weak self] result in
                             self?.unregisterCurrentWechatRedirectURI()
                             switch result {
