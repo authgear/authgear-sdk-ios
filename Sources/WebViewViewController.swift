@@ -6,8 +6,6 @@ protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerOnOpenEmailClient(_: WebViewViewController)
 }
 
-
-
 enum WebViewMessageName: String {
     case openEmailClient
 }
@@ -18,7 +16,7 @@ let openEmailClientScript = """
             window.webkit.messageHandlers.\(WebViewMessageName.openEmailClient.rawValue).postMessage('');
         }
     )
-""";
+"""
 
 class WebViewViewController: UIViewController, WKScriptMessageHandler {
     let webview: WKWebView
@@ -102,7 +100,7 @@ class WebViewViewController: UIViewController, WKScriptMessageHandler {
     @objc func goBack(_: AnyObject) {
         self.webview.goBack()
     }
-    
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         switch message.name {
         case WebViewMessageName.openEmailClient.rawValue:

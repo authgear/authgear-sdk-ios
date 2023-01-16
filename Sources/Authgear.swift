@@ -334,7 +334,7 @@ public class Authgear {
         sessionState = newState
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
-    
+
     private func openEmailClient(_ vc: UIViewController) {
         delegate?.onOpenEmailClient(vc)
     }
@@ -1340,15 +1340,15 @@ public class Authgear {
             }
         }
     }
-    
+
     public class func makeChooseEmailClientAlertController(items: [EmailClientItem]) -> UIAlertController {
         let alert = UIAlertController(title: "Open mail app", message: "Which app would you like to open?", preferredStyle: .actionSheet)
-        let openableItems = items.filter({ item in
+        let openableItems = items.filter { item in
             guard let url = URL(string: item.openURL) else {
                 return false
             }
             return UIApplication.shared.canOpenURL(url)
-        })
+        }
         for item in openableItems {
             alert.addAction(UIAlertAction(
                 title: item.title,

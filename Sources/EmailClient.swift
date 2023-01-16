@@ -8,7 +8,7 @@ public protocol EmailClientInfo {
 public enum EmailClient: EmailClientInfo {
     case gmail
     case mail
-    
+
     public var name: String {
         switch self {
         case .gmail:
@@ -17,7 +17,7 @@ public enum EmailClient: EmailClientInfo {
             return "Mail"
         }
     }
-    
+
     public var openURL: String {
         switch self {
         case .gmail:
@@ -36,7 +36,7 @@ public struct EmailClientItem {
         self.openURL = info.openURL
         self.title = info.name
     }
-    
+
     public init(client c: EmailClient) {
         self.init(info: c)
     }

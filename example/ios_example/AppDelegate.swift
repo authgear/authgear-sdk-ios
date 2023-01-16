@@ -47,7 +47,7 @@ extension AppDelegate: AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {
         appContainer.sessionState = container.sessionState
     }
-    
+
     func onOpenEmailClient(_ vc: UIViewController) {
         let items = [
             EmailClientItem(client: .mail),

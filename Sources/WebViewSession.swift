@@ -27,11 +27,13 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
     private var viewController: WebViewViewController?
     private var initialNavigation: WKNavigation?
 
-    init(url: URL,
-         redirectURI: URL,
-         isFullScreenMode: Bool,
-         openEmailClientHandler: @escaping OpenEmailClientHandler,
-         completionHandler: @escaping CompletionHandler) {
+    init(
+        url: URL,
+        redirectURI: URL,
+        isFullScreenMode: Bool,
+        openEmailClientHandler: @escaping OpenEmailClientHandler,
+        completionHandler: @escaping CompletionHandler
+    ) {
         self.url = url
         self.redirectURI = redirectURI
         self.isFullScreenMode = isFullScreenMode
@@ -132,7 +134,7 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
     func webViewViewControllerOnTapCancel(_: WebViewViewController) {
         self.cancel()
     }
-    
+
     func webViewViewControllerOnOpenEmailClient(_ vc: WebViewViewController) {
         self.openEmailClientHandler?(vc)
     }
