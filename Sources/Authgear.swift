@@ -429,6 +429,11 @@ public class Authgear {
         let params = urlComponents.queryParams
 
         if let errorParams = params["error"] {
+            if errorParams == "cancel" {
+                return handler(
+                    .failure(AuthgearError.cancel)
+                )
+            }
             return handler(
                 .failure(AuthgearError.oauthError(
                     OAuthError(
@@ -499,6 +504,11 @@ public class Authgear {
         let params = urlComponents.queryParams
 
         if let errorParams = params["error"] {
+            if errorParams == "cancel" {
+                return handler(
+                    .failure(AuthgearError.cancel)
+                )
+            }
             return handler(
                 .failure(AuthgearError.oauthError(
                     OAuthError(
