@@ -1341,8 +1341,17 @@ public class Authgear {
         }
     }
 
-    public class func makeChooseEmailClientAlertController(items: [EmailClientItem]) -> UIAlertController {
-        let alert = UIAlertController(title: "Open mail app", message: "Which app would you like to open?", preferredStyle: .actionSheet)
+    public class func makeChooseEmailClientAlertController(
+        title: String,
+        message: String,
+        cancelLabel: String,
+        items: [EmailClientItem]
+    ) -> UIAlertController {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .actionSheet
+        )
         let openableItems = items.filter { item in
             guard let url = URL(string: item.openURL) else {
                 return false
@@ -1362,7 +1371,7 @@ public class Authgear {
             ))
         }
         alert.addAction(UIAlertAction(
-            title: "Cancel",
+            title: cancelLabel,
             style: .cancel,
             handler: { _ in
             }

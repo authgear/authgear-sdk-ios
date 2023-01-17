@@ -53,7 +53,12 @@ extension AppDelegate: AuthgearDelegate {
             EmailClientItem(client: .mail),
             EmailClientItem(client: .gmail)
         ]
-        let alert = Authgear.makeChooseEmailClientAlertController(items: items)
+        let alert = Authgear.makeChooseEmailClientAlertController(
+            title: "Open mail app",
+            message: "Which app would you like to open?",
+            cancelLabel: "Cancel",
+            items: items
+        )
         vc.present(alert, animated: true)
     }
 }
