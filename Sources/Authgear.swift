@@ -1345,7 +1345,7 @@ public class Authgear {
         title: String,
         message: String,
         cancelLabel: String,
-        items: [EmailClientItem]
+        items: [EmailClient]
     ) -> UIAlertController {
         let alert = UIAlertController(
             title: title,
@@ -1360,7 +1360,7 @@ public class Authgear {
         }
         for item in openableItems {
             alert.addAction(UIAlertAction(
-                title: item.title,
+                title: item.name,
                 style: .default,
                 handler: { _ in
                     guard let url = URL(string: item.openURL) else {
