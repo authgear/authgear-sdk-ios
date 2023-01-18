@@ -217,11 +217,13 @@ public enum UIVariant: String {
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
     func sendWechatAuthRequest(_ state: String)
+    func onOpenEmailClient(_ vc: UIViewController)
 }
 
 public extension AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
     func sendWechatAuthRequest(_ state: String) {}
+    func onOpenEmailClient(_ vc: UIViewController) {}
 }
 
 public class Authgear {
@@ -333,6 +335,10 @@ public class Authgear {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
+    private func openEmailClient(_ vc: UIViewController) {
+        delegate?.onOpenEmailClient(vc)
+    }
+
     private func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
         let queryItems = request.toQueryItems(clientID: self.clientId, verifier: verifier)
@@ -364,6 +370,9 @@ public class Authgear {
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     uiVariant: self.uiVariant,
+                    openEmailClientHandler: { [weak self] vc in
+                        self?.openEmailClient(vc)
+                    },
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -401,6 +410,9 @@ public class Authgear {
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     uiVariant: self.uiVariant,
+                    openEmailClientHandler: { [weak self] vc in
+                        self?.openEmailClient(vc)
+                    },
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -999,6 +1011,9 @@ public class Authgear {
                         // the app session token cookie is forgotten when the webview is closed.
                         prefersEphemeralWebBrowserSession: true,
                         uiVariant: self.uiVariant,
+                        openEmailClientHandler: { [weak self] vc in
+                            self?.openEmailClient(vc)
+                        },
                         completionHandler: { [weak self] result in
                             self?.unregisterCurrentWechatRedirectURI()
                             switch result {
@@ -1324,6 +1339,44 @@ public class Authgear {
                 }
             }
         }
+    }
+
+    public class func makeChooseEmailClientAlertController(
+        title: String,
+        message: String,
+        cancelLabel: String,
+        items: [EmailClient]
+    ) -> UIAlertController {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .actionSheet
+        )
+        let openableItems = items.filter { item in
+            guard let url = URL(string: item.openURL) else {
+                return false
+            }
+            return UIApplication.shared.canOpenURL(url)
+        }
+        for item in openableItems {
+            alert.addAction(UIAlertAction(
+                title: item.name,
+                style: .default,
+                handler: { _ in
+                    guard let url = URL(string: item.openURL) else {
+                        return
+                    }
+                    UIApplication.shared.open(url)
+                }
+            ))
+        }
+        alert.addAction(UIAlertAction(
+            title: cancelLabel,
+            style: .cancel,
+            handler: { _ in
+            }
+        ))
+        return alert
     }
 
     private func _handleInvalidGrantException(error: Error) -> Result<Void, Error> {

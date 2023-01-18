@@ -14,6 +14,7 @@ enum WebViewSessionError: Error {
 
 @available(iOS 13.0, *)
 class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDelegate {
+    typealias OpenEmailClientHandler = (UIViewController) -> Void
     typealias CompletionHandler = (URL?, Error?) -> Void
 
     let url: URL
@@ -22,13 +23,21 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
     weak var delegate: WebViewSessionDelegate?
 
     private var completionHandler: CompletionHandler?
+    private var openEmailClientHandler: OpenEmailClientHandler?
     private var viewController: WebViewViewController?
     private var initialNavigation: WKNavigation?
 
-    init(url: URL, redirectURI: URL, isFullScreenMode: Bool, completionHandler: @escaping CompletionHandler) {
+    init(
+        url: URL,
+        redirectURI: URL,
+        isFullScreenMode: Bool,
+        openEmailClientHandler: @escaping OpenEmailClientHandler,
+        completionHandler: @escaping CompletionHandler
+    ) {
         self.url = url
         self.redirectURI = redirectURI
         self.isFullScreenMode = isFullScreenMode
+        self.openEmailClientHandler = openEmailClientHandler
         self.completionHandler = completionHandler
     }
 
@@ -124,5 +133,9 @@ class WebViewSession: NSObject, WKNavigationDelegate, WebViewViewControllerDeleg
 
     func webViewViewControllerOnTapCancel(_: WebViewViewController) {
         self.cancel()
+    }
+
+    func webViewViewControllerOnOpenEmailClient(_ vc: WebViewViewController) {
+        self.openEmailClientHandler?(vc)
     }
 }

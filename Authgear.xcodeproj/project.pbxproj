@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		775FF72A2603649500B81ECD /* Biometric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF7292603649500B81ECD /* Biometric.swift */; };
 		775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF73326047C7700B81ECD /* DeviceInfo.swift */; };
+		A648BE852975316A002D8EA5 /* EmailClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A648BE842975316A002D8EA5 /* EmailClient.swift */; };
 		CC38CD6429520E8E00C57346 /* WebViewSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC38CD6329520E8E00C57346 /* WebViewSession.swift */; };
 		CC38CD6829520EA000C57346 /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC38CD6729520EA000C57346 /* WebViewViewController.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
@@ -48,6 +49,7 @@
 /* Begin PBXFileReference section */
 		775FF7292603649500B81ECD /* Biometric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometric.swift; sourceTree = "<group>"; };
 		775FF73326047C7700B81ECD /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
+		A648BE842975316A002D8EA5 /* EmailClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailClient.swift; sourceTree = "<group>"; };
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20D6F025BAA3C400E579DD /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = example/Pods/Pods.xcodeproj; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 			children = (
 				F83D84AB24F66D3400B4393C /* APIClient.swift */,
 				F83D84A724F64D0E00B4393C /* Authgear.swift */,
+				A648BE842975316A002D8EA5 /* EmailClient.swift */,
 				F83D84AF24F860AA00B4393C /* AuthenticationSession.swift */,
 				F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */,
 				F83D84AD24F6A93600B4393C /* CodeVerifier.swift */,
@@ -254,6 +257,7 @@
 				775FF72A2603649500B81ECD /* Biometric.swift in Sources */,
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
+				A648BE852975316A002D8EA5 /* EmailClient.swift in Sources */,
 				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
 				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
 				F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */,
