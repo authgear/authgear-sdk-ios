@@ -77,6 +77,11 @@ class WebViewViewController: UIViewController, WKScriptMessageHandler {
         }
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.webview.becomeFirstResponder()
+    }
+
     @objc func onTapCancel(_: AnyObject) {
         self.delegate?.webViewViewControllerOnTapCancel(self)
     }
