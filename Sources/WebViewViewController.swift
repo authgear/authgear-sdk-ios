@@ -77,6 +77,15 @@ class WebViewViewController: UIViewController, WKScriptMessageHandler {
         }
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        // This makes autofocus in WebView works on iOS 16
+        // Before iOS 16, the workaround does not work, and keyboard
+        // would not be shown for JS auto-focused field in WebView.
+        self.webview.becomeFirstResponder()
+    }
+
     @objc func onTapCancel(_: AnyObject) {
         self.delegate?.webViewViewControllerOnTapCancel(self)
     }
