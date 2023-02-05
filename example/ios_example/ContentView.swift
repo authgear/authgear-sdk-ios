@@ -254,6 +254,12 @@ struct ActionButtonList: View {
                 }.disabled(!configured || !loggedIn || isAnonymous)
 
                 Button(action: {
+                    self.app.verifyEmail()
+                }) {
+                    ActionButton(text: "Verify Email")
+                }.disabled(!configured || !loggedIn)
+
+                Button(action: {
                     self.app.showAuthTime()
                 }) {
                     ActionButton(text: "Show auth_time")

@@ -236,6 +236,31 @@ class App: ObservableObject {
         }
     }
 
+    func verifyEmail() {
+        container?.fetchUserInfo { userInfoResult in
+            switch userInfoResult {
+            case let .success(userInfo):
+                if userInfo.email == nil || userInfo.emailVerified == true {
+                    self.authgearActionErrorMessage = "Unverified email not found"
+                    return
+                }
+                self.container?.verifyEmail(
+                    redirectURI: App.redirectURI,
+                    colorScheme: self.colorScheme
+                ) { result in
+                    switch result {
+                    case .success():
+                        self.successAlertMessage = "Verify email successfully"
+                    case let .failure(error):
+                        self.setError(error)
+                    }
+                }
+            case let .failure(error):
+                self.setError(error)
+            }
+        }
+    }
+
     func showAuthTime() {
         let f = DateFormatter()
         f.dateStyle = .long

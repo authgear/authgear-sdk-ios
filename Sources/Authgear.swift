@@ -42,7 +42,8 @@ struct AuthenticateOptions {
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
             page: self.page,
-            customUIQuery: self.customUIQuery
+            customUIQuery: self.customUIQuery,
+            settingsAction: nil
         )
     }
 }
@@ -72,7 +73,8 @@ struct ReauthenticateOptions {
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
             page: nil,
-            customUIQuery: self.customUIQuery
+            customUIQuery: self.customUIQuery,
+            settingsAction: nil
         )
     }
 }
@@ -197,6 +199,10 @@ public enum AuthenticationPage: String {
 public enum SettingsPage: String {
     case settings = "/settings"
     case identity = "/settings/identities"
+}
+
+enum SettingsAction: String {
+    case verifyEmail = "verify_email"
 }
 
 public enum SessionStateChangeReason: String {
@@ -574,6 +580,32 @@ public class Authgear {
         } catch {
             return handler(.failure(wrapError(error: error)))
         }
+    }
+
+    private func finishPerformAction(
+        url: URL,
+        handler: @escaping VoidCompletionHandler
+    ) {
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        let params = urlComponents.queryParams
+
+        if let errorParams = params["error"] {
+            if errorParams == "cancel" {
+                return handler(
+                    .failure(AuthgearError.cancel)
+                )
+            }
+            return handler(
+                .failure(AuthgearError.oauthError(
+                    OAuthError(
+                        error: errorParams,
+                        errorDescription: params["error_description"],
+                        errorUri: params["error_uri"]
+                    )
+                ))
+            )
+        }
+        return handler(.success(()))
     }
 
     private func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason) -> Result<Void, Error> {
@@ -989,7 +1021,8 @@ public class Authgear {
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
                     page: nil,
-                    customUIQuery: nil
+                    customUIQuery: nil,
+                    settingsAction: nil
                 ), verifier: nil)
 
                 DispatchQueue.main.async {
@@ -1049,6 +1082,95 @@ public class Authgear {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI
         )
+    }
+
+    public func verifyEmail(
+        redirectURI: String,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        handler: @escaping VoidCompletionHandler
+    ) {
+        performAction(
+            settingsAction: .verifyEmail,
+            redirectURI: redirectURI,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme,
+            handler: handler
+        )
+    }
+
+    private func performAction(
+        settingsAction: SettingsAction,
+        redirectURI: String,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        handler: @escaping VoidCompletionHandler
+    ) {
+        let handler = self.withMainQueueHandler(handler)
+        workerQueue.async {
+            do {
+                guard let refreshToken = try self.tokenStorage.getRefreshToken(namespace: self.name) else {
+                    handler(.failure(AuthgearError.unauthenticatedUser))
+                    return
+                }
+
+                var token = ""
+                do {
+                    token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
+                } catch {
+                    _ = self._handleInvalidGrantException(error: error)
+                    handler(.failure(wrapError(error: error)))
+                    return
+                }
+
+                let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
+                let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
+                    redirectURI: redirectURI,
+                    responseType: "none",
+                    scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+                    isSSOEnabled: self.isSSOEnabled,
+                    state: nil,
+                    prompt: [.none],
+                    loginHint: loginHint,
+                    uiLocales: uiLocales,
+                    colorScheme: colorScheme,
+                    idTokenHint: nil,
+                    maxAge: nil,
+                    wechatRedirectURI: nil,
+                    page: nil,
+                    customUIQuery: nil,
+                    settingsAction: settingsAction.rawValue
+                ), verifier: nil)
+
+                DispatchQueue.main.async {
+                    self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
+                        url: endpoint,
+                        redirectURI: redirectURI,
+                        // prefersEphemeralWebBrowserSession is true so that
+                        // the alert dialog is never prompted and
+                        // the app session token cookie is forgotten when the webview is closed.
+                        prefersEphemeralWebBrowserSession: true,
+                        uiVariant: self.uiVariant,
+                        openEmailClientHandler: { [weak self] vc in
+                            self?.openEmailClient(vc)
+                        },
+                        completionHandler: { result in
+                            switch result {
+                            case let .success(url):
+                                self.finishPerformAction(url: url, handler: handler)
+                                return
+                            case let .failure(error):
+                                handler(.failure(wrapError(error: error)))
+                                return
+                            }
+                        }
+                    )
+                    self.authenticationSession?.start()
+                }
+            } catch {
+                handler(.failure(wrapError(error: error)))
+            }
+        }
     }
 
     private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {

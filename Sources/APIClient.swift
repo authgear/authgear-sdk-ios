@@ -35,6 +35,7 @@ struct OIDCAuthenticationRequest {
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
     let customUIQuery: String?
+    let settingsAction: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -105,6 +106,10 @@ struct OIDCAuthenticationRequest {
 
         if let customUIQuery = self.customUIQuery, !customUIQuery.isEmpty {
             queryItems.append(URLQueryItem(name: "x_custom_ui_query", value: customUIQuery))
+        }
+
+        if let settingsAction = self.settingsAction, !settingsAction.isEmpty {
+            queryItems.append(URLQueryItem(name: "x_settings_action", value: settingsAction))
         }
 
         if self.isSSOEnabled == false {
