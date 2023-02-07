@@ -149,6 +149,11 @@ struct AppSessionTokenResponse: Decodable {
     let expireAt: String
 }
 
+struct LoginLinkVerificationBody: Encodable {
+    let code: String
+    let clientId: String
+}
+
 protocol AuthAPIClient: AnyObject {
     var endpoint: URL { get }
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void)
@@ -190,6 +195,11 @@ protocol AuthAPIClient: AnyObject {
         code: String,
         state: String,
         handler: @escaping (Result<Void, Error>) -> Void
+    )
+    func requestLoginLinkVerification(
+        code: String,
+        clientId: String,
+        handler: @escaping VoidCompletionHandler
     )
 }
 
@@ -307,6 +317,12 @@ extension AuthAPIClient {
                 code: code, state: state,
                 handler: handler
             )
+        }
+    }
+
+    func syncRequestLoginLinkVerification(code: String, clientId: String) throws {
+        try withSemaphore { handler in
+            self.requestLoginLinkVerification(code: code, clientId: clientId, handler: handler)
         }
     }
 }
@@ -587,6 +603,22 @@ class DefaultAuthAPIClient: AuthAPIClient {
             forHTTPHeaderField: "content-type"
         )
         urlRequest.httpBody = urlComponents.query?.data(using: .utf8)
+        fetch(request: urlRequest, handler: { result in
+            handler(result.map { _ in () })
+        })
+    }
+
+    func requestLoginLinkVerification(code: String, clientId: String, handler: @escaping VoidCompletionHandler) {
+        let u = endpoint.appendingPathComponent("/api/login_link/verification")
+        var urlRequest = URLRequest(url: u)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
+        urlRequest.httpBody = try? jsonEncoder.encode(
+            LoginLinkVerificationBody(code: code, clientId: clientId)
+        )
+
         fetch(request: urlRequest, handler: { result in
             handler(result.map { _ in () })
         })
