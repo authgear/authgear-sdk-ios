@@ -216,13 +216,13 @@ public enum UIVariant: String {
 
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
-    func sendWechatAuthRequest(_ state: String)
+    func sendWechatAuthRequest(_ state: String, handler: VoidCompletionHandler?)
     func onOpenEmailClient(_ vc: UIViewController)
 }
 
 public extension AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
-    func sendWechatAuthRequest(_ state: String) {}
+    func sendWechatAuthRequest(_ state: String, handler: VoidCompletionHandler? = nil) {}
     func onOpenEmailClient(_ vc: UIViewController) {}
 }
 
@@ -638,7 +638,10 @@ public class Authgear {
         currentWechatRedirectURI = nil
     }
 
-    private func handleWechatRedirectURI(_ url: URL) -> Bool {
+    private func handleWechatRedirectURI(
+        _ url: URL,
+        handler: VoidCompletionHandler? = nil
+    ) -> Bool {
         if currentWechatRedirectURI == nil {
             return false
         }
@@ -661,8 +664,47 @@ public class Authgear {
             return false
         }
 
+        let handler = handler.map { h in withMainQueueHandler(h) }
         if urlWithoutQuery == currentWechatRedirectURI {
-            delegate?.sendWechatAuthRequest(state!)
+            delegate?.sendWechatAuthRequest(state!, handler: handler)
+            return true
+        }
+
+        return false
+    }
+
+    private func handleLoginLinkVerificationURI(
+        _ url: URL,
+        handler: VoidCompletionHandler? = nil
+    ) -> Bool {
+        guard var uc = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return false
+        }
+
+        // get token
+        let params = uc.queryParams
+        guard let token = params["token"] else { return false }
+
+        // construct and compare url without query
+        uc.query = nil
+        uc.fragment = nil
+        guard let urlWithoutQuery = uc.string else {
+            return false
+        }
+
+        let handler = handler.map { h in withMainQueueHandler(h) }
+        if urlWithoutQuery.hasSuffix("/flows/verify_magic_link") {
+            workerQueue.async {
+                do {
+                    try self.apiClient.syncRequestLoginLinkVerification(
+                        code: token
+                    )
+                } catch {
+                    handler?(.failure(wrapError(error: error)))
+                    return
+                }
+                handler?(.success(()))
+            }
             return true
         }
 
@@ -672,22 +714,49 @@ public class Authgear {
     public func application(
         _ application: UIApplication,
         continue userActivity: NSUserActivity,
-        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void,
+        handler: VoidCompletionHandler? = nil
     ) -> Bool {
+        var matched = false
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
            let url = userActivity.webpageURL {
-            _ = handleWechatRedirectURI(url)
+            matched =
+                handleWechatRedirectURI(url, handler: handler) ||
+                handleLoginLinkVerificationURI(url, handler: handler)
         }
-        return true
+        return matched
     }
 
     @available(iOS 13.0, *)
-    public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+    public func scene(
+        _ scene: UIScene,
+        continue userActivity: NSUserActivity,
+        handler: VoidCompletionHandler? = nil
+    ) -> Bool {
         guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
               let url = userActivity.webpageURL else {
-            return
+            return false
         }
-        _ = handleWechatRedirectURI(url)
+        var matched = false
+        matched =
+            handleWechatRedirectURI(url, handler: handler) ||
+            handleLoginLinkVerificationURI(url, handler: handler)
+        return matched
+    }
+
+    @available(iOS 13.0, *)
+    public func scene(
+        _ scene: UIScene,
+        openURLContexts URLContexts: Set<UIOpenURLContext>,
+        handler: VoidCompletionHandler? = nil
+    ) -> Bool {
+        guard let url = URLContexts.first?.url else { return false }
+
+        var matched = false
+        matched =
+            handleWechatRedirectURI(url, handler: handler) ||
+            handleLoginLinkVerificationURI(url, handler: handler)
+        return matched
     }
 
     public func authenticate(

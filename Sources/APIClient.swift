@@ -149,6 +149,10 @@ struct AppSessionTokenResponse: Decodable {
     let expireAt: String
 }
 
+struct LoginLinkVerificationBody: Encodable {
+    let code: String
+}
+
 protocol AuthAPIClient: AnyObject {
     var endpoint: URL { get }
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void)
@@ -190,6 +194,10 @@ protocol AuthAPIClient: AnyObject {
         code: String,
         state: String,
         handler: @escaping (Result<Void, Error>) -> Void
+    )
+    func requestLoginLinkVerification(
+        code: String,
+        handler: @escaping VoidCompletionHandler
     )
 }
 
@@ -307,6 +315,12 @@ extension AuthAPIClient {
                 code: code, state: state,
                 handler: handler
             )
+        }
+    }
+
+    func syncRequestLoginLinkVerification (code: String) throws -> Void {
+        try withSemaphore { handler in
+            self.requestLoginLinkVerification(code: code, handler: handler)
         }
     }
 }
@@ -587,6 +601,18 @@ class DefaultAuthAPIClient: AuthAPIClient {
             forHTTPHeaderField: "content-type"
         )
         urlRequest.httpBody = urlComponents.query?.data(using: .utf8)
+        fetch(request: urlRequest, handler: { result in
+            handler(result.map { _ in () })
+        })
+    }
+
+    func requestLoginLinkVerification(code: String, handler: @escaping VoidCompletionHandler) {
+        let u = endpoint.appendingPathComponent("/api/login_link/verification")
+        var urlRequest = URLRequest(url: u)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
+        urlRequest.httpBody = try? JSONEncoder().encode(LoginLinkVerificationBody(code: code))
+
         fetch(request: urlRequest, handler: { result in
             handler(result.map { _ in () })
         })
