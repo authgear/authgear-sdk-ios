@@ -7,6 +7,7 @@ import WebKit
 
 public typealias UserInfoCompletionHandler = (Result<UserInfo, Error>) -> Void
 public typealias VoidCompletionHandler = (Result<Void, Error>) -> Void
+public typealias URLCompletionHandler = (Result<URL, Error>) -> Void
 
 public enum PromptOption: String {
     case none
@@ -934,6 +935,57 @@ public class Authgear {
         }
     }
 
+    func generateURL(
+        redirectURI: String,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        wechatRedirectURI: String? = nil,
+        handler: URLCompletionHandler?
+    ) {
+        let handler = handler.map { h in self.withMainQueueHandler(h) }
+
+        self.workerQueue.async {
+            do {
+                guard let refreshToken = try self.tokenStorage.getRefreshToken(namespace: self.name) else {
+                    handler?(.failure(AuthgearError.unauthenticatedUser))
+                    return
+                }
+
+                var token = ""
+                do {
+                    token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
+                } catch {
+                    _ = self._handleInvalidGrantException(error: error)
+                    handler?(.failure(wrapError(error: error)))
+                    return
+                }
+
+                let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
+
+                let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
+                    redirectURI: redirectURI,
+                    responseType: "none",
+                    scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+                    isSSOEnabled: self.isSSOEnabled,
+                    state: nil,
+                    prompt: [.none],
+                    loginHint: loginHint,
+                    uiLocales: uiLocales,
+                    colorScheme: colorScheme,
+                    idTokenHint: nil,
+                    maxAge: nil,
+                    wechatRedirectURI: wechatRedirectURI,
+                    page: nil,
+                    customUIQuery: nil
+                ), verifier: nil)
+
+                handler?(.success(endpoint))
+            } catch {
+                handler?(.failure(wrapError(error: error)))
+            }
+        }
+    }
+
     public func openURL(
         path: String,
         uiLocales: [String]? = nil,
@@ -957,82 +1009,51 @@ public class Authgear {
         urlComponents.queryItems = queryItems
         let url = urlComponents.url!
 
-        workerQueue.async {
-            do {
-                guard let refreshToken = try self.tokenStorage.getRefreshToken(namespace: self.name) else {
-                    handler?(.failure(AuthgearError.unauthenticatedUser))
-                    return
-                }
+        self.generateURL(redirectURI: url.absoluteString) { [weak self] result in
+            guard let self = self else { return }
 
-                var token = ""
-                do {
-                    token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
-                } catch {
-                    _ = self._handleInvalidGrantException(error: error)
-                    handler?(.failure(wrapError(error: error)))
-                    return
-                }
+            switch result {
+            case let .failure(err):
+                handler?(.failure(err))
 
-                let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
-
-                let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
-                    redirectURI: url.absoluteString,
-                    responseType: "none",
-                    scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
-                    isSSOEnabled: self.isSSOEnabled,
-                    state: nil,
-                    prompt: [.none],
-                    loginHint: loginHint,
-                    uiLocales: uiLocales,
-                    colorScheme: colorScheme,
-                    idTokenHint: nil,
-                    maxAge: nil,
-                    wechatRedirectURI: wechatRedirectURI,
-                    page: nil,
-                    customUIQuery: nil
-                ), verifier: nil)
-
-                DispatchQueue.main.async {
-                    // For opening setting page, sdk will not know when user end
-                    // the setting page.
-                    // So we cannot unregister the wechat uri in this case
-                    // It is fine to not unresgister it, as everytime we open a
-                    // new authorize section (authorize or setting page)
-                    // registerCurrentWeChatRedirectURI will be called and overwrite
-                    // previous registered wechatRedirectURI
-                    self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
-                    self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
-                        url: endpoint,
-                        // Opening an arbitrary URL does not have a clear goal.
-                        // So here we pass a placeholder redirect uri.
-                        redirectURI: "nocallback",
-                        // prefersEphemeralWebBrowserSession is true so that
-                        // the alert dialog is never prompted and
-                        // the app session token cookie is forgotten when the webview is closed.
-                        prefersEphemeralWebBrowserSession: true,
-                        uiVariant: self.uiVariant,
-                        openEmailClientHandler: { [weak self] vc in
-                            self?.openEmailClient(vc)
-                        },
-                        completionHandler: { [weak self] result in
-                            self?.unregisterCurrentWechatRedirectURI()
-                            switch result {
-                            case .success:
-                                // This branch is unreachable.
+            case let .success(endpoint):
+                // For opening setting page, sdk will not know when user end
+                // the setting page.
+                // So we cannot unregister the wechat uri in this case
+                // It is fine to not unresgister it, as everytime we open a
+                // new authorize section (authorize or setting page)
+                // registerCurrentWeChatRedirectURI will be called and overwrite
+                // previous registered wechatRedirectURI
+                self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
+                self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
+                    url: endpoint,
+                    // Opening an arbitrary URL does not have a clear goal.
+                    // So here we pass a placeholder redirect uri.
+                    redirectURI: "nocallback",
+                    // prefersEphemeralWebBrowserSession is true so that
+                    // the alert dialog is never prompted and
+                    // the app session token cookie is forgotten when the webview is closed.
+                    prefersEphemeralWebBrowserSession: true,
+                    uiVariant: self.uiVariant,
+                    openEmailClientHandler: { [weak self] vc in
+                        self?.openEmailClient(vc)
+                    },
+                    completionHandler: { [weak self] result in
+                        self?.unregisterCurrentWechatRedirectURI()
+                        switch result {
+                        case .success:
+                            // This branch is unreachable.
+                            handler?(.success(()))
+                        case let .failure(error):
+                            if case AuthgearError.cancel = error {
                                 handler?(.success(()))
-                            case let .failure(error):
-                                if case AuthgearError.cancel = error {
-                                    handler?(.success(()))
-                                } else {
-                                    handler?(.failure(wrapError(error: error)))
-                                }
+                            } else {
+                                handler?(.failure(wrapError(error: error)))
                             }
                         }
-                    )
-                    self.authenticationSession?.start()
-                }
-            } catch {
-                handler?(.failure(wrapError(error: error)))
+                    }
+                )
+                self.authenticationSession?.start()
             }
         }
     }
