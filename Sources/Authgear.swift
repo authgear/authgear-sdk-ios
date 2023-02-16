@@ -48,6 +48,12 @@ struct AuthenticateOptions {
     }
 }
 
+struct AuthenticationRequest {
+    let url: URL
+    let redirectURI: String
+    let verifier: CodeVerifier
+}
+
 struct ReauthenticateOptions {
     let redirectURI: String
     let isSSOEnabled: Bool
@@ -393,21 +399,29 @@ public class Authgear {
         }
     }
 
+    func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthenticationRequest, Error> {
+        let verifier = CodeVerifier()
+        let request = options.request
+        let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
+
+        return url.map { url in
+            AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
+        }
+    }
+
     private func authenticateWithASWebAuthenticationSession(
         _ options: AuthenticateOptions,
         handler: @escaping UserInfoCompletionHandler
     ) {
-        let verifier = CodeVerifier()
-        let request = options.request
-        let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
+        let request = self.createAuthenticateRequest(options)
         let prefersEphemeralWebBrowserSession = self.shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession()
 
         DispatchQueue.main.async {
-            switch url {
-            case let .success(url):
+            switch request {
+            case let .success(request):
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
-                    url: url,
+                    url: request.url,
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
                     uiVariant: self.uiVariant,
@@ -419,7 +433,7 @@ public class Authgear {
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
-                                self?.finishAuthentication(url: url, verifier: verifier, handler: handler)
+                                self?.finishAuthentication(url: url, request: request, handler: handler)
                             }
                         case let .failure(error):
                             return handler(.failure(wrapError(error: error)))
@@ -433,9 +447,9 @@ public class Authgear {
         }
     }
 
-    private func finishAuthentication(
+    func finishAuthentication(
         url: URL,
-        verifier: CodeVerifier,
+        request: AuthenticationRequest,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
@@ -484,7 +498,7 @@ public class Authgear {
                 deviceInfo: getDeviceInfo(),
                 redirectURI: redirectURI,
                 code: code,
-                codeVerifier: verifier.value,
+                codeVerifier: request.verifier.value,
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil
