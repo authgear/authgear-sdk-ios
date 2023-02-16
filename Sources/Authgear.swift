@@ -48,7 +48,7 @@ struct AuthenticateOptions {
     }
 }
 
-struct AuthorizationRequest {
+struct AuthenticationRequest {
     let url: URL
     let redirectURI: String
     let verifier: CodeVerifier
@@ -399,13 +399,13 @@ public class Authgear {
         }
     }
 
-    func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthorizationRequest, Error> {
+    func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthenticationRequest, Error> {
         let verifier = CodeVerifier()
         let request = options.request
         let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
 
         return url.map { url in
-            AuthorizationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
+            AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
         }
     }
 
@@ -449,7 +449,7 @@ public class Authgear {
 
     func finishAuthentication(
         url: URL,
-        request: AuthorizationRequest,
+        request: AuthenticationRequest,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
