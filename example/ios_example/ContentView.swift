@@ -72,15 +72,12 @@ enum TokenStorageClassName: String, CaseIterable, Identifiable {
 struct AuthgearConfigurationForm: View {
     @EnvironmentObject private var app: App
 
-    static let defaultUIVariant = UIVariant.asWebAuthenticationSession
-
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
-    @State private var uiVariantString = UserDefaults.standard.string(forKey: "authgear.demo.uiVariant") ?? defaultUIVariant.rawValue
     @State private var customUIQuery = UserDefaults.standard.string(forKey: "authgear.demo.customUIQuery") ?? ""
 
     var body: some View {
@@ -109,11 +106,6 @@ struct AuthgearConfigurationForm: View {
                 Text("Light").tag(ColorScheme.light.rawValue)
                 Text("Dark").tag(ColorScheme.dark.rawValue)
             }.pickerStyle(.segmented)
-            Picker("UI Variant", selection: $uiVariantString) {
-                Text("ASWebAuthenticationSession").tag(UIVariant.asWebAuthenticationSession.rawValue)
-                Text("WKWebView").tag(UIVariant.wkWebView.rawValue)
-                Text("WKWebViewFullScreen").tag(UIVariant.wkWebViewFullScreen.rawValue)
-            }.pickerStyle(.segmented)
             AuthgearConfigurationInput(
                 label: "Custom UI Query",
                 input: AuthgearConfigurationTextField(
@@ -141,7 +133,6 @@ struct AuthgearConfigurationForm: View {
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
                     isSSOEnabled: self.isSSOEnabled,
-                    uiVariant: UIVariant(rawValue: self.uiVariantString) ?? AuthgearConfigurationForm.defaultUIVariant,
                     customUIQuery: self.customUIQuery
                 )
             }) {

@@ -40,7 +40,6 @@ class App: ObservableObject {
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
         isSSOEnabled: Bool,
-        uiVariant: UIVariant,
         customUIQuery: String
     ) {
         guard clientId != "", endpoint != "" else {
@@ -55,9 +54,8 @@ class App: ObservableObject {
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
-        UserDefaults.standard.set(uiVariant.rawValue, forKey: "authgear.demo.uiVariant")
         UserDefaults.standard.set(customUIQuery, forKey: "authgear.demo.customUIQuery")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, uiVariant: uiVariant)
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
         self.customUIQuery = customUIQuery.isEmpty ? nil : customUIQuery
