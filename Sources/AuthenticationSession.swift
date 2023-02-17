@@ -2,7 +2,6 @@ import AuthenticationServices
 import SafariServices
 
 protocol AuthenticationSession {
-    typealias OpenEmailClientHandler = (UIViewController) -> Void
     typealias CompletionHandler = (Result<URL, Error>) -> Void
     @discardableResult func start() -> Bool
     func cancel()
@@ -18,7 +17,6 @@ class AuthenticationSessionProvider: NSObject {
         url: URL,
         redirectURI: String,
         prefersEphemeralWebBrowserSession: Bool?,
-        openEmailClientHandler: @escaping AuthenticationSession.OpenEmailClientHandler,
         completionHandler: @escaping AuthenticationSession.CompletionHandler
     ) -> AuthenticationSession {
         let realCompletionHandler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in

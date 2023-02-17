@@ -47,20 +47,6 @@ extension AppDelegate: AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {
         appContainer.sessionState = container.sessionState
     }
-
-    func onOpenEmailClient(_ vc: UIViewController) {
-        let items = [
-            EmailClient.mail,
-            EmailClient.gmail
-        ]
-        let alert = Authgear.makeChooseEmailClientAlertController(
-            title: "Open mail app",
-            message: "Which app would you like to open?",
-            cancelLabel: "Cancel",
-            items: items
-        )
-        vc.present(alert, animated: true)
-    }
 }
 
 extension AppDelegate: WXApiDelegate {
