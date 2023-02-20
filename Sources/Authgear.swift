@@ -215,22 +215,14 @@ public enum SessionStateChangeReason: String {
     case clear = "CLEAR"
 }
 
-public enum UIVariant: String {
-    case asWebAuthenticationSession
-    case wkWebView
-    case wkWebViewFullScreen
-}
-
 public protocol AuthgearDelegate: AnyObject {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
     func sendWechatAuthRequest(_ state: String)
-    func onOpenEmailClient(_ vc: UIViewController)
 }
 
 public extension AuthgearDelegate {
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
     func sendWechatAuthRequest(_ state: String) {}
-    func onOpenEmailClient(_ vc: UIViewController) {}
 }
 
 public class Authgear {
@@ -255,7 +247,6 @@ public class Authgear {
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
     public let isSSOEnabled: Bool
-    public let uiVariant: UIVariant
 
     private let authenticationSessionProvider = AuthenticationSessionProvider()
     private var authenticationSession: AuthenticationSession?
@@ -305,13 +296,12 @@ public class Authgear {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, uiVariant: UIVariant = .asWebAuthenticationSession, name: String? = nil) {
+    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, name: String? = nil) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
-        self.uiVariant = uiVariant
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
@@ -340,10 +330,6 @@ public class Authgear {
     private func setSessionState(_ newState: SessionState, reason: SessionStateChangeReason) {
         sessionState = newState
         delegate?.authgearSessionStateDidChange(self, reason: reason)
-    }
-
-    private func openEmailClient(_ vc: UIViewController) {
-        delegate?.onOpenEmailClient(vc)
     }
 
     private func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
@@ -376,10 +362,6 @@ public class Authgear {
                     url: url,
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
-                    uiVariant: self.uiVariant,
-                    openEmailClientHandler: { [weak self] vc in
-                        self?.openEmailClient(vc)
-                    },
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -424,10 +406,6 @@ public class Authgear {
                     url: request.url,
                     redirectURI: request.redirectURI,
                     prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
-                    uiVariant: self.uiVariant,
-                    openEmailClientHandler: { [weak self] vc in
-                        self?.openEmailClient(vc)
-                    },
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -1048,10 +1026,6 @@ public class Authgear {
                     // the alert dialog is never prompted and
                     // the app session token cookie is forgotten when the webview is closed.
                     prefersEphemeralWebBrowserSession: true,
-                    uiVariant: self.uiVariant,
-                    openEmailClientHandler: { [weak self] vc in
-                        self?.openEmailClient(vc)
-                    },
                     completionHandler: { [weak self] result in
                         self?.unregisterCurrentWechatRedirectURI()
                         switch result {
@@ -1374,44 +1348,6 @@ public class Authgear {
                 }
             }
         }
-    }
-
-    public class func makeChooseEmailClientAlertController(
-        title: String,
-        message: String,
-        cancelLabel: String,
-        items: [EmailClient]
-    ) -> UIAlertController {
-        let alert = UIAlertController(
-            title: title,
-            message: message,
-            preferredStyle: .actionSheet
-        )
-        let openableItems = items.filter { item in
-            guard let url = URL(string: item.openURL) else {
-                return false
-            }
-            return UIApplication.shared.canOpenURL(url)
-        }
-        for item in openableItems {
-            alert.addAction(UIAlertAction(
-                title: item.name,
-                style: .default,
-                handler: { _ in
-                    guard let url = URL(string: item.openURL) else {
-                        return
-                    }
-                    UIApplication.shared.open(url)
-                }
-            ))
-        }
-        alert.addAction(UIAlertAction(
-            title: cancelLabel,
-            style: .cancel,
-            handler: { _ in
-            }
-        ))
-        return alert
     }
 
     private func _handleInvalidGrantException(error: Error) -> Result<Void, Error> {

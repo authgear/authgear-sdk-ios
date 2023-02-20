@@ -9,9 +9,10 @@
 /* Begin PBXBuildFile section */
 		775FF72A2603649500B81ECD /* Biometric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF7292603649500B81ECD /* Biometric.swift */; };
 		775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF73326047C7700B81ECD /* DeviceInfo.swift */; };
-		A648BE852975316A002D8EA5 /* EmailClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A648BE842975316A002D8EA5 /* EmailClient.swift */; };
-		CC38CD6429520E8E00C57346 /* WebViewSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC38CD6329520E8E00C57346 /* WebViewSession.swift */; };
-		CC38CD6829520EA000C57346 /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC38CD6729520EA000C57346 /* WebViewViewController.swift */; };
+		95E67333299F652100C9466C /* Latte+WKWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E67330299F652000C9466C /* Latte+WKWebView.swift */; };
+		95E67334299F652100C9466C /* Latte.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E67331299F652000C9466C /* Latte.swift */; };
+		95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E67332299F652000C9466C /* AuthgearExperimental.swift */; };
+		A648BE852975316A002D8EA5 /* Latte+EmailClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
 		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
@@ -49,12 +50,13 @@
 /* Begin PBXFileReference section */
 		775FF7292603649500B81ECD /* Biometric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometric.swift; sourceTree = "<group>"; };
 		775FF73326047C7700B81ECD /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
-		A648BE842975316A002D8EA5 /* EmailClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailClient.swift; sourceTree = "<group>"; };
+		95E67330299F652000C9466C /* Latte+WKWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Latte+WKWebView.swift"; sourceTree = "<group>"; };
+		95E67331299F652000C9466C /* Latte.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Latte.swift; sourceTree = "<group>"; };
+		95E67332299F652000C9466C /* AuthgearExperimental.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthgearExperimental.swift; sourceTree = "<group>"; };
+		A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+EmailClient.swift"; sourceTree = "<group>"; };
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20D6F025BAA3C400E579DD /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = example/Pods/Pods.xcodeproj; sourceTree = "<group>"; };
-		CC38CD6329520E8E00C57346 /* WebViewSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewSession.swift; sourceTree = "<group>"; };
-		CC38CD6729520EA000C57346 /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
 		F83392EE24FC344D00A69D3C /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		F83392F024FDA87900A69D3C /* AuthgearError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthgearError.swift; sourceTree = "<group>"; };
 		F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLComponents+QueryParames.swift"; sourceTree = "<group>"; };
@@ -136,7 +138,7 @@
 			children = (
 				F83D84AB24F66D3400B4393C /* APIClient.swift */,
 				F83D84A724F64D0E00B4393C /* Authgear.swift */,
-				A648BE842975316A002D8EA5 /* EmailClient.swift */,
+				95E67332299F652000C9466C /* AuthgearExperimental.swift */,
 				F83D84AF24F860AA00B4393C /* AuthenticationSession.swift */,
 				F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */,
 				F83D84AD24F6A93600B4393C /* CodeVerifier.swift */,
@@ -149,8 +151,9 @@
 				775FF7292603649500B81ECD /* Biometric.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
 				F8A657A825055A7C0027888F /* Base64.swift */,
-				CC38CD6329520E8E00C57346 /* WebViewSession.swift */,
-				CC38CD6729520EA000C57346 /* WebViewViewController.swift */,
+				95E67331299F652000C9466C /* Latte.swift */,
+				95E67330299F652000C9466C /* Latte+WKWebView.swift */,
+				A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */,
 			);
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -248,23 +251,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				95E67333299F652100C9466C /* Latte+WKWebView.swift in Sources */,
 				F83D84AA24F66C5100B4393C /* OIDCConfiguration.swift in Sources */,
 				F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */,
 				F83392EF24FC344D00A69D3C /* Storage.swift in Sources */,
+				95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */,
 				F83D84AE24F6A93600B4393C /* CodeVerifier.swift in Sources */,
 				F8A657A925055A7C0027888F /* Base64.swift in Sources */,
 				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
 				775FF72A2603649500B81ECD /* Biometric.swift in Sources */,
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
-				A648BE852975316A002D8EA5 /* EmailClient.swift in Sources */,
+				A648BE852975316A002D8EA5 /* Latte+EmailClient.swift in Sources */,
 				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
 				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
 				F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */,
 				F83D84B024F860AA00B4393C /* AuthenticationSession.swift in Sources */,
-				CC38CD6429520E8E00C57346 /* WebViewSession.swift in Sources */,
-				CC38CD6829520EA000C57346 /* WebViewViewController.swift in Sources */,
 				F83D84A824F64D0E00B4393C /* Authgear.swift in Sources */,
+				95E67334299F652100C9466C /* Latte.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

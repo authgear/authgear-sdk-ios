@@ -5,12 +5,12 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var appContainer = App()
 
-    func configureAuthgear(clientId: String, endpoint: String, tokenStorage: String, isSSOEnabled: Bool, uiVariant: UIVariant) {
+    func configureAuthgear(clientId: String, endpoint: String, tokenStorage: String, isSSOEnabled: Bool) {
         switch tokenStorage {
         case TokenStorageClassName.TransientTokenStorage.rawValue:
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: TransientTokenStorage(), isSSOEnabled: isSSOEnabled, uiVariant: uiVariant)
+            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: TransientTokenStorage(), isSSOEnabled: isSSOEnabled)
         default:
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: PersistentTokenStorage(), isSSOEnabled: isSSOEnabled, uiVariant: uiVariant)
+            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: PersistentTokenStorage(), isSSOEnabled: isSSOEnabled)
         }
         appContainer.container?.configure()
         appContainer.container?.delegate = self
@@ -46,20 +46,6 @@ extension AppDelegate: AuthgearDelegate {
 
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {
         appContainer.sessionState = container.sessionState
-    }
-
-    func onOpenEmailClient(_ vc: UIViewController) {
-        let items = [
-            EmailClient.mail,
-            EmailClient.gmail
-        ]
-        let alert = Authgear.makeChooseEmailClientAlertController(
-            title: "Open mail app",
-            message: "Which app would you like to open?",
-            cancelLabel: "Cancel",
-            items: items
-        )
-        vc.present(alert, animated: true)
     }
 }
 

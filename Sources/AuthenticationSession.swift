@@ -2,7 +2,6 @@ import AuthenticationServices
 import SafariServices
 
 protocol AuthenticationSession {
-    typealias OpenEmailClientHandler = (UIViewController) -> Void
     typealias CompletionHandler = (Result<URL, Error>) -> Void
     @discardableResult func start() -> Bool
     func cancel()
@@ -13,16 +12,11 @@ extension SFAuthenticationSession: AuthenticationSession {}
 @available(iOS 12.0, *)
 extension ASWebAuthenticationSession: AuthenticationSession {}
 
-@available(iOS 13.0, *)
-extension WebViewSession: AuthenticationSession {}
-
-class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
+class AuthenticationSessionProvider: NSObject {
     func makeAuthenticationSession(
         url: URL,
         redirectURI: String,
         prefersEphemeralWebBrowserSession: Bool?,
-        uiVariant: UIVariant,
-        openEmailClientHandler: @escaping AuthenticationSession.OpenEmailClientHandler,
         completionHandler: @escaping AuthenticationSession.CompletionHandler
     ) -> AuthenticationSession {
         let realCompletionHandler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
@@ -32,20 +26,6 @@ class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
 
             if let url = url {
                 return completionHandler(.success(url))
-            }
-        }
-
-        if #available(iOS 13.0, *) {
-            if uiVariant == .wkWebView || uiVariant == .wkWebViewFullScreen {
-                let session = WebViewSession(
-                    url: url,
-                    redirectURI: URL(string: redirectURI)!,
-                    isFullScreenMode: uiVariant == .wkWebViewFullScreen,
-                    openEmailClientHandler: openEmailClientHandler,
-                    completionHandler: realCompletionHandler
-                )
-                session.delegate = self
-                return session
             }
         }
 
@@ -78,14 +58,6 @@ class AuthenticationSessionProvider: NSObject, WebViewSessionDelegate {
         }
         return uri
     }
-
-    @available(iOS 13.0, *)
-    func presentationAnchor(for: WebViewSession) -> UIWindow {
-        UIApplication.shared.windows.filter { $0.isKeyWindow }.first!
-    }
-
-    @available(iOS 13.0, *)
-    func webViewSessionWillPresent(_: WebViewSession) {}
 }
 
 extension AuthenticationSessionProvider: ASWebAuthenticationPresentationContextProviding {

@@ -72,11 +72,6 @@ func wrapError(error: Error) -> Error {
         return AuthgearError.cancel
     }
 
-    if let webViewSessionErr = error as? WebViewSessionError,
-       case .canceled = webViewSessionErr {
-        return AuthgearError.cancel
-    }
-
     let nsError = error as NSError
 
     // Cancel
