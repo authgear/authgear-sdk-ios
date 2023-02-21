@@ -4,18 +4,25 @@ import UIKit
 @available(iOS 13.0, *)
 public extension Latte {
     struct Handle<T> {
+        let isPresented: Bool
         let viewController: UIViewController?
         public let result: Result<T, Error>
 
-        public func popViewController(animated: Bool) {
-            self.viewController?.navigationController?.popViewController(animated: animated)
+        public func dismiss(animated: Bool) {
+            if self.isPresented {
+                self.viewController?.dismiss(animated: animated)
+            } else {
+                var viewControllers = self.viewController?.navigationController?.viewControllers ?? []
+                viewControllers.removeAll(where: { $0 == self.viewController })
+                self.viewController?.navigationController?.setViewControllers(viewControllers, animated: animated)
+            }
         }
     }
 
     typealias ResultHandler<T> = (Handle<T>) -> Void
 
     static func authenticate(
-        context: UIViewController,
+        context: UINavigationController,
         authgear: Authgear,
         redirectURI: String,
         state: String? = nil,
@@ -52,22 +59,22 @@ public extension Latte {
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
                     latteVC.handler = { next.resume(with: $0) }
-                    context.navigationController?.pushViewController(latteVC, animated: true)
+                    context.pushViewController(latteVC, animated: true)
                 }
 
                 let userInfo: UserInfo = try await withCheckedThrowingContinuation { resume in
                     authgear.experimental.finishAuthentication(finishURL: result.finishURL, request: request) { resume.resume(with: $0)
                     }
                 }
-                handler(Handle(viewController: viewController, result: .success(userInfo)))
+                handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
-                handler(Handle(viewController: viewController, result: .failure(error)))
+                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
     }
 
     static func verifyEmail(
-        context: UIViewController,
+        context: UINavigationController,
         authgear: Authgear,
         email: String,
         entryURL: String,
@@ -99,7 +106,7 @@ public extension Latte {
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
                     latteVC.handler = { next.resume(with: $0) }
-                    context.navigationController?.pushViewController(latteVC, animated: true)
+                    context.pushViewController(latteVC, animated: true)
                 }
 
                 let components = URLComponents(url: result.finishURL, resolvingAgainstBaseURL: false)!
@@ -110,16 +117,16 @@ public extension Latte {
                     } else {
                         error = .oauthError(OAuthError(error: urlError, errorDescription: nil, errorUri: nil))
                     }
-                    handler(Handle(viewController: viewController, result: .failure(error)))
+                    handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
                     return
                 }
 
                 let userInfo: UserInfo = try await withCheckedThrowingContinuation { resume in
                     authgear.experimental.authgear.fetchUserInfo() { resume.resume(with: $0) }
                 }
-                handler(Handle(viewController: viewController, result: .success(userInfo)))
+                handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
-                handler(Handle(viewController: viewController, result: .failure(error)))
+                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
     }
