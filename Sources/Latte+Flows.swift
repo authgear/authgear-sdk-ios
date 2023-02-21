@@ -76,9 +76,8 @@ public extension Latte {
     static func verifyEmail(
         context: UINavigationController,
         authgear: Authgear,
+        customUIEndpoint: String,
         email: String,
-        entryURL: String,
-        redirectURI: String,
         handler: @escaping ResultHandler<UserInfo>
     ) {
         Task { await run() }
@@ -87,6 +86,9 @@ public extension Latte {
         func run() async {
             var viewController: LatteViewController?
             do {
+                let entryURL = customUIEndpoint + "/verify/email"
+                let redirectURI = customUIEndpoint + "/verify/email/completed"
+
                 let urlQueryAllowed = CharacterSet.urlQueryAllowed.subtracting(["+"])
                 let query = [
                     "email=\(email.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)",
