@@ -17,7 +17,7 @@ public extension Latte {
         )
     }
 
-    func makeChooseEmailClientAlertController(
+    static func makeChooseEmailClientAlertController(
         title: String,
         message: String,
         cancelLabel: String,
