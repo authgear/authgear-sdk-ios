@@ -129,6 +129,39 @@ public extension Latte {
             }
         }
     }
+
+    func resetPassword(
+        context: UINavigationController,
+        extraQuery: [URLQueryItem]?,
+        handler: @escaping ResultHandler<Void>
+    ) {
+        Task { await run() }
+        @Sendable @MainActor
+        func run() async {
+            var viewController: LatteViewController?
+            do {
+                var entryURLComponents = URLComponents(string: customUIEndpoint + "/recovery/reset")!
+                let redirectURI = "latte://reset-complete"
+                var urlQuery = extraQuery ?? []
+                urlQuery.append(
+                    URLQueryItem(name: "redirect_uri", value: redirectURI)
+                )
+                entryURLComponents.queryItems = urlQuery
+                let entryURL = entryURLComponents.url!
+                let webViewRequest = LatteWebViewRequest(url: entryURL, redirectURI: redirectURI)
+                let latteVC = LatteViewController(context: context, request: webViewRequest)
+                viewController = latteVC
+                let _: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                    latteVC.handler = { next.resume(with: $0) }
+                    context.pushViewController(latteVC, animated: true)
+                }
+                latteVC.dismiss(animated: true)
+                handler(Handle(isPresented: false, viewController: viewController, result: .success(())))
+            } catch {
+                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
+            }
+        }
+    }
 }
 
 @available(iOS 13.0, *)

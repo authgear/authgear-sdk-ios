@@ -5,7 +5,7 @@ import UIKit
 public protocol LatteLinkHandler {
     func handle(
         context: UINavigationController,
-        authgear: Authgear,
+        latte: Latte,
         handler: @escaping (Result<Void, Error>) -> Void
     )
 }
@@ -18,33 +18,17 @@ public extension Latte {
 
         public func handle(
             context: UINavigationController,
-            authgear: Authgear,
+            latte: Latte,
             handler: @escaping (Result<Void, Error>) -> Void
         ) {
-            Task { await run() }
-            @Sendable @MainActor
-            func run() async {
-                do {
-                    var entryURLComponents = URLComponents(string: customUIEndpoint + "/recovery/reset")!
-                    let redirectURI = "latte://reset-complete"
-                    var urlQuery = query ?? []
-                    urlQuery.append(
-                        URLQueryItem(name: "redirect_uri", value: redirectURI)
-                    )
-                    entryURLComponents.queryItems = urlQuery
-                    let entryURL = entryURLComponents.url!
-                    let webViewRequest = LatteWebViewRequest(url: entryURL, redirectURI: redirectURI)
-                    let latteVC = LatteViewController(context: context, request: webViewRequest)
-                    let _ = try await withCheckedThrowingContinuation { next in
-                        latteVC.handler = { next.resume(with: $0) }
-                        context.pushViewController(latteVC, animated: true)
-                    }
-                    latteVC.dismiss(animated: true)
-                    handler(.success(()))
-                } catch {
-                    handler(.failure(error))
+            latte.resetPassword(
+                context: context,
+                extraQuery: query,
+                handler: { handle in
+                    handle.dismiss(animated: true)
+                    handler(handle.result)
                 }
-            }
+            )
         }
     }
 
