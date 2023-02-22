@@ -27,9 +27,13 @@ public extension Latte {
                 var viewController: LatteViewController?
                 do {
                     var entryURLComponents = URLComponents(string: customUIEndpoint + "/recovery/reset")!
-                    entryURLComponents.queryItems = query
+                    let redirectURI = "latte://reset-complete"
+                    var urlQuery = query ?? []
+                    urlQuery.append(
+                        URLQueryItem(name: "redirect_uri", value: redirectURI)
+                    )
+                    entryURLComponents.queryItems = urlQuery
                     let entryURL = entryURLComponents.url!
-                    let redirectURI = customUIEndpoint + "/recovery/reset/complete"
                     let webViewRequest = LatteWebViewRequest(url: entryURL, redirectURI: redirectURI)
                     let latteVC = LatteViewController(context: context, request: webViewRequest)
                     viewController = latteVC
