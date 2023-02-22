@@ -135,7 +135,7 @@ public extension Latte {
 }
 
 @available(iOS 13.0, *)
-private class LatteViewController: UIViewController, LatteWebViewDelegate {
+internal class LatteViewController: UIViewController, LatteWebViewDelegate {
     weak var context: UIViewController?
     let webView: LatteWKWebView
     var handler: ((Result<LatteWebViewResult, Error>) -> Void)?
