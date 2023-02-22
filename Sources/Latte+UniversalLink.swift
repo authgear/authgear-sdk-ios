@@ -13,7 +13,6 @@ public protocol LatteLinkHandler {
 @available(iOS 13.0, *)
 public extension Latte {
     struct ResetLinkHandler: LatteLinkHandler {
-        let customUIEndpoint: String
         let query: [URLQueryItem]?
 
         public func handle(
@@ -33,7 +32,6 @@ public extension Latte {
     }
 
     static func getUniversalLinkHandler(
-        customUIEndpoint: String,
         linkURLHost: String,
         userActivity: NSUserActivity
     ) -> LatteLinkHandler? {
@@ -49,7 +47,6 @@ public extension Latte {
         switch path {
         case _ where path.hasSuffix("/reset_link"):
             return ResetLinkHandler(
-                customUIEndpoint: customUIEndpoint,
                 query: components.queryItems
             )
         default:
