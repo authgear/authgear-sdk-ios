@@ -21,9 +21,8 @@ public extension Latte {
 
     typealias ResultHandler<T> = (Handle<T>) -> Void
 
-    static func authenticate(
+    func authenticate(
         context: UINavigationController,
-        authgear: Authgear,
         redirectURI: String,
         state: String? = nil,
         prompt: [PromptOption]? = nil,
@@ -73,10 +72,8 @@ public extension Latte {
         }
     }
 
-    static func verifyEmail(
+    func verifyEmail(
         context: UINavigationController,
-        authgear: Authgear,
-        customUIEndpoint: String,
         email: String,
         handler: @escaping ResultHandler<UserInfo>
     ) {

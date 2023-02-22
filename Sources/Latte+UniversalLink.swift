@@ -19,7 +19,8 @@ public extension Latte {
         public func handle(
             context: UINavigationController,
             authgear: Authgear,
-            handler: @escaping Latte.ResultHandler<Void>) {
+            handler: @escaping Latte.ResultHandler<Void>
+        ) {
             Task { await run() }
             @Sendable @MainActor
             func run() async {
@@ -43,10 +44,8 @@ public extension Latte {
             }
         }
     }
-    
-    
+
     static func getUniversalLinkHandler(
-        context: UINavigationController,
         customUIEndpoint: String,
         linkURLHost: String,
         userActivity: NSUserActivity
@@ -64,7 +63,8 @@ public extension Latte {
         case _ where path.hasSuffix("/reset_link"):
             return ResetLinkHandler(
                 customUIEndpoint: customUIEndpoint,
-                query: components.queryItems)
+                query: components.queryItems
+            )
         default:
             return nil
         }

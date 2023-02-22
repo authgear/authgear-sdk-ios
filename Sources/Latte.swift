@@ -1,7 +1,15 @@
 import Foundation
 import UIKit
 
-public enum Latte {}
+public class Latte {
+    let authgear: Authgear
+    let customUIEndpoint: String
+
+    public init(authgear: Authgear, customUIEndpoint: String) {
+        self.authgear = authgear
+        self.customUIEndpoint = customUIEndpoint
+    }
+}
 
 public struct LatteWebViewRequest {
     public let url: URL
