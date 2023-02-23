@@ -4,10 +4,12 @@ import UIKit
 public class Latte {
     let authgear: Authgear
     let customUIEndpoint: String
+    let urlSession: URLSession
 
     public init(authgear: Authgear, customUIEndpoint: String) {
         self.authgear = authgear
         self.customUIEndpoint = customUIEndpoint
+        self.urlSession = URLSession(configuration: .default)
     }
 }
 

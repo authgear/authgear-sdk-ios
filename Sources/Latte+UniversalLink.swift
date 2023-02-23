@@ -31,6 +31,27 @@ public extension Latte {
         }
     }
 
+    struct LoginLinkHandler: LatteLinkHandler {
+        let url: URL
+
+        public func handle(
+            context: UINavigationController,
+            latte: Latte,
+            handler: @escaping (Result<Void, Error>
+        ) -> Void) {
+            var request = URLRequest(url: self.url)
+            request.httpMethod = "POST"
+            let task = latte.urlSession.dataTask(with: request) { data, response, error in
+                if let error = error {
+                        handler(.failure(error))
+                        return
+                }
+                handler(.success(()))
+            }
+            task.resume()
+        }
+    }
+
     static func getUniversalLinkHandler(
         linkURLHost: String,
         userActivity: NSUserActivity
@@ -48,6 +69,10 @@ public extension Latte {
         case _ where path.hasSuffix("/reset_link"):
             return ResetLinkHandler(
                 query: components.queryItems
+            )
+        case _ where path.hasSuffix("/login_link"):
+            return LoginLinkHandler(
+                url: incomingURL
             )
         default:
             return nil
