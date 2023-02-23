@@ -38,13 +38,14 @@ public extension Latte {
             context: UINavigationController,
             latte: Latte,
             handler: @escaping (Result<Void, Error>
-        ) -> Void) {
+            ) -> Void
+        ) {
             var request = URLRequest(url: self.url)
             request.httpMethod = "POST"
-            let task = latte.urlSession.dataTask(with: request) { data, response, error in
+            let task = latte.urlSession.dataTask(with: request) { _, _, error in
                 if let error = error {
-                        handler(.failure(error))
-                        return
+                    handler(.failure(error))
+                    return
                 }
                 handler(.success(()))
             }
