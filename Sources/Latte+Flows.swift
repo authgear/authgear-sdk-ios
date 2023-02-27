@@ -132,7 +132,7 @@ public extension Latte {
 
     func changePassword(
         context: UINavigationController,
-        handler: @escaping ResultHandler<UserInfo>
+        handler: @escaping ResultHandler<Void>
     ) {
         Task { await run() }
 
@@ -176,10 +176,7 @@ public extension Latte {
                     return
                 }
 
-                let userInfo: UserInfo = try await withCheckedThrowingContinuation { resume in
-                    authgear.experimental.authgear.fetchUserInfo() { resume.resume(with: $0) }
-                }
-                handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
+                handler(Handle(isPresented: false, viewController: viewController, result: .success(())))
             } catch {
                 handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
