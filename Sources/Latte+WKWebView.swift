@@ -110,7 +110,8 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
                     parent.delegate?.latteWebView(onEvent: parent, event: .openEmailClient)
                 case LatteBuiltInEvents.viewPage.rawValue:
                     guard let path = body["path"] as? String else { return }
-                    parent.delegate?.latteWebView(onEvent: parent, event: .viewPage(path: path))
+                    let event = LatteViewPageEvent(path: path)
+                    parent.delegate?.latteWebView(onEvent: parent, event: .viewPage(event: event))
                 default:
                     return
                 }

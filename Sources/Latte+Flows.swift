@@ -339,7 +339,7 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
                 items: items
             )
             self.context?.present(alert, animated: true)
-        case .viewPage(path: _):
+        case .viewPage(event: _):
             break
         }
     }

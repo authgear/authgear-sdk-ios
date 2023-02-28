@@ -20,8 +20,8 @@ public class Latte: LatteViewControllerDelegate {
     @available(iOS 13.0, *)
     func latteViewController(onEvent _: LatteViewController, event: LatteWebViewEvent) {
         switch event {
-        case let .viewPage(path):
-            self.delegate?.latte(onViewPage: self, path: path)
+        case let .viewPage(event):
+            self.delegate?.latte(onViewPage: self, path: event.path)
         case .openEmailClient:
             break
         }
@@ -49,9 +49,13 @@ public struct LatteWebViewResult {
     public let finishURL: URL
 }
 
+public struct LatteViewPageEvent {
+    public let path: String
+}
+
 public enum LatteWebViewEvent {
     case openEmailClient
-    case viewPage(path: String)
+    case viewPage(event: LatteViewPageEvent)
 }
 
 public protocol LatteWebViewDelegate: AnyObject {
