@@ -159,6 +159,7 @@ public extension Latte {
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
+                latteVC.delegate = self
                 viewController = latteVC
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
@@ -248,6 +249,7 @@ public extension Latte {
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
+                latteVC.delegate = self
                 viewController = latteVC
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
