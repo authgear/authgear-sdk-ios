@@ -54,6 +54,7 @@ public extension Latte {
 
                 let webViewRequest = LatteWebViewRequest(request: request)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
+                latteVC.delegate = self
                 viewController = latteVC
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
@@ -101,6 +102,7 @@ public extension Latte {
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
+                latteVC.delegate = self
                 viewController = latteVC
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
@@ -157,6 +159,7 @@ public extension Latte {
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
+                latteVC.delegate = self
                 viewController = latteVC
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
@@ -203,6 +206,7 @@ public extension Latte {
                 let entryURL = entryURLComponents.url!
                 let webViewRequest = LatteWebViewRequest(url: entryURL, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
+                latteVC.delegate = self
                 viewController = latteVC
                 let _: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
                     latteVC.handler = { next.resume(with: $0) }
@@ -245,6 +249,7 @@ public extension Latte {
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
+                latteVC.delegate = self
                 viewController = latteVC
 
                 let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
@@ -276,10 +281,16 @@ public extension Latte {
 }
 
 @available(iOS 13.0, *)
+internal protocol LatteViewControllerDelegate: AnyObject {
+    func latteViewController(onEvent _: LatteViewController, event: LatteWebViewEvent)
+}
+
+@available(iOS 13.0, *)
 internal class LatteViewController: UIViewController, LatteWebViewDelegate {
     weak var context: UIViewController?
     let webView: LatteWKWebView
     var handler: ((Result<LatteWebViewResult, Error>) -> Void)?
+    weak var delegate: LatteViewControllerDelegate?
 
     init(
         context: UIViewController,
@@ -315,6 +326,8 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
     }
 
     func latteWebView(onEvent _: LatteWebView, event: LatteWebViewEvent) {
+        self.delegate?.latteViewController(onEvent: self, event: event)
+
         switch event {
         case .openEmailClient:
             let items = [
@@ -328,6 +341,8 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
                 items: items
             )
             self.context?.present(alert, animated: true)
+        case .viewPage(event: _):
+            break
         }
     }
 }

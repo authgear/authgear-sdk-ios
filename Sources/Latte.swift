@@ -1,15 +1,30 @@
 import Foundation
 import UIKit
 
-public class Latte {
+public protocol LatteDelegate: AnyObject {
+    func latte(onViewPage _: Latte, event: LatteViewPageEvent)
+}
+
+public class Latte: LatteViewControllerDelegate {
     let authgear: Authgear
     let customUIEndpoint: String
     let urlSession: URLSession
+    public weak var delegate: LatteDelegate?
 
     public init(authgear: Authgear, customUIEndpoint: String) {
         self.authgear = authgear
         self.customUIEndpoint = customUIEndpoint
         self.urlSession = URLSession(configuration: .default)
+    }
+
+    @available(iOS 13.0, *)
+    func latteViewController(onEvent _: LatteViewController, event: LatteWebViewEvent) {
+        switch event {
+        case let .viewPage(event):
+            self.delegate?.latte(onViewPage: self, event: event)
+        case .openEmailClient:
+            break
+        }
     }
 }
 
@@ -34,8 +49,13 @@ public struct LatteWebViewResult {
     public let finishURL: URL
 }
 
+public struct LatteViewPageEvent {
+    public let path: String
+}
+
 public enum LatteWebViewEvent {
     case openEmailClient
+    case viewPage(event: LatteViewPageEvent)
 }
 
 public protocol LatteWebViewDelegate: AnyObject {
