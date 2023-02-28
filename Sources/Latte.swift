@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 public protocol LatteDelegate: AnyObject {
-    func latte(onViewPage _: Latte, path: String)
+    func latte(onViewPage _: Latte, event: LatteViewPageEvent)
 }
 
 public class Latte: LatteViewControllerDelegate {
@@ -21,7 +21,7 @@ public class Latte: LatteViewControllerDelegate {
     func latteViewController(onEvent _: LatteViewController, event: LatteWebViewEvent) {
         switch event {
         case let .viewPage(event):
-            self.delegate?.latte(onViewPage: self, path: event.path)
+            self.delegate?.latte(onViewPage: self, event: event)
         case .openEmailClient:
             break
         }
