@@ -76,6 +76,8 @@ public extension Latte {
     func verifyEmail(
         context: UINavigationController,
         email: String,
+        state: String? = nil,
+        uiLocales: [String]? = nil,
         handler: @escaping ResultHandler<UserInfo>
     ) {
         Task { await run() }
@@ -86,12 +88,16 @@ public extension Latte {
             do {
                 let entryURL = customUIEndpoint + "/verify/email"
                 let redirectURI = customUIEndpoint + "/verify/email/completed"
-
-                let urlQueryAllowed = CharacterSet.urlQueryAllowed.subtracting(["+"])
-                let query = [
-                    "email=\(email.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)",
-                    "redirect_uri=\(redirectURI.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)"
-                ].joined(separator: "&")
+                var queryList = [
+                    "email=\(email.encodeAsQuery()!)",
+                    "redirect_uri=\(redirectURI.encodeAsQuery()!)"
+                ]
+                queryList.append(
+                    contentsOf: constructUIParamQuery(
+                        state: state,
+                        uiLocales: uiLocales
+                    ))
+                let query = queryList.joined(separator: "&")
                 let verifyEmailURL = "\(entryURL)?\(query)"
 
                 let url: URL = try await withCheckedThrowingContinuation { resume in
@@ -134,6 +140,8 @@ public extension Latte {
 
     func changePassword(
         context: UINavigationController,
+        state: String? = nil,
+        uiLocales: [String]? = nil,
         handler: @escaping ResultHandler<Void>
     ) {
         Task { await run() }
@@ -145,10 +153,15 @@ public extension Latte {
                 let entryURL = customUIEndpoint + "/settings/change_password"
                 let redirectURI = "latte://complete"
 
-                let urlQueryAllowed = CharacterSet.urlQueryAllowed.subtracting(["+"])
-                let query = [
-                    "redirect_uri=\(redirectURI.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)"
-                ].joined(separator: "&")
+                var queryList = [
+                    "redirect_uri=\(redirectURI.encodeAsQuery()!)"
+                ]
+                queryList.append(
+                    contentsOf: constructUIParamQuery(
+                        state: state,
+                        uiLocales: uiLocales
+                    ))
+                let query = queryList.joined(separator: "&")
                 let entryURLWithWQuery = "\(entryURL)?\(query)"
 
                 let url: URL = try await withCheckedThrowingContinuation { resume in
@@ -188,7 +201,7 @@ public extension Latte {
 
     func resetPassword(
         context: UINavigationController,
-        extraQuery: [URLQueryItem]?,
+        query: [URLQueryItem]?,
         handler: @escaping ResultHandler<Void>
     ) {
         Task { await run() }
@@ -198,7 +211,7 @@ public extension Latte {
             do {
                 var entryURLComponents = URLComponents(string: customUIEndpoint + "/recovery/reset")!
                 let redirectURI = "latte://reset-complete"
-                var urlQuery = extraQuery ?? []
+                var urlQuery = query ?? []
                 urlQuery.append(
                     URLQueryItem(name: "redirect_uri", value: redirectURI)
                 )
@@ -224,6 +237,8 @@ public extension Latte {
         context: UINavigationController,
         email: String,
         phoneNumber: String,
+        state: String? = nil,
+        uiLocales: [String]? = nil,
         handler: @escaping ResultHandler<UserInfo>
     ) {
         Task { await run() }
@@ -235,12 +250,17 @@ public extension Latte {
                 let entryURL = customUIEndpoint + "/settings/change_email"
                 let redirectURI = customUIEndpoint + "/verify/email/completed"
 
-                let urlQueryAllowed = CharacterSet.urlQueryAllowed.subtracting(["+"])
-                let query = [
-                    "email=\(email.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)",
-                    "phone=\(phoneNumber.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)",
-                    "redirect_uri=\(redirectURI.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)"
-                ].joined(separator: "&")
+                var queryList = [
+                    "email=\(email.encodeAsQuery()!)",
+                    "phone=\(phoneNumber.encodeAsQuery()!)",
+                    "redirect_uri=\(redirectURI.encodeAsQuery()!)"
+                ]
+                queryList.append(
+                    contentsOf: constructUIParamQuery(
+                        state: state,
+                        uiLocales: uiLocales
+                    ))
+                let query = queryList.joined(separator: "&")
                 let changeEmailURL = "\(entryURL)?\(query)"
 
                 let url: URL = try await withCheckedThrowingContinuation { resume in
@@ -279,6 +299,20 @@ public extension Latte {
                 handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
+    }
+
+    private func constructUIParamQuery(
+        state: String? = nil,
+        uiLocales: [String]? = nil
+    ) -> Array<String> {
+        var result: Array<String> = []
+        if let mustState = state {
+            result.append("state=\(mustState.encodeAsQuery()!)")
+        }
+        if let mustUILocales = uiLocales {
+            result.append("ui_locales=\(UILocales.stringify(uiLocales: mustUILocales).encodeAsQuery()!)")
+        }
+        return result
     }
 }
 

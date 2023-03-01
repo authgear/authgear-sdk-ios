@@ -22,7 +22,7 @@ public extension Latte {
         ) {
             latte.resetPassword(
                 context: context,
-                extraQuery: query,
+                query: query,
                 handler: { handle in
                     handle.dismiss(animated: true)
                     handler(handle.result)

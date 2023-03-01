@@ -74,7 +74,7 @@ struct OIDCAuthenticationRequest {
         if let uiLocales = self.uiLocales {
             queryItems.append(URLQueryItem(
                 name: "ui_locales",
-                value: uiLocales.joined(separator: " ")
+                value: UILocales.stringify(uiLocales: uiLocales)
             ))
         }
 
