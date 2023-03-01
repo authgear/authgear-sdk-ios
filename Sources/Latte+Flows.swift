@@ -223,6 +223,7 @@ public extension Latte {
     func changeEmail(
         context: UINavigationController,
         email: String,
+        phoneNumber: String,
         handler: @escaping ResultHandler<UserInfo>
     ) {
         Task { await run() }
@@ -237,6 +238,7 @@ public extension Latte {
                 let urlQueryAllowed = CharacterSet.urlQueryAllowed.subtracting(["+"])
                 let query = [
                     "email=\(email.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)",
+                    "phone=\(phoneNumber.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)",
                     "redirect_uri=\(redirectURI.addingPercentEncoding(withAllowedCharacters: urlQueryAllowed)!)"
                 ].joined(separator: "&")
                 let changeEmailURL = "\(entryURL)?\(query)"
