@@ -616,7 +616,7 @@ public class Authgear {
     private func withMainQueueHandler<ResultType, ErrorType: Error>(
         _ handler: @escaping (Result<ResultType, ErrorType>) -> Void
     ) -> ((Result<ResultType, ErrorType>) -> Void) {
-        return { result in
+        { result in
             DispatchQueue.main.async {
                 handler(result)
             }
