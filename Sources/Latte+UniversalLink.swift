@@ -42,14 +42,14 @@ public extension Latte {
         ) {
             var request = URLRequest(url: self.url)
             request.httpMethod = "POST"
-            let task = latte.urlSession.dataTask(with: request) { _, _, error in
-                if let error = error {
+            authgearFetch(urlSession: latte.urlSession, request: request) { result in
+                switch result {
+                case let .failure(error):
                     handler(.failure(error))
-                    return
+                case .success:
+                    handler(.success(()))
                 }
-                handler(.success(()))
             }
-            task.resume()
         }
     }
 
