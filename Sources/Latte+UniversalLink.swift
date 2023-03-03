@@ -13,7 +13,7 @@ public protocol LatteLinkHandler {
 @available(iOS 13.0, *)
 public extension Latte {
     struct ResetLinkHandler: LatteLinkHandler {
-        let query: [URLQueryItem]?
+        let url: URL
 
         public func handle(
             context: UINavigationController,
@@ -22,7 +22,7 @@ public extension Latte {
         ) {
             latte.resetPassword(
                 context: context,
-                query: query,
+                url: url,
                 handler: { handle in
                     handle.dismiss(animated: true)
                     handler(handle.result)
@@ -75,7 +75,7 @@ public extension Latte {
         switch path {
         case _ where path.hasSuffix("/reset_link"):
             return ResetLinkHandler(
-                query: components.queryItems
+                url: components.url!
             )
         case _ where path.hasSuffix("/login_link"):
             let url: URL

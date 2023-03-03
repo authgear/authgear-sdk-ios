@@ -200,7 +200,7 @@ public extension Latte {
 
     func resetPassword(
         context: UINavigationController,
-        query: [URLQueryItem]?,
+        url: URL,
         handler: @escaping ResultHandler<Void>
     ) {
         Task { await run() }
@@ -210,11 +210,9 @@ public extension Latte {
             do {
                 var entryURLComponents = URLComponents(string: customUIEndpoint + "/recovery/reset")!
                 let redirectURI = "latte://reset-complete"
-                var urlQuery = query ?? []
-                urlQuery.append(
-                    URLQueryItem(name: "redirect_uri", value: redirectURI)
-                )
-                entryURLComponents.queryItems = urlQuery
+                var newQueryParams = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryParams ?? [:]
+                newQueryParams["redirect_uri"] = redirectURI
+                entryURLComponents.query = newQueryParams.encodeAsQuery()
                 let entryURL = entryURLComponents.url!
                 let webViewRequest = LatteWebViewRequest(url: entryURL, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
@@ -379,5 +377,12 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
         case .viewPage(event: _):
             break
         }
+    }
+}
+
+private extension Dictionary<String, String> {
+    func encodeAsQuery() -> String {
+        return self.keys.map({ "\($0)=\(self[$0]!.encodeAsQuery()!)" })
+            .joined(separator: "&")
     }
 }
