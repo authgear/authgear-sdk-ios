@@ -88,8 +88,8 @@ public extension Latte {
                 let entryURL = customUIEndpoint + "/verify/email"
                 let redirectURI = customUIEndpoint + "/verify/email/completed"
                 var queryList = [
-                    "email=\(email.encodeAsQuery()!)",
-                    "redirect_uri=\(redirectURI.encodeAsQuery()!)"
+                    "email=\(email.encodeAsQueryComponent()!)",
+                    "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
@@ -153,7 +153,7 @@ public extension Latte {
                 let redirectURI = "latte://complete"
 
                 var queryList = [
-                    "redirect_uri=\(redirectURI.encodeAsQuery()!)"
+                    "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
@@ -212,9 +212,10 @@ public extension Latte {
                 let redirectURI = "latte://reset-complete"
                 var newQueryParams = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryParams ?? [:]
                 newQueryParams["redirect_uri"] = redirectURI
-                entryURLComponents.query = newQueryParams.encodeAsQuery()
-                let entryURL = entryURLComponents.url!
-                let webViewRequest = LatteWebViewRequest(url: entryURL, redirectURI: redirectURI)
+                let newQuery = newQueryParams.encodeAsQuery()
+                entryURLComponents.percentEncodedQuery = newQuery
+                let entryURL = entryURLComponents.url!.absoluteString
+                let webViewRequest = LatteWebViewRequest(url: URL(string: entryURL)!, redirectURI: redirectURI)
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
                 latteVC.delegate = self
                 viewController = latteVC
@@ -248,9 +249,9 @@ public extension Latte {
                 let redirectURI = customUIEndpoint + "/verify/email/completed"
 
                 var queryList = [
-                    "email=\(email.encodeAsQuery()!)",
-                    "phone=\(phoneNumber.encodeAsQuery()!)",
-                    "redirect_uri=\(redirectURI.encodeAsQuery()!)"
+                    "email=\(email.encodeAsQueryComponent()!)",
+                    "phone=\(phoneNumber.encodeAsQueryComponent()!)",
+                    "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
@@ -304,10 +305,10 @@ public extension Latte {
     ) -> Array<String> {
         var result: Array<String> = []
         if let mustState = state {
-            result.append("state=\(mustState.encodeAsQuery()!)")
+            result.append("state=\(mustState.encodeAsQueryComponent()!)")
         }
         if let mustUILocales = uiLocales {
-            result.append("ui_locales=\(UILocales.stringify(uiLocales: mustUILocales).encodeAsQuery()!)")
+            result.append("ui_locales=\(UILocales.stringify(uiLocales: mustUILocales).encodeAsQueryComponent()!)")
         }
         return result
     }
@@ -382,7 +383,7 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
 
 private extension Dictionary<String, String> {
     func encodeAsQuery() -> String {
-        return self.keys.map({ "\($0)=\(self[$0]!.encodeAsQuery()!)" })
+        return self.keys.map({ "\($0)=\(self[$0]!.encodeAsQueryComponent()!)" })
             .joined(separator: "&")
     }
 }
