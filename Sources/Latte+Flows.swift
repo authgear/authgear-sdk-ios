@@ -31,7 +31,6 @@ public extension Latte {
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         page: AuthenticationPage? = nil,
-        customUIQuery: String? = nil,
         handler: @escaping ResultHandler<UserInfo>
     ) {
         Task { await run() }
@@ -49,7 +48,7 @@ public extension Latte {
                     colorScheme: colorScheme,
                     wechatRedirectURI: wechatRedirectURI,
                     page: page,
-                    customUIQuery: customUIQuery
+                    customUIQuery: nil
                 ).get()
 
                 let webViewRequest = LatteWebViewRequest(request: request)
