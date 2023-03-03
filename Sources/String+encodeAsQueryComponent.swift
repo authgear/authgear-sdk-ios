@@ -3,7 +3,7 @@ import Foundation
 private extension CharacterSet {
     static var queryComponentAllowed: CharacterSet {
         // See https://url.spec.whatwg.org/#component-percent-encode-set
-        return CharacterSet.urlUserAllowed.subtracting([
+        CharacterSet.urlUserAllowed.subtracting([
             // userinfo percent-encode set
             "/", ":", ";", "=", "@", "[", "\\", "]", "^", "|",
             // component percent-encode set

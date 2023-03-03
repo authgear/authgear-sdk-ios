@@ -383,7 +383,7 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
 
 private extension Dictionary<String, String> {
     func encodeAsQuery() -> String {
-        return self.keys.map({ "\($0)=\(self[$0]!.encodeAsQueryComponent()!)" })
+        self.keys.map { "\($0)=\(self[$0]!.encodeAsQueryComponent()!)" }
             .joined(separator: "&")
     }
 }
