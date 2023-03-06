@@ -26,7 +26,6 @@ struct AuthenticateOptions {
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
-    let customUIQuery: String?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -42,8 +41,7 @@ struct AuthenticateOptions {
             idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: self.page,
-            customUIQuery: self.customUIQuery
+            page: self.page
         )
     }
 }
@@ -62,7 +60,6 @@ struct ReauthenticateOptions {
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let maxAge: Int?
-    let customUIQuery: String?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -78,8 +75,7 @@ struct ReauthenticateOptions {
             idTokenHint: idTokenHint,
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: nil,
-            customUIQuery: self.customUIQuery
+            page: nil
         )
     }
 }
@@ -692,7 +688,6 @@ public class Authgear {
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         page: AuthenticationPage? = nil,
-        customUIQuery: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         self.authenticate(AuthenticateOptions(
@@ -704,8 +699,7 @@ public class Authgear {
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            page: page,
-            customUIQuery: customUIQuery
+            page: page
         ), handler: handler)
     }
 
@@ -767,8 +761,7 @@ public class Authgear {
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            maxAge: maxAge,
-            customUIQuery: customUIQuery
+            maxAge: maxAge
         )
 
         self.workerQueue.async {
@@ -880,8 +873,7 @@ public class Authgear {
                         uiLocales: uiLocales,
                         colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
-                        page: nil,
-                        customUIQuery: nil
+                        page: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -967,8 +959,7 @@ public class Authgear {
                     idTokenHint: nil,
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
-                    page: nil,
-                    customUIQuery: nil
+                    page: nil
                 ), verifier: nil)
 
                 handler?(.success(endpoint))

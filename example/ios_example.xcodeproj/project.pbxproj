@@ -13,12 +13,12 @@
 		7A0B54412555135300718C05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B54402555135300718C05 /* ContentView.swift */; };
 		7A0B544525554CB300718C05 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B544425554CB300718C05 /* App.swift */; };
 		7A60D1052559571C00357B6D /* KeyboardAvoidingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */; };
+		A68DAD1B29AF64DB00487DAF /* Authgear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; };
+		A68DAD1C29AF64DB00487DAF /* Authgear.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CCC8F73025AC33D6000358F1 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCC8F72E25AC33D0000358F1 /* WebKit.framework */; };
 		F89AEF8424F57A6B00CF5F57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */; };
 		F89AEF8D24F57A6C00CF5F57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */; };
 		F89AEF9024F57A6C00CF5F57 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */; };
-		F89AEFAE24F5826E00CF5F57 /* Authgear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; };
-		F89AEFAF24F5826E00CF5F57 /* Authgear.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,13 +39,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		F89AEFB024F5826E00CF5F57 /* Embed Frameworks */ = {
+		A68DAD1D29AF64DB00487DAF /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F89AEFAF24F5826E00CF5F57 /* Authgear.framework in Embed Frameworks */,
+				A68DAD1C29AF64DB00487DAF /* Authgear.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -78,7 +78,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CCC8F73025AC33D6000358F1 /* WebKit.framework in Frameworks */,
-				F89AEFAE24F5826E00CF5F57 /* Authgear.framework in Frameworks */,
+				A68DAD1B29AF64DB00487DAF /* Authgear.framework in Frameworks */,
 				25D3CE61D191A5A941AE7822 /* Pods_ios_example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -161,7 +161,7 @@
 				F89AEF7C24F57A6B00CF5F57 /* Sources */,
 				F89AEF7D24F57A6B00CF5F57 /* Frameworks */,
 				F89AEF7E24F57A6B00CF5F57 /* Resources */,
-				F89AEFB024F5826E00CF5F57 /* Embed Frameworks */,
+				A68DAD1D29AF64DB00487DAF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

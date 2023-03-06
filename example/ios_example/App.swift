@@ -28,7 +28,6 @@ class App: ObservableObject {
     @Published var user: UserInfo?
     @Published var authenticationPage: AuthenticationPage?
     @Published var explicitColorScheme: AuthgearColorScheme?
-    @Published var customUIQuery: String?
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
@@ -39,8 +38,7 @@ class App: ObservableObject {
         authenticationPage: AuthenticationPage?,
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
-        isSSOEnabled: Bool,
-        customUIQuery: String
+        isSSOEnabled: Bool
     ) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
@@ -54,11 +52,9 @@ class App: ObservableObject {
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
-        UserDefaults.standard.set(customUIQuery, forKey: "authgear.demo.customUIQuery")
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
-        self.customUIQuery = customUIQuery.isEmpty ? nil : customUIQuery
         self.updateBiometricState()
     }
 
@@ -113,7 +109,6 @@ class App: ObservableObject {
             colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI,
             page: self.authenticationPage,
-            customUIQuery: self.customUIQuery,
             handler: self.handleAuthorizeResult
         )
     }
@@ -126,8 +121,7 @@ class App: ObservableObject {
                     redirectURI: App.redirectURI,
                     colorScheme: self.colorScheme,
                     localizedReason: "Authenticate with biometric",
-                    policy: .deviceOwnerAuthenticationWithBiometrics,
-                    customUIQuery: self.customUIQuery
+                    policy: .deviceOwnerAuthenticationWithBiometrics
                 ) { result in
                     self.updateBiometricState()
                     switch result {
@@ -149,8 +143,7 @@ class App: ObservableObject {
             case .success:
                 self.container?.reauthenticate(
                     redirectURI: App.redirectURI,
-                    colorScheme: self.colorScheme,
-                    customUIQuery: self.customUIQuery
+                    colorScheme: self.colorScheme
                 ) { result in
                     self.updateBiometricState()
                     switch result {
