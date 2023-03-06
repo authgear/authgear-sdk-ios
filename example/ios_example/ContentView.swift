@@ -78,7 +78,6 @@ struct AuthgearConfigurationForm: View {
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
-    @State private var customUIQuery = UserDefaults.standard.string(forKey: "authgear.demo.customUIQuery") ?? ""
 
     var body: some View {
         VStack {
@@ -106,13 +105,6 @@ struct AuthgearConfigurationForm: View {
                 Text("Light").tag(ColorScheme.light.rawValue)
                 Text("Dark").tag(ColorScheme.dark.rawValue)
             }.pickerStyle(.segmented)
-            AuthgearConfigurationInput(
-                label: "Custom UI Query",
-                input: AuthgearConfigurationTextField(
-                    placeHolder: "e.g. x=1&y=2&z=3",
-                    text: $customUIQuery
-                )
-            )
             Picker("Token Storage", selection: $tokenStorage) {
                 Text(TokenStorageClassName.TransientTokenStorage.rawValue).tag(TokenStorageClassName.TransientTokenStorage.rawValue)
                 Text(TokenStorageClassName.PersistentTokenStorage.rawValue).tag(TokenStorageClassName.PersistentTokenStorage.rawValue)
@@ -132,8 +124,7 @@ struct AuthgearConfigurationForm: View {
                     authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
-                    isSSOEnabled: self.isSSOEnabled,
-                    customUIQuery: self.customUIQuery
+                    isSSOEnabled: self.isSSOEnabled
                 )
             }) {
                 ActionButton(text: "Configure")

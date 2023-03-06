@@ -47,8 +47,7 @@ public extension Latte {
                     uiLocales: uiLocales,
                     colorScheme: colorScheme,
                     wechatRedirectURI: wechatRedirectURI,
-                    page: page,
-                    customUIQuery: nil
+                    page: page
                 ).get()
 
                 let webViewRequest = LatteWebViewRequest(request: request)

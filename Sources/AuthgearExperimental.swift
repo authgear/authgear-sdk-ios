@@ -21,8 +21,7 @@ public struct AuthgearExperimental {
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
-        page: AuthenticationPage? = nil,
-        customUIQuery: String? = nil
+        page: AuthenticationPage? = nil
     ) -> Result<AuthenticationRequest, Error> {
         let options = AuthenticateOptions(
             redirectURI: redirectURI,
@@ -33,8 +32,7 @@ public struct AuthgearExperimental {
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            page: page,
-            customUIQuery: customUIQuery
+            page: page
         )
         return self.authgear.createAuthenticateRequest(options).map { request in
             AuthenticationRequest.fromInternal(request)
