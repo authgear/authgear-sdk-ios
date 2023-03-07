@@ -40,6 +40,8 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
         self.configuration.userContentController.addUserScript(userScript)
         self.configuration.userContentController.add(MessageHandler(self), name: "latteEvent")
         self.configuration.processPool.perform(Selector(("_setCookieAcceptPolicy:")), with: HTTPCookie.AcceptPolicy.always)
+
+        _ = LatteWKWebView.oneTimeOnlySwizzle
     }
 
     @available(*, unavailable)
@@ -118,6 +120,52 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
             default:
                 break
             }
+        }
+    }
+}
+
+// ref: https://github.com/ionic-team/capacitor/blob/89cddcd6497034146e0938ce8c264e22e7baba52/ios/Capacitor/Capacitor/WKWebView%2BCapacitor.swift#L22
+@available(iOS 13.0, *)
+extension LatteWKWebView {
+    typealias FiveArgClosureType = @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void
+
+    static let oneTimeOnlySwizzle: () = swizzleKeyboardMethods()
+    private static func swizzleKeyboardMethods() {
+        let frameworkName = "WK"
+        let className = "ContentView"
+        guard let targetClass = NSClassFromString(frameworkName + className) else {
+            return
+        }
+
+        func findWebView(_ object: Any?) -> WKWebView? {
+            var view = object as? UIView
+            while view != nil {
+                if let webview = view as? WKWebView {
+                    return webview
+                }
+                view = view?.superview
+            }
+            return nil
+        }
+
+        func swizzleFiveArgClosure(_ method: Method, _ selector: Selector) {
+            let originalImp: IMP = method_getImplementation(method)
+            let original: FiveArgClosureType = unsafeBitCast(originalImp, to: FiveArgClosureType.self)
+            let block: @convention(block) (Any, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void = { (me, arg0, arg1, arg2, arg3, arg4) in
+                if let webView = findWebView(me), webView is LatteWKWebView {
+                    original(me, selector, arg0, true, arg2, arg3, arg4)
+                } else {
+                    original(me, selector, arg0, arg1, arg2, arg3, arg4)
+                }
+            }
+            let imp: IMP = imp_implementationWithBlock(block)
+            method_setImplementation(method, imp)
+        }
+
+        let selectorMkIV: Selector = sel_getUid("_elementDidFocus:userIsInteracting:blurPreviousNode:activityStateChanges:userObject:")
+
+        if let method = class_getInstanceMethod(targetClass, selectorMkIV) {
+            swizzleFiveArgClosure(method, selectorMkIV)
         }
     }
 }
