@@ -47,6 +47,38 @@ public extension LatteWebViewRequest {
 
 public struct LatteWebViewResult {
     public let finishURL: URL
+
+    @available(iOS 13.0, *)
+    func handle<T>(handler: (URL, @escaping (Result<T, Error>) -> Void) -> Void) async throws -> T {
+        let query = URLComponents(url: self.finishURL, resolvingAgainstBaseURL: false)!.queryParams
+
+        if let oauthError = query["error"] {
+            if oauthError == "cancel" {
+                throw AuthgearError.cancel
+            }
+
+            if let latteError = query["x_latte_error"],
+               let json = Data(base64Encoded: base64urlToBase64(base64url: latteError)) {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                if let error = try? decoder.decode(ServerError.self, from: json) {
+                    throw AuthgearError.serverError(error)
+                }
+            }
+
+            throw AuthgearError.oauthError(
+                OAuthError(
+                    error: oauthError,
+                    errorDescription: query["error_description"],
+                    errorUri: query["error_uri"]
+                )
+            )
+        }
+
+        return try await withCheckedThrowingContinuation { resume in
+            handler(finishURL) { resume.resume(with: $0) }
+        }
+    }
 }
 
 public struct LatteViewPageEvent {
