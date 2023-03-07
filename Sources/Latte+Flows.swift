@@ -60,9 +60,8 @@ public extension Latte {
                     context.pushViewController(latteVC, animated: true)
                 }
 
-                let userInfo: UserInfo = try await withCheckedThrowingContinuation { resume in
-                    authgear.experimental.finishAuthentication(finishURL: result.finishURL, request: request) { resume.resume(with: $0)
-                    }
+                let userInfo = try await result.handle { _, completion in
+                    authgear.experimental.finishAuthentication(finishURL: result.finishURL, request: request, handler: completion)
                 }
                 handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
@@ -114,20 +113,8 @@ public extension Latte {
                     context.pushViewController(latteVC, animated: true)
                 }
 
-                let components = URLComponents(url: result.finishURL, resolvingAgainstBaseURL: false)!
-                if let urlError = components.queryItems?.first(where: { $0.name == "error" })?.value {
-                    let error: AuthgearError
-                    if urlError == "cancel" {
-                        error = .cancel
-                    } else {
-                        error = .oauthError(OAuthError(error: urlError, errorDescription: nil, errorUri: nil))
-                    }
-                    handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
-                    return
-                }
-
-                let userInfo: UserInfo = try await withCheckedThrowingContinuation { resume in
-                    authgear.experimental.authgear.fetchUserInfo() { resume.resume(with: $0) }
+                let userInfo = try await result.handle { _, completion in
+                    authgear.fetchUserInfo(handler: completion)
                 }
                 handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
@@ -178,18 +165,9 @@ public extension Latte {
                     context.pushViewController(latteVC, animated: true)
                 }
 
-                let components = URLComponents(url: result.finishURL, resolvingAgainstBaseURL: false)!
-                if let urlError = components.queryItems?.first(where: { $0.name == "error" })?.value {
-                    let error: AuthgearError
-                    if urlError == "cancel" {
-                        error = .cancel
-                    } else {
-                        error = .oauthError(OAuthError(error: urlError, errorDescription: nil, errorUri: nil))
-                    }
-                    handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
-                    return
+                try await result.handle { _, completion in
+                    completion(.success(()))
                 }
-
                 handler(Handle(isPresented: false, viewController: viewController, result: .success(())))
             } catch {
                 handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
@@ -218,9 +196,14 @@ public extension Latte {
                 let latteVC = LatteViewController(context: context, request: webViewRequest)
                 latteVC.delegate = self
                 viewController = latteVC
-                let _: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+
+                let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
                     latteVC.handler = { next.resume(with: $0) }
                     context.pushViewController(latteVC, animated: true)
+                }
+
+                try await result.handle { _, completion in
+                    completion(.success(()))
                 }
                 latteVC.dismiss(animated: true)
                 handler(Handle(isPresented: false, viewController: viewController, result: .success(())))
@@ -276,20 +259,8 @@ public extension Latte {
                     context.pushViewController(latteVC, animated: true)
                 }
 
-                let components = URLComponents(url: result.finishURL, resolvingAgainstBaseURL: false)!
-                if let urlError = components.queryItems?.first(where: { $0.name == "error" })?.value {
-                    let error: AuthgearError
-                    if urlError == "cancel" {
-                        error = .cancel
-                    } else {
-                        error = .oauthError(OAuthError(error: urlError, errorDescription: nil, errorUri: nil))
-                    }
-                    handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
-                    return
-                }
-
-                let userInfo: UserInfo = try await withCheckedThrowingContinuation { resume in
-                    authgear.experimental.authgear.fetchUserInfo() { resume.resume(with: $0) }
+                let userInfo = try await result.handle { _, completion in
+                    authgear.fetchUserInfo(handler: completion)
                 }
                 handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
