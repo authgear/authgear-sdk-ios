@@ -84,7 +84,7 @@ public extension Latte {
             var viewController: LatteViewController?
             do {
                 let entryURL = customUIEndpoint + "/verify/email"
-                let redirectURI = customUIEndpoint + "/verify/email/completed"
+                let redirectURI = "latte://complete"
                 var queryList = [
                     "email=\(email.encodeAsQueryComponent()!)",
                     "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
@@ -186,7 +186,7 @@ public extension Latte {
             var viewController: LatteViewController?
             do {
                 var entryURLComponents = URLComponents(string: customUIEndpoint + "/recovery/reset")!
-                let redirectURI = "latte://reset-complete"
+                let redirectURI = "latte://complete"
                 var newQueryParams = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryParams ?? [:]
                 newQueryParams["redirect_uri"] = redirectURI
                 let newQuery = newQueryParams.encodeAsQuery()
@@ -228,7 +228,7 @@ public extension Latte {
             var viewController: LatteViewController?
             do {
                 let entryURL = customUIEndpoint + "/settings/change_email"
-                let redirectURI = customUIEndpoint + "/verify/email/completed"
+                let redirectURI = "latte://complete"
 
                 var queryList = [
                     "email=\(email.encodeAsQueryComponent()!)",
