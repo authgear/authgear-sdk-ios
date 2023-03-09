@@ -938,7 +938,7 @@ public class Authgear {
                 do {
                     token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
                 } catch {
-                    self._handleInvalidGrantException(error: error, handler: { (_: Result<Void, Error>) in })
+                    self._handleInvalidGrantException(error: error)
                     handler?(.failure(wrapError(error: error)))
                     return
                 }
@@ -1099,9 +1099,6 @@ public class Authgear {
                 if let error = error as? AuthgearError,
                    case let .oauthError(oauthError) = error,
                    oauthError.error == "invalid_grant" {
-                    let handler: VoidCompletionHandler = { result in
-                        handler?(result)
-                    }
                     self._handleInvalidGrantException(error: error, handler: handler)
                     return
                 }
@@ -1134,7 +1131,7 @@ public class Authgear {
             self.workerQueue.async {
                 let result = Result { try self.apiClient.syncRequestOIDCUserInfo(accessToken: accessToken) }
                 if case let .failure(error) = result {
-                    self._handleInvalidGrantException(error: error, handler: { (_: Result<Void, Error>) in })
+                    self._handleInvalidGrantException(error: error)
                 }
                 handler(result)
             }
@@ -1166,7 +1163,7 @@ public class Authgear {
                     }
                     handler(.success(()))
                 } catch {
-                    self._handleInvalidGrantException(error: error, handler: { (_: Result<Void, Error>) in })
+                    self._handleInvalidGrantException(error: error)
                     handler(.failure(wrapError(error: error)))
                 }
             }
@@ -1260,7 +1257,7 @@ public class Authgear {
                         try self.storage.setBiometricKeyId(namespace: self.name, kid: kid)
                         handler(.success(()))
                     } catch {
-                        self._handleInvalidGrantException(error: error, handler: { (_: Result<Void, Error>) in })
+                        self._handleInvalidGrantException(error: error)
                         handler(.failure(wrapError(error: error)))
                     }
                 }
@@ -1341,7 +1338,7 @@ public class Authgear {
         }
     }
 
-    private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler) {
+    private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {
         if let error = error as? AuthgearError,
            case let .oauthError(oauthError) = error,
            oauthError.error == "invalid_grant" {
@@ -1351,6 +1348,6 @@ public class Authgear {
                   serverError.reason == "InvalidGrant" {
             return self.cleanupSession(force: true, reason: .invalid) { result in handler?(result) }
         }
-        return handler(.success(()))
+        handler?(.success(()))
     }
 }
