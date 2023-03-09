@@ -2,24 +2,17 @@ import Foundation
 import UIKit
 
 @available(iOS 13.0, *)
-public protocol LatteLinkHandler {
-    func handle(
+public enum LatteLinkHandler {
+    case resetPassword(url: URL)
+    case login(url: URL)
+
+    public func handle(
         context: UINavigationController,
         latte: Latte,
         handler: @escaping (Result<Void, Error>) -> Void
-    )
-}
-
-@available(iOS 13.0, *)
-public extension Latte {
-    struct ResetLinkHandler: LatteLinkHandler {
-        let url: URL
-
-        public func handle(
-            context: UINavigationController,
-            latte: Latte,
-            handler: @escaping (Result<Void, Error>) -> Void
-        ) {
+    ) {
+        switch self {
+        case let .resetPassword(url):
             latte.resetPassword(
                 context: context,
                 url: url,
@@ -28,19 +21,8 @@ public extension Latte {
                     handler(handle.result)
                 }
             )
-        }
-    }
-
-    struct LoginLinkHandler: LatteLinkHandler {
-        let url: URL
-
-        public func handle(
-            context: UINavigationController,
-            latte: Latte,
-            handler: @escaping (Result<Void, Error>
-            ) -> Void
-        ) {
-            var request = URLRequest(url: self.url)
+        case let .login(url):
+            var request = URLRequest(url: url)
             request.httpMethod = "POST"
             authgearFetch(urlSession: latte.urlSession, request: request) { result in
                 switch result {
@@ -52,7 +34,10 @@ public extension Latte {
             }
         }
     }
+}
 
+@available(iOS 13.0, *)
+public extension Latte {
     static func getUniversalLinkHandler(
         userActivity: NSUserActivity,
         universalLinkOrigin: URL,
@@ -74,9 +59,7 @@ public extension Latte {
 
         switch path {
         case _ where path.hasSuffix("/reset_link"):
-            return ResetLinkHandler(
-                url: components.url!
-            )
+            return .resetPassword(url: components.url!)
         case _ where path.hasSuffix("/login_link"):
             let url: URL
             if let rewriteUniversalLinkOrigin = rewriteUniversalLinkOrigin {
@@ -84,9 +67,7 @@ public extension Latte {
             } else {
                 url = incomingURL
             }
-            return LoginLinkHandler(
-                url: url
-            )
+            return .login(url: url)
         default:
             return nil
         }
