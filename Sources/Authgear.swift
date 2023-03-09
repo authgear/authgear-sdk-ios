@@ -480,18 +480,16 @@ public class Authgear {
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
 
-            let handler: VoidCompletionHandler = { result in
-                let newResult = result.flatMap {
+            persistSession(oidcTokenResponse, reason: .authenticated) { result in
+                handler(result.flatMap {
                     Result { () in
                         if #available(iOS 11.3, *) {
                             try self.disableBiometric()
                         }
                     }
                 }
-                .map { userInfo }
-                return handler(newResult)
+                .map { userInfo })
             }
-            persistSession(oidcTokenResponse, reason: .authenticated, handler: handler)
         } catch {
             return handler(.failure(wrapError(error: error)))
         }
@@ -811,8 +809,8 @@ public class Authgear {
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
 
-                let handler: VoidCompletionHandler = { result in
-                    let newResult = result.flatMap {
+                self.persistSession(oidcTokenResponse, reason: .authenticated) { result in
+                    handler(result.flatMap {
                         Result { () in
                             try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId)
                             if #available(iOS 11.3, *) {
@@ -820,10 +818,8 @@ public class Authgear {
                             }
                         }
                     }
-                    .map { userInfo }
-                    return handler(newResult)
+                    .map { userInfo })
                 }
-                self.persistSession(oidcTokenResponse, reason: .authenticated, handler: handler)
             } catch {
                 handler(.failure(wrapError(error: error)))
             }
@@ -1079,12 +1075,10 @@ public class Authgear {
         let handler = handler.map { h in withMainQueueHandler(h) }
         workerQueue.async {
             do {
-                let handler: VoidCompletionHandler = { result in
-                    handler?(result)
-                }
-
                 guard let refreshToken = try self.tokenStorage.getRefreshToken(namespace: self.name) else {
-                    self.cleanupSession(force: true, reason: .noToken, handler: handler)
+                    self.cleanupSession(force: true, reason: .noToken) { result in
+                        handler?(result)
+                    }
                     return
                 }
 
@@ -1100,7 +1094,7 @@ public class Authgear {
                     accessToken: nil
                 )
 
-                self.persistSession(oidcTokenResponse, reason: .foundToken, handler: handler)
+                self.persistSession(oidcTokenResponse, reason: .foundToken) { result in handler?(result) }
             } catch {
                 if let error = error as? AuthgearError,
                    case let .oauthError(oauthError) = error,
@@ -1331,11 +1325,9 @@ public class Authgear {
                     )
 
                     let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
-                    let handler: VoidCompletionHandler = { result in
-                        let newResult = result.map { userInfo }
-                        return handler(newResult)
+                    self.persistSession(oidcTokenResponse, reason: .authenticated) { result in
+                        handler(result.map { userInfo })
                     }
-                    self.persistSession(oidcTokenResponse, reason: .authenticated, handler: handler)
                 } catch {
                     // In case the biometric was removed remotely.
                     if case let AuthgearError.oauthError(oauthError) = error {
@@ -1353,11 +1345,11 @@ public class Authgear {
         if let error = error as? AuthgearError,
            case let .oauthError(oauthError) = error,
            oauthError.error == "invalid_grant" {
-            return self.cleanupSession(force: true, reason: .invalid, handler: handler)
+            return self.cleanupSession(force: true, reason: .invalid) { result in handler?(result) }
         } else if let error = error as? AuthgearError,
                   case let .serverError(serverError) = error,
                   serverError.reason == "InvalidGrant" {
-            return self.cleanupSession(force: true, reason: .invalid, handler: handler)
+            return self.cleanupSession(force: true, reason: .invalid) { result in handler?(result) }
         }
         return handler(.success(()))
     }
