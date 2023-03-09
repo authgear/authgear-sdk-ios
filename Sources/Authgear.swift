@@ -564,7 +564,7 @@ public class Authgear {
         }
     }
 
-    private func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason, handler: VoidCompletionHandler) {
+    private func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
         if let refreshToken = oidcTokenResponse.refreshToken {
             let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
             guard case .success = result else {
@@ -587,7 +587,7 @@ public class Authgear {
         }
     }
 
-    private func cleanupSession(force: Bool, reason: SessionStateChangeReason, handler: VoidCompletionHandler) {
+    private func cleanupSession(force: Bool, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
         if case let .failure(error) = Result(catching: { try tokenStorage.delRefreshToken(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
