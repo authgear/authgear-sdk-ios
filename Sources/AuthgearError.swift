@@ -27,16 +27,16 @@ public enum AuthgearError: Error {
 }
 
 public struct OAuthError: Error, Decodable {
-    let error: String
-    let errorDescription: String?
-    let errorUri: String?
+    public let error: String
+    public let errorDescription: String?
+    public let errorUri: String?
 }
 
 public struct ServerError: Error, Decodable {
-    let name: String
-    let message: String
-    let reason: String
-    let info: [String: Any]?
+    public let name: String
+    public let message: String
+    public let reason: String
+    public let info: [String: Any]?
 
     enum CodingKeys: String, CodingKey {
         case name
