@@ -23,7 +23,6 @@ public extension Latte {
 
     func authenticate(
         context: UINavigationController,
-        redirectURI: String,
         state: String? = nil,
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
@@ -40,7 +39,7 @@ public extension Latte {
             var viewController: LatteViewController?
             do {
                 let request = try authgear.experimental.createAuthenticateRequest(
-                    redirectURI: redirectURI,
+                    redirectURI: "latte://complete",
                     state: state,
                     prompt: prompt,
                     loginHint: loginHint,
