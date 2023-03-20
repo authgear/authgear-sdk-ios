@@ -20,6 +20,7 @@ struct AuthenticateOptions {
     let redirectURI: String
     let isSSOEnabled: Bool
     let state: String?
+    let xState: String?
     let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
@@ -34,6 +35,7 @@ struct AuthenticateOptions {
             scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
             isSSOEnabled: isSSOEnabled,
             state: self.state,
+            xState: self.xState,
             prompt: self.prompt,
             loginHint: self.loginHint,
             uiLocales: self.uiLocales,
@@ -56,6 +58,7 @@ struct ReauthenticateOptions {
     let redirectURI: String
     let isSSOEnabled: Bool
     let state: String?
+    let xState: String?
     let uiLocales: [String]?
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
@@ -68,6 +71,7 @@ struct ReauthenticateOptions {
             scope: ["openid", "https://authgear.com/scopes/full-access"],
             isSSOEnabled: isSSOEnabled,
             state: self.state,
+            xState: self.xState,
             prompt: nil,
             loginHint: nil,
             uiLocales: self.uiLocales,
@@ -682,6 +686,7 @@ public class Authgear {
     public func authenticate(
         redirectURI: String,
         state: String? = nil,
+        xState: String? = nil,
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
@@ -694,6 +699,7 @@ public class Authgear {
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
             state: state,
+            xState: xState,
             prompt: prompt,
             loginHint: loginHint,
             uiLocales: uiLocales,
@@ -716,6 +722,7 @@ public class Authgear {
     public func reauthenticate(
         redirectURI: String,
         state: String? = nil,
+        xState: String? = nil,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
@@ -758,6 +765,7 @@ public class Authgear {
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
             state: state,
+            xState: xState,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
@@ -829,6 +837,7 @@ public class Authgear {
     public func promoteAnonymousUser(
         redirectURI: String,
         state: String? = nil,
+        xState: String? = nil,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
@@ -867,6 +876,7 @@ public class Authgear {
                         redirectURI: redirectURI,
                         isSSOEnabled: self.isSSOEnabled,
                         state: state,
+                        xState: xState,
                         prompt: [.login],
                         loginHint: loginHint,
                         uiLocales: uiLocales,
@@ -951,6 +961,7 @@ public class Authgear {
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
                     isSSOEnabled: self.isSSOEnabled,
                     state: nil,
+                    xState: nil,
                     prompt: [.none],
                     loginHint: loginHint,
                     uiLocales: uiLocales,
