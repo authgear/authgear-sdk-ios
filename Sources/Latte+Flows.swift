@@ -23,7 +23,7 @@ public extension Latte {
 
     func authenticate(
         context: UINavigationController,
-        state: String? = nil,
+        xState: String? = nil,
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
@@ -40,7 +40,7 @@ public extension Latte {
             do {
                 let request = try authgear.experimental.createAuthenticateRequest(
                     redirectURI: "latte://complete",
-                    state: state,
+                    xState: xState,
                     prompt: prompt,
                     loginHint: loginHint,
                     uiLocales: uiLocales,
@@ -72,7 +72,7 @@ public extension Latte {
     func verifyEmail(
         context: UINavigationController,
         email: String,
-        state: String? = nil,
+        xState: String? = nil,
         uiLocales: [String]? = nil,
         handler: @escaping ResultHandler<UserInfo>
     ) {
@@ -90,7 +90,7 @@ public extension Latte {
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        state: state,
+                        xState: xState,
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -124,7 +124,7 @@ public extension Latte {
 
     func changePassword(
         context: UINavigationController,
-        state: String? = nil,
+        xState: String? = nil,
         uiLocales: [String]? = nil,
         handler: @escaping ResultHandler<Void>
     ) {
@@ -142,7 +142,7 @@ public extension Latte {
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        state: state,
+                        xState: xState,
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -216,7 +216,7 @@ public extension Latte {
         context: UINavigationController,
         email: String,
         phoneNumber: String,
-        state: String? = nil,
+        xState: String? = nil,
         uiLocales: [String]? = nil,
         handler: @escaping ResultHandler<UserInfo>
     ) {
@@ -236,7 +236,7 @@ public extension Latte {
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        state: state,
+                        xState: xState,
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -269,12 +269,12 @@ public extension Latte {
     }
 
     private func constructUIParamQuery(
-        state: String? = nil,
+        xState: String? = nil,
         uiLocales: [String]? = nil
     ) -> Array<String> {
         var result: Array<String> = []
-        if let mustState = state {
-            result.append("state=\(mustState.encodeAsQueryComponent()!)")
+        if let mustXState = xState {
+            result.append("x_state=\(mustXState.encodeAsQueryComponent()!)")
         }
         if let mustUILocales = uiLocales {
             result.append("ui_locales=\(UILocales.stringify(uiLocales: mustUILocales).encodeAsQueryComponent()!)")

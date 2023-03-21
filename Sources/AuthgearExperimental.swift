@@ -16,6 +16,7 @@ public struct AuthgearExperimental {
     public func createAuthenticateRequest(
         redirectURI: String,
         state: String? = nil,
+        xState: String? = nil,
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
@@ -27,6 +28,7 @@ public struct AuthgearExperimental {
             redirectURI: redirectURI,
             isSSOEnabled: self.authgear.isSSOEnabled,
             state: state,
+            xState: xState,
             prompt: prompt,
             loginHint: loginHint,
             uiLocales: uiLocales,

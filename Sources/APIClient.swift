@@ -26,6 +26,7 @@ struct OIDCAuthenticationRequest {
     let scope: [String]
     let isSSOEnabled: Bool
     let state: String?
+    let xState: String?
     let prompt: [PromptOption]?
     let loginHint: String?
     let uiLocales: [String]?
@@ -56,6 +57,10 @@ struct OIDCAuthenticationRequest {
 
         if let state = self.state {
             queryItems.append(URLQueryItem(name: "state", value: state))
+        }
+
+        if let xState = self.xState {
+            queryItems.append(URLQueryItem(name: "x_state", value: xState))
         }
 
         if let prompt = self.prompt {
