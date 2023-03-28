@@ -326,6 +326,7 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
 
     func latteWebView(completed _: LatteWebView, result: Result<LatteWebViewResult, Error>) {
         self.handler?(result)
+        self.handler = nil
     }
 
     func latteWebView(onEvent _: LatteWebView, event: LatteWebViewEvent) {
