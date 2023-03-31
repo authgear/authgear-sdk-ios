@@ -345,7 +345,7 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
                 items: items
             )
             self.context?.present(alert, animated: true)
-        case .analytics(event: _):
+        case .trackingEvent(event: _):
             break
         }
     }
