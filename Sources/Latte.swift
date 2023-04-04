@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 public protocol LatteDelegate: AnyObject {
-    func latte(onAnalyticsEvent _: Latte, event: LatteAnalyticsEvent)
+    func latte(_: Latte, onTrackingEvent: LatteTrackingEvent)
 }
 
 public class Latte: LatteViewControllerDelegate {
@@ -20,8 +20,8 @@ public class Latte: LatteViewControllerDelegate {
     @available(iOS 13.0, *)
     func latteViewController(onEvent _: LatteViewController, event: LatteWebViewEvent) {
         switch event {
-        case let .analytics(event: event):
-            self.delegate?.latte(onAnalyticsEvent: self, event: event)
+        case let .trackingEvent(event: event):
+            self.delegate?.latte(_: self, onTrackingEvent: event)
         case .openEmailClient:
             break
         }
@@ -81,17 +81,14 @@ public struct LatteWebViewResult {
     }
 }
 
-public struct LatteAnalyticsEvent {
-    public let type: String
-    public let path: String
-    public let url: String
-    public let clientID: String
-    public let data: [String: Any]?
+public struct LatteTrackingEvent {
+    public let event_name: String
+    public let params: [String: Any]
 }
 
 public enum LatteWebViewEvent {
     case openEmailClient
-    case analytics(event: LatteAnalyticsEvent)
+    case trackingEvent(event: LatteTrackingEvent)
 }
 
 public protocol LatteWebViewDelegate: AnyObject {

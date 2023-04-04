@@ -4,7 +4,7 @@ import WebKit
 
 enum LatteBuiltInEvents: String {
     case openEmailClient
-    case analytics
+    case tracking
 }
 
 let initScript = """
@@ -110,20 +110,13 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
                 switch type {
                 case LatteBuiltInEvents.openEmailClient.rawValue:
                     parent.delegate?.latteWebView(onEvent: parent, event: .openEmailClient)
-                case LatteBuiltInEvents.analytics.rawValue:
-                    guard let analyticsEventType = body["analytics_event_type"] as? String else { return }
-                    let path = body["path"] as? String ?? ""
-                    let url = body["url"] as? String ?? ""
-                    let clientID = body["client_id"] as? String ?? ""
-                    let data = body["data"] as? [String: Any]
-                    let event = LatteAnalyticsEvent(
-                        type: analyticsEventType,
-                        path: path,
-                        url: url,
-                        clientID: clientID,
-                        data: data
+                case LatteBuiltInEvents.tracking.rawValue:
+                    guard let event_name = body["event_name"] as? String else { return }
+                    guard let params = body["params"] as? [String: Any] else { return }
+                    let event = LatteTrackingEvent(
+                        event_name: event_name, params: params
                     )
-                    parent.delegate?.latteWebView(onEvent: parent, event: .analytics(event: event))
+                    parent.delegate?.latteWebView(onEvent: parent, event: .trackingEvent(event: event))
                 default:
                     return
                 }
