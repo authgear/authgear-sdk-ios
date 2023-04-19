@@ -24,10 +24,17 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
     private var initialNavigation: WKNavigation?
     private var result: Result<LatteWebViewResult, Error>?
 
-    init(_ request: LatteWebViewRequest) {
+    init(_ request: LatteWebViewRequest, inspectable: Bool = false) {
         self.request = request
 
         super.init(frame: .zero, configuration: WKWebViewConfiguration())
+        if inspectable {
+            if #available(iOS 16.4, *) {
+                self.isInspectable = true
+            } else {
+                self.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+            }
+        }
 
         self.allowsBackForwardNavigationGestures = true
         self.scrollView.alwaysBounceVertical = false
