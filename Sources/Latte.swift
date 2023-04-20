@@ -9,11 +9,13 @@ public class Latte: LatteViewControllerDelegate {
     let authgear: Authgear
     let customUIEndpoint: String
     let urlSession: URLSession
+    let webviewIsInspectable: Bool
     public weak var delegate: LatteDelegate?
 
-    public init(authgear: Authgear, customUIEndpoint: String) {
+    public init(authgear: Authgear, customUIEndpoint: String, webviewIsInspectable: Bool = false) {
         self.authgear = authgear
         self.customUIEndpoint = customUIEndpoint
+        self.webviewIsInspectable = webviewIsInspectable
         self.urlSession = URLSession(configuration: .default)
     }
 
