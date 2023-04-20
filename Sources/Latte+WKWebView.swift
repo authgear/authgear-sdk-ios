@@ -24,11 +24,11 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
     private var initialNavigation: WKNavigation?
     private var result: Result<LatteWebViewResult, Error>?
 
-    init(_ request: LatteWebViewRequest, inspectable: Bool = false) {
+    init(_ request: LatteWebViewRequest, isInspectable: Bool) {
         self.request = request
 
         super.init(frame: .zero, configuration: WKWebViewConfiguration())
-        if inspectable {
+        if isInspectable {
             if #available(iOS 16.4, *) {
                 self.isInspectable = true
             } else {

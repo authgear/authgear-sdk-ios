@@ -301,7 +301,7 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
         webviewIsInspectable: Bool
     ) {
         self.context = context
-        self.webView = LatteWKWebView(request, inspectable: webviewIsInspectable)
+        self.webView = LatteWKWebView(request, isInspectable: webviewIsInspectable)
         super.init(nibName: nil, bundle: nil)
     }
 
