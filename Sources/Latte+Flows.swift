@@ -50,7 +50,7 @@ public extension Latte {
                 ).get()
 
                 let webViewRequest = LatteWebViewRequest(request: request)
-                let latteVC = LatteViewController(context: context, request: webViewRequest)
+                let latteVC = LatteViewController(context: context, request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.delegate = self
                 viewController = latteVC
 
@@ -103,7 +103,7 @@ public extension Latte {
                 }
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
-                let latteVC = LatteViewController(context: context, request: webViewRequest)
+                let latteVC = LatteViewController(context: context, request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.delegate = self
                 viewController = latteVC
 
@@ -155,7 +155,7 @@ public extension Latte {
                 }
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
-                let latteVC = LatteViewController(context: context, request: webViewRequest)
+                let latteVC = LatteViewController(context: context, request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.delegate = self
                 viewController = latteVC
 
@@ -192,7 +192,7 @@ public extension Latte {
                 entryURLComponents.percentEncodedQuery = newQuery
                 let entryURL = entryURLComponents.url!.absoluteString
                 let webViewRequest = LatteWebViewRequest(url: URL(string: entryURL)!, redirectURI: redirectURI)
-                let latteVC = LatteViewController(context: context, request: webViewRequest)
+                let latteVC = LatteViewController(context: context, request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.delegate = self
                 viewController = latteVC
 
@@ -249,7 +249,7 @@ public extension Latte {
                 }
 
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
-                let latteVC = LatteViewController(context: context, request: webViewRequest)
+                let latteVC = LatteViewController(context: context, request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.delegate = self
                 viewController = latteVC
 
@@ -297,10 +297,11 @@ internal class LatteViewController: UIViewController, LatteWebViewDelegate {
 
     init(
         context: UIViewController,
-        request: LatteWebViewRequest
+        request: LatteWebViewRequest,
+        webviewIsInspectable: Bool
     ) {
         self.context = context
-        self.webView = LatteWKWebView(request)
+        self.webView = LatteWKWebView(request, isInspectable: webviewIsInspectable)
         super.init(nibName: nil, bundle: nil)
     }
 
