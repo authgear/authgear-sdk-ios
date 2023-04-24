@@ -29,11 +29,15 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
 
         super.init(frame: .zero, configuration: WKWebViewConfiguration())
         if isInspectable {
-            if #available(iOS 16.4, *) {
-                self.isInspectable = true
-            } else {
-                self.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-            }
+            // iOS 16.4 requires Xcode 14.3 to build.
+            // Xcode 14.3 requires macOS 13 to install.
+            // Compiling against iOS 16.4 requires a lot toolchain updates as of 2023-04-24.
+            // if #available(iOS 16.4, *) {
+            //     self.isInspectable = true
+            // } else {
+            //     self.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+            // }
+            self.configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
         }
 
         self.allowsBackForwardNavigationGestures = true
