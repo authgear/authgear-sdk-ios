@@ -1,25 +1,25 @@
 import Foundation
 import UIKit
 
-@available(iOS 13.0, *)
-public extension Latte {
-    struct Handle<T> {
-        let isPresented: Bool
-        let viewController: UIViewController?
-        public let result: Result<T, Error>
+public struct LatteHandle<T> {
+    let isPresented: Bool
+    let viewController: UIViewController?
+    public let result: Result<T, Error>
 
-        public func dismiss(animated: Bool) {
-            if self.isPresented {
-                self.viewController?.dismiss(animated: animated)
-            } else {
-                var viewControllers = self.viewController?.navigationController?.viewControllers ?? []
-                viewControllers.removeAll(where: { $0 == self.viewController })
-                self.viewController?.navigationController?.setViewControllers(viewControllers, animated: animated)
-            }
+    public func dismiss(animated: Bool) {
+        if self.isPresented {
+            self.viewController?.dismiss(animated: animated)
+        } else {
+            var viewControllers = self.viewController?.navigationController?.viewControllers ?? []
+            viewControllers.removeAll(where: { $0 == self.viewController })
+            self.viewController?.navigationController?.setViewControllers(viewControllers, animated: animated)
         }
     }
+}
 
-    typealias ResultHandler<T> = (Handle<T>) -> Void
+@available(iOS 13.0, *)
+public extension Latte {
+    typealias ResultHandler<T> = (LatteHandle<T>) -> Void
 
     func authenticate(
         context: UINavigationController,
@@ -62,9 +62,9 @@ public extension Latte {
                 let userInfo = try await result.handle { _, completion in
                     authgear.experimental.finishAuthentication(finishURL: result.finishURL, request: request, handler: completion)
                 }
-                handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
-                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
     }
@@ -115,9 +115,9 @@ public extension Latte {
                 let userInfo = try await result.handle { _, completion in
                     authgear.fetchUserInfo(handler: completion)
                 }
-                handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
-                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
     }
@@ -167,9 +167,9 @@ public extension Latte {
                 try await result.handle { _, completion in
                     completion(.success(()))
                 }
-                handler(Handle(isPresented: false, viewController: viewController, result: .success(())))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .success(())))
             } catch {
-                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
     }
@@ -205,9 +205,9 @@ public extension Latte {
                     completion(.success(()))
                 }
                 latteVC.dismiss(animated: true)
-                handler(Handle(isPresented: false, viewController: viewController, result: .success(())))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .success(())))
             } catch {
-                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
     }
@@ -261,9 +261,9 @@ public extension Latte {
                 let userInfo = try await result.handle { _, completion in
                     authgear.fetchUserInfo(handler: completion)
                 }
-                handler(Handle(isPresented: false, viewController: viewController, result: .success(userInfo)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .success(userInfo)))
             } catch {
-                handler(Handle(isPresented: false, viewController: viewController, result: .failure(error)))
+                handler(LatteHandle(isPresented: false, viewController: viewController, result: .failure(error)))
             }
         }
     }
