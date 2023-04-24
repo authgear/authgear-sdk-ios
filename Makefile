@@ -1,6 +1,6 @@
-DEVICE_SDK=iphoneos16.4
-SIMULATOR_SDK=iphonesimulator16.4
-TEST_DESTINATION="platform=iOS Simulator,name=iPhone 14,OS=16.4"
+DEVICE_SDK=iphoneos16.3
+SIMULATOR_SDK=iphonesimulator16.3
+TEST_DESTINATION="platform=iOS Simulator,name=iPhone 14,OS=16.3"
 
 GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
 
