@@ -75,8 +75,9 @@ public extension Latte {
                             next.resume(with: result)
                         }
                     }
-                    let userInfo = try await result.handle { _, completion in
-                        self.authgear.experimental.finishAuthentication(finishURL: result.finishURL, request: request, handler: completion)
+                    let finishURL = try result.unwrap()
+                    let userInfo = try await withCheckedThrowingContinuation { next in
+                        self.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { next.resume(with: $0) }
                     }
                     return userInfo
                 }
@@ -140,8 +141,9 @@ public extension Latte {
                             next.resume(with: result)
                         }
                     }
-                    let userInfo = try await result.handle { _, completion in
-                        self.authgear.fetchUserInfo(handler: completion)
+                    _ = try result.unwrap()
+                    let userInfo = try await withCheckedThrowingContinuation { next in
+                        self.authgear.fetchUserInfo { next.resume(with: $0) }
                     }
                     return userInfo
                 }
@@ -204,9 +206,7 @@ public extension Latte {
                             next.resume(with: result)
                         }
                     }
-                    try await result.handle { _, completion in
-                        completion(.success(()))
-                    }
+                    _ = try result.unwrap()
                 }
                 completion(.success((latteVC, handle)))
             } catch {
@@ -252,9 +252,7 @@ public extension Latte {
                             next.resume(with: result)
                         }
                     }
-                    try await result.handle { _, completion in
-                        completion(.success(()))
-                    }
+                    _ = try result.unwrap()
                 }
                 completion(.success((latteVC, handle)))
             } catch {
@@ -319,8 +317,9 @@ public extension Latte {
                             next.resume(with: result)
                         }
                     }
-                    let userInfo = try await result.handle { _, completion in
-                        self.authgear.fetchUserInfo(handler: completion)
+                    _ = try result.unwrap()
+                    let userInfo = try await withCheckedThrowingContinuation { next in
+                        self.authgear.fetchUserInfo { next.resume(with: $0) }
                     }
                     return userInfo
                 }

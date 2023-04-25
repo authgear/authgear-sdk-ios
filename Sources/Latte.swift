@@ -58,11 +58,14 @@ public extension LatteWebViewRequest {
     }
 }
 
-public struct LatteWebViewResult {
-    public let finishURL: URL
+internal struct LatteWebViewResult {
+    private let finishURL: URL
 
-    @available(iOS 13.0, *)
-    func handle<T>(handler: (URL, @escaping (Result<T, Error>) -> Void) -> Void) async throws -> T {
+    init(finishURL: URL) {
+        self.finishURL = finishURL
+    }
+
+    func unwrap() throws -> URL {
         let query = URLComponents(url: self.finishURL, resolvingAgainstBaseURL: false)!.queryParams
 
         if let oauthError = query["error"] {
@@ -88,9 +91,7 @@ public struct LatteWebViewResult {
             )
         }
 
-        return try await withCheckedThrowingContinuation { resume in
-            handler(finishURL) { resume.resume(with: $0) }
-        }
+        return finishURL
     }
 }
 
