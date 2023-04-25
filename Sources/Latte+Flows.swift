@@ -2,15 +2,24 @@ import Foundation
 import UIKit
 
 @available(iOS 13.0, *)
-public struct LatteHandle<T> {
-    let doWait: (_ completion: @escaping (Result<T, Error>) -> Void) -> Void
+public struct LatteHandle<T: Sendable> {
+    let task: Task<T, Error>
 
-    init(_ doWait: @escaping (_ completion: @escaping (Result<T, Error>) -> Void) -> Void) {
-        self.doWait = doWait
+    internal init(task: Task<T, Error>) {
+        self.task = task
     }
 
     public func wait(completion: @escaping (Result<T, Error>) -> Void) {
-        doWait(completion)
+        Task { await run() }
+        @Sendable
+        func run() async {
+            do {
+                let value = try await self.task.value
+                completion(.success(value))
+            } catch {
+                completion(.failure(error))
+            }
+        }
     }
 }
 
@@ -58,24 +67,18 @@ public extension Latte {
                     }
                 }
 
-                let handle = LatteHandle<UserInfo> { completion in
-                    Task { await run() }
-                    @Sendable @MainActor
-                    func run() async {
-                        do {
-                            let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
-                                latteVC.webView.completion = { (_, result) in
-                                    next.resume(with: result)
-                                }
-                            }
-                            let userInfo = try await result.handle { _, completion in
-                                self.authgear.experimental.finishAuthentication(finishURL: result.finishURL, request: request, handler: completion)
-                            }
-                            completion(.success(userInfo))
-                        } catch {
-                            completion(.failure(error))
+                let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
+                @Sendable @MainActor
+                func run1() async throws -> UserInfo {
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                        latteVC.webView.completion = { (_, result) in
+                            next.resume(with: result)
                         }
                     }
+                    let userInfo = try await result.handle { _, completion in
+                        self.authgear.experimental.finishAuthentication(finishURL: result.finishURL, request: request, handler: completion)
+                    }
+                    return userInfo
                 }
                 completion(.success((latteVC, handle)))
             } catch {
@@ -129,24 +132,18 @@ public extension Latte {
                     }
                 }
 
-                let handle = LatteHandle<UserInfo> { completion in
-                    Task { await run() }
-                    @Sendable @MainActor
-                    func run() async {
-                        do {
-                            let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
-                                latteVC.webView.completion = { (_, result) in
-                                    next.resume(with: result)
-                                }
-                            }
-                            let userInfo = try await result.handle { _, completion in
-                                self.authgear.fetchUserInfo(handler: completion)
-                            }
-                            completion(.success(userInfo))
-                        } catch {
-                            completion(.failure(error))
+                let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
+                @Sendable @MainActor
+                func run1() async throws -> UserInfo {
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                        latteVC.webView.completion = { (_, result) in
+                            next.resume(with: result)
                         }
                     }
+                    let userInfo = try await result.handle { _, completion in
+                        self.authgear.fetchUserInfo(handler: completion)
+                    }
+                    return userInfo
                 }
                 completion(.success((latteVC, handle)))
             } catch {
@@ -199,23 +196,16 @@ public extension Latte {
                     }
                 }
 
-                let handle = LatteHandle<Void> { completion in
-                    Task { await run() }
-                    @Sendable @MainActor
-                    func run() async {
-                        do {
-                            let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
-                                latteVC.webView.completion = { (_, result) in
-                                    next.resume(with: result)
-                                }
-                            }
-                            let _: Void = try await result.handle { _, completion in
-                                completion(.success(()))
-                            }
-                            completion(.success(()))
-                        } catch {
-                            completion(.failure(error))
+                let handle = LatteHandle<Void>(task: Task { try await run1() })
+                @Sendable @MainActor
+                func run1() async throws {
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                        latteVC.webView.completion = { (_, result) in
+                            next.resume(with: result)
                         }
+                    }
+                    try await result.handle { _, completion in
+                        completion(.success(()))
                     }
                 }
                 completion(.success((latteVC, handle)))
@@ -254,23 +244,16 @@ public extension Latte {
                     }
                 }
 
-                let handle = LatteHandle<Void> { completion in
-                    Task { await run() }
-                    @Sendable @MainActor
-                    func run() async {
-                        do {
-                            let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
-                                latteVC.webView.completion = { (_, result) in
-                                    next.resume(with: result)
-                                }
-                            }
-                            let _: Void = try await result.handle { _, completion in
-                                completion(.success(()))
-                            }
-                            completion(.success(()))
-                        } catch {
-                            completion(.failure(error))
+                let handle = LatteHandle<Void>(task: Task { try await run1() })
+                @Sendable @MainActor
+                func run1() async throws {
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                        latteVC.webView.completion = { (_, result) in
+                            next.resume(with: result)
                         }
+                    }
+                    try await result.handle { _, completion in
+                        completion(.success(()))
                     }
                 }
                 completion(.success((latteVC, handle)))
@@ -328,24 +311,18 @@ public extension Latte {
                     }
                 }
 
-                let handle = LatteHandle<UserInfo> { completion in
-                    Task { await run() }
-                    @Sendable @MainActor
-                    func run() async {
-                        do {
-                            let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
-                                latteVC.webView.completion = { (_, result) in
-                                    next.resume(with: result)
-                                }
-                            }
-                            let userInfo = try await result.handle { _, completion in
-                                self.authgear.fetchUserInfo(handler: completion)
-                            }
-                            completion(.success(userInfo))
-                        } catch {
-                            completion(.failure(error))
+                let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
+                @Sendable @MainActor
+                func run1() async throws -> UserInfo {
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                        latteVC.webView.completion = { (_, result) in
+                            next.resume(with: result)
                         }
                     }
+                    let userInfo = try await result.handle { _, completion in
+                        self.authgear.fetchUserInfo(handler: completion)
+                    }
+                    return userInfo
                 }
                 completion(.success((latteVC, handle)))
             } catch {
