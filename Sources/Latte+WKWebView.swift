@@ -5,6 +5,7 @@ import WebKit
 enum LatteBuiltInEvents: String {
     case openEmailClient
     case tracking
+    case ready
 }
 
 let initScript = """
@@ -16,15 +17,21 @@ let initScript = """
 """
 
 @available(iOS 13.0, *)
-class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
-    let request: LatteWebViewRequest
+protocol LatteWebViewDelegate: AnyObject {
+    func latteWebView(onEvent _: LatteWKWebView, event: LatteWebViewEvent)
+}
 
+@available(iOS 13.0, *)
+class LatteWKWebView: WKWebView, WKNavigationDelegate {
+    let request: LatteWebViewRequest
+    var onReady: ((_ webview: LatteWKWebView) -> Void)?
+    var completion: ((_ webview: LatteWKWebView, _ result: Result<LatteWebViewResult, Error>) -> Void)?
+    weak var viewController: UIViewController?
     weak var delegate: LatteWebViewDelegate?
 
     private var initialNavigation: WKNavigation?
-    private var result: Result<LatteWebViewResult, Error>?
 
-    init(_ request: LatteWebViewRequest, isInspectable: Bool) {
+    init(request: LatteWebViewRequest, isInspectable: Bool) {
         self.request = request
 
         super.init(frame: .zero, configuration: WKWebViewConfiguration())
@@ -66,13 +73,15 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         if navigation == self.initialNavigation {
-            self.delegate?.latteWebView(completed: self, result: .failure(error))
+            self.completion?(self, .failure(error))
+            self.completion = nil
         }
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         if navigation == self.initialNavigation {
-            self.delegate?.latteWebView(completed: self, result: .failure(error))
+            self.completion?(self, .failure(error))
+            self.completion = nil
         }
     }
 
@@ -86,8 +95,8 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
                     LatteWebViewResult(finishURL: navigationURL)
                 )
 
-                self.delegate?.latteWebView(completed: self, result: result)
-                self.result = result
+                self.completion?(self, result)
+                self.completion = nil
                 return .cancel
             }
         }
@@ -128,6 +137,9 @@ class LatteWKWebView: WKWebView, LatteWebView, WKNavigationDelegate {
                         event_name: event_name, params: params
                     )
                     parent.delegate?.latteWebView(onEvent: parent, event: .trackingEvent(event: event))
+                case LatteBuiltInEvents.ready.rawValue:
+                    parent.onReady?(parent)
+                    parent.onReady = nil
                 default:
                     return
                 }

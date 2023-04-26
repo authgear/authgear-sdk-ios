@@ -5,7 +5,7 @@ public protocol LatteDelegate: AnyObject {
     func latte(_: Latte, onTrackingEvent: LatteTrackingEvent)
 }
 
-public class Latte: LatteViewControllerDelegate {
+public class Latte: LatteWebViewDelegate {
     let authgear: Authgear
     let customUIEndpoint: String
     let urlSession: URLSession
@@ -20,12 +20,23 @@ public class Latte: LatteViewControllerDelegate {
     }
 
     @available(iOS 13.0, *)
-    func latteViewController(onEvent _: LatteViewController, event: LatteWebViewEvent) {
+    func latteWebView(onEvent webView: LatteWKWebView, event: LatteWebViewEvent) {
         switch event {
         case let .trackingEvent(event: event):
             self.delegate?.latte(_: self, onTrackingEvent: event)
         case .openEmailClient:
-            break
+            // FIXME: This should be handled by the SDK user.
+            let items = [
+                Latte.EmailClient.mail,
+                Latte.EmailClient.gmail
+            ]
+            let alert = Latte.makeChooseEmailClientAlertController(
+                title: "Open mail app",
+                message: "Which app would you like to open?",
+                cancelLabel: "Cancel",
+                items: items
+            )
+            webView.viewController?.present(alert, animated: true)
         }
     }
 }
@@ -47,11 +58,14 @@ public extension LatteWebViewRequest {
     }
 }
 
-public struct LatteWebViewResult {
-    public let finishURL: URL
+internal struct LatteWebViewResult {
+    private let finishURL: URL
 
-    @available(iOS 13.0, *)
-    func handle<T>(handler: (URL, @escaping (Result<T, Error>) -> Void) -> Void) async throws -> T {
+    init(finishURL: URL) {
+        self.finishURL = finishURL
+    }
+
+    func unwrap() throws -> URL {
         let query = URLComponents(url: self.finishURL, resolvingAgainstBaseURL: false)!.queryParams
 
         if let oauthError = query["error"] {
@@ -77,9 +91,7 @@ public struct LatteWebViewResult {
             )
         }
 
-        return try await withCheckedThrowingContinuation { resume in
-            handler(finishURL) { resume.resume(with: $0) }
-        }
+        return finishURL
     }
 }
 
@@ -88,16 +100,7 @@ public struct LatteTrackingEvent {
     public let params: [String: Any]
 }
 
-public enum LatteWebViewEvent {
+enum LatteWebViewEvent {
     case openEmailClient
     case trackingEvent(event: LatteTrackingEvent)
-}
-
-public protocol LatteWebViewDelegate: AnyObject {
-    func latteWebView(completed _: LatteWebView, result: Result<LatteWebViewResult, Error>)
-    func latteWebView(onEvent _: LatteWebView, event: LatteWebViewEvent)
-}
-
-public protocol LatteWebView: UIView {
-    var delegate: LatteWebViewDelegate? { get set }
 }
