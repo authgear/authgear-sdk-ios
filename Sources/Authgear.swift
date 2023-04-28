@@ -290,6 +290,9 @@ public class Authgear {
     private let jwkStore = JWKStore()
     private let workerQueue: DispatchQueue
 
+    private let accessTokenRefreshLock = NSLock()
+    private let accessTokenRefreshQueue: DispatchQueue
+
     private var currentWechatRedirectURI: String?
 
     public private(set) var sessionState: SessionState = .unknown
@@ -304,6 +307,7 @@ public class Authgear {
         self.isSSOEnabled = isSSOEnabled
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
+        self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
     }
 
     public func configure(
@@ -1121,12 +1125,19 @@ public class Authgear {
     public func refreshAccessTokenIfNeeded(
         handler: @escaping VoidCompletionHandler
     ) {
-        if shouldRefreshAccessToken() {
-            refreshAccessToken { result in
+        accessTokenRefreshQueue.async {
+            self.accessTokenRefreshLock.lock()
+            func complete(_ result: Result<Void, Error>) {
+                self.accessTokenRefreshLock.unlock()
                 handler(result)
             }
-        } else {
-            handler(.success(()))
+            if self.shouldRefreshAccessToken() {
+                self.refreshAccessToken { result in
+                    complete(result)
+                }
+            } else {
+                complete(.success(()))
+            }
         }
     }
 
