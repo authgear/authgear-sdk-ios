@@ -58,14 +58,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                let _: Void = try await withCheckedThrowingContinuation { next in
-                    latteVC.webView.onReady = { _ in
-                        next.resume()
-                    }
-                    latteVC.webView.completion = { (_, result) in
-                        next.resume(with: result.map { _ in () })
-                    }
-                }
+                try await latteVC.suspendUntilReady()
 
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -124,14 +117,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                let _: Void = try await withCheckedThrowingContinuation { next in
-                    latteVC.webView.onReady = { _ in
-                        next.resume()
-                    }
-                    latteVC.webView.completion = { (_, result) in
-                        next.resume(with: result.map { _ in () })
-                    }
-                }
+                try await latteVC.suspendUntilReady()
 
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -189,14 +175,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                let _: Void = try await withCheckedThrowingContinuation { next in
-                    latteVC.webView.onReady = { _ in
-                        next.resume()
-                    }
-                    latteVC.webView.completion = { (_, result) in
-                        next.resume(with: result.map { _ in () })
-                    }
-                }
+                try await latteVC.suspendUntilReady()
 
                 let handle = LatteHandle<Void>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -235,14 +214,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                let _: Void = try await withCheckedThrowingContinuation { next in
-                    latteVC.webView.onReady = { _ in
-                        next.resume()
-                    }
-                    latteVC.webView.completion = { (_, result) in
-                        next.resume(with: result.map { _ in () })
-                    }
-                }
+                try await latteVC.suspendUntilReady()
 
                 let handle = LatteHandle<Void>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -300,14 +272,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                let _: Void = try await withCheckedThrowingContinuation { next in
-                    latteVC.webView.onReady = { _ in
-                        next.resume()
-                    }
-                    latteVC.webView.completion = { (_, result) in
-                        next.resume(with: result.map { _ in () })
-                    }
-                }
+                try await latteVC.suspendUntilReady()
 
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -372,6 +337,32 @@ class LatteViewController: UIViewController {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    internal func suspendUntilReady() async throws {
+        return try await withCheckedThrowingContinuation { next in
+            var isResumed = false
+            self.webView.onReady = { _ in
+                guard isResumed == false else { return }
+                isResumed = true
+                next.resume()
+            }
+            self.webView.completion = { (_, result) in
+                guard isResumed == false else { return }
+                switch result {
+                case .success(let r):
+                    do {
+                        // If there is an error in the result, throw it
+                        let _ = try r.unwrap()
+                        next.resume()
+                    } catch {
+                        next.resume(throwing: error)
+                    }
+                case .failure(let error):
+                    next.resume(throwing: error)
+                }
+            }
+        }
     }
 }
 
