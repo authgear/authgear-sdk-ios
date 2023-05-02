@@ -338,9 +338,9 @@ class LatteViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     internal func suspendUntilReady() async throws {
-        return try await withCheckedThrowingContinuation { next in
+        try await withCheckedThrowingContinuation { next in
             var isResumed = false
             self.webView.onReady = { _ in
                 guard isResumed == false else { return }
@@ -350,15 +350,15 @@ class LatteViewController: UIViewController {
             self.webView.completion = { (_, result) in
                 guard isResumed == false else { return }
                 switch result {
-                case .success(let r):
+                case let .success(r):
                     do {
                         // If there is an error in the result, throw it
-                        let _ = try r.unwrap()
+                        _ = try r.unwrap()
                         next.resume()
                     } catch {
                         next.resume(throwing: error)
                     }
-                case .failure(let error):
+                case let .failure(error):
                     next.resume(throwing: error)
                 }
             }
