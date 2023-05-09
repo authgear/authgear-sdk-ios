@@ -27,6 +27,45 @@ public struct LatteHandle<T: Sendable> {
 public extension Latte {
     typealias Completion<T> = (Result<(UIViewController, LatteHandle<T>), Error>) -> Void
 
+    func preload(completion: @escaping (Result<Void, Error>) -> Void) {
+        Task { await run() }
+        @Sendable @MainActor
+        func run() async {
+            do {
+                let url = URL(string: self.customUIEndpoint + "/preload")!
+                let request = LatteWebViewRequest(url: url, redirectURI: "latte://complete")
+                let webView = LatteWKWebView(request: request, isInspectable: self.webviewIsInspectable)
+                webView.load()
+                try await withCheckedThrowingContinuation { next in
+                    var isResumed = false
+                    webView.onReady = { _ in
+                        guard isResumed == false else { return }
+                        isResumed = true
+                        next.resume()
+                    }
+                    webView.completion = { (_, result) in
+                        guard isResumed == false else { return }
+                        switch result {
+                        case let .success(r):
+                            do {
+                                // If there is an error in the result, throw it
+                                _ = try r.unwrap()
+                                next.resume()
+                            } catch {
+                                next.resume(throwing: error)
+                            }
+                        case let .failure(error):
+                            next.resume(throwing: error)
+                        }
+                    }
+                }
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+
     func authenticate(
         xState: String? = nil,
         prompt: [PromptOption]? = nil,
