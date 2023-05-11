@@ -17,6 +17,8 @@
 		A648BE852975316A002D8EA5 /* Latte+EmailClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */; };
 		A68DAD2229AF686000487DAF /* UILocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD1F29AF686000487DAF /* UILocales.swift */; };
 		A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */; };
+		A6D692B92A0CCA2B00B457F9 /* Latte+Tokenize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */; };
+		A6D692BD2A0CCF1700B457F9 /* LatteError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D692BC2A0CCF1700B457F9 /* LatteError.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
 		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
@@ -62,6 +64,8 @@
 		A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+EmailClient.swift"; sourceTree = "<group>"; };
 		A68DAD1F29AF686000487DAF /* UILocales.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILocales.swift; sourceTree = "<group>"; };
 		A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+encodeAsQueryComponent.swift"; sourceTree = "<group>"; };
+		A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+Tokenize.swift"; sourceTree = "<group>"; };
+		A6D692BC2A0CCF1700B457F9 /* LatteError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatteError.swift; sourceTree = "<group>"; };
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20D6F025BAA3C400E579DD /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = example/Pods/Pods.xcodeproj; sourceTree = "<group>"; };
@@ -160,6 +164,8 @@
 				F8A657A6250551ED0027888F /* JWT.swift */,
 				F8A657A825055A7C0027888F /* Base64.swift */,
 				95E67331299F652000C9466C /* Latte.swift */,
+				A6D692BC2A0CCF1700B457F9 /* LatteError.swift */,
+				A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */,
 				A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */,
 				95E6733A29A37E5A00C9466C /* Latte+Flows.swift */,
 				77AE4DD929A72A5B006A3ADB /* Latte+UniversalLink.swift */,
@@ -266,6 +272,7 @@
 				77AE4DDC29A72A5B006A3ADB /* Latte+UniversalLink.swift in Sources */,
 				95E67333299F652100C9466C /* Latte+WKWebView.swift in Sources */,
 				F83D84AA24F66C5100B4393C /* OIDCConfiguration.swift in Sources */,
+				A6D692B92A0CCA2B00B457F9 /* Latte+Tokenize.swift in Sources */,
 				A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */,
 				F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */,
 				F83392EF24FC344D00A69D3C /* Storage.swift in Sources */,
@@ -285,6 +292,7 @@
 				F83D84B024F860AA00B4393C /* AuthenticationSession.swift in Sources */,
 				F83D84A824F64D0E00B4393C /* Authgear.swift in Sources */,
 				95E67334299F652100C9466C /* Latte.swift in Sources */,
+				A6D692BD2A0CCF1700B457F9 /* LatteError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

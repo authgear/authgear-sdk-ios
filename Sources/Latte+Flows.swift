@@ -67,7 +67,8 @@ public extension Latte {
     }
 
     func authenticate(
-        xState: String? = nil,
+        secrets: [String:String] = [:],
+        xState: [String:String] = [:],
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
@@ -81,9 +82,15 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                var finalXState = xState
+                let tokenParamsJson = try JSONSerialization.data(withJSONObject: secrets)
+                let token = try await withCheckedThrowingContinuation { next in
+                    self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
+                }
+                finalXState["x_token"] = token
                 let request = try authgear.experimental.createAuthenticateRequest(
                     redirectURI: "latte://complete",
-                    xState: xState,
+                    xState: finalXState.encodeAsQuery(),
                     prompt: prompt,
                     loginHint: loginHint,
                     uiLocales: uiLocales,
@@ -122,7 +129,7 @@ public extension Latte {
 
     func verifyEmail(
         email: String,
-        xState: String? = nil,
+        xState: [String:String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<UserInfo>
     ) {
@@ -131,15 +138,23 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                var finalXState = xState
+                let tokenParams = [
+                    "email": email,
+                ]
+                let tokenParamsJson = try JSONSerialization.data(withJSONObject: tokenParams)
+                let token = try await withCheckedThrowingContinuation { next in
+                    self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
+                }
+                finalXState["x_token"] = token
                 let entryURL = customUIEndpoint + "/verify/email"
                 let redirectURI = "latte://complete"
                 var queryList = [
-                    "email=\(email.encodeAsQueryComponent()!)",
                     "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        xState: xState,
+                        xState: finalXState.encodeAsQuery(),
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -180,7 +195,7 @@ public extension Latte {
     }
 
     func changePassword(
-        xState: String? = nil,
+        xState: [String:String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<Void>
     ) {
@@ -197,7 +212,7 @@ public extension Latte {
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        xState: xState,
+                        xState: xState.encodeAsQuery(),
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -275,7 +290,7 @@ public extension Latte {
     func changeEmail(
         email: String,
         phoneNumber: String,
-        xState: String? = nil,
+        xState: [String:String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<UserInfo>
     ) {
@@ -284,17 +299,25 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                var finalXState = xState
+                let tokenParams = [
+                    "phone": phoneNumber,
+                    "email": email,
+                ]
+                let tokenParamsJson = try JSONSerialization.data(withJSONObject: tokenParams)
+                let token = try await withCheckedThrowingContinuation { next in
+                    self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
+                }
+                finalXState["x_token"] = token
                 let entryURL = customUIEndpoint + "/settings/change_email"
                 let redirectURI = "latte://complete"
 
                 var queryList = [
-                    "email=\(email.encodeAsQueryComponent()!)",
-                    "phone=\(phoneNumber.encodeAsQueryComponent()!)",
                     "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        xState: xState,
+                        xState: finalXState.encodeAsQuery(),
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
