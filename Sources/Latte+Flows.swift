@@ -67,7 +67,7 @@ public extension Latte {
     }
 
     func authenticate(
-        secrets: [String:String] = [:],
+        xSecrets: [String:String] = [:],
         xState: [String:String] = [:],
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
@@ -82,12 +82,10 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
-                var finalXState = xState
-                let tokenParamsJson = try JSONSerialization.data(withJSONObject: secrets)
-                let token = try await withCheckedThrowingContinuation { next in
-                    self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
-                }
-                finalXState["x_token"] = token
+                
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: xState,
+                    xSecrets: xSecrets)
                 let request = try authgear.experimental.createAuthenticateRequest(
                     redirectURI: "latte://complete",
                     xState: finalXState.encodeAsQuery(),
@@ -138,15 +136,12 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
-                var finalXState = xState
-                let tokenParams = [
+                let xSecrets = [
                     "email": email,
                 ]
-                let tokenParamsJson = try JSONSerialization.data(withJSONObject: tokenParams)
-                let token = try await withCheckedThrowingContinuation { next in
-                    self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
-                }
-                finalXState["x_token"] = token
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: xState,
+                    xSecrets: xSecrets)
                 let entryURL = customUIEndpoint + "/verify/email"
                 let redirectURI = "latte://complete"
                 var queryList = [
@@ -299,16 +294,13 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
-                var finalXState = xState
-                let tokenParams = [
+                let xSecrets = [
                     "phone": phoneNumber,
                     "email": email,
                 ]
-                let tokenParamsJson = try JSONSerialization.data(withJSONObject: tokenParams)
-                let token = try await withCheckedThrowingContinuation { next in
-                    self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
-                }
-                finalXState["x_token"] = token
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: xState,
+                    xSecrets: xSecrets)
                 let entryURL = customUIEndpoint + "/settings/change_email"
                 let redirectURI = "latte://complete"
 
@@ -369,6 +361,19 @@ public extension Latte {
             result.append("ui_locales=\(UILocales.stringify(uiLocales: mustUILocales).encodeAsQueryComponent()!)")
         }
         return result
+    }
+    
+    private func makeXStateWithSecrets(
+        xState: Dictionary<String, String>,
+        xSecrets: Dictionary<String, String>
+    ) async throws -> Dictionary<String, String> {
+        var finalXState = xState
+        let tokenParamsJson = try JSONSerialization.data(withJSONObject: xSecrets)
+        let token = try await withCheckedThrowingContinuation { next in
+            self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
+        }
+        finalXState["x_secrets_token"] = token
+        return finalXState
     }
 }
 
