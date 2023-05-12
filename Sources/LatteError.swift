@@ -1,7 +1,7 @@
 import Foundation
 
 enum LatteError: LocalizedError {
-  case unexpected(message: String)
+    case unexpected(message: String)
 }
 
 extension LatteError {
