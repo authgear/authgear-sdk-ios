@@ -368,11 +368,13 @@ public extension Latte {
         xSecrets: Dictionary<String, String>
     ) async throws -> Dictionary<String, String> {
         var finalXState = xState
-        let tokenParamsJson = try JSONSerialization.data(withJSONObject: xSecrets)
-        let token = try await withCheckedThrowingContinuation { next in
-            self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
+        if !xSecrets.isEmpty {
+            let tokenParamsJson = try JSONSerialization.data(withJSONObject: xSecrets)
+            let token = try await withCheckedThrowingContinuation { next in
+                self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
+            }
+            finalXState["x_secrets_token"] = token
         }
-        finalXState["x_secrets_token"] = token
         return finalXState
     }
 }
