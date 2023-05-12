@@ -13,10 +13,12 @@ public class Latte: LatteWebViewDelegate {
     let webviewIsInspectable: Bool
     public weak var delegate: LatteDelegate?
 
-    public init(authgear: Authgear,
-                customUIEndpoint: String,
-                tokenizeEndpoint: String,
-                webviewIsInspectable: Bool = false) {
+    public init(
+        authgear: Authgear,
+        customUIEndpoint: String,
+        tokenizeEndpoint: String,
+        webviewIsInspectable: Bool = false
+    ) {
         self.authgear = authgear
         self.customUIEndpoint = customUIEndpoint
         self.tokenizeEndpoint = tokenizeEndpoint

@@ -1,7 +1,7 @@
 import Foundation
 
 extension Latte {
-    internal func tokenize(
+    func tokenize(
         data: Data,
         handler: @escaping (Result<String, Error>) -> Void
     ) {
@@ -12,7 +12,7 @@ extension Latte {
             switch result {
             case let .failure(error):
                 handler(.failure(error))
-            case .success((let respData, _)):
+            case let .success((respData, _)):
                 guard let respData = respData,
                       let token = String(data: respData, encoding: String.Encoding.utf8) else {
                     handler(.failure(
@@ -25,4 +25,3 @@ extension Latte {
         }
     }
 }
-

@@ -67,8 +67,8 @@ public extension Latte {
     }
 
     func authenticate(
-        xSecrets: [String:String] = [:],
-        xState: [String:String] = [:],
+        xSecrets: [String: String] = [:],
+        xState: [String: String] = [:],
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
@@ -82,10 +82,10 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
-                
                 let finalXState = try await makeXStateWithSecrets(
                     xState: xState,
-                    xSecrets: xSecrets)
+                    xSecrets: xSecrets
+                )
                 let request = try authgear.experimental.createAuthenticateRequest(
                     redirectURI: "latte://complete",
                     xState: finalXState.encodeAsQuery(),
@@ -127,7 +127,7 @@ public extension Latte {
 
     func verifyEmail(
         email: String,
-        xState: [String:String] = [:],
+        xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<UserInfo>
     ) {
@@ -137,11 +137,12 @@ public extension Latte {
         func run() async {
             do {
                 let xSecrets = [
-                    "email": email,
+                    "email": email
                 ]
                 let finalXState = try await makeXStateWithSecrets(
                     xState: xState,
-                    xSecrets: xSecrets)
+                    xSecrets: xSecrets
+                )
                 let entryURL = customUIEndpoint + "/verify/email"
                 let redirectURI = "latte://complete"
                 var queryList = [
@@ -190,7 +191,7 @@ public extension Latte {
     }
 
     func changePassword(
-        xState: [String:String] = [:],
+        xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<Void>
     ) {
@@ -285,7 +286,7 @@ public extension Latte {
     func changeEmail(
         email: String,
         phoneNumber: String,
-        xState: [String:String] = [:],
+        xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<UserInfo>
     ) {
@@ -296,11 +297,12 @@ public extension Latte {
             do {
                 let xSecrets = [
                     "phone": phoneNumber,
-                    "email": email,
+                    "email": email
                 ]
                 let finalXState = try await makeXStateWithSecrets(
                     xState: xState,
-                    xSecrets: xSecrets)
+                    xSecrets: xSecrets
+                )
                 let entryURL = customUIEndpoint + "/settings/change_email"
                 let redirectURI = "latte://complete"
 
@@ -362,7 +364,7 @@ public extension Latte {
         }
         return result
     }
-    
+
     private func makeXStateWithSecrets(
         xState: Dictionary<String, String>,
         xSecrets: Dictionary<String, String>
