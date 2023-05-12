@@ -8,20 +8,13 @@ public protocol LatteDelegate: AnyObject {
 public class Latte: LatteWebViewDelegate {
     let authgear: Authgear
     let customUIEndpoint: String
-    let tokenizeEndpoint: String
     let urlSession: URLSession
     let webviewIsInspectable: Bool
     public weak var delegate: LatteDelegate?
 
-    public init(
-        authgear: Authgear,
-        customUIEndpoint: String,
-        tokenizeEndpoint: String,
-        webviewIsInspectable: Bool = false
-    ) {
+    public init(authgear: Authgear, customUIEndpoint: String, webviewIsInspectable: Bool = false) {
         self.authgear = authgear
         self.customUIEndpoint = customUIEndpoint
-        self.tokenizeEndpoint = tokenizeEndpoint
         self.webviewIsInspectable = webviewIsInspectable
         self.urlSession = URLSession(configuration: .default)
     }
