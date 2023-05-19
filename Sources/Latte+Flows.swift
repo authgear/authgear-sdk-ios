@@ -67,7 +67,8 @@ public extension Latte {
     }
 
     func authenticate(
-        xState: String? = nil,
+        xSecrets: [String: String] = [:],
+        xState: [String: String] = [:],
         prompt: [PromptOption]? = nil,
         loginHint: String? = nil,
         uiLocales: [String]? = nil,
@@ -81,9 +82,13 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: xState,
+                    xSecrets: xSecrets
+                )
                 let request = try authgear.experimental.createAuthenticateRequest(
                     redirectURI: "latte://complete",
-                    xState: xState,
+                    xState: finalXState.encodeAsQuery(),
                     prompt: prompt,
                     loginHint: loginHint,
                     uiLocales: uiLocales,
@@ -122,7 +127,7 @@ public extension Latte {
 
     func verifyEmail(
         email: String,
-        xState: String? = nil,
+        xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<UserInfo>
     ) {
@@ -131,15 +136,21 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                let xSecrets = [
+                    "email": email
+                ]
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: xState,
+                    xSecrets: xSecrets
+                )
                 let entryURL = customUIEndpoint + "/verify/email"
                 let redirectURI = "latte://complete"
                 var queryList = [
-                    "email=\(email.encodeAsQueryComponent()!)",
                     "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        xState: xState,
+                        xState: finalXState.encodeAsQuery(),
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -180,7 +191,7 @@ public extension Latte {
     }
 
     func changePassword(
-        xState: String? = nil,
+        xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<Void>
     ) {
@@ -197,7 +208,7 @@ public extension Latte {
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        xState: xState,
+                        xState: xState.encodeAsQuery(),
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -275,7 +286,7 @@ public extension Latte {
     func changeEmail(
         email: String,
         phoneNumber: String,
-        xState: String? = nil,
+        xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<UserInfo>
     ) {
@@ -284,17 +295,23 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                let xSecrets = [
+                    "phone": phoneNumber,
+                    "email": email
+                ]
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: xState,
+                    xSecrets: xSecrets
+                )
                 let entryURL = customUIEndpoint + "/settings/change_email"
                 let redirectURI = "latte://complete"
 
                 var queryList = [
-                    "email=\(email.encodeAsQueryComponent()!)",
-                    "phone=\(phoneNumber.encodeAsQueryComponent()!)",
                     "redirect_uri=\(redirectURI.encodeAsQueryComponent()!)"
                 ]
                 queryList.append(
                     contentsOf: constructUIParamQuery(
-                        xState: xState,
+                        xState: finalXState.encodeAsQuery(),
                         uiLocales: uiLocales
                     ))
                 let query = queryList.joined(separator: "&")
@@ -346,6 +363,21 @@ public extension Latte {
             result.append("ui_locales=\(UILocales.stringify(uiLocales: mustUILocales).encodeAsQueryComponent()!)")
         }
         return result
+    }
+
+    private func makeXStateWithSecrets(
+        xState: Dictionary<String, String>,
+        xSecrets: Dictionary<String, String>
+    ) async throws -> Dictionary<String, String> {
+        var finalXState = xState
+        if !xSecrets.isEmpty {
+            let tokenParamsJson = try JSONSerialization.data(withJSONObject: xSecrets)
+            let token = try await withCheckedThrowingContinuation { next in
+                self.tokenize(data: tokenParamsJson) { next.resume(with: $0) }
+            }
+            finalXState["x_secrets_token"] = token
+        }
+        return finalXState
     }
 }
 
