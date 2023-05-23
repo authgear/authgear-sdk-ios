@@ -7,8 +7,8 @@ public protocol LatteDelegate: AnyObject {
 }
 
 // Default implemetations
-extension LatteDelegate {
-    public func latte(_: Latte, onOpenEmailClient source: UIViewController) {
+public extension LatteDelegate {
+    func latte(_: Latte, onOpenEmailClient source: UIViewController) {
         let items = [
             Latte.EmailClient.mail,
             Latte.EmailClient.gmail
