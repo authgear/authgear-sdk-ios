@@ -3,6 +3,24 @@ import UIKit
 
 public protocol LatteDelegate: AnyObject {
     func latte(_: Latte, onTrackingEvent: LatteTrackingEvent)
+    func latte(_: Latte, onOpenEmailClient source: UIViewController)
+}
+
+// Default implemetations
+public extension LatteDelegate {
+    func latte(_: Latte, onOpenEmailClient source: UIViewController) {
+        let items = [
+            Latte.EmailClient.mail,
+            Latte.EmailClient.gmail
+        ]
+        let alert = Latte.makeChooseEmailClientAlertController(
+            title: "Open mail app",
+            message: "Which app would you like to open?",
+            cancelLabel: "Cancel",
+            items: items
+        )
+        source.present(alert, animated: true)
+    }
 }
 
 public class Latte: LatteWebViewDelegate {
@@ -32,18 +50,8 @@ public class Latte: LatteWebViewDelegate {
         case let .trackingEvent(event: event):
             self.delegate?.latte(_: self, onTrackingEvent: event)
         case .openEmailClient:
-            // FIXME: This should be handled by the SDK user.
-            let items = [
-                Latte.EmailClient.mail,
-                Latte.EmailClient.gmail
-            ]
-            let alert = Latte.makeChooseEmailClientAlertController(
-                title: "Open mail app",
-                message: "Which app would you like to open?",
-                cancelLabel: "Cancel",
-                items: items
-            )
-            webView.viewController?.present(alert, animated: true)
+            guard let vc = webView.viewController else { return }
+            self.delegate?.latte(_: self, onOpenEmailClient: vc)
         }
     }
 }
