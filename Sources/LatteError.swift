@@ -1,5 +1,6 @@
 import Foundation
 
+// Implement LocalizedError to customize localizedDescription
 enum LatteError: LocalizedError {
     case unexpected(message: String)
 }
