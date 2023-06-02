@@ -71,20 +71,31 @@ public enum AuthgearError: CustomNSError {
         case let .oauthError(err):
             info = err.errorUserInfo
         case let .biometricNotSupportedOrPermissionDenied(err):
-            info["error"] = err.localizedDescription
+            info["error"] = makeErrorInfo(err)
         case let .biometricNoPasscode(err):
-            info["error"] = err.localizedDescription
+            info["error"] = makeErrorInfo(err)
         case let .biometricNoEnrollment(err):
-            info["error"] = err.localizedDescription
+            info["error"] = makeErrorInfo(err)
         case let .biometricLockout(err):
-            info["error"] = err.localizedDescription
+            info["error"] = makeErrorInfo(err)
         case let .invalidJWT(jwt):
             info["jwt"] = jwt
         case let .error(err):
-            info["error"] = err.localizedDescription
+            info["error"] = makeErrorInfo(err)
         default:
             break
         }
+        return info
+    }
+
+    private func makeErrorInfo(_ err: Error) -> [String: Any] {
+        var info: [String: Any] = [
+            "message": err.localizedDescription
+        ]
+        let nserr = err as NSError
+        info["domain"] = nserr.domain
+        info["code"] = nserr.code
+        info["info"] = nserr.userInfo
         return info
     }
 }
