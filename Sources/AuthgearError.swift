@@ -100,11 +100,14 @@ public enum AuthgearError: CustomNSError {
     }
 }
 
-public struct OAuthError: Error, Decodable {
+public struct OAuthError: Error, CustomNSError, Decodable {
     public let error: String
     public let errorDescription: String?
     public let errorUri: String?
-
+    
+    // Implements CustomNSError
+    public static var errorDomain: String { "OAuthError" }
+    public var errorCode: Int { 0 }
     public var errorUserInfo: [String: Any] {
         var userInfo: [String: Any] = [
             "error": self.error
@@ -119,7 +122,7 @@ public struct OAuthError: Error, Decodable {
     }
 }
 
-public struct ServerError: Error, Decodable {
+public struct ServerError: Error, CustomNSError, Decodable {
     public let name: String
     public let message: String
     public let reason: String
@@ -140,6 +143,9 @@ public struct ServerError: Error, Decodable {
         info = try? values.decode([String: Any].self, forKey: .info)
     }
 
+    // Implements CustomNSError
+    public static var errorDomain: String { "ServerError" }
+    public var errorCode: Int { 0 }
     public var errorUserInfo: [String: Any] {
         var userInfo: [String: Any] = [
             "name": self.name,
