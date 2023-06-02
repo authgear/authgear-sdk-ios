@@ -67,21 +67,21 @@ public enum AuthgearError: CustomNSError {
         case let .unexpectedHttpStatusCode(code, _):
             info["code"] = code
         case let .serverError(err):
-            info = err.errorUserInfo
+            info = makeErrorInfo(err)
         case let .oauthError(err):
-            info = err.errorUserInfo
+            info = makeErrorInfo(err)
         case let .biometricNotSupportedOrPermissionDenied(err):
-            info["error"] = makeErrorInfo(err)
+            info = makeErrorInfo(err)
         case let .biometricNoPasscode(err):
-            info["error"] = makeErrorInfo(err)
+            info = makeErrorInfo(err)
         case let .biometricNoEnrollment(err):
-            info["error"] = makeErrorInfo(err)
+            info = makeErrorInfo(err)
         case let .biometricLockout(err):
-            info["error"] = makeErrorInfo(err)
+            info = makeErrorInfo(err)
         case let .invalidJWT(jwt):
             info["jwt"] = jwt
         case let .error(err):
-            info["error"] = makeErrorInfo(err)
+            info = makeErrorInfo(err)
         default:
             break
         }
