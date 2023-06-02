@@ -3,7 +3,7 @@ import Foundation
 import LocalAuthentication
 import SafariServices
 
-public enum AuthgearError: CustomNSError {
+public enum AuthgearError: CustomNSError, LocalizedError {
     case cancel
     case unexpectedHttpStatusCode(Int, Data?)
     case serverError(ServerError)
@@ -25,6 +25,7 @@ public enum AuthgearError: CustomNSError {
     case publicKeyNotFound
     case error(Error)
 
+    // Implements CustomNSError
     public static var errorDomain: String { "AuthgearError" }
     public var errorCode: Int {
         switch self {
@@ -88,6 +89,44 @@ public enum AuthgearError: CustomNSError {
         return info
     }
 
+    // Implements LocalizedError
+    public var errorDescription: String? {
+        var message = ""
+        switch self {
+        case .cancel:
+            message = "cancel"
+        case .unexpectedHttpStatusCode:
+            message = "unexpectedHttpStatusCode"
+        case .serverError:
+            message = "serverError"
+        case .oauthError:
+            message = "oauthError"
+        case .anonymousUserNotFound:
+            message = "anonymousUserNotFound"
+        case .biometricPrivateKeyNotFound:
+            message = "biometricPrivateKeyNotFound"
+        case .biometricNotSupportedOrPermissionDenied:
+            message = "biometricNotSupportedOrPermissionDenied"
+        case .biometricNoPasscode:
+            message = "biometricNoPasscode"
+        case .biometricNoEnrollment:
+            message = "biometricNoEnrollment"
+        case .biometricLockout:
+            message = "biometricLockout"
+        case .cannotReauthenticate:
+            message = "cannotReauthenticate"
+        case .invalidJWT:
+            message = "invalidJWT"
+        case .unauthenticatedUser:
+            message = "unauthenticatedUser"
+        case .publicKeyNotFound:
+            message = "publicKeyNotFound"
+        case .error:
+            message = "error"
+        }
+        return "\(Self.errorDomain): \(message)"
+    }
+
     private func makeErrorInfo(_ err: Error) -> [String: Any] {
         var info: [String: Any] = [
             "message": err.localizedDescription
@@ -100,11 +139,11 @@ public enum AuthgearError: CustomNSError {
     }
 }
 
-public struct OAuthError: Error, CustomNSError, Decodable {
+public struct OAuthError: LocalizedError, CustomNSError, Decodable {
     public let error: String
     public let errorDescription: String?
     public let errorUri: String?
-    
+
     // Implements CustomNSError
     public static var errorDomain: String { "OAuthError" }
     public var errorCode: Int { 0 }
@@ -122,7 +161,7 @@ public struct OAuthError: Error, CustomNSError, Decodable {
     }
 }
 
-public struct ServerError: Error, CustomNSError, Decodable {
+public struct ServerError: CustomNSError, LocalizedError, Decodable {
     public let name: String
     public let message: String
     public let reason: String
@@ -156,6 +195,12 @@ public struct ServerError: Error, CustomNSError, Decodable {
             userInfo["info"] = info
         }
         return userInfo
+    }
+
+    // Implements LocalizedError
+    public var errorDescription: String? {
+        let message = "\(reason): \(message)"
+        return "\(Self.errorDomain): \(message)"
     }
 }
 

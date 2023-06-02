@@ -1,9 +1,9 @@
 import Foundation
 
-// Implement LocalizedError to customize localizedDescription
 enum LatteError: LocalizedError, CustomNSError {
     case unexpected(message: String)
 
+    // Implements CustomNSError
     public static var errorDomain: String { "LatteError" }
     public var errorCode: Int {
         switch self {
@@ -20,9 +20,8 @@ enum LatteError: LocalizedError, CustomNSError {
         }
         return info
     }
-}
 
-extension LatteError {
+    // Implements LocalizedError
     public var errorDescription: String? {
         switch self {
         case let .unexpected(message):
