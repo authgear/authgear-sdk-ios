@@ -6,7 +6,7 @@ class App2App {
     private let apiClient: AuthAPIClient
     private let storage: ContainerStorage
     
-    internal init(
+    init(
         namespace: String,
         apiClient: AuthAPIClient,
         storage: ContainerStorage
@@ -16,7 +16,7 @@ class App2App {
         self.storage = storage
     }
     
-    internal func requireMinimumApp2AppIOSVersion() throws {
+    func requireMinimumApp2AppIOSVersion() throws {
         if #available(iOS 11.3, *) {
             return
         } else {
@@ -100,7 +100,7 @@ class App2App {
     }
     
     @available(iOS 11.3, *)
-    internal func generateApp2AppJWT() throws -> String {
+    func generateApp2AppJWT() throws -> String {
         let challenge = try apiClient.syncRequestOAuthChallenge(purpose: "app2app_request").token
         let existingKid = try storage.getApp2AppDeviceKeyId(namespace: namespace)
         let kid = existingKid ?? UUID().uuidString
@@ -123,7 +123,7 @@ class App2App {
     }
     
     @available(iOS 11.3, *)
-    internal func startAuthenticateRequest(
+    func startAuthenticateRequest(
         request: App2AppAuthenticateRequest,
         handler: @escaping (Result<Void, Error>) -> Void
     ) throws {
@@ -132,12 +132,12 @@ class App2App {
     }
     
     @available(iOS 11.3, *)
-    internal func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
+    func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
         return App2AppAuthenticateRequest.parse(url: url)
     }
     
     @available(iOS 11.3, *)
-    internal func approveApp2AppAuthenticationRequest(
+    func approveApp2AppAuthenticationRequest(
         maybeRefreshToken: String?,
         request: App2AppAuthenticateRequest,
         handler: @escaping (Result<Void, Error>) -> Void
@@ -153,6 +153,19 @@ class App2App {
                 defaultError: "unknown_error",
                 e: error)
         }
+        openURLInUniversalLink(url: resultURL, handler: handler)
+    }
+    
+    @available(iOS 11.3, *)
+    func rejectApp2AppAuthenticationRequest(
+        request: App2AppAuthenticateRequest,
+        reason: Error,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let resultURL = constructErrorURL(
+            redirectUri: request.redirectUri,
+            defaultError: "unknown_error",
+            e: reason)
         openURLInUniversalLink(url: resultURL, handler: handler)
     }
     

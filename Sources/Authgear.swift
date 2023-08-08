@@ -1441,6 +1441,21 @@ public class Authgear {
                 handler: handler)
         }
     }
+    
+    @available(iOS 11.3, *)
+    public func rejectApp2AppAuthenticationRequest(
+        request: App2AppAuthenticateRequest,
+        reason: Error,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let handler = withMainQueueHandler(handler)
+        self.workerQueue.async {
+            self.app2app.rejectApp2AppAuthenticationRequest(
+                request: request,
+                reason: reason,
+                handler: handler)
+        }
+    }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {
         if let error = error as? AuthgearError,
