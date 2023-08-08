@@ -80,6 +80,25 @@ class App2App {
         return privateKey
     }
     
+    private func openURLInUniversalLink(
+        url: URL,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let options: [UIApplication.OpenExternalURLOptionsKey : Any] = [
+            UIApplication.OpenExternalURLOptionsKey.universalLinksOnly: NSNumber(value: true)
+        ]
+        UIApplication.shared.open(url, options: options) { success in
+            if (success) {
+                handler(.success(()))
+            } else {
+                handler(.failure(OAuthError(
+                    error: "invalid_client",
+                    errorDescription: "failed to open url \(url.absoluteString)",
+                    errorUri: nil)))
+            }
+        }
+    }
+    
     @available(iOS 11.3, *)
     internal func generateApp2AppJWT() throws -> String {
         let challenge = try apiClient.syncRequestOAuthChallenge(purpose: "app2app_request").token
@@ -109,23 +128,98 @@ class App2App {
         handler: @escaping (Result<Void, Error>) -> Void
     ) throws {
         let url = try request.toURL()
-        let options: [UIApplication.OpenExternalURLOptionsKey : Any] = [
-            UIApplication.OpenExternalURLOptionsKey.universalLinksOnly: NSNumber(value: true)
-        ]
-        UIApplication.shared.open(url, options: options) { success in
-            if (success) {
-                handler(.success(()))
-            } else {
-                handler(.failure(OAuthError(
-                    error: "invalid_client",
-                    errorDescription: "failed to open url \(url.absoluteString)",
-                    errorUri: nil)))
-            }
-        }
+        openURLInUniversalLink(url: url, handler: handler)
     }
     
     @available(iOS 11.3, *)
     internal func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
         return App2AppAuthenticateRequest.parse(url: url)
+    }
+    
+    @available(iOS 11.3, *)
+    internal func approveApp2AppAuthenticationRequest(
+        maybeRefreshToken: String?,
+        request: App2AppAuthenticateRequest,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        var resultURL: URL
+        do {
+            resultURL = try doApproveApp2AppAuthenticationRequest(
+                maybeRefreshToken: maybeRefreshToken,
+                request: request)
+        } catch {
+            resultURL = constructErrorURL(
+                redirectUri: request.redirectUri,
+                defaultError: "unknown_error",
+                e: error)
+        }
+        openURLInUniversalLink(url: resultURL, handler: handler)
+    }
+    
+    private func constructErrorURL(redirectUri: URL, defaultError: String, e: Error) -> URL {
+        var error = defaultError
+        var errorDescription: String? = "Unknown error"
+        if let localizedErr = e as? LocalizedError {
+            errorDescription = localizedErr.errorDescription
+        }
+        if let oauthErr = e as? OAuthError {
+            error = oauthErr.error
+            errorDescription = oauthErr.errorDescription
+        } else if let serverErr = e as? ServerError {
+            error = "server_error"
+            errorDescription = serverErr.message
+        }
+        
+        var query = [
+            "error": error
+        ]
+        if let errorDescription = errorDescription {
+            query["error_description"] = errorDescription
+        }
+        var urlcomponents = URLComponents(
+            url: redirectUri,
+            resolvingAgainstBaseURL: false
+        )!
+        urlcomponents.percentEncodedQuery = query.encodeAsQuery()
+        return urlcomponents.url!
+    }
+    
+    @available(iOS 11.3, *)
+    private func doApproveApp2AppAuthenticationRequest(
+        maybeRefreshToken: String?,
+        request: App2AppAuthenticateRequest
+    ) throws -> URL {
+        guard let refreshToken = maybeRefreshToken else {
+            throw OAuthError(
+                error: "invalid_grant",
+                errorDescription: "unauthenticated",
+                errorUri: nil
+            )
+        }
+        let jwt = try generateApp2AppJWT()
+        let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
+            grantType: GrantType.app2app,
+            clientId: request.clientID,
+            deviceInfo: nil,
+            redirectURI: request.redirectUri.absoluteString,
+            code: nil,
+            codeVerifier: nil,
+            codeChallenge: request.codeChallenge,
+            codeChallengeMethod: Authgear.CodeChallengeMethod,
+            refreshToken: refreshToken,
+            jwt: nil,
+            accessToken: nil,
+            xApp2AppDeviceKeyJwt: jwt
+        )
+        let code = oidcTokenResponse.code ?? ""
+        let query: [String: String] = [
+            "code": code
+        ]
+        var urlcomponents = URLComponents(
+            url: request.redirectUri,
+            resolvingAgainstBaseURL: false
+        )!
+        urlcomponents.percentEncodedQuery = query.encodeAsQuery()
+        return urlcomponents.url!
     }
 }

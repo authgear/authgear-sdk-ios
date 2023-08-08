@@ -507,6 +507,8 @@ public class Authgear {
                 redirectURI: redirectURI,
                 code: code,
                 codeVerifier: request.verifier.value,
+                codeChallenge: nil,
+                codeChallengeMethod: nil,
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
@@ -582,6 +584,8 @@ public class Authgear {
                 redirectURI: redirectURI,
                 code: code,
                 codeVerifier: verifier.value,
+                codeChallenge: nil,
+                codeChallengeMethod: nil,
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
@@ -842,6 +846,8 @@ public class Authgear {
                     redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
+                    codeChallenge: nil,
+                    codeChallengeMethod: nil,
                     refreshToken: nil,
                     jwt: signedJWT,
                     accessToken: nil,
@@ -1133,6 +1139,8 @@ public class Authgear {
                     redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
+                    codeChallenge: nil,
+                    codeChallengeMethod: nil,
                     refreshToken: refreshToken,
                     jwt: nil,
                     accessToken: nil,
@@ -1206,6 +1214,8 @@ public class Authgear {
                         redirectURI: nil,
                         code: nil,
                         codeVerifier: nil,
+                        codeChallenge: nil,
+                        codeChallengeMethod: nil,
                         refreshToken: nil,
                         jwt: nil,
                         accessToken: self.accessToken,
@@ -1369,6 +1379,8 @@ public class Authgear {
                         redirectURI: nil,
                         code: nil,
                         codeVerifier: nil,
+                        codeChallenge: nil,
+                        codeChallengeMethod: nil,
                         refreshToken: nil,
                         jwt: signedJWT,
                         accessToken: nil,
@@ -1414,6 +1426,20 @@ public class Authgear {
     @available(iOS 11.3, *)
     public func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
         return app2app.parseApp2AppAuthenticationRequest(url: url)
+    }
+    
+    @available(iOS 11.3, *)
+    public func approveApp2AppAuthenticationRequest(
+        request: App2AppAuthenticateRequest,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let handler = withMainQueueHandler(handler)
+        self.workerQueue.async {
+            self.app2app.approveApp2AppAuthenticationRequest(
+                maybeRefreshToken: self.refreshToken,
+                request: request,
+                handler: handler)
+        }
     }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {

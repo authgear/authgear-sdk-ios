@@ -2,7 +2,7 @@ import Foundation
 
 public struct App2AppAuthenticateRequest {
     public let authorizationEndpoint: String
-    public let redirectUri: String
+    public let redirectUri: URL
     public let clientID: String
     public let codeChallenge: String
     
@@ -13,7 +13,7 @@ public struct App2AppAuthenticateRequest {
         }
         let query: [String:String] = [
             "client_id": clientID,
-            "redirect_uri": redirectUri,
+            "redirect_uri": redirectUri.absoluteString,
             "code_challenge_method": Authgear.CodeChallengeMethod,
             "code_challenge": codeChallenge
         ]
@@ -35,7 +35,8 @@ public struct App2AppAuthenticateRequest {
         guard let authorizationEndpointURL = authorizationEndpointURLComponents.url else {
             return nil
         }
-        guard let redirectUri = queryParams["redirect_uri"] else {
+        guard let redirectUriStr = queryParams["redirect_uri"],
+            let redirectUri = URL(string: redirectUriStr) else {
             return nil
         }
         guard let clientID = queryParams["client_id"] else {

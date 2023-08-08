@@ -18,7 +18,7 @@ public struct App2AppAuthenticateOptions {
     ) -> App2AppAuthenticateRequest {
         return App2AppAuthenticateRequest(
             authorizationEndpoint: authorizationEndpoint,
-            redirectUri: redirectUri,
+            redirectUri: URL(string: redirectUri)!,
             clientID: clientID,
             codeChallenge: codeVerifier.codeChallenge
         )
