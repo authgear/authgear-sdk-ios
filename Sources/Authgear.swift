@@ -240,6 +240,8 @@ public class Authgear {
      * @internal
      */
     private static let ExpireInPercentage = 0.9
+    
+    internal static let CodeChallengeMethod = "S256"
 
     let name: String
     let clientId: String
@@ -1386,6 +1388,25 @@ public class Authgear {
                     }
                     handler(.failure(wrapError(error: error)))
                 }
+            }
+        }
+    }
+    
+    @available(iOS 11.3, *)
+    public func startApp2AppAuthentication(
+        options: App2AppAuthenticateOptions,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let handler = withMainQueueHandler(handler)
+        let verifier = CodeVerifier()
+        let request = options.toRequest(clientID: self.clientId, codeVerifier: verifier)
+        self.workerQueue.async {
+            do {
+                try self.app2app.startAuthenticateRequest(
+                    request: request,
+                    handler: handler)
+            } catch {
+                handler(.failure(wrapError(error: error)))
             }
         }
     }

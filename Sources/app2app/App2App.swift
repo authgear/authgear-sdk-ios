@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 class App2App {
     private let namespace: String
@@ -100,5 +101,26 @@ class App2App {
         let jwt = JWT(header: header, payload: payload)
         let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
         return signedJWT
+    }
+    
+    @available(iOS 11.3, *)
+    internal func startAuthenticateRequest(
+        request: App2AppAuthenticateRequest,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) throws {
+        let url = try request.toURL()
+        let options: [UIApplication.OpenExternalURLOptionsKey : Any] = [
+            UIApplication.OpenExternalURLOptionsKey.universalLinksOnly: NSNumber(value: true)
+        ]
+        UIApplication.shared.open(url, options: options) { success in
+            if (success) {
+                handler(.success(()))
+            } else {
+                handler(.failure(OAuthError(
+                    error: "invalid_client",
+                    errorDescription: "failed to open url \(url.absoluteString)",
+                    errorUri: nil)))
+            }
+        }
     }
 }

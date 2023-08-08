@@ -50,7 +50,7 @@ struct OIDCAuthenticationRequest {
 
         if let verifier = verifier {
             queryItems.append(contentsOf: [
-                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "code_challenge_method", value: Authgear.CodeChallengeMethod),
                 URLQueryItem(name: "code_challenge", value: verifier.codeChallenge)
             ])
         }
