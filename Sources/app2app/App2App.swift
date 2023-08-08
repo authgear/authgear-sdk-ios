@@ -123,4 +123,9 @@ class App2App {
             }
         }
     }
+    
+    @available(iOS 11.3, *)
+    internal func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
+        return App2AppAuthenticateRequest.parse(url: url)
+    }
 }

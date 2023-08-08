@@ -1410,6 +1410,11 @@ public class Authgear {
             }
         }
     }
+    
+    @available(iOS 11.3, *)
+    public func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
+        return app2app.parseApp2AppAuthenticationRequest(url: url)
+    }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {
         if let error = error as? AuthgearError,
