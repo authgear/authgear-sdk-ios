@@ -4,6 +4,7 @@ import Foundation
 enum JWTHeaderType: String, Encodable {
     case anonymous = "vnd.authgear.anonymous-request"
     case biometric = "vnd.authgear.biometric-request"
+    case app2app = "vnd.authgear.app2app-request"
 }
 
 struct JWTHeader: Encodable {
@@ -38,6 +39,10 @@ enum AnonymousPayloadAction: String, Encodable {
 enum BiometricPayloadAction: String, Encodable {
     case setup
     case authenticate
+}
+
+enum App2AppPayloadAction: String, Encodable {
+    case setup
 }
 
 struct JWTPayload: Encodable {

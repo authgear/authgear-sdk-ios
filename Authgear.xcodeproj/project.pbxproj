@@ -15,6 +15,8 @@
 		95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E67332299F652000C9466C /* AuthgearExperimental.swift */; };
 		95E6733B29A37E5A00C9466C /* Latte+Flows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E6733A29A37E5A00C9466C /* Latte+Flows.swift */; };
 		A648BE852975316A002D8EA5 /* Latte+EmailClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */; };
+		A652CEAE2A812CA9006E789F /* App2AppOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEAD2A812CA9006E789F /* App2AppOptions.swift */; };
+		A652CEB32A8131BF006E789F /* App2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEB22A8131BF006E789F /* App2App.swift */; };
 		A68DAD2229AF686000487DAF /* UILocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD1F29AF686000487DAF /* UILocales.swift */; };
 		A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */; };
 		A6D692B92A0CCA2B00B457F9 /* Latte+Tokenize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */; };
@@ -62,6 +64,8 @@
 		95E67332299F652000C9466C /* AuthgearExperimental.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthgearExperimental.swift; sourceTree = "<group>"; };
 		95E6733A29A37E5A00C9466C /* Latte+Flows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+Flows.swift"; sourceTree = "<group>"; };
 		A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+EmailClient.swift"; sourceTree = "<group>"; };
+		A652CEAD2A812CA9006E789F /* App2AppOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2AppOptions.swift; sourceTree = "<group>"; };
+		A652CEB22A8131BF006E789F /* App2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2App.swift; sourceTree = "<group>"; };
 		A68DAD1F29AF686000487DAF /* UILocales.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILocales.swift; sourceTree = "<group>"; };
 		A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+encodeAsQueryComponent.swift"; sourceTree = "<group>"; };
 		A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+Tokenize.swift"; sourceTree = "<group>"; };
@@ -106,6 +110,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A652CEAA2A812C94006E789F /* app2app */ = {
+			isa = PBXGroup;
+			children = (
+				A652CEAD2A812CA9006E789F /* App2AppOptions.swift */,
+				A652CEB22A8131BF006E789F /* App2App.swift */,
+			);
+			path = app2app;
+			sourceTree = "<group>";
+		};
 		CC20D6F125BAA3C400E579DD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -148,6 +161,7 @@
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A652CEAA2A812C94006E789F /* app2app */,
 				F83D84AB24F66D3400B4393C /* APIClient.swift */,
 				F83D84A724F64D0E00B4393C /* Authgear.swift */,
 				95E67332299F652000C9466C /* AuthgearExperimental.swift */,
@@ -269,6 +283,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				A652CEB32A8131BF006E789F /* App2App.swift in Sources */,
 				77AE4DDC29A72A5B006A3ADB /* Latte+UniversalLink.swift in Sources */,
 				95E67333299F652100C9466C /* Latte+WKWebView.swift in Sources */,
 				F83D84AA24F66C5100B4393C /* OIDCConfiguration.swift in Sources */,
@@ -276,6 +291,7 @@
 				A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */,
 				F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */,
 				F83392EF24FC344D00A69D3C /* Storage.swift in Sources */,
+				A652CEAE2A812CA9006E789F /* App2AppOptions.swift in Sources */,
 				95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */,
 				F83D84AE24F6A93600B4393C /* CodeVerifier.swift in Sources */,
 				95E6733B29A37E5A00C9466C /* Latte+Flows.swift in Sources */,

@@ -292,6 +292,9 @@ public class Authgear {
 
     private let accessTokenRefreshLock = NSLock()
     private let accessTokenRefreshQueue: DispatchQueue
+    
+    private let app2AppOptions: App2AppOptions
+    private let app2app: App2App
 
     private var currentWechatRedirectURI: String?
 
@@ -299,7 +302,14 @@ public class Authgear {
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, name: String? = nil) {
+    public init(
+        clientId: String,
+        endpoint: String,
+        tokenStorage: TokenStorage = PersistentTokenStorage(),
+        isSSOEnabled: Bool = false,
+        name: String? = nil,
+        app2AppOptions: App2AppOptions = App2AppOptions(isEnabled: false)
+    ) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
@@ -308,6 +318,12 @@ public class Authgear {
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
+        self.app2AppOptions = app2AppOptions
+        
+        self.app2app = App2App(
+            namespace: self.name,
+            apiClient: self.apiClient,
+            storage: self.storage)
     }
 
     public func configure(
@@ -474,6 +490,14 @@ public class Authgear {
         }()
 
         do {
+            var xApp2AppDeviceKeyJwt: String? = nil
+            if (app2AppOptions.isEnabled) {
+                if #available(iOS 11.3, *) {
+                    xApp2AppDeviceKeyJwt = try app2app.generateApp2AppJWT()
+                } else {
+                    try app2app.requireMinimumApp2AppIOSVersion()
+                }
+            }
             let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
                 grantType: GrantType.authorizationCode,
                 clientId: clientId,
@@ -483,7 +507,8 @@ public class Authgear {
                 codeVerifier: request.verifier.value,
                 refreshToken: nil,
                 jwt: nil,
-                accessToken: nil
+                accessToken: nil,
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -557,7 +582,8 @@ public class Authgear {
                 codeVerifier: verifier.value,
                 refreshToken: nil,
                 jwt: nil,
-                accessToken: nil
+                accessToken: nil,
+                xApp2AppDeviceKeyJwt: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -816,7 +842,8 @@ public class Authgear {
                     codeVerifier: nil,
                     refreshToken: nil,
                     jwt: signedJWT,
-                    accessToken: nil
+                    accessToken: nil,
+                    xApp2AppDeviceKeyJwt: nil
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -1106,7 +1133,8 @@ public class Authgear {
                     codeVerifier: nil,
                     refreshToken: refreshToken,
                     jwt: nil,
-                    accessToken: nil
+                    accessToken: nil,
+                    xApp2AppDeviceKeyJwt: nil
                 )
 
                 self.persistSession(oidcTokenResponse, reason: .foundToken) { result in handler?(result) }
@@ -1178,7 +1206,8 @@ public class Authgear {
                         codeVerifier: nil,
                         refreshToken: nil,
                         jwt: nil,
-                        accessToken: self.accessToken
+                        accessToken: self.accessToken,
+                        xApp2AppDeviceKeyJwt: nil
                     )
                     if let idToken = oidcTokenResponse.idToken {
                         self.idToken = idToken
@@ -1340,7 +1369,8 @@ public class Authgear {
                         codeVerifier: nil,
                         refreshToken: nil,
                         jwt: signedJWT,
-                        accessToken: nil
+                        accessToken: nil,
+                        xApp2AppDeviceKeyJwt: nil
                     )
 
                     let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)

@@ -162,6 +162,7 @@ protocol AuthAPIClient: AnyObject {
         refreshToken: String?,
         jwt: String?,
         accessToken: String?,
+        xApp2AppDeviceKeyJwt: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
     func requestBiometricSetup(
@@ -224,7 +225,8 @@ extension AuthAPIClient {
         codeVerifier: String?,
         refreshToken: String?,
         jwt: String?,
-        accessToken: String?
+        accessToken: String?,
+        xApp2AppDeviceKeyJwt: String?
     ) throws -> OIDCTokenResponse {
         try withSemaphore { handler in
             self.requestOIDCToken(
@@ -237,6 +239,7 @@ extension AuthAPIClient {
                 refreshToken: refreshToken,
                 jwt: jwt,
                 accessToken: accessToken,
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt,
                 handler: handler
             )
         }
@@ -399,6 +402,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         refreshToken: String? = nil,
         jwt: String? = nil,
         accessToken: String? = nil,
+        xApp2AppDeviceKeyJwt: String? = nil,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     ) {
         fetchOIDCConfiguration { [weak self] result in
@@ -430,6 +434,10 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
                 if let jwt = jwt {
                     queryParams["jwt"] = jwt
+                }
+                
+                if let xApp2AppDeviceKeyJwt = xApp2AppDeviceKeyJwt {
+                    queryParams["xApp2AppDeviceKeyJwt"] = xApp2AppDeviceKeyJwt
                 }
 
                 var urlComponents = URLComponents()
