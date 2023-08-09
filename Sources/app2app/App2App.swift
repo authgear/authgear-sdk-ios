@@ -190,7 +190,18 @@ class App2App {
         if let localizedErr = e as? LocalizedError {
             errorDescription = localizedErr.errorDescription
         }
-        if let oauthErr = e as? OAuthError {
+        if let authgearErr = e as? AuthgearError {
+            switch (authgearErr) {
+            case let .oauthError(oauthErr):
+                error = oauthErr.error
+                errorDescription = oauthErr.errorDescription
+            case let .serverError(serverErr):
+                error = "server_error"
+                errorDescription = serverErr.message
+            default:
+                errorDescription = authgearErr.localizedDescription
+            }
+        } else if let oauthErr = e as? OAuthError {
             error = oauthErr.error
             errorDescription = oauthErr.errorDescription
         } else if let serverErr = e as? ServerError {
@@ -263,7 +274,9 @@ class App2App {
         return { () in
             self.dispatchQueue.async {
                 self.resultHandlerLock.lock()
-                self.resultHandlerRegistry.removeValue(forKey: normalizedRedirectUri)
+                if (self.resultHandlerRegistry[normalizedRedirectUri] === handlerContainer) {
+                    self.resultHandlerRegistry.removeValue(forKey: normalizedRedirectUri)
+                }
                 self.resultHandlerLock.unlock()
             }
         }
