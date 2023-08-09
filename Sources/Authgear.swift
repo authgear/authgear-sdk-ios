@@ -1415,6 +1415,7 @@ public class Authgear {
         let request = options.toRequest(clientID: self.clientId, codeVerifier: verifier)
         self.workerQueue.async {
             do {
+                self.app2app.clearApp2AppAuthenticationResult()
                 try self.app2app.startAuthenticateRequest(
                     request: request) { success in
                         do {
