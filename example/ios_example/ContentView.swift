@@ -314,6 +314,32 @@ struct SuccessAlertView: View {
     }
 }
 
+struct App2AppAlertView: View {
+    @EnvironmentObject private var app: App
+
+    private var shouldShow: Binding<Bool> { Binding(
+        get: { self.app.app2AppConfirmation != nil },
+        set: { _ in }
+    ) }
+
+    var body: some View {
+        VStack {
+            EmptyView()
+        }
+        .alert(isPresented: shouldShow, content: {
+            Alert(
+                title: Text("Approve app2app request?"),
+                primaryButton: .default(Text("OK")) {
+                    self.app.app2AppConfirmation?.onConfirm()
+                },
+                secondaryButton: .cancel(Text("Cancel")) {
+                    self.app.app2AppConfirmation?.onReject()
+                }
+            )
+        })
+    }
+}
+
 struct ContentView: View {
     @EnvironmentObject private var app: App
 
@@ -329,6 +355,8 @@ struct ContentView: View {
                 ErrorAlertView()
                     .environmentObject(app)
                 SuccessAlertView()
+                    .environmentObject(app)
+                App2AppAlertView()
                     .environmentObject(app)
             }.padding(20)
         }
