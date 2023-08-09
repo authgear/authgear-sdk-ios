@@ -179,7 +179,7 @@ class App2App {
     ) {
         let resultURL = constructErrorURL(
             redirectUri: request.redirectUri,
-            defaultError: "unknown_error",
+            defaultError: "x_app2app_rejected",
             e: reason)
         openURLInUniversalLink(url: resultURL, handler: handler)
     }
