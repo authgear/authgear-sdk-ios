@@ -72,7 +72,7 @@ class App: ObservableObject {
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: true)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
-        self.app2appEndpoint = app2appEndpoint
+        self.app2appEndpoint = app2AppEndpoint
         self.updateBiometricState()
     }
 

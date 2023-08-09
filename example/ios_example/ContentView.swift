@@ -189,10 +189,10 @@ struct ActionButtonList: View {
                 }.disabled(!configured || loggedIn)
                 
                 Button(action: {
-                    self.app.login()
+                    self.app.authenticateApp2App()
                 }) {
                     ActionButton(text: "Authenticate App2App")
-                }.disabled(!configured || loggedIn || app2appConfigured)
+                }.disabled(!configured || loggedIn || !app2appConfigured)
 
                 Button(action: {
                     self.app.loginAnonymously()
