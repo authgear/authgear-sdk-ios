@@ -55,13 +55,13 @@ public enum AuthgearError: CustomNSError, LocalizedError {
         case .invalidJWT:
             return 11
         case .unauthenticatedUser:
-            return 11
+            return 12
         case .publicKeyNotFound:
-            return 11
+            return 13
         case .error:
-            return 12
+            return 14
         case .runtimeError:
-            return 12
+            return 15
         }
     }
 
