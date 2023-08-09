@@ -5,15 +5,20 @@ class App2App {
     private let namespace: String
     private let apiClient: AuthAPIClient
     private let storage: ContainerStorage
+    private let dispatchQueue: DispatchQueue
+    let resultObservable: Observable<URL?>
     
     init(
         namespace: String,
         apiClient: AuthAPIClient,
-        storage: ContainerStorage
+        storage: ContainerStorage,
+        dispatchQueue: DispatchQueue
     ) {
         self.namespace = namespace
         self.apiClient = apiClient
         self.storage = storage
+        self.dispatchQueue = dispatchQueue
+        self.resultObservable = Observable(dispatchQueue: dispatchQueue, value: nil)
     }
     
     func requireMinimumApp2AppIOSVersion() throws {
@@ -234,5 +239,13 @@ class App2App {
         )!
         urlcomponents.percentEncodedQuery = query.encodeAsQuery()
         return urlcomponents.url!
+    }
+    
+    func setApp2AppAuthenticationResult(url: URL) {
+        resultObservable.postValue(newValue: url)
+    }
+    
+    func clearApp2AppAuthenticationResult() {
+        resultObservable.postValue(newValue: nil)
     }
 }

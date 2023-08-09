@@ -325,7 +325,8 @@ public class Authgear {
         self.app2app = App2App(
             namespace: self.name,
             apiClient: self.apiClient,
-            storage: self.storage)
+            storage: self.storage,
+            dispatchQueue: self.workerQueue)
     }
 
     public func configure(
@@ -433,7 +434,7 @@ public class Authgear {
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
-                                self?.finishAuthentication(url: url, request: request, handler: handler)
+                                self?.finishAuthentication(url: url, verifier: request.verifier, handler: handler)
                             }
                         case let .failure(error):
                             return handler(.failure(wrapError(error: error)))
@@ -449,7 +450,7 @@ public class Authgear {
 
     func finishAuthentication(
         url: URL,
-        request: AuthenticationRequest,
+        verifier: CodeVerifier,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
@@ -506,7 +507,7 @@ public class Authgear {
                 deviceInfo: getDeviceInfo(),
                 redirectURI: redirectURI,
                 code: code,
-                codeVerifier: request.verifier.value,
+                codeVerifier: verifier.value,
                 codeChallenge: nil,
                 codeChallengeMethod: nil,
                 refreshToken: nil,
@@ -1407,7 +1408,7 @@ public class Authgear {
     @available(iOS 11.3, *)
     public func startApp2AppAuthentication(
         options: App2AppAuthenticateOptions,
-        handler: @escaping (Result<Void, Error>) -> Void
+        handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
         let verifier = CodeVerifier()
@@ -1415,8 +1416,27 @@ public class Authgear {
         self.workerQueue.async {
             do {
                 try self.app2app.startAuthenticateRequest(
-                    request: request,
-                    handler: handler)
+                    request: request) { success in
+                        do {
+                            // If failed to start, fail immediately
+                            try success.get()
+                        } catch {
+                            handler(.failure(wrapError(error: error)))
+                        }
+                        var unsubscribe: (() -> Void)? = nil
+                        unsubscribe = self.app2app.resultObservable.subscribe { [weak self] resultURL in
+                            guard let this = self,
+                                  let resultURL = resultURL else {
+                                return
+                            }
+                            unsubscribe?()
+                            this.app2app.clearApp2AppAuthenticationResult()
+                            this.finishAuthentication(
+                                url: resultURL,
+                                verifier: verifier,
+                                handler: handler)
+                        }
+                    }
             } catch {
                 handler(.failure(wrapError(error: error)))
             }
@@ -1455,6 +1475,13 @@ public class Authgear {
                 reason: reason,
                 handler: handler)
         }
+    }
+    
+    @available(iOS 11.3, *)
+    public func handleApp2AppAuthenticationResult(
+        url: URL
+    ) {
+        app2app.setApp2AppAuthenticationResult(url: url)
     }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {
