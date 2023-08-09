@@ -65,6 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             appContainer.pendingApp2AppRequest = app2appRequest
             return true
         }
+        if let container = appContainer.container,
+            container.handleApp2AppAuthenticationResult(
+                userActivity: userActivity) == true {
+            return true
+        }
         return false
     }
 }

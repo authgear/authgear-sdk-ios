@@ -30,6 +30,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             appDelegate?.appContainer.pendingApp2AppRequest = app2appRequest
             return
         }
+        if let container = appDelegate?.appContainer.container,
+            container.handleApp2AppAuthenticationResult(
+                userActivity: userActivity) == true {
+            return
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -67,6 +72,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             userActivity: userActivity)
         if let app2appRequest = app2appRequest {
             appDelegate?.appContainer.pendingApp2AppRequest = app2appRequest
+            return
+        }
+        if let container = appDelegate?.appContainer.container,
+            container.handleApp2AppAuthenticationResult(
+                userActivity: userActivity) == true {
             return
         }
         WXApi.handleOpenUniversalLink(userActivity, delegate: appDelegate)

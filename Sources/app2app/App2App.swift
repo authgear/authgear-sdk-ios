@@ -2,11 +2,16 @@ import Foundation
 import UIKit
 
 class App2App {
+    typealias ResultUnsubscriber = () -> Void
+    typealias ResultHandler = (URL) -> Void
+    
     private let namespace: String
     private let apiClient: AuthAPIClient
     private let storage: ContainerStorage
     private let dispatchQueue: DispatchQueue
-    let resultObservable: Observable<URL?>
+    
+    private var resultHandlerRegistry: Dictionary<String, WeakHandlerRef> = Dictionary()
+    private let resultHandlerLock = NSLock()
     
     init(
         namespace: String,
@@ -18,7 +23,6 @@ class App2App {
         self.apiClient = apiClient
         self.storage = storage
         self.dispatchQueue = dispatchQueue
-        self.resultObservable = Observable(dispatchQueue: dispatchQueue, value: nil)
     }
     
     func requireMinimumApp2AppIOSVersion() throws {
@@ -245,11 +249,62 @@ class App2App {
         return urlcomponents.url!
     }
     
-    func setApp2AppAuthenticationResult(url: URL) {
-        resultObservable.postValue(newValue: url)
+    func listenToApp2AppAuthenticationResult(redirectUri: String, handler: @escaping ResultHandler) -> App2App.ResultUnsubscriber {
+        let normalizedRedirectUri = normalizeRedirectUri(redirectUri)
+        let handlerContainer = HandlerContainer(fn: handler)
+        let weakRef = WeakHandlerRef(handlerContainer)
+        dispatchQueue.async {
+            self.resultHandlerLock.lock()
+            self.resultHandlerRegistry[normalizedRedirectUri] = weakRef
+            self.resultHandlerLock.unlock()
+        }
+        return { () in
+            self.dispatchQueue.async {
+                self.resultHandlerLock.lock()
+                self.resultHandlerRegistry.removeValue(forKey: normalizedRedirectUri)
+                self.resultHandlerLock.unlock()
+            }
+        }
     }
     
-    func clearApp2AppAuthenticationResult() {
-        resultObservable.postValue(newValue: nil)
+    func handleApp2AppAuthenticationResult(url: URL) -> Bool {
+        let normalizedRedirectUri = normalizeRedirectUri(url.absoluteString)
+        let handleAsync = {
+            let fn = self.resultHandlerRegistry[normalizedRedirectUri]?.container?.fn
+            if let fn = fn {
+                self.dispatchQueue.async {
+                    fn(url)
+                }
+                return true
+            }
+            return false
+        }
+        resultHandlerLock.lock()
+        let result = handleAsync()
+        resultHandlerLock.unlock()
+        return result
+    }
+    
+    private func normalizeRedirectUri(_ redirectUri: String) -> String {
+        var urlcomponents = URLComponents(string: redirectUri)!
+        urlcomponents.percentEncodedQuery = nil
+        urlcomponents.fragment = nil
+        return urlcomponents.url!.absoluteString
+    }
+}
+
+private class HandlerContainer {
+    let fn: App2App.ResultHandler
+    
+    init(fn: @escaping App2App.ResultHandler) {
+        self.fn = fn
+    }
+}
+
+private class WeakHandlerRef {
+    weak var container: HandlerContainer?
+    
+    init(_ container: HandlerContainer? = nil) {
+        self.container = container
     }
 }

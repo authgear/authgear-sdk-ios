@@ -1417,7 +1417,6 @@ public class Authgear {
         let request = options.toRequest(clientID: self.clientId, codeVerifier: verifier)
         self.workerQueue.async {
             do {
-                self.app2app.clearApp2AppAuthenticationResult()
                 try self.app2app.startAuthenticateRequest(
                     request: request) { success in
                         do {
@@ -1427,13 +1426,13 @@ public class Authgear {
                             handler(.failure(wrapError(error: error)))
                         }
                         var unsubscribe: (() -> Void)? = nil
-                        unsubscribe = self.app2app.resultObservable.subscribe { [weak self] resultURL in
-                            guard let this = self,
-                                  let resultURL = resultURL else {
+                        unsubscribe = self.app2app.listenToApp2AppAuthenticationResult(
+                            redirectUri: request.redirectUri.absoluteString
+                        ) { [weak self] resultURL in
+                            unsubscribe?()
+                            guard let this = self else {
                                 return
                             }
-                            unsubscribe?()
-                            this.app2app.clearApp2AppAuthenticationResult()
                             this.finishAuthentication(
                                 url: resultURL,
                                 verifier: verifier,
@@ -1493,9 +1492,15 @@ public class Authgear {
     
     @available(iOS 11.3, *)
     public func handleApp2AppAuthenticationResult(
-        url: URL
-    ) {
-        app2app.setApp2AppAuthenticationResult(url: url)
+        userActivity: NSUserActivity
+    ) -> Bool {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else {
+            return false
+        }
+        guard let incomingURL = userActivity.webpageURL else {
+            return false
+        }
+        return app2app.handleApp2AppAuthenticationResult(url: incomingURL)
     }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {
