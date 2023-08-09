@@ -96,14 +96,16 @@ class App2App {
         let options: [UIApplication.OpenExternalURLOptionsKey : Any] = [
             UIApplication.OpenExternalURLOptionsKey.universalLinksOnly: NSNumber(value: true)
         ]
-        UIApplication.shared.open(url, options: options) { success in
-            if (success) {
-                handler(.success(()))
-            } else {
-                handler(.failure(OAuthError(
-                    error: "invalid_client",
-                    errorDescription: "failed to open url \(url.absoluteString)",
-                    errorUri: nil)))
+        DispatchQueue.main.async {
+            UIApplication.shared.open(url, options: options) { success in
+                if (success) {
+                    handler(.success(()))
+                } else {
+                    handler(.failure(OAuthError(
+                        error: "invalid_client",
+                        errorDescription: "failed to open url \(url.absoluteString)",
+                        errorUri: nil)))
+                }
             }
         }
     }
