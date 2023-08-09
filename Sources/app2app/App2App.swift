@@ -246,9 +246,9 @@ class App2App {
             codeChallenge: request.codeChallenge,
             codeChallengeMethod: Authgear.CodeChallengeMethod,
             refreshToken: refreshToken,
-            jwt: nil,
+            jwt: jwt,
             accessToken: nil,
-            xApp2AppDeviceKeyJwt: jwt
+            xApp2AppDeviceKeyJwt: nil
         )
         let code = oidcTokenResponse.code ?? ""
         let query: [String: String] = [
