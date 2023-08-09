@@ -5,12 +5,30 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var appContainer = App()
 
-    func configureAuthgear(clientId: String, endpoint: String, tokenStorage: String, isSSOEnabled: Bool) {
+    func configureAuthgear(
+        clientId: String,
+        endpoint: String,
+        tokenStorage: String,
+        isSSOEnabled: Bool,
+        isApp2AppEnabled: Bool
+    ) {
+        let app2AppOptions = App2AppOptions(isEnabled: isApp2AppEnabled)
         switch tokenStorage {
         case TokenStorageClassName.TransientTokenStorage.rawValue:
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: TransientTokenStorage(), isSSOEnabled: isSSOEnabled)
+            appContainer.container = Authgear(
+                clientId: clientId,
+                endpoint: endpoint,
+                tokenStorage: TransientTokenStorage(),
+                isSSOEnabled: isSSOEnabled,
+                app2AppOptions: app2AppOptions
+            )
         default:
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: PersistentTokenStorage(), isSSOEnabled: isSSOEnabled)
+            appContainer.container = Authgear(
+                clientId: clientId,
+                endpoint: endpoint,
+                tokenStorage: PersistentTokenStorage(),
+                isSSOEnabled: isSSOEnabled,
+                app2AppOptions: app2AppOptions)
         }
         appContainer.container?.configure()
         appContainer.container?.delegate = self

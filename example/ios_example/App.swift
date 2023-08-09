@@ -3,6 +3,7 @@ import SwiftUI
 
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
+    static let app2appRedirectURI = "https://authgear-demo.pandawork.com/app2app/redirect"
     static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
     static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
     static let wechatAppID = "wxa2f631873c63add1"
@@ -31,10 +32,12 @@ class App: ObservableObject {
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
+    @Published var app2appEndpoint: String = ""
 
     func configure(
         clientId: String,
         endpoint: String,
+        app2AppEndpoint: String,
         authenticationPage: AuthenticationPage?,
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
@@ -50,11 +53,13 @@ class App: ObservableObject {
         }
         UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
+        UserDefaults.standard.set(app2AppEndpoint, forKey: "authgear.demo.app2appendpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled)
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: true)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
+        self.app2appEndpoint = app2appEndpoint
         self.updateBiometricState()
     }
 
@@ -111,6 +116,15 @@ class App: ObservableObject {
             page: self.authenticationPage,
             handler: self.handleAuthorizeResult
         )
+    }
+    
+    func authenticateApp2App() {
+        container?.startApp2AppAuthentication(
+            options: App2AppAuthenticateOptions(
+                authorizationEndpoint: self.app2appEndpoint,
+                redirectUri: App.app2appRedirectURI
+            ),
+            handler: self.handleAuthorizeResult)
     }
 
     func reauthenticate() {

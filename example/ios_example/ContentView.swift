@@ -74,6 +74,7 @@ struct AuthgearConfigurationForm: View {
 
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
+    @State private var app2AppEndpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.app2appendpoint") ?? ""
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
     @State private var authenticationPage: String = ""
@@ -93,6 +94,13 @@ struct AuthgearConfigurationForm: View {
                 input: AuthgearConfigurationTextField(
                     placeHolder: "Enter Endpoint",
                     text: $endpoint
+                )
+            )
+            AuthgearConfigurationInput(
+                label: "App2App Endpoint",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter App2App Endpoint",
+                    text: $app2AppEndpoint
                 )
             )
             Picker("Authentication Page", selection: $authenticationPage) {
@@ -121,6 +129,7 @@ struct AuthgearConfigurationForm: View {
                 self.app.configure(
                     clientId: self.clientID,
                     endpoint: self.endpoint,
+                    app2AppEndpoint: self.app2AppEndpoint,
                     authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
@@ -160,6 +169,10 @@ struct ActionButtonList: View {
     private var biometricEnabled: Bool {
         app.biometricEnabled
     }
+    
+    private var app2appConfigured: Bool {
+        !app.app2appEndpoint.isEmpty
+    }
 
     var body: some View {
         VStack(spacing: 30) {
@@ -174,6 +187,12 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Authenticate")
                 }.disabled(!configured || loggedIn)
+                
+                Button(action: {
+                    self.app.login()
+                }) {
+                    ActionButton(text: "Authenticate App2App")
+                }.disabled(!configured || loggedIn || app2appConfigured)
 
                 Button(action: {
                     self.app.loginAnonymously()
