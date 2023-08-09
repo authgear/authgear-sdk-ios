@@ -310,7 +310,9 @@ public class Authgear {
         tokenStorage: TokenStorage = PersistentTokenStorage(),
         isSSOEnabled: Bool = false,
         name: String? = nil,
-        app2AppOptions: App2AppOptions = App2AppOptions(isEnabled: false)
+        app2AppOptions: App2AppOptions = App2AppOptions(
+            isEnabled: false,
+            authorizationEndpoint: nil)
     ) {
         self.clientId = clientId
         self.name = name ?? "default"
@@ -1445,8 +1447,19 @@ public class Authgear {
     }
     
     @available(iOS 11.3, *)
-    public func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
-        return app2app.parseApp2AppAuthenticationRequest(url: url)
+    public func parseApp2AppAuthenticationRequest(userActivity: NSUserActivity) -> App2AppAuthenticateRequest? {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else {
+            return nil
+        }
+        guard let incomingURL = userActivity.webpageURL,
+              let authorizationEndpoint = app2AppOptions.authorizationEndpoint
+        else {
+            return nil
+        }
+        return app2app.parseApp2AppAuthenticationRequest(
+            url: incomingURL,
+            expectedEndpoint: authorizationEndpoint
+        )
     }
     
     @available(iOS 11.3, *)

@@ -12,7 +12,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         isSSOEnabled: Bool,
         isApp2AppEnabled: Bool
     ) {
-        let app2AppOptions = App2AppOptions(isEnabled: isApp2AppEnabled)
+        let app2AppOptions = App2AppOptions(
+            isEnabled: isApp2AppEnabled,
+            authorizationEndpoint: App.app2appAuthorizeEndpoint
+        )
         switch tokenStorage {
         case TokenStorageClassName.TransientTokenStorage.rawValue:
             appContainer.container = Authgear(
@@ -30,7 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 isSSOEnabled: isSSOEnabled,
                 app2AppOptions: app2AppOptions)
         }
-        appContainer.container?.configure()
+        appContainer.container?.configure() { _ in
+            self.appContainer.postConfig()
+        }
         appContainer.container?.delegate = self
 
         // configure WeChat SDK
@@ -49,6 +54,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+    
+    func application(_ application: UIApplication,
+                     continue userActivity: NSUserActivity,
+                     restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        let app2appRequest = appContainer.container?.parseApp2AppAuthenticationRequest(
+            userActivity: userActivity)
+        if let app2appRequest = app2appRequest {
+            appContainer.pendingApp2AppRequest = app2appRequest
+            return true
+        }
+        return false
     }
 }
 

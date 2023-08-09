@@ -20,6 +20,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.window = window
             window.makeKeyAndVisible()
         }
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        guard let userActivity = connectionOptions.userActivities.first else {
+            return
+        }
+        let app2appRequest = appDelegate?.appContainer.container?.parseApp2AppAuthenticationRequest(
+            userActivity: userActivity)
+        if let app2appRequest = app2appRequest {
+            appDelegate?.appContainer.pendingApp2AppRequest = app2appRequest
+            return
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -53,6 +63,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         // wechat sdk handle
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        let app2appRequest = appDelegate?.appContainer.container?.parseApp2AppAuthenticationRequest(
+            userActivity: userActivity)
+        if let app2appRequest = app2appRequest {
+            appDelegate?.appContainer.pendingApp2AppRequest = app2appRequest
+            return
+        }
         WXApi.handleOpenUniversalLink(userActivity, delegate: appDelegate)
 
         // authgear sdk handle

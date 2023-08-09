@@ -6,7 +6,13 @@ public struct App2AppOptions {
     */
     public let isEnabled: Bool
     
-    public init(isEnabled: Bool) {
+    /**
+     * If isEnabled is true, your app will listen for app2app authentication requests sent to this universal link.
+    */
+    public let authorizationEndpoint: String?
+    
+    public init(isEnabled: Bool, authorizationEndpoint: String?) {
         self.isEnabled = isEnabled
+        self.authorizationEndpoint = authorizationEndpoint
     }
 }

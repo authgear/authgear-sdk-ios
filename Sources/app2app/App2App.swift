@@ -137,8 +137,12 @@ class App2App {
     }
     
     @available(iOS 11.3, *)
-    func parseApp2AppAuthenticationRequest(url: URL) -> App2AppAuthenticateRequest? {
-        return App2AppAuthenticateRequest.parse(url: url)
+    func parseApp2AppAuthenticationRequest(url: URL, expectedEndpoint: String) -> App2AppAuthenticateRequest? {
+        let parsedRequest = App2AppAuthenticateRequest.parse(url: url)
+        if (expectedEndpoint != parsedRequest?.authorizationEndpoint) {
+            return nil
+        }
+        return parsedRequest
     }
     
     @available(iOS 11.3, *)

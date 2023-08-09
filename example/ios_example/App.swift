@@ -4,6 +4,7 @@ import SwiftUI
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
     static let app2appRedirectURI = "https://authgear-demo.pandawork.com/app2app/redirect"
+    static let app2appAuthorizeEndpoint = "https://authgear-demo.pandawork.com/app2app/authorize"
     static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
     static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
     static let wechatAppID = "wxa2f631873c63add1"
@@ -33,6 +34,18 @@ class App: ObservableObject {
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
     @Published var app2appEndpoint: String = ""
+    @Published var isAuthgearConfigured: Bool = false
+    
+    private var mPendingApp2AppRequest: App2AppAuthenticateRequest? = nil
+    var pendingApp2AppRequest: App2AppAuthenticateRequest? {
+        get {
+            return mPendingApp2AppRequest
+        }
+        set {
+            mPendingApp2AppRequest = newValue
+            handlePendingApp2AppRequest()
+        }
+    }
 
     func configure(
         clientId: String,
@@ -256,6 +269,32 @@ class App: ObservableObject {
             case .success():
                 self.user = nil
             case let .failure(error):
+                self.setError(error)
+            }
+        }
+    }
+    
+    func postConfig() {
+        self.isAuthgearConfigured = true
+        handlePendingApp2AppRequest()
+    }
+    
+    private func handlePendingApp2AppRequest() {
+        guard isAuthgearConfigured,
+            let request = pendingApp2AppRequest,
+            let container = container else {
+            
+            return
+        }
+        pendingApp2AppRequest = nil
+        if (container.sessionState != .authenticated) {
+            setError(AuthgearError.runtimeError("must be in authenticated state to handle app2app request"))
+            return
+        }
+        container.approveApp2AppAuthenticationRequest(request: request) { approveResult in
+            do {
+                try approveResult.get()
+            } catch {
                 self.setError(error)
             }
         }
