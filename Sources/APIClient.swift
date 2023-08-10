@@ -458,7 +458,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 }
                 
                 if let xApp2AppDeviceKeyJwt = xApp2AppDeviceKeyJwt {
-                    queryParams["xApp2AppDeviceKeyJwt"] = xApp2AppDeviceKeyJwt
+                    queryParams["x_app2app_device_key_jwt"] = xApp2AppDeviceKeyJwt
                 }
 
                 var urlComponents = URLComponents()
