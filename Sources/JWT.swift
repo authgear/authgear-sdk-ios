@@ -121,8 +121,16 @@ struct JWTSigner {
         }
 
         var error: Unmanaged<CFError>?
+        
+        let algorithm: SecKeyAlgorithm
+        switch KeyType.from(privateKey) {
+        case .rsa:
+            algorithm = .rsaSignatureDigestPKCS1v15SHA256
+        default:
+            algorithm = .ecdsaSignatureMessageX962SHA256
+        }
 
-        guard let signedData = SecKeyCreateSignature(privateKey, .rsaSignatureDigestPKCS1v15SHA256, Data(buffer) as CFData, &error) else {
+        guard let signedData = SecKeyCreateSignature(privateKey, algorithm, Data(buffer) as CFData, &error) else {
             throw AuthgearError.error(error!.takeRetainedValue() as Error)
         }
 

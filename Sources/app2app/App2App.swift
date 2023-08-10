@@ -34,17 +34,40 @@ class App2App {
     }
     
     @available(iOS 11.3, *)
-    private func generatePrivateKey(tag: String) throws -> SecKey {
+    private func generatePrivateKeyInSecureEnclave(tag: String) throws -> SecKey {
         var error: Unmanaged<CFError>?
-        let query: [String: Any] = [
-            kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-            kSecAttrKeySizeInBits as String: 2048,
-            kSecPrivateKeyAttrs as String: [
-                kSecAttrIsPermanent as String: true,
-                kSecAttrApplicationTag as String: tag
+        let attributes: NSDictionary = [
+            kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
+            kSecAttrKeySizeInBits: 256,
+            kSecAttrTokenID: kSecAttrTokenIDSecureEnclave,
+            kSecPrivateKeyAttrs: [
+                kSecAttrIsPermanent: true,
+                kSecAttrApplicationTag: tag,
             ]
         ]
-        guard let privateKey = SecKeyCreateRandomKey(query as CFDictionary, &error) else {
+        guard let privateKey = SecKeyCreateRandomKey(attributes, &error) else {
+            throw AuthgearError.error(error!.takeRetainedValue() as Error)
+        }
+        return privateKey
+    }
+    
+    @available(iOS 11.3, *)
+    private func generatePrivateKey(tag: String) throws -> SecKey {
+        do {
+            return try generatePrivateKeyInSecureEnclave(tag: tag)
+        } catch {
+            // Fallback if generation in secure enclave is failed for any reason
+        }
+        var error: Unmanaged<CFError>?
+        let attributes: NSDictionary = [
+            kSecAttrKeyType: kSecAttrKeyTypeRSA,
+            kSecAttrKeySizeInBits: 2048,
+            kSecPrivateKeyAttrs: [
+                kSecAttrIsPermanent: true,
+                kSecAttrApplicationTag: tag
+            ]
+        ]
+        guard let privateKey = SecKeyCreateRandomKey(attributes, &error) else {
             throw AuthgearError.error(error!.takeRetainedValue() as Error)
         }
         return privateKey
@@ -52,13 +75,12 @@ class App2App {
 
     @available(iOS 11.3, *)
     private func removePrivateKey(tag: String) throws {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassKey,
-            kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-            kSecAttrApplicationTag as String: tag,
+        let query: NSDictionary = [
+            kSecClass: kSecClassKey,
+            kSecAttrApplicationTag: tag,
         ]
 
-        let status = SecItemDelete(query as CFDictionary)
+        let status = SecItemDelete(query)
         guard status == errSecSuccess || status == errSecItemNotFound else {
             throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
         }
@@ -66,16 +88,15 @@ class App2App {
 
     @available(iOS 11.3, *)
     private func getPrivateKey(tag: String) throws -> SecKey? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassKey,
-            kSecMatchLimit as String: kSecMatchLimitOne,
-            kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-            kSecAttrApplicationTag as String: tag,
-            kSecReturnRef as String: true
+        let query: NSDictionary = [
+            kSecClass: kSecClassKey,
+            kSecMatchLimit: kSecMatchLimitOne,
+            kSecAttrApplicationTag: tag,
+            kSecReturnRef: true
         ]
 
         var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        let status = SecItemCopyMatching(query, &item)
 
         guard status != errSecItemNotFound else {
             return nil
