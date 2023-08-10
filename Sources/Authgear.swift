@@ -498,7 +498,7 @@ public class Authgear {
             var xApp2AppDeviceKeyJwt: String? = nil
             if (app2AppOptions.isEnabled) {
                 if #available(iOS 11.3, *) {
-                    xApp2AppDeviceKeyJwt = try app2app.generateApp2AppJWT()
+                    xApp2AppDeviceKeyJwt = try app2app.generateApp2AppJWT(forceNew: true)
                 } else {
                     try app2app.requireMinimumApp2AppIOSVersion()
                 }

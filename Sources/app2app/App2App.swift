@@ -111,14 +111,18 @@ class App2App {
     }
     
     @available(iOS 11.3, *)
-    func generateApp2AppJWT() throws -> String {
+    func generateApp2AppJWT(forceNew: Bool) throws -> String {
         let challenge = try apiClient.syncRequestOAuthChallenge(purpose: "app2app_request").token
         let existingKid = try storage.getApp2AppDeviceKeyId(namespace: namespace)
-        let kid = existingKid ?? UUID().uuidString
+        let kid: String
+        if let existingKid = existingKid, !forceNew {
+            kid = existingKid
+        } else {
+            kid = UUID().uuidString
+        }
         let tag = "com.authgear.keys.app2app.\(kid)"
-        let existingPrivateKey = try getPrivateKey(tag: tag)
         let privateKey: SecKey
-        if let existingPrivateKey = existingPrivateKey {
+        if !forceNew, let existingPrivateKey = try getPrivateKey(tag: tag) {
             privateKey = existingPrivateKey
         } else {
             privateKey = try generatePrivateKey(tag: tag)
@@ -235,7 +239,7 @@ class App2App {
                 errorUri: nil
             )
         }
-        let jwt = try generateApp2AppJWT()
+        let jwt = try generateApp2AppJWT(forceNew: false)
         let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
             grantType: GrantType.app2app,
             clientId: request.clientID,
