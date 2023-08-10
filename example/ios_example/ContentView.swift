@@ -84,6 +84,7 @@ struct AuthgearConfigurationForm: View {
 
     var body: some View {
         VStack {
+            Text(appName ?? "Authgear Example App")
             AuthgearConfigurationInput(
                 label: "ClientID",
                 input: AuthgearConfigurationTextField(

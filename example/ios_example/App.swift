@@ -3,8 +3,8 @@ import SwiftUI
 
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
-    static let app2appRedirectURI = "https://authgear-demo.pandawork.com/app2app/redirect"
-    static let app2appAuthorizeEndpoint = "https://authgear-demo.pandawork.com/app2app/authorize"
+    static let app2appRedirectURI = Bundle.main.infoDictionary?["App2AppRedirectURI"] as? String ?? ""
+    static let app2appAuthorizeEndpoint = Bundle.main.infoDictionary?["App2AppAuthorizeEndpoint"] as? String ?? ""
     static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
     static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
     static let wechatAppID = "wxa2f631873c63add1"

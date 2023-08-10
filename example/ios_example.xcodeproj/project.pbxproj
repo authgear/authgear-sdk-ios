@@ -13,6 +13,18 @@
 		7A0B54412555135300718C05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B54402555135300718C05 /* ContentView.swift */; };
 		7A0B544525554CB300718C05 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B544425554CB300718C05 /* App.swift */; };
 		7A60D1052559571C00357B6D /* KeyboardAvoidingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */; };
+		A652CEC32A83B0D1006E789F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89AEF8324F57A6B00CF5F57 /* AppDelegate.swift */; };
+		A652CEC42A83B0D1006E789F /* KeyboardAvoidingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */; };
+		A652CEC52A83B0D1006E789F /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B544425554CB300718C05 /* App.swift */; };
+		A652CEC62A83B0D1006E789F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B54402555135300718C05 /* ContentView.swift */; };
+		A652CEC72A83B0D1006E789F /* ColorScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E1D5EB2836353900C2D78B /* ColorScheme.swift */; };
+		A652CEC82A83B0D1006E789F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0B543E255512F800718C05 /* SceneDelegate.swift */; };
+		A652CECA2A83B0D1006E789F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCC8F72E25AC33D0000358F1 /* WebKit.framework */; };
+		A652CECB2A83B0D1006E789F /* Authgear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; };
+		A652CECC2A83B0D1006E789F /* Pods_ios_example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 334D39BA4EECBD0957B18F9D /* Pods_ios_example.framework */; };
+		A652CECE2A83B0D1006E789F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */; };
+		A652CECF2A83B0D1006E789F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */; };
+		A652CED12A83B0D1006E789F /* Authgear.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A68DAD1B29AF64DB00487DAF /* Authgear.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; };
 		A68DAD1C29AF64DB00487DAF /* Authgear.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F89AEFAB24F5826400CF5F57 /* Authgear.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CCC8F73025AC33D6000358F1 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCC8F72E25AC33D0000358F1 /* WebKit.framework */; };
@@ -39,6 +51,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		A652CED02A83B0D1006E789F /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A652CED12A83B0D1006E789F /* Authgear.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A68DAD1D29AF64DB00487DAF /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -61,6 +84,8 @@
 		7A0B544425554CB300718C05 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAvoidingView.swift; sourceTree = "<group>"; };
 		80C812C632281CE6A9C785F1 /* Pods-ios_example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_example.debug.xcconfig"; path = "Target Support Files/Pods-ios_example/Pods-ios_example.debug.xcconfig"; sourceTree = "<group>"; };
+		A652CED52A83B0D1006E789F /* ios_example_2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios_example_2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A652CED62A83B0D1006E789F /* ios_example_2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ios_example_2-Info.plist"; path = "/Users/tung/repo/authgear-sdk-ios/example/ios_example_2-Info.plist"; sourceTree = "<absolute>"; };
 		CCC8F72E25AC33D0000358F1 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		CCC8F73225AC3488000358F1 /* ios_example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ios_example.entitlements; sourceTree = "<group>"; };
 		CCC8F73925AC35D9000358F1 /* WechatOpenSDK-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WechatOpenSDK-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -73,6 +98,16 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A652CEC92A83B0D1006E789F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A652CECA2A83B0D1006E789F /* WebKit.framework in Frameworks */,
+				A652CECB2A83B0D1006E789F /* Authgear.framework in Frameworks */,
+				A652CECC2A83B0D1006E789F /* Pods_ios_example.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F89AEF7D24F57A6B00CF5F57 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -109,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				F89AEF8024F57A6B00CF5F57 /* ios_example.app */,
+				A652CED52A83B0D1006E789F /* ios_example_2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -122,6 +158,7 @@
 				F89AEF8C24F57A6C00CF5F57 /* Assets.xcassets */,
 				F89AEF8E24F57A6C00CF5F57 /* LaunchScreen.storyboard */,
 				F89AEF9124F57A6C00CF5F57 /* Info.plist */,
+				A652CED62A83B0D1006E789F /* ios_example_2-Info.plist */,
 				7A0B54402555135300718C05 /* ContentView.swift */,
 				7A0B544425554CB300718C05 /* App.swift */,
 				7A60D1042559571C00357B6D /* KeyboardAvoidingView.swift */,
@@ -153,6 +190,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A652CEC02A83B0D1006E789F /* ios_example_2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A652CED22A83B0D1006E789F /* Build configuration list for PBXNativeTarget "ios_example_2" */;
+			buildPhases = (
+				A652CEC12A83B0D1006E789F /* [CP] Check Pods Manifest.lock */,
+				A652CEC22A83B0D1006E789F /* Sources */,
+				A652CEC92A83B0D1006E789F /* Frameworks */,
+				A652CECD2A83B0D1006E789F /* Resources */,
+				A652CED02A83B0D1006E789F /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ios_example_2;
+			productName = "iOS Example";
+			productReference = A652CED52A83B0D1006E789F /* ios_example_2.app */;
+			productType = "com.apple.product-type.application";
+		};
 		F89AEF7F24F57A6B00CF5F57 /* ios_example */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F89AEF9424F57A6C00CF5F57 /* Build configuration list for PBXNativeTarget "ios_example" */;
@@ -207,6 +263,7 @@
 			projectRoot = "";
 			targets = (
 				F89AEF7F24F57A6B00CF5F57 /* ios_example */,
+				A652CEC02A83B0D1006E789F /* ios_example_2 */,
 			);
 		};
 /* End PBXProject section */
@@ -229,6 +286,15 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A652CECD2A83B0D1006E789F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A652CECE2A83B0D1006E789F /* LaunchScreen.storyboard in Resources */,
+				A652CECF2A83B0D1006E789F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F89AEF7E24F57A6B00CF5F57 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -241,6 +307,28 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A652CEC12A83B0D1006E789F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ios_example-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		BBE01E8358FA780B4704E345 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -266,6 +354,19 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A652CEC22A83B0D1006E789F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A652CEC32A83B0D1006E789F /* AppDelegate.swift in Sources */,
+				A652CEC42A83B0D1006E789F /* KeyboardAvoidingView.swift in Sources */,
+				A652CEC52A83B0D1006E789F /* App.swift in Sources */,
+				A652CEC62A83B0D1006E789F /* ContentView.swift in Sources */,
+				A652CEC72A83B0D1006E789F /* ColorScheme.swift in Sources */,
+				A652CEC82A83B0D1006E789F /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F89AEF7C24F57A6B00CF5F57 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -293,6 +394,97 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		A652CED32A83B0D1006E789F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 80C812C632281CE6A9C785F1 /* Pods-ios_example.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ios_example/ios_example_2.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = M7HB6C3N6X;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M7HB6C3N6X;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				INFOPLIST_FILE = "ios_example_2-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"WeChatSDK\"",
+					"-l\"c++\"",
+					"-l\"sqlite3.0\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"WebKit\"",
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.sdk.exampleapp.reactnative;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS development";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Authgear Demo React Native Dev";
+				SWIFT_OBJC_BRIDGING_HEADER = "ios_example/WechatOpenSDK-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A652CED42A83B0D1006E789F /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0BF7FAA64028E5C1E5B4FFD9 /* Pods-ios_example.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ios_example/ios_example_2.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = M7HB6C3N6X;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M7HB6C3N6X;
+				INFOPLIST_FILE = "ios_example_2-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"WeChatSDK\"",
+					"-l\"c++\"",
+					"-l\"sqlite3.0\"",
+					"-l\"z\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"Security\"",
+					"-framework",
+					"\"UIKit\"",
+					"-framework",
+					"\"WebKit\"",
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.sdk.exampleapp.reactnative;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Authgear Demo React Native Dev";
+				SWIFT_OBJC_BRIDGING_HEADER = "ios_example/WechatOpenSDK-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		F89AEF9224F57A6C00CF5F57 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -413,10 +605,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ios_example/ios_example.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = E2F6KNYMR6;
+				DEVELOPMENT_TEAM = M7HB6C3N6X;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M7HB6C3N6X;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = ios_example/Info.plist;
@@ -445,7 +637,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.authgear.sdk.exampleapp.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "Authgear demo app iOS development";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Authgear Demo iOS Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "ios_example/WechatOpenSDK-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -461,7 +653,7 @@
 				CODE_SIGN_ENTITLEMENTS = ios_example/ios_example.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = E2F6KNYMR6;
+				DEVELOPMENT_TEAM = M7HB6C3N6X;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M7HB6C3N6X;
 				INFOPLIST_FILE = ios_example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -500,6 +692,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A652CED22A83B0D1006E789F /* Build configuration list for PBXNativeTarget "ios_example_2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A652CED32A83B0D1006E789F /* Debug */,
+				A652CED42A83B0D1006E789F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F89AEF7B24F57A6B00CF5F57 /* Build configuration list for PBXProject "ios_example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

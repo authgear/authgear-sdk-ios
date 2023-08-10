@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>App2AppAuthorizeEndpoint</key>
-	<string>https://authgear-demo.pandawork.com/app2app/authorize</string>
+	<string>https://authgear-demo-rn.pandawork.com/app2app/authorize</string>
 	<key>App2AppRedirectURI</key>
-	<string>https://authgear-demo.pandawork.com/app2app/redirect</string>
+	<string>https://authgear-demo-rn.pandawork.com/app2app/redirect</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Authgear demo iOS 1</string>
+	<string>Authgear demo iOS 2</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
