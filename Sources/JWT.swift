@@ -111,29 +111,93 @@ struct JWTSigner {
     init(privateKey: SecKey) {
         self.privateKey = privateKey
     }
+    
+    private func createRSASignature(input: Data) throws -> Data {
+        var error: Unmanaged<CFError>?
+        guard let signature = SecKeyCreateSignature(
+            privateKey,
+            .rsaSignatureMessagePKCS1v15SHA256,
+            input as CFData,
+            &error
+        ) else {
+            throw AuthgearError.error(error!.takeRetainedValue() as Error)
+        }
+        return signature as Data
+    }
+    
+    private func createECSignature(input: Data) throws -> Data {
+        var error: Unmanaged<CFError>?
+        guard let signature = SecKeyCreateSignature(
+            privateKey,
+            .ecdsaSignatureMessageX962SHA256,
+            input as CFData,
+            &error
+        ) else {
+            throw AuthgearError.error(error!.takeRetainedValue() as Error)
+        }
+        
+        // Convert the signature to correct format
+        // See https://github.com/airsidemobile/JOSESwift/blob/2.4.0/JOSESwift/Sources/CryptoImplementation/EC.swift#L208
+        let crv = ECCurveType.P256
+        let ecSignatureTLV = [UInt8](signature as Data)
+        let ecSignature = try ecSignatureTLV.read(.sequence)
+        let varlenR = try Data(ecSignature.read(.integer))
+        let varlenS = try Data(ecSignature.skip(.integer).read(.integer))
+        let fixlenR = Asn1IntegerConversion.toRaw(varlenR, of: crv.coordinateOctetLength)
+        let fixlenS = Asn1IntegerConversion.toRaw(varlenS, of: crv.coordinateOctetLength)
+
+        let fixedSignature = (fixlenR + fixlenS)
+        return fixedSignature
+    }
 
     func sign(header: String, payload: String) throws -> String {
         let data = "\(header).\(payload)".data(using: .utf8)!
-        var buffer = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
 
-        data.withUnsafeBytes {
-            _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &buffer)
-        }
-
-        var error: Unmanaged<CFError>?
-        
-        let algorithm: SecKeyAlgorithm
+        let signature: Data
         switch KeyType.from(privateKey) {
         case .rsa:
-            algorithm = .rsaSignatureDigestPKCS1v15SHA256
+            signature = try createRSASignature(input: data)
         default:
-            algorithm = .ecdsaSignatureMessageX962SHA256
+            signature = try createECSignature(input: data)
         }
 
-        guard let signedData = SecKeyCreateSignature(privateKey, algorithm, Data(buffer) as CFData, &error) else {
-            throw AuthgearError.error(error!.takeRetainedValue() as Error)
-        }
+        return signature.base64urlEncodedString()
+    }
+}
 
-        return (signedData as Data).base64urlEncodedString()
+// Copied from https://github.com/airsidemobile/JOSESwift/blob/2.4.0/JOSESwift/Sources/CryptoImplementation/EC.swift#L229
+private struct Asn1IntegerConversion {
+    static func toRaw(_ data: Data, of fixedLength: Int) -> Data {
+        let varLength = data.count
+        if varLength > fixedLength + 1 {
+            fatalError("ASN.1 integer is \(varLength) bytes long when it should be < \(fixedLength + 1).")
+        }
+        if varLength == fixedLength + 1 {
+            assert(data.first == 0)
+            return data.dropFirst()
+        }
+        if varLength == fixedLength {
+            return data
+        }
+        if varLength < fixedLength {
+            // pad to fixed length using 0x00 bytes
+            return Data(count: fixedLength - varLength) + data
+        }
+        fatalError("Unable to parse ASN.1 integer. This should be unreachable.")
+    }
+
+    static func fromRaw(_ data: Data) -> Data {
+        assert(data.count > 0)
+        let msb: UInt8 = 0b1000_0000
+        // drop all leading zero bytes
+        let varlen = data.drop { $0 == 0}
+        guard let firstNonZero = varlen.first else {
+            // all bytes were zero so the encoded value is zero
+            return Data(count: 1)
+        }
+        if (firstNonZero & msb) == msb {
+            return Data(count: 1) + varlen
+        }
+        return varlen
     }
 }

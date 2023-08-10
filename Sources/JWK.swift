@@ -58,6 +58,17 @@ enum KeyType {
     }
 }
 
+enum ECCurveType: String {
+    case P256 = "P-256"
+    
+    var coordinateOctetLength: Int {
+        switch self {
+        case .P256:
+            return 32
+        }
+    }
+}
+
 private func publicKeyToRSAJWK(kid: String, data: Data) -> JWK {
     let n = data.subdata(in: Range(NSRange(location: data.count > 269 ? 9 : 8, length: 256))!)
     let e = data.subdata(in: Range(NSRange(location: data.count - 3, length: 3))!)
@@ -79,8 +90,8 @@ private func publicKeyToECJWK(kid: String, data: Data) throws -> JWK {
         throw AuthgearError.runtimeError("unexpected ec public key format")
     }
         
-    let crv = "P-256"
-    let coordinateOctetLength = 32
+    let crv = ECCurveType.P256
+    let coordinateOctetLength = crv.coordinateOctetLength
     
     let xBytes = publicKeyBytes[0..<coordinateOctetLength]
     let yBytes = publicKeyBytes[coordinateOctetLength..<coordinateOctetLength*2]
@@ -92,7 +103,7 @@ private func publicKeyToECJWK(kid: String, data: Data) throws -> JWK {
         alg: "ES256",
         x: xData.base64urlEncodedString(),
         y: yData.base64urlEncodedString(),
-        crv: crv
+        crv: crv.rawValue
     )
 }
 
