@@ -1,18 +1,17 @@
 import Foundation
 
-
 typealias Unsubscriber = () -> Void
 
 class Observable<T> {
     private let dispatchQueue: DispatchQueue
     private var value: T
     private var listeners: Array<ListenerContainer<T>> = Array()
-    
+
     init(dispatchQueue: DispatchQueue, value: T) {
         self.dispatchQueue = dispatchQueue
         self.value = value
     }
-    
+
     public func postValue(newValue: T) {
         dispatchQueue.async {
             self.value = newValue
@@ -21,7 +20,7 @@ class Observable<T> {
             }
         }
     }
-    
+
     public func subscribe(_ listener: @escaping (T) -> Void) -> Unsubscriber {
         let container = ListenerContainer(fn: listener)
         dispatchQueue.async {
@@ -32,7 +31,7 @@ class Observable<T> {
             guard let this = self else { return }
             this.dispatchQueue.async {
                 this.listeners = this.listeners.filter { thiscontainer in
-                    return thiscontainer !== container
+                    thiscontainer !== container
                 }
             }
         }
@@ -41,7 +40,7 @@ class Observable<T> {
 
 private class ListenerContainer<T> {
     let fn: (T) -> Void
-    
+
     init(fn: @escaping (T) -> Void) {
         self.fn = fn
     }

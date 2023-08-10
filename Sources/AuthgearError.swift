@@ -126,7 +126,7 @@ public enum AuthgearError: CustomNSError, LocalizedError {
             message = "publicKeyNotFound"
         case .error:
             message = "error"
-        case .runtimeError(let errmsg):
+        case let .runtimeError(errmsg):
             message = errmsg
         }
         return "\(Self.errorDomain): \(message)"

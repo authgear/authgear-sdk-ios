@@ -111,7 +111,7 @@ struct JWTSigner {
     init(privateKey: SecKey) {
         self.privateKey = privateKey
     }
-    
+
     private func createRSASignature(input: Data) throws -> Data {
         var error: Unmanaged<CFError>?
         guard let signature = SecKeyCreateSignature(
@@ -124,7 +124,7 @@ struct JWTSigner {
         }
         return signature as Data
     }
-    
+
     private func createECSignature(input: Data) throws -> Data {
         var error: Unmanaged<CFError>?
         guard let signature = SecKeyCreateSignature(
@@ -135,7 +135,7 @@ struct JWTSigner {
         ) else {
             throw AuthgearError.error(error!.takeRetainedValue() as Error)
         }
-        
+
         // Convert the signature to correct format
         // See https://github.com/airsidemobile/JOSESwift/blob/2.4.0/JOSESwift/Sources/CryptoImplementation/EC.swift#L208
         let crv = ECCurveType.P256
@@ -166,7 +166,7 @@ struct JWTSigner {
 }
 
 // Copied from https://github.com/airsidemobile/JOSESwift/blob/2.4.0/JOSESwift/Sources/CryptoImplementation/EC.swift#L229
-private struct Asn1IntegerConversion {
+private enum Asn1IntegerConversion {
     static func toRaw(_ data: Data, of fixedLength: Int) -> Data {
         let varLength = data.count
         if varLength > fixedLength + 1 {
@@ -187,10 +187,10 @@ private struct Asn1IntegerConversion {
     }
 
     static func fromRaw(_ data: Data) -> Data {
-        assert(data.count > 0)
+        assert(!data.isEmpty)
         let msb: UInt8 = 0b1000_0000
         // drop all leading zero bytes
-        let varlen = data.drop { $0 == 0}
+        let varlen = data.drop { $0 == 0 }
         guard let firstNonZero = varlen.first else {
             // all bytes were zero so the encoded value is zero
             return Data(count: 1)

@@ -31,7 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 endpoint: endpoint,
                 tokenStorage: PersistentTokenStorage(),
                 isSSOEnabled: isSSOEnabled,
-                app2AppOptions: app2AppOptions)
+                app2AppOptions: app2AppOptions
+            )
         }
         appContainer.container?.configure() { _ in
             self.appContainer.postConfig()
@@ -55,10 +56,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
-    
-    func application(_ application: UIApplication,
-                     continue userActivity: NSUserActivity,
-                     restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+
+    func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
         let app2appRequest = appContainer.container?.parseApp2AppAuthenticationRequest(
             userActivity: userActivity)
         if let app2appRequest = app2appRequest {
@@ -66,8 +69,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return true
         }
         if let container = appContainer.container,
-            container.handleApp2AppAuthenticationResult(
-                userActivity: userActivity) == true {
+           container.handleApp2AppAuthenticationResult(
+               userActivity: userActivity) == true {
             return true
         }
         return false

@@ -80,6 +80,8 @@ struct AuthgearConfigurationForm: View {
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
 
+    private let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
+
     var body: some View {
         VStack {
             AuthgearConfigurationInput(
@@ -169,7 +171,7 @@ struct ActionButtonList: View {
     private var biometricEnabled: Bool {
         app.biometricEnabled
     }
-    
+
     private var app2appConfigured: Bool {
         !app.app2appEndpoint.isEmpty
     }
@@ -187,7 +189,7 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Authenticate")
                 }.disabled(!configured || loggedIn)
-                
+
                 Button(action: {
                     self.app.authenticateApp2App()
                 }) {

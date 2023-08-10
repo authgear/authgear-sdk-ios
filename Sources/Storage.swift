@@ -15,8 +15,7 @@ protocol ContainerStorage {
     func setBiometricKeyId(namespace: String, kid: String) throws
     func getBiometricKeyId(namespace: String) throws -> String?
     func delBiometricKeyId(namespace: String) throws
-    
-    
+
     func setApp2AppDeviceKeyId(namespace: String, kid: String) throws
     func getApp2AppDeviceKeyId(namespace: String) throws -> String?
     func delApp2AppDeviceKeyId(namespace: String) throws
@@ -71,7 +70,7 @@ class PersistentContainerStorage: ContainerStorage {
     func setBiometricKeyId(namespace: String, kid: String) throws {
         try self.driver.set(key: self.keyMaker.keyBiometricKeyId(namespace: namespace), value: kid)
     }
-    
+
     func setApp2AppDeviceKeyId(namespace: String, kid: String) throws {
         try self.driver.set(key: self.keyMaker.keyApp2AppDeviceKeyId(namespace: namespace), value: kid)
     }
@@ -95,11 +94,10 @@ class PersistentContainerStorage: ContainerStorage {
     func delBiometricKeyId(namespace: String) throws {
         try self.driver.del(key: self.keyMaker.keyBiometricKeyId(namespace: namespace))
     }
-    
+
     func delApp2AppDeviceKeyId(namespace: String) throws {
         try self.driver.del(key: self.keyMaker.keyApp2AppDeviceKeyId(namespace: namespace))
     }
-    
 }
 
 class KeyMaker {
@@ -118,7 +116,7 @@ class KeyMaker {
     func keyBiometricKeyId(namespace: String) -> String {
         scopedKey("\(namespace)_biometricKeyID")
     }
-    
+
     func keyApp2AppDeviceKeyId(namespace: String) -> String {
         scopedKey("\(namespace)_app2AppDeviceKeyID")
     }

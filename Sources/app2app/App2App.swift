@@ -4,15 +4,15 @@ import UIKit
 class App2App {
     typealias ResultUnsubscriber = () -> Void
     typealias ResultHandler = (URL) -> Void
-    
+
     private let namespace: String
     private let apiClient: AuthAPIClient
     private let storage: ContainerStorage
     private let dispatchQueue: DispatchQueue
-    
+
     private var resultHandlerRegistry: Dictionary<String, WeakHandlerRef> = Dictionary()
     private let resultHandlerLock = NSLock()
-    
+
     init(
         namespace: String,
         apiClient: AuthAPIClient,
@@ -24,7 +24,7 @@ class App2App {
         self.storage = storage
         self.dispatchQueue = dispatchQueue
     }
-    
+
     func requireMinimumApp2AppIOSVersion() throws {
         if #available(iOS 11.3, *) {
             return
@@ -32,7 +32,7 @@ class App2App {
             throw AuthgearError.runtimeError("App2App authentication requires at least ios 11.3")
         }
     }
-    
+
     @available(iOS 11.3, *)
     private func generatePrivateKeyInSecureEnclave(tag: String) throws -> SecKey {
         var error: Unmanaged<CFError>?
@@ -42,7 +42,7 @@ class App2App {
             kSecAttrTokenID: kSecAttrTokenIDSecureEnclave,
             kSecPrivateKeyAttrs: [
                 kSecAttrIsPermanent: true,
-                kSecAttrApplicationTag: tag,
+                kSecAttrApplicationTag: tag
             ]
         ]
         guard let privateKey = SecKeyCreateRandomKey(attributes, &error) else {
@@ -50,7 +50,7 @@ class App2App {
         }
         return privateKey
     }
-    
+
     @available(iOS 11.3, *)
     private func generatePrivateKey(tag: String) throws -> SecKey {
         do {
@@ -77,7 +77,7 @@ class App2App {
     private func removePrivateKey(tag: String) throws {
         let query: NSDictionary = [
             kSecClass: kSecClassKey,
-            kSecAttrApplicationTag: tag,
+            kSecAttrApplicationTag: tag
         ]
 
         let status = SecItemDelete(query)
@@ -109,12 +109,12 @@ class App2App {
         let privateKey = item as! SecKey
         return privateKey
     }
-    
+
     private func openURLInUniversalLink(
         url: URL,
         handler: @escaping (Result<Void, Error>) -> Void
     ) {
-        let options: [UIApplication.OpenExternalURLOptionsKey : Any] = [
+        let options: [UIApplication.OpenExternalURLOptionsKey: Any] = [
             UIApplication.OpenExternalURLOptionsKey.universalLinksOnly: NSNumber(value: true)
         ]
         DispatchQueue.main.async {
@@ -125,12 +125,13 @@ class App2App {
                     handler(.failure(OAuthError(
                         error: "invalid_client",
                         errorDescription: "failed to open url \(url.absoluteString)",
-                        errorUri: nil)))
+                        errorUri: nil
+                    )))
                 }
             }
         }
     }
-    
+
     @available(iOS 11.3, *)
     func generateApp2AppJWT(forceNew: Bool) throws -> String {
         let challenge = try apiClient.syncRequestOAuthChallenge(purpose: "app2app_request").token
@@ -157,7 +158,7 @@ class App2App {
         let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
         return signedJWT
     }
-    
+
     @available(iOS 11.3, *)
     func startAuthenticateRequest(
         request: App2AppAuthenticateRequest,
@@ -166,7 +167,7 @@ class App2App {
         let url = try request.toURL()
         openURLInUniversalLink(url: url, handler: handler)
     }
-    
+
     @available(iOS 11.3, *)
     func parseApp2AppAuthenticationRequest(url: URL, expectedEndpoint: String) -> App2AppAuthenticateRequest? {
         let parsedRequest = App2AppAuthenticateRequest.parse(url: url)
@@ -175,7 +176,7 @@ class App2App {
         }
         return parsedRequest
     }
-    
+
     @available(iOS 11.3, *)
     func approveApp2AppAuthenticationRequest(
         maybeRefreshToken: String?,
@@ -186,16 +187,18 @@ class App2App {
         do {
             resultURL = try doApproveApp2AppAuthenticationRequest(
                 maybeRefreshToken: maybeRefreshToken,
-                request: request)
+                request: request
+            )
         } catch {
             resultURL = constructErrorURL(
                 redirectUri: request.redirectUri,
                 defaultError: "unknown_error",
-                e: error)
+                e: error
+            )
         }
         openURLInUniversalLink(url: resultURL, handler: handler)
     }
-    
+
     @available(iOS 11.3, *)
     func rejectApp2AppAuthenticationRequest(
         request: App2AppAuthenticateRequest,
@@ -205,10 +208,11 @@ class App2App {
         let resultURL = constructErrorURL(
             redirectUri: request.redirectUri,
             defaultError: "x_app2app_rejected",
-            e: reason)
+            e: reason
+        )
         openURLInUniversalLink(url: resultURL, handler: handler)
     }
-    
+
     private func constructErrorURL(redirectUri: URL, defaultError: String, e: Error) -> URL {
         var error = defaultError
         var errorDescription: String? = "Unknown error"
@@ -233,7 +237,7 @@ class App2App {
             error = "server_error"
             errorDescription = serverErr.message
         }
-        
+
         var query = [
             "error": error
         ]
@@ -247,7 +251,7 @@ class App2App {
         urlcomponents.percentEncodedQuery = query.encodeAsQuery()
         return urlcomponents.url!
     }
-    
+
     @available(iOS 11.3, *)
     private func doApproveApp2AppAuthenticationRequest(
         maybeRefreshToken: String?,
@@ -286,7 +290,7 @@ class App2App {
         urlcomponents.percentEncodedQuery = query.encodeAsQuery()
         return urlcomponents.url!
     }
-    
+
     func listenToApp2AppAuthenticationResult(redirectUri: String, handler: @escaping ResultHandler) -> App2App.ResultUnsubscriber {
         let normalizedRedirectUri = normalizeRedirectUri(redirectUri)
         let handlerContainer = HandlerContainer(fn: handler)
@@ -306,7 +310,7 @@ class App2App {
             }
         }
     }
-    
+
     func handleApp2AppAuthenticationResult(url: URL) -> Bool {
         let normalizedRedirectUri = normalizeRedirectUri(url.absoluteString)
         let handleAsync = {
@@ -324,7 +328,7 @@ class App2App {
         resultHandlerLock.unlock()
         return result
     }
-    
+
     private func normalizeRedirectUri(_ redirectUri: String) -> String {
         var urlcomponents = URLComponents(string: redirectUri)!
         urlcomponents.percentEncodedQuery = nil
@@ -335,7 +339,7 @@ class App2App {
 
 private class HandlerContainer {
     let fn: App2App.ResultHandler
-    
+
     init(fn: @escaping App2App.ResultHandler) {
         self.fn = fn
     }
@@ -343,7 +347,7 @@ private class HandlerContainer {
 
 private class WeakHandlerRef {
     weak var container: HandlerContainer?
-    
+
     init(_ container: HandlerContainer? = nil) {
         self.container = container
     }

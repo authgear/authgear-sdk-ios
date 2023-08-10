@@ -31,8 +31,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
         if let container = appDelegate?.appContainer.container,
-            container.handleApp2AppAuthenticationResult(
-                userActivity: userActivity) == true {
+           container.handleApp2AppAuthenticationResult(
+               userActivity: userActivity) == true {
             return
         }
     }
@@ -75,8 +75,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
         if let container = appDelegate?.appContainer.container,
-            container.handleApp2AppAuthenticationResult(
-                userActivity: userActivity) == true {
+           container.handleApp2AppAuthenticationResult(
+               userActivity: userActivity) == true {
             return
         }
         WXApi.handleOpenUniversalLink(userActivity, delegate: appDelegate)

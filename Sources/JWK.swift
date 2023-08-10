@@ -9,12 +9,12 @@ struct JWK: Encodable {
     // RSA
     let n: String?
     let e: String?
-    
+
     // EC
     let x: String?
     let y: String?
     let crv: String?
-    
+
     init(kid: String, alg: String, n: String, e: String) {
         self.kid = kid
         self.kty = "RSA"
@@ -26,8 +26,7 @@ struct JWK: Encodable {
         self.y = nil
         self.crv = nil
     }
-    
-    
+
     init(kid: String, alg: String, x: String, y: String, crv: String) {
         self.kid = kid
         self.alg = alg
@@ -44,13 +43,13 @@ struct JWK: Encodable {
 enum KeyType {
     case rsa
     case ec
-    
+
     static func from(_ seckey: SecKey) -> KeyType {
         guard let attributes = SecKeyCopyAttributes(seckey) as? [CFString: Any],
-            let keyType = attributes[kSecAttrKeyType] as? String else {
+              let keyType = attributes[kSecAttrKeyType] as? String else {
             return .rsa
         }
-        
+
         if (keyType == (kSecAttrKeyTypeECSECPrimeRandom as String)) {
             return .ec
         }
@@ -60,7 +59,7 @@ enum KeyType {
 
 enum ECCurveType: String {
     case P256 = "P-256"
-    
+
     var coordinateOctetLength: Int {
         switch self {
         case .P256:
@@ -72,7 +71,7 @@ enum ECCurveType: String {
 private func publicKeyToRSAJWK(kid: String, data: Data) -> JWK {
     let n = data.subdata(in: Range(NSRange(location: data.count > 269 ? 9 : 8, length: 256))!)
     let e = data.subdata(in: Range(NSRange(location: data.count - 3, length: 3))!)
-    
+
     return JWK(
         kid: kid,
         alg: "RS256",
@@ -83,21 +82,21 @@ private func publicKeyToRSAJWK(kid: String, data: Data) -> JWK {
 
 private func publicKeyToECJWK(kid: String, data: Data) throws -> JWK {
     // refernce: https://github.com/airsidemobile/JOSESwift/blob/2.4.0/JOSESwift/Sources/CryptoImplementation/DataECPublicKey.swift
-    
+
     var publicKeyBytes = [UInt8](data)
-    
+
     guard publicKeyBytes.removeFirst() == 0x04 else {
         throw AuthgearError.runtimeError("unexpected ec public key format")
     }
-        
+
     let crv = ECCurveType.P256
     let coordinateOctetLength = crv.coordinateOctetLength
-    
+
     let xBytes = publicKeyBytes[0..<coordinateOctetLength]
-    let yBytes = publicKeyBytes[coordinateOctetLength..<coordinateOctetLength*2]
+    let yBytes = publicKeyBytes[coordinateOctetLength..<coordinateOctetLength * 2]
     let xData = Data(xBytes)
     let yData = Data(yBytes)
-    
+
     return JWK(
         kid: kid,
         alg: "ES256",
@@ -113,7 +112,7 @@ func publicKeyToJWK(kid: String, publicKey: SecKey) throws -> JWK {
         throw AuthgearError.error(error!.takeRetainedValue() as Error)
     }
     let data = keyData as Data
-    
+
     switch KeyType.from(publicKey) {
     case .rsa:
         return publicKeyToRSAJWK(kid: kid, data: data)

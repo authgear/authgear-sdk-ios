@@ -56,10 +56,10 @@ internal struct TLVTriplet {
 }
 
 // MARK: Array Extension for Parsing
+
 // Inspired by: https://github.com/henrinormak/Heimdall/blob/master/Heimdall/Heimdall.swift
 
 internal extension Array where Element == UInt8 {
-
     /// Reads the value of the specified ASN.1 type from the front of the bytes array.
     /// The bytes array is expected to be a DER encoding of an ASN.1 type.
     /// The specified type's TLV triplet is expected to be at the front of the bytes array.
@@ -127,7 +127,6 @@ internal extension Array where Element == UInt8 {
 
         return TLVTriplet(tag: tag, length: lengthField, value: valueField)
     }
-
 }
 
 // MARK: Freestanding Helper Functions
@@ -150,7 +149,7 @@ private func readTag(from encodedTriplet: [UInt8], pointer: inout Int) -> UInt8 
 
 private func readLengthField(from encodedTriplet: [UInt8], pointer: inout Int) throws -> [UInt8] {
     if encodedTriplet[pointer] < 128 {
-        let lengthField = [ encodedTriplet[pointer] ]
+        let lengthField = [encodedTriplet[pointer]]
         pointer.advance()
 
         return lengthField

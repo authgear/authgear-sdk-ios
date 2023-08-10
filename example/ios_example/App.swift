@@ -36,11 +36,11 @@ class App: ObservableObject {
     @Published var app2appEndpoint: String = ""
     @Published var isAuthgearConfigured: Bool = false
     @Published var app2AppConfirmation: App2AppConfirmation? = nil
-    
-    private var mPendingApp2AppRequest: App2AppAuthenticateRequest? = nil
+
+    private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
         get {
-            return mPendingApp2AppRequest
+            mPendingApp2AppRequest
         }
         set {
             mPendingApp2AppRequest = newValue
@@ -131,14 +131,15 @@ class App: ObservableObject {
             handler: self.handleAuthorizeResult
         )
     }
-    
+
     func authenticateApp2App() {
         container?.startApp2AppAuthentication(
             options: App2AppAuthenticateOptions(
                 authorizationEndpoint: self.app2appEndpoint,
                 redirectUri: App.app2appRedirectURI
             ),
-            handler: self.handleAuthorizeResult)
+            handler: self.handleAuthorizeResult
+        )
     }
 
     func reauthenticate() {
@@ -274,17 +275,16 @@ class App: ObservableObject {
             }
         }
     }
-    
+
     func postConfig() {
         self.isAuthgearConfigured = true
         handlePendingApp2AppRequest()
     }
-    
+
     private func handlePendingApp2AppRequest() {
         guard isAuthgearConfigured,
-            let request = pendingApp2AppRequest,
-            let container = container else {
-            
+              let request = pendingApp2AppRequest,
+              let container = container else {
             return
         }
         pendingApp2AppRequest = nil
@@ -326,9 +326,9 @@ struct App2AppConfirmation {
 class AppError: Error, LocalizedError {
     private let message: String
     public var errorDescription: String? {
-        return message
+        message
     }
-    
+
     init(_ message: String) {
         self.message = message
     }

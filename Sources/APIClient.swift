@@ -428,7 +428,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     let xDeviceInfo = deviceInfoJSON.base64urlEncodedString()
                     queryParams["x_device_info"] = xDeviceInfo
                 }
-                
+
                 if let code = code {
                     queryParams["code"] = code
                 }
@@ -440,11 +440,11 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 if let codeVerifier = codeVerifier {
                     queryParams["code_verifier"] = codeVerifier
                 }
-                
+
                 if let codeChallenge = codeChallenge {
                     queryParams["code_challenge"] = codeChallenge
                 }
-                
+
                 if let codeChallengeMethod = codeChallengeMethod {
                     queryParams["code_challenge_method"] = codeChallengeMethod
                 }
@@ -456,7 +456,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 if let jwt = jwt {
                     queryParams["jwt"] = jwt
                 }
-                
+
                 if let xApp2AppDeviceKeyJwt = xApp2AppDeviceKeyJwt {
                     queryParams["x_app2app_device_key_jwt"] = xApp2AppDeviceKeyJwt
                 }

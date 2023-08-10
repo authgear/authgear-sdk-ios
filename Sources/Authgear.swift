@@ -240,7 +240,7 @@ public class Authgear {
      * @internal
      */
     private static let ExpireInPercentage = 0.9
-    
+
     internal static let CodeChallengeMethod = "S256"
 
     let name: String
@@ -294,7 +294,7 @@ public class Authgear {
 
     private let accessTokenRefreshLock = NSLock()
     private let accessTokenRefreshQueue: DispatchQueue
-    
+
     private let app2AppOptions: App2AppOptions
     private let app2app: App2App
 
@@ -312,7 +312,8 @@ public class Authgear {
         name: String? = nil,
         app2AppOptions: App2AppOptions = App2AppOptions(
             isEnabled: false,
-            authorizationEndpoint: nil)
+            authorizationEndpoint: nil
+        )
     ) {
         self.clientId = clientId
         self.name = name ?? "default"
@@ -323,12 +324,13 @@ public class Authgear {
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.app2AppOptions = app2AppOptions
-        
+
         self.app2app = App2App(
             namespace: self.name,
             apiClient: self.apiClient,
             storage: self.storage,
-            dispatchQueue: self.workerQueue)
+            dispatchQueue: self.workerQueue
+        )
     }
 
     public func configure(
@@ -495,7 +497,7 @@ public class Authgear {
         }()
 
         do {
-            var xApp2AppDeviceKeyJwt: String? = nil
+            var xApp2AppDeviceKeyJwt: String?
             if (app2AppOptions.isEnabled) {
                 if #available(iOS 11.3, *) {
                     xApp2AppDeviceKeyJwt = try app2app.generateApp2AppJWT(forceNew: true)
@@ -1406,7 +1408,7 @@ public class Authgear {
             }
         }
     }
-    
+
     @available(iOS 11.3, *)
     public func startApp2AppAuthentication(
         options: App2AppAuthenticateOptions,
@@ -1425,7 +1427,7 @@ public class Authgear {
                         } catch {
                             handler(.failure(wrapError(error: error)))
                         }
-                        var unsubscribe: (() -> Void)? = nil
+                        var unsubscribe: (() -> Void)?
                         unsubscribe = self.app2app.listenToApp2AppAuthenticationResult(
                             redirectUri: request.redirectUri.absoluteString
                         ) { [weak self] resultURL in
@@ -1436,7 +1438,8 @@ public class Authgear {
                             this.finishAuthentication(
                                 url: resultURL,
                                 verifier: verifier,
-                                handler: handler)
+                                handler: handler
+                            )
                         }
                     }
             } catch {
@@ -1444,7 +1447,7 @@ public class Authgear {
             }
         }
     }
-    
+
     @available(iOS 11.3, *)
     public func parseApp2AppAuthenticationRequest(userActivity: NSUserActivity) -> App2AppAuthenticateRequest? {
         guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else {
@@ -1460,7 +1463,7 @@ public class Authgear {
             expectedEndpoint: authorizationEndpoint
         )
     }
-    
+
     @available(iOS 11.3, *)
     public func approveApp2AppAuthenticationRequest(
         request: App2AppAuthenticateRequest,
@@ -1471,10 +1474,11 @@ public class Authgear {
             self.app2app.approveApp2AppAuthenticationRequest(
                 maybeRefreshToken: self.refreshToken,
                 request: request,
-                handler: handler)
+                handler: handler
+            )
         }
     }
-    
+
     @available(iOS 11.3, *)
     public func rejectApp2AppAuthenticationRequest(
         request: App2AppAuthenticateRequest,
@@ -1486,10 +1490,11 @@ public class Authgear {
             self.app2app.rejectApp2AppAuthenticationRequest(
                 request: request,
                 reason: reason,
-                handler: handler)
+                handler: handler
+            )
         }
     }
-    
+
     @available(iOS 11.3, *)
     public func handleApp2AppAuthenticationResult(
         userActivity: NSUserActivity
