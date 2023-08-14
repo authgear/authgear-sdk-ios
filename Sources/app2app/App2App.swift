@@ -34,34 +34,12 @@ class App2App {
     }
 
     @available(iOS 11.3, *)
-    private func generatePrivateKeyInSecureEnclave(tag: String) throws -> SecKey {
+    private func generatePrivateKey(tag: String) throws -> SecKey {
         var error: Unmanaged<CFError>?
         let attributes: NSDictionary = [
             kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
             kSecAttrKeySizeInBits: 256,
             kSecAttrTokenID: kSecAttrTokenIDSecureEnclave,
-            kSecPrivateKeyAttrs: [
-                kSecAttrIsPermanent: true,
-                kSecAttrApplicationTag: tag
-            ]
-        ]
-        guard let privateKey = SecKeyCreateRandomKey(attributes, &error) else {
-            throw AuthgearError.error(error!.takeRetainedValue() as Error)
-        }
-        return privateKey
-    }
-
-    @available(iOS 11.3, *)
-    private func generatePrivateKey(tag: String) throws -> SecKey {
-        do {
-            return try generatePrivateKeyInSecureEnclave(tag: tag)
-        } catch {
-            // Fallback if generation in secure enclave is failed for any reason
-        }
-        var error: Unmanaged<CFError>?
-        let attributes: NSDictionary = [
-            kSecAttrKeyType: kSecAttrKeyTypeRSA,
-            kSecAttrKeySizeInBits: 2048,
             kSecPrivateKeyAttrs: [
                 kSecAttrIsPermanent: true,
                 kSecAttrApplicationTag: tag
