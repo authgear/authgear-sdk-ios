@@ -50,7 +50,7 @@ public struct App2AppAuthenticateRequest {
         self.clientID = clientID
         self.codeChallenge = codeChallenge
     }
-    
+
     init(
         authorizationEndpoint: String,
         redirectUri: URL,
