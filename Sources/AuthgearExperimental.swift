@@ -48,7 +48,7 @@ public struct AuthgearExperimental {
     ) {
         self.authgear.finishAuthentication(
             url: finishURL,
-            request: request.toInternal(),
+            verifier: request.verifier,
             handler: handler
         )
     }

@@ -5,7 +5,7 @@ import UIKit
 public struct LatteHandle<T: Sendable> {
     let task: Task<T, Error>
 
-    internal init(task: Task<T, Error>) {
+    init(task: Task<T, Error>) {
         self.task = task
     }
 
@@ -410,7 +410,7 @@ class LatteViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    internal func suspendUntilReady() async throws {
+    func suspendUntilReady() async throws {
         try await withCheckedThrowingContinuation { next in
             var isResumed = false
             self.webView.onReady = { _ in
@@ -434,12 +434,5 @@ class LatteViewController: UIViewController {
                 }
             }
         }
-    }
-}
-
-private extension Dictionary where Key == String, Value == String {
-    func encodeAsQuery() -> String {
-        self.keys.map { "\($0)=\(self[$0]!.encodeAsQueryComponent()!)" }
-            .joined(separator: "&")
     }
 }

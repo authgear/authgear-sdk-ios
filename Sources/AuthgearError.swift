@@ -24,6 +24,7 @@ public enum AuthgearError: CustomNSError, LocalizedError {
     case unauthenticatedUser
     case publicKeyNotFound
     case error(Error)
+    case runtimeError(String)
 
     // Implements CustomNSError
     public static var errorDomain: String { "AuthgearError" }
@@ -54,11 +55,13 @@ public enum AuthgearError: CustomNSError, LocalizedError {
         case .invalidJWT:
             return 11
         case .unauthenticatedUser:
-            return 11
-        case .publicKeyNotFound:
-            return 11
-        case .error:
             return 12
+        case .publicKeyNotFound:
+            return 13
+        case .error:
+            return 14
+        case .runtimeError:
+            return 15
         }
     }
 
@@ -123,6 +126,8 @@ public enum AuthgearError: CustomNSError, LocalizedError {
             message = "publicKeyNotFound"
         case .error:
             message = "error"
+        case let .runtimeError(errmsg):
+            message = errmsg
         }
         return "\(Self.errorDomain): \(message)"
     }

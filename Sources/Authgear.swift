@@ -241,6 +241,8 @@ public class Authgear {
      */
     private static let ExpireInPercentage = 0.9
 
+    static let CodeChallengeMethod = "S256"
+
     let name: String
     let clientId: String
     let apiClient: AuthAPIClient
@@ -293,13 +295,26 @@ public class Authgear {
     private let accessTokenRefreshLock = NSLock()
     private let accessTokenRefreshQueue: DispatchQueue
 
+    private let app2AppOptions: App2AppOptions
+    private let app2app: App2App
+
     private var currentWechatRedirectURI: String?
 
     public private(set) var sessionState: SessionState = .unknown
 
     public weak var delegate: AuthgearDelegate?
 
-    public init(clientId: String, endpoint: String, tokenStorage: TokenStorage = PersistentTokenStorage(), isSSOEnabled: Bool = false, name: String? = nil) {
+    public init(
+        clientId: String,
+        endpoint: String,
+        tokenStorage: TokenStorage = PersistentTokenStorage(),
+        isSSOEnabled: Bool = false,
+        name: String? = nil,
+        app2AppOptions: App2AppOptions = App2AppOptions(
+            isEnabled: false,
+            authorizationEndpoint: nil
+        )
+    ) {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
@@ -308,6 +323,14 @@ public class Authgear {
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
+        self.app2AppOptions = app2AppOptions
+
+        self.app2app = App2App(
+            namespace: self.name,
+            apiClient: self.apiClient,
+            storage: self.storage,
+            dispatchQueue: self.workerQueue
+        )
     }
 
     public func configure(
@@ -415,7 +438,7 @@ public class Authgear {
                         switch result {
                         case let .success(url):
                             self?.workerQueue.async {
-                                self?.finishAuthentication(url: url, request: request, handler: handler)
+                                self?.finishAuthentication(url: url, verifier: request.verifier, handler: handler)
                             }
                         case let .failure(error):
                             return handler(.failure(wrapError(error: error)))
@@ -431,7 +454,7 @@ public class Authgear {
 
     func finishAuthentication(
         url: URL,
-        request: AuthenticationRequest,
+        verifier: CodeVerifier,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
@@ -474,16 +497,27 @@ public class Authgear {
         }()
 
         do {
+            var xApp2AppDeviceKeyJwt: String?
+            if (app2AppOptions.isEnabled) {
+                if #available(iOS 11.3, *) {
+                    xApp2AppDeviceKeyJwt = try app2app.generateApp2AppJWT(forceNew: true)
+                } else {
+                    try app2app.requireMinimumApp2AppIOSVersion()
+                }
+            }
             let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
                 grantType: GrantType.authorizationCode,
                 clientId: clientId,
                 deviceInfo: getDeviceInfo(),
                 redirectURI: redirectURI,
                 code: code,
-                codeVerifier: request.verifier.value,
+                codeVerifier: verifier.value,
+                codeChallenge: nil,
+                codeChallengeMethod: nil,
                 refreshToken: nil,
                 jwt: nil,
-                accessToken: nil
+                accessToken: nil,
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -555,9 +589,12 @@ public class Authgear {
                 redirectURI: redirectURI,
                 code: code,
                 codeVerifier: verifier.value,
+                codeChallenge: nil,
+                codeChallengeMethod: nil,
                 refreshToken: nil,
                 jwt: nil,
-                accessToken: nil
+                accessToken: nil,
+                xApp2AppDeviceKeyJwt: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -814,9 +851,12 @@ public class Authgear {
                     redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
+                    codeChallenge: nil,
+                    codeChallengeMethod: nil,
                     refreshToken: nil,
                     jwt: signedJWT,
-                    accessToken: nil
+                    accessToken: nil,
+                    xApp2AppDeviceKeyJwt: nil
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -1104,9 +1144,12 @@ public class Authgear {
                     redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
+                    codeChallenge: nil,
+                    codeChallengeMethod: nil,
                     refreshToken: refreshToken,
                     jwt: nil,
-                    accessToken: nil
+                    accessToken: nil,
+                    xApp2AppDeviceKeyJwt: nil
                 )
 
                 self.persistSession(oidcTokenResponse, reason: .foundToken) { result in handler?(result) }
@@ -1176,9 +1219,12 @@ public class Authgear {
                         redirectURI: nil,
                         code: nil,
                         codeVerifier: nil,
+                        codeChallenge: nil,
+                        codeChallengeMethod: nil,
                         refreshToken: nil,
                         jwt: nil,
-                        accessToken: self.accessToken
+                        accessToken: self.accessToken,
+                        xApp2AppDeviceKeyJwt: nil
                     )
                     if let idToken = oidcTokenResponse.idToken {
                         self.idToken = idToken
@@ -1338,9 +1384,12 @@ public class Authgear {
                         redirectURI: nil,
                         code: nil,
                         codeVerifier: nil,
+                        codeChallenge: nil,
+                        codeChallengeMethod: nil,
                         refreshToken: nil,
                         jwt: signedJWT,
-                        accessToken: nil
+                        accessToken: nil,
+                        xApp2AppDeviceKeyJwt: nil
                     )
 
                     let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -1358,6 +1407,105 @@ public class Authgear {
                 }
             }
         }
+    }
+
+    @available(iOS 11.3, *)
+    public func startApp2AppAuthentication(
+        options: App2AppAuthenticateOptions,
+        handler: @escaping UserInfoCompletionHandler
+    ) {
+        let handler = withMainQueueHandler(handler)
+        let verifier = CodeVerifier()
+        let request = options.toRequest(clientID: self.clientId, codeVerifier: verifier)
+        self.workerQueue.async {
+            do {
+                try self.app2app.startAuthenticateRequest(
+                    request: request) { success in
+                        do {
+                            // If failed to start, fail immediately
+                            try success.get()
+                        } catch {
+                            handler(.failure(wrapError(error: error)))
+                        }
+                        var unsubscribe: (() -> Void)?
+                        unsubscribe = self.app2app.listenToApp2AppAuthenticationResult(
+                            redirectUri: request.redirectUri.absoluteString
+                        ) { [weak self] resultURL in
+                            unsubscribe?()
+                            guard let this = self else {
+                                return
+                            }
+                            this.finishAuthentication(
+                                url: resultURL,
+                                verifier: verifier,
+                                handler: handler
+                            )
+                        }
+                    }
+            } catch {
+                handler(.failure(wrapError(error: error)))
+            }
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func parseApp2AppAuthenticationRequest(userActivity: NSUserActivity) -> App2AppAuthenticateRequest? {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else {
+            return nil
+        }
+        guard let incomingURL = userActivity.webpageURL,
+              let authorizationEndpoint = app2AppOptions.authorizationEndpoint
+        else {
+            return nil
+        }
+        return app2app.parseApp2AppAuthenticationRequest(
+            url: incomingURL,
+            expectedEndpoint: authorizationEndpoint
+        )
+    }
+
+    @available(iOS 11.3, *)
+    public func approveApp2AppAuthenticationRequest(
+        request: App2AppAuthenticateRequest,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let handler = withMainQueueHandler(handler)
+        self.workerQueue.async {
+            self.app2app.approveApp2AppAuthenticationRequest(
+                maybeRefreshToken: self.refreshToken,
+                request: request,
+                handler: handler
+            )
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func rejectApp2AppAuthenticationRequest(
+        request: App2AppAuthenticateRequest,
+        reason: Error,
+        handler: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let handler = withMainQueueHandler(handler)
+        self.workerQueue.async {
+            self.app2app.rejectApp2AppAuthenticationRequest(
+                request: request,
+                reason: reason,
+                handler: handler
+            )
+        }
+    }
+
+    @available(iOS 11.3, *)
+    public func handleApp2AppAuthenticationResult(
+        userActivity: NSUserActivity
+    ) -> Bool {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else {
+            return false
+        }
+        guard let incomingURL = userActivity.webpageURL else {
+            return false
+        }
+        return app2app.handleApp2AppAuthenticationResult(url: incomingURL)
     }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {

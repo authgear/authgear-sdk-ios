@@ -4,6 +4,7 @@ import Foundation
 enum JWTHeaderType: String, Encodable {
     case anonymous = "vnd.authgear.anonymous-request"
     case biometric = "vnd.authgear.biometric-request"
+    case app2app = "vnd.authgear.app2app-request"
 }
 
 struct JWTHeader: Encodable {
@@ -38,6 +39,10 @@ enum AnonymousPayloadAction: String, Encodable {
 enum BiometricPayloadAction: String, Encodable {
     case setup
     case authenticate
+}
+
+enum App2AppPayloadAction: String, Encodable {
+    case setup
 }
 
 struct JWTPayload: Encodable {
@@ -107,20 +112,55 @@ struct JWTSigner {
         self.privateKey = privateKey
     }
 
-    func sign(header: String, payload: String) throws -> String {
-        let data = "\(header).\(payload)".data(using: .utf8)!
-        var buffer = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-
-        data.withUnsafeBytes {
-            _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &buffer)
-        }
-
+    private func createRSASignature(input: Data) throws -> Data {
         var error: Unmanaged<CFError>?
+        guard let signature = SecKeyCreateSignature(
+            privateKey,
+            .rsaSignatureMessagePKCS1v15SHA256,
+            input as CFData,
+            &error
+        ) else {
+            throw AuthgearError.error(error!.takeRetainedValue() as Error)
+        }
+        return signature as Data
+    }
 
-        guard let signedData = SecKeyCreateSignature(privateKey, .rsaSignatureDigestPKCS1v15SHA256, Data(buffer) as CFData, &error) else {
+    private func createECSignature(input: Data) throws -> Data {
+        var error: Unmanaged<CFError>?
+        guard let signature = SecKeyCreateSignature(
+            privateKey,
+            .ecdsaSignatureMessageX962SHA256,
+            input as CFData,
+            &error
+        ) else {
             throw AuthgearError.error(error!.takeRetainedValue() as Error)
         }
 
-        return (signedData as Data).base64urlEncodedString()
+        // Convert the signature to correct format
+        // See https://github.com/airsidemobile/JOSESwift/blob/2.4.0/JOSESwift/Sources/CryptoImplementation/EC.swift#L208
+        let crv = ECCurveType.P256
+        let ecSignatureTLV = [UInt8](signature as Data)
+        let ecSignature = try ecSignatureTLV.read(.sequence)
+        let varlenR = try Data(ecSignature.read(.integer))
+        let varlenS = try Data(ecSignature.skip(.integer).read(.integer))
+        let fixlenR = Asn1IntegerConversion.toRaw(varlenR, of: crv.coordinateOctetLength)
+        let fixlenS = Asn1IntegerConversion.toRaw(varlenS, of: crv.coordinateOctetLength)
+
+        let fixedSignature = (fixlenR + fixlenS)
+        return fixedSignature
+    }
+
+    func sign(header: String, payload: String) throws -> String {
+        let data = "\(header).\(payload)".data(using: .utf8)!
+
+        let signature: Data
+        switch KeyType.from(privateKey) {
+        case .rsa:
+            signature = try createRSASignature(input: data)
+        default:
+            signature = try createECSignature(input: data)
+        }
+
+        return signature.base64urlEncodedString()
     }
 }

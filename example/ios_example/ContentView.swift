@@ -74,10 +74,13 @@ struct AuthgearConfigurationForm: View {
 
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
+    @State private var app2AppEndpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.app2appendpoint") ?? ""
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
+
+    private let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
 
     var body: some View {
         VStack {
@@ -93,6 +96,13 @@ struct AuthgearConfigurationForm: View {
                 input: AuthgearConfigurationTextField(
                     placeHolder: "Enter Endpoint",
                     text: $endpoint
+                )
+            )
+            AuthgearConfigurationInput(
+                label: "App2App Endpoint",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter App2App Endpoint",
+                    text: $app2AppEndpoint
                 )
             )
             Picker("Authentication Page", selection: $authenticationPage) {
@@ -121,6 +131,7 @@ struct AuthgearConfigurationForm: View {
                 self.app.configure(
                     clientId: self.clientID,
                     endpoint: self.endpoint,
+                    app2AppEndpoint: self.app2AppEndpoint,
                     authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
@@ -161,6 +172,10 @@ struct ActionButtonList: View {
         app.biometricEnabled
     }
 
+    private var app2appConfigured: Bool {
+        !app.app2appEndpoint.isEmpty
+    }
+
     var body: some View {
         VStack(spacing: 30) {
             // We have to start using Group here because
@@ -174,6 +189,12 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Authenticate")
                 }.disabled(!configured || loggedIn)
+
+                Button(action: {
+                    self.app.authenticateApp2App()
+                }) {
+                    ActionButton(text: "Authenticate App2App")
+                }.disabled(!configured || loggedIn || !app2appConfigured)
 
                 Button(action: {
                     self.app.loginAnonymously()
@@ -295,6 +316,32 @@ struct SuccessAlertView: View {
     }
 }
 
+struct App2AppAlertView: View {
+    @EnvironmentObject private var app: App
+
+    private var shouldShow: Binding<Bool> { Binding(
+        get: { self.app.app2AppConfirmation != nil },
+        set: { _ in }
+    ) }
+
+    var body: some View {
+        VStack {
+            EmptyView()
+        }
+        .alert(isPresented: shouldShow, content: {
+            Alert(
+                title: Text("Approve app2app request?"),
+                primaryButton: .default(Text("OK")) {
+                    self.app.app2AppConfirmation?.onConfirm()
+                },
+                secondaryButton: .cancel(Text("Cancel")) {
+                    self.app.app2AppConfirmation?.onReject()
+                }
+            )
+        })
+    }
+}
+
 struct ContentView: View {
     @EnvironmentObject private var app: App
 
@@ -310,6 +357,8 @@ struct ContentView: View {
                 ErrorAlertView()
                     .environmentObject(app)
                 SuccessAlertView()
+                    .environmentObject(app)
+                App2AppAlertView()
                     .environmentObject(app)
             }.padding(20)
         }

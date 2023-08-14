@@ -6,6 +6,7 @@ enum GrantType: String {
     case anonymous = "urn:authgear:params:oauth:grant-type:anonymous-request"
     case biometric = "urn:authgear:params:oauth:grant-type:biometric-request"
     case idToken = "urn:authgear:params:oauth:grant-type:id-token"
+    case app2app = "urn:authgear:params:oauth:grant-type:app2app-request"
 }
 
 struct APIResponse<T: Decodable>: Decodable {
@@ -50,7 +51,7 @@ struct OIDCAuthenticationRequest {
 
         if let verifier = verifier {
             queryItems.append(contentsOf: [
-                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "code_challenge_method", value: Authgear.CodeChallengeMethod),
                 URLQueryItem(name: "code_challenge", value: verifier.codeChallenge)
             ])
         }
@@ -125,6 +126,7 @@ struct OIDCTokenResponse: Decodable {
     let accessToken: String?
     let expiresIn: Int?
     let refreshToken: String?
+    let code: String?
 }
 
 struct ChallengeBody: Encodable {
@@ -155,13 +157,16 @@ protocol AuthAPIClient: AnyObject {
     func requestOIDCToken(
         grantType: GrantType,
         clientId: String,
-        deviceInfo: DeviceInfoRoot,
+        deviceInfo: DeviceInfoRoot?,
         redirectURI: String?,
         code: String?,
         codeVerifier: String?,
+        codeChallenge: String?,
+        codeChallengeMethod: String?,
         refreshToken: String?,
         jwt: String?,
         accessToken: String?,
+        xApp2AppDeviceKeyJwt: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
     func requestBiometricSetup(
@@ -218,13 +223,16 @@ extension AuthAPIClient {
     func syncRequestOIDCToken(
         grantType: GrantType,
         clientId: String,
-        deviceInfo: DeviceInfoRoot,
+        deviceInfo: DeviceInfoRoot?,
         redirectURI: String?,
         code: String?,
         codeVerifier: String?,
+        codeChallenge: String?,
+        codeChallengeMethod: String?,
         refreshToken: String?,
         jwt: String?,
-        accessToken: String?
+        accessToken: String?,
+        xApp2AppDeviceKeyJwt: String?
     ) throws -> OIDCTokenResponse {
         try withSemaphore { handler in
             self.requestOIDCToken(
@@ -234,9 +242,12 @@ extension AuthAPIClient {
                 redirectURI: redirectURI,
                 code: code,
                 codeVerifier: codeVerifier,
+                codeChallenge: codeChallenge,
+                codeChallengeMethod: codeChallengeMethod,
                 refreshToken: refreshToken,
                 jwt: jwt,
                 accessToken: accessToken,
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt,
                 handler: handler
             )
         }
@@ -392,25 +403,31 @@ class DefaultAuthAPIClient: AuthAPIClient {
     func requestOIDCToken(
         grantType: GrantType,
         clientId: String,
-        deviceInfo: DeviceInfoRoot,
+        deviceInfo: DeviceInfoRoot? = nil,
         redirectURI: String? = nil,
         code: String? = nil,
         codeVerifier: String? = nil,
+        codeChallenge: String? = nil,
+        codeChallengeMethod: String? = nil,
         refreshToken: String? = nil,
         jwt: String? = nil,
         accessToken: String? = nil,
+        xApp2AppDeviceKeyJwt: String? = nil,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     ) {
         fetchOIDCConfiguration { [weak self] result in
             switch result {
             case let .success(config):
-                let deviceInfoJSON = try! JSONEncoder().encode(deviceInfo)
-                let xDeviceInfo = deviceInfoJSON.base64urlEncodedString()
 
                 var queryParams = [String: String]()
                 queryParams["client_id"] = clientId
                 queryParams["grant_type"] = grantType.rawValue
-                queryParams["x_device_info"] = xDeviceInfo
+
+                if let deviceInfo = deviceInfo {
+                    let deviceInfoJSON = try! JSONEncoder().encode(deviceInfo)
+                    let xDeviceInfo = deviceInfoJSON.base64urlEncodedString()
+                    queryParams["x_device_info"] = xDeviceInfo
+                }
 
                 if let code = code {
                     queryParams["code"] = code
@@ -424,12 +441,24 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     queryParams["code_verifier"] = codeVerifier
                 }
 
+                if let codeChallenge = codeChallenge {
+                    queryParams["code_challenge"] = codeChallenge
+                }
+
+                if let codeChallengeMethod = codeChallengeMethod {
+                    queryParams["code_challenge_method"] = codeChallengeMethod
+                }
+
                 if let refreshToken = refreshToken {
                     queryParams["refresh_token"] = refreshToken
                 }
 
                 if let jwt = jwt {
                     queryParams["jwt"] = jwt
+                }
+
+                if let xApp2AppDeviceKeyJwt = xApp2AppDeviceKeyJwt {
+                    queryParams["x_app2app_device_key_jwt"] = xApp2AppDeviceKeyJwt
                 }
 
                 var urlComponents = URLComponents()

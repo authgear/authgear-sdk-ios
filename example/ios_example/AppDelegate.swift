@@ -5,14 +5,38 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var appContainer = App()
 
-    func configureAuthgear(clientId: String, endpoint: String, tokenStorage: String, isSSOEnabled: Bool) {
+    func configureAuthgear(
+        clientId: String,
+        endpoint: String,
+        tokenStorage: String,
+        isSSOEnabled: Bool,
+        isApp2AppEnabled: Bool
+    ) {
+        let app2AppOptions = App2AppOptions(
+            isEnabled: isApp2AppEnabled,
+            authorizationEndpoint: App.app2appAuthorizeEndpoint
+        )
         switch tokenStorage {
         case TokenStorageClassName.TransientTokenStorage.rawValue:
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: TransientTokenStorage(), isSSOEnabled: isSSOEnabled)
+            appContainer.container = Authgear(
+                clientId: clientId,
+                endpoint: endpoint,
+                tokenStorage: TransientTokenStorage(),
+                isSSOEnabled: isSSOEnabled,
+                app2AppOptions: app2AppOptions
+            )
         default:
-            appContainer.container = Authgear(clientId: clientId, endpoint: endpoint, tokenStorage: PersistentTokenStorage(), isSSOEnabled: isSSOEnabled)
+            appContainer.container = Authgear(
+                clientId: clientId,
+                endpoint: endpoint,
+                tokenStorage: PersistentTokenStorage(),
+                isSSOEnabled: isSSOEnabled,
+                app2AppOptions: app2AppOptions
+            )
         }
-        appContainer.container?.configure()
+        appContainer.container?.configure() { _ in
+            self.appContainer.postConfig()
+        }
         appContainer.container?.delegate = self
 
         // configure WeChat SDK
@@ -31,6 +55,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+
+    func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
+        let app2appRequest = appContainer.container?.parseApp2AppAuthenticationRequest(
+            userActivity: userActivity)
+        if let app2appRequest = app2appRequest {
+            appContainer.pendingApp2AppRequest = app2appRequest
+            return true
+        }
+        if let container = appContainer.container,
+           container.handleApp2AppAuthenticationResult(
+               userActivity: userActivity) == true {
+            return true
+        }
+        return false
     }
 }
 
