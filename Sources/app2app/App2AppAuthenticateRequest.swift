@@ -21,7 +21,7 @@ public struct App2AppAuthenticateRequest {
         return urlcomponents.url!.absoluteURL
     }
 
-    static func parse(url: URL) -> App2AppAuthenticateRequest? {
+    init?(url: URL) {
         let urlcomponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
         guard let urlcomponents = urlcomponents else {
             return nil
@@ -45,11 +45,21 @@ public struct App2AppAuthenticateRequest {
         guard let codeChallenge = queryParams["code_challenge"] else {
             return nil
         }
-        return App2AppAuthenticateRequest(
-            authorizationEndpoint: authorizationEndpointURL.absoluteString,
-            redirectUri: redirectUri,
-            clientID: clientID,
-            codeChallenge: codeChallenge
-        )
+        self.authorizationEndpoint = authorizationEndpointURL.absoluteString
+        self.redirectUri = redirectUri
+        self.clientID = clientID
+        self.codeChallenge = codeChallenge
+    }
+    
+    init(
+        authorizationEndpoint: String,
+        redirectUri: URL,
+        clientID: String,
+        codeChallenge: String
+    ) {
+        self.authorizationEndpoint = authorizationEndpoint
+        self.redirectUri = redirectUri
+        self.clientID = clientID
+        self.codeChallenge = codeChallenge
     }
 }
