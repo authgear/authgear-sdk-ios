@@ -12,7 +12,7 @@ public struct App2AppAuthenticateOptions {
         self.redirectUri = redirectUri
     }
 
-    internal func toRequest(
+    func toRequest(
         clientID: String,
         codeVerifier: CodeVerifier
     ) -> App2AppAuthenticateRequest {

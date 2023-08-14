@@ -241,7 +241,7 @@ public class Authgear {
      */
     private static let ExpireInPercentage = 0.9
 
-    internal static let CodeChallengeMethod = "S256"
+    static let CodeChallengeMethod = "S256"
 
     let name: String
     let clientId: String

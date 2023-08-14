@@ -73,7 +73,7 @@ public extension LatteWebViewRequest {
     }
 }
 
-internal struct LatteWebViewResult {
+struct LatteWebViewResult {
     private let finishURL: URL
 
     init(finishURL: URL) {
