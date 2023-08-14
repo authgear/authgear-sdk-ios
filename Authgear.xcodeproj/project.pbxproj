@@ -21,6 +21,7 @@
 		A652CEB92A8227C2006E789F /* App2AppAuthenticateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEB82A8227C2006E789F /* App2AppAuthenticateRequest.swift */; };
 		A652CEBB2A822D19006E789F /* Dictionary+encodeAsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */; };
 		A652CEE72A84DE72006E789F /* ASN1DERParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */; };
+		A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */; };
 		A68DAD2229AF686000487DAF /* UILocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD1F29AF686000487DAF /* UILocales.swift */; };
 		A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */; };
 		A6D692B92A0CCA2B00B457F9 /* Latte+Tokenize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */; };
@@ -74,6 +75,7 @@
 		A652CEB82A8227C2006E789F /* App2AppAuthenticateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2AppAuthenticateRequest.swift; sourceTree = "<group>"; };
 		A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+encodeAsQuery.swift"; sourceTree = "<group>"; };
 		A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASN1DERParsing.swift; sourceTree = "<group>"; };
+		A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asn1IntegerConversion.swift; sourceTree = "<group>"; };
 		A68DAD1F29AF686000487DAF /* UILocales.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILocales.swift; sourceTree = "<group>"; };
 		A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+encodeAsQueryComponent.swift"; sourceTree = "<group>"; };
 		A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+Tokenize.swift"; sourceTree = "<group>"; };
@@ -187,6 +189,7 @@
 				775FF7292603649500B81ECD /* Biometric.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
 				A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */,
+				A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */,
 				F8A657A825055A7C0027888F /* Base64.swift */,
 				95E67331299F652000C9466C /* Latte.swift */,
 				A6D692BC2A0CCF1700B457F9 /* LatteError.swift */,
@@ -308,6 +311,7 @@
 				95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */,
 				F83D84AE24F6A93600B4393C /* CodeVerifier.swift in Sources */,
 				A652CEBB2A822D19006E789F /* Dictionary+encodeAsQuery.swift in Sources */,
+				A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */,
 				95E6733B29A37E5A00C9466C /* Latte+Flows.swift in Sources */,
 				F8A657A925055A7C0027888F /* Base64.swift in Sources */,
 				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
