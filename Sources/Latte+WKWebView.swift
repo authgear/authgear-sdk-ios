@@ -4,6 +4,7 @@ import WebKit
 
 enum LatteBuiltInEvents: String {
     case openEmailClient
+    case openSMSClient
     case tracking
     case ready
 }
@@ -130,6 +131,8 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
                 switch type {
                 case LatteBuiltInEvents.openEmailClient.rawValue:
                     parent.delegate?.latteWebView(onEvent: parent, event: .openEmailClient)
+                case LatteBuiltInEvents.openSMSClient.rawValue:
+                    parent.delegate?.latteWebView(onEvent: parent, event: .openSMSClient)
                 case LatteBuiltInEvents.tracking.rawValue:
                     guard let event_name = body["event_name"] as? String else { return }
                     guard let params = body["params"] as? [String: Any] else { return }
