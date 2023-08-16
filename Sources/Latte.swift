@@ -4,6 +4,7 @@ import UIKit
 public protocol LatteDelegate: AnyObject {
     func latte(_: Latte, onTrackingEvent: LatteTrackingEvent)
     func latte(_: Latte, onOpenEmailClient source: UIViewController)
+    func latte(_: Latte, onOpenSMSClient source: UIViewController)
 }
 
 // Default implemetations
@@ -20,6 +21,10 @@ public extension LatteDelegate {
             items: items
         )
         source.present(alert, animated: true)
+    }
+
+    func latte(_: Latte, onOpenSMSClient source: UIViewController) {
+        UIApplication.shared.open(URL(string: "messages://")!)
     }
 }
 
@@ -52,6 +57,9 @@ public class Latte: LatteWebViewDelegate {
         case .openEmailClient:
             guard let vc = webView.viewController else { return }
             self.delegate?.latte(_: self, onOpenEmailClient: vc)
+        case .openSMSClient:
+            guard let vc = webView.viewController else { return }
+            self.delegate?.latte(_: self, onOpenSMSClient: vc)
         }
     }
 }
@@ -117,5 +125,6 @@ public struct LatteTrackingEvent {
 
 enum LatteWebViewEvent {
     case openEmailClient
+    case openSMSClient
     case trackingEvent(event: LatteTrackingEvent)
 }
