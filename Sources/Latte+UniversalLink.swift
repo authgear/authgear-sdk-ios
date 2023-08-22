@@ -128,6 +128,7 @@ public extension Latte {
         userActivity: NSUserActivity,
         shortLinkOrigin: URL,
         universalLinkOrigin: URL,
+        rewriteShortLinkOrigin: URL? = nil,
         rewriteUniversalLinkOrigin: URL? = nil
     ) -> LatteShortLinkExpander? {
         guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else {
@@ -140,8 +141,14 @@ public extension Latte {
               incomingURL.path.starts(with: "/s") else {
             return nil
         }
+        let url: URL
+        if let rewriteShortLinkOrigin = rewriteShortLinkOrigin {
+            url = incomingURL.rewriteOrigin(origin: rewriteShortLinkOrigin)
+        } else {
+            url = incomingURL
+        }
         return LatteShortLinkExpander(
-            url: incomingURL,
+            url: url,
             universalLinkOrigin: universalLinkOrigin,
             rewriteUniversalLinkOrigin: rewriteUniversalLinkOrigin
         )
