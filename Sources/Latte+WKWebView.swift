@@ -30,6 +30,11 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
     weak var viewController: UIViewController?
     weak var delegate: LatteWebViewDelegate?
 
+    override var inputAccessoryView: UIView? {
+        // Hide the accessory view
+        nil
+    }
+
     private var initialNavigation: WKNavigation?
 
     init(request: LatteWebViewRequest, isInspectable: Bool) {
