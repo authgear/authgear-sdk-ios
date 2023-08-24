@@ -2,6 +2,7 @@ import Foundation
 
 enum LatteError: LocalizedError, CustomNSError {
     case unexpected(message: String)
+    case invalidShortLink
 
     // Implements CustomNSError
     public static var errorDomain: String { "LatteError" }
@@ -9,6 +10,8 @@ enum LatteError: LocalizedError, CustomNSError {
         switch self {
         case .unexpected:
             return 0
+        case .invalidShortLink:
+            return 1
         }
     }
 
@@ -17,6 +20,8 @@ enum LatteError: LocalizedError, CustomNSError {
         switch self {
         case let .unexpected(msg):
             info["message"] = msg
+        case .invalidShortLink:
+            info["message"] = "invalid short link"
         }
         return info
     }
@@ -26,6 +31,8 @@ enum LatteError: LocalizedError, CustomNSError {
         switch self {
         case let .unexpected(message):
             return message
+        case .invalidShortLink:
+            return "invalid short link"
         }
     }
 }

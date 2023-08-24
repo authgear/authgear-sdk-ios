@@ -25,19 +25,65 @@ public struct LoginLinkHandler: LatteLinkHandler {
 }
 
 @available(iOS 13.0, *)
+public class LatteShortLinkExpander: NSObject, URLSessionDelegate, URLSessionTaskDelegate {
+    let url: URL
+    lazy var session: URLSession = .init(configuration: .default, delegate: self, delegateQueue: nil)
+
+    let universalLinkOrigin: URL
+    let rewriteUniversalLinkOrigin: URL?
+
+    init(
+        url: URL,
+        universalLinkOrigin: URL,
+        rewriteUniversalLinkOrigin: URL?
+    ) {
+        self.url = url
+        self.universalLinkOrigin = universalLinkOrigin
+        self.rewriteUniversalLinkOrigin = rewriteUniversalLinkOrigin
+        super.init()
+    }
+
+    public func expand(_ handler: @escaping (Result<LatteLinkHandler?, Error>) -> Void) {
+        func mainQueueHandler(_ result: Result<LatteLinkHandler?, Error>) {
+            DispatchQueue.main.async {
+                handler(result)
+            }
+        }
+        let task = session.dataTask(with: url) { _, response, error in
+            if let error = error {
+                return mainQueueHandler(.failure(wrapError(error: error)))
+            }
+            guard let response = response as? HTTPURLResponse,
+                  response.statusCode == 302,
+                  let location = response.allHeaderFields["Location"] as? String,
+                  let locationURL = URL(string: location)
+            else {
+                return mainQueueHandler(.failure(LatteError.invalidShortLink))
+            }
+            mainQueueHandler(.success(Latte.getUniversalLinkHandler(
+                incomingURL: locationURL,
+                universalLinkOrigin: self.universalLinkOrigin,
+                rewriteUniversalLinkOrigin: self.rewriteUniversalLinkOrigin
+            )))
+        }
+        task.resume()
+    }
+
+    public func urlSession(_: URLSession, task _: URLSessionTask, willPerformHTTPRedirection _: HTTPURLResponse, newRequest _: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+        // Stop redirection
+        completionHandler(nil)
+    }
+}
+
+@available(iOS 13.0, *)
 public extension Latte {
-    static func getUniversalLinkHandler(
-        userActivity: NSUserActivity,
+    internal static func getUniversalLinkHandler(
+        incomingURL: URL,
         universalLinkOrigin: URL,
         rewriteUniversalLinkOrigin: URL? = nil
     ) -> LatteLinkHandler? {
-        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-              let incomingURL = userActivity.webpageURL,
+        guard incomingURL.origin == universalLinkOrigin.origin,
               let components = NSURLComponents(url: incomingURL, resolvingAgainstBaseURL: true) else {
-            return nil
-        }
-
-        guard incomingURL.origin == universalLinkOrigin.origin else {
             return nil
         }
 
@@ -60,6 +106,53 @@ public extension Latte {
             return nil
         }
     }
+
+    static func getUniversalLinkHandler(
+        userActivity: NSUserActivity,
+        universalLinkOrigin: URL,
+        rewriteUniversalLinkOrigin: URL? = nil
+    ) -> LatteLinkHandler? {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let incomingURL = userActivity.webpageURL else {
+            return nil
+        }
+
+        return getUniversalLinkHandler(
+            incomingURL: incomingURL,
+            universalLinkOrigin: universalLinkOrigin,
+            rewriteUniversalLinkOrigin: rewriteUniversalLinkOrigin
+        )
+    }
+
+    static func getShortLinkExpander(
+        userActivity: NSUserActivity,
+        shortLinkOrigin: URL,
+        universalLinkOrigin: URL,
+        rewriteShortLinkOrigin: URL? = nil,
+        rewriteUniversalLinkOrigin: URL? = nil
+    ) -> LatteShortLinkExpander? {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else {
+            return nil
+        }
+        guard let incomingURL = userActivity.webpageURL else {
+            return nil
+        }
+        guard incomingURL.origin == shortLinkOrigin.origin,
+              incomingURL.path.starts(with: "/s") else {
+            return nil
+        }
+        let url: URL
+        if let rewriteShortLinkOrigin = rewriteShortLinkOrigin {
+            url = incomingURL.rewriteOrigin(origin: rewriteShortLinkOrigin)
+        } else {
+            url = incomingURL
+        }
+        return LatteShortLinkExpander(
+            url: url,
+            universalLinkOrigin: universalLinkOrigin,
+            rewriteUniversalLinkOrigin: rewriteUniversalLinkOrigin
+        )
+    }
 }
 
 private extension URL {
@@ -75,7 +168,7 @@ private extension URL {
 
     func rewriteOrigin(origin: URL) -> URL {
         var selfComponents = URLComponents(url: self, resolvingAgainstBaseURL: true)!
-        var thatComponents = URLComponents(url: origin, resolvingAgainstBaseURL: true)!
+        let thatComponents = URLComponents(url: origin, resolvingAgainstBaseURL: true)!
         selfComponents.scheme = thatComponents.scheme
         selfComponents.host = thatComponents.host
         selfComponents.port = thatComponents.port
