@@ -142,16 +142,15 @@ public extension Latte {
                     throw AuthgearError.unauthenticatedUser
                 }
                 
-                var laContext: LAContext? = nil
+                var laContext: LatteLAContext? = nil
                 var reauthXState = xState
                 reauthXState["user_initiate"] = "reauth"
                 
                 var capabilities: Array<LatteCapability> = []
                 
                 if let biometricOptions = biometricOptions {
-                    laContext = LAContext(policy: biometricOptions.laPolicy)
-                    var error: NSError?
-                    let canEvaluate = laContext!.canEvaluatePolicy(biometricOptions.laPolicy, error: &error)
+                    laContext = biometricOptions.laContext
+                    let canEvaluate = laContext!.canEvaluatePolicy(biometricOptions.laPolicy)
                     if (canEvaluate) {
                         capabilities.append(.biometric)
                     }

@@ -133,16 +133,48 @@ enum LatteWebViewEvent {
 public struct LatteBiometricOptions {
     let localizedReason: String
     let laPolicy: LAPolicy
+    let laContext: LatteLAContext
 
     public init(
         localizedReason: String,
-        laPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
+        laPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics,
+        laContext: LatteLAContext? = nil
     ) {
         self.localizedReason = localizedReason
         self.laPolicy = laPolicy
+        self.laContext = laContext ?? DefaultLatteLAContext(laPolicy: laPolicy)
     }
 }
 
 enum LatteCapability: String {
     case biometric
+}
+
+public protocol LatteLAContext {
+    func canEvaluatePolicy(_ policy: LAPolicy) -> Bool
+    func evaluatePolicy(
+        _ policy: LAPolicy,
+        localizedReason: String,
+        reply: @escaping (Bool, Error?) -> Void
+    )
+}
+
+class DefaultLatteLAContext: LatteLAContext {
+    let laPolicy: LAPolicy
+    lazy var laCtx: LAContext = {
+        LAContext(policy: laPolicy)
+    }()
+    
+    init(laPolicy: LAPolicy) {
+        self.laPolicy = laPolicy
+    }
+    
+    func canEvaluatePolicy(_ policy: LAPolicy) -> Bool {
+        var error: NSError?
+        return laCtx.canEvaluatePolicy(laPolicy, error: &error)
+    }
+    
+    func evaluatePolicy(_ policy: LAPolicy, localizedReason: String, reply: @escaping (Bool, Error?) -> Void) {
+        return laCtx.evaluatePolicy(policy, localizedReason: localizedReason, reply: reply)
+    }
 }
