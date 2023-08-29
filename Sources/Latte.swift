@@ -1,4 +1,5 @@
 import Foundation
+import LocalAuthentication
 import UIKit
 
 public protocol LatteDelegate: AnyObject {
@@ -127,4 +128,17 @@ enum LatteWebViewEvent {
     case openEmailClient
     case openSMSClient
     case trackingEvent(event: LatteTrackingEvent)
+}
+
+public struct LatteBiometricOptions {
+    let localizedReason: String
+    let laPolicy: LAPolicy
+
+    public init(
+        localizedReason: String,
+        laPolicy: LAPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
+    ) {
+        self.localizedReason = localizedReason
+        self.laPolicy = laPolicy
+    }
 }

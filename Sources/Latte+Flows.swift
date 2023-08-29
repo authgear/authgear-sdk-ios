@@ -1,4 +1,5 @@
 import Foundation
+import LocalAuthentication
 import UIKit
 
 @available(iOS 13.0, *)
@@ -124,15 +125,16 @@ public extension Latte {
             }
         }
     }
-    
+
     func reauthenticate(
+        biometricOptions: LatteBiometricOptions? = nil,
         xSecrets: [String: String] = [:],
         xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<Bool>
     ) {
         Task { await run() }
-        
+
         @Sendable @MainActor
         func run() async {
             do {
@@ -154,24 +156,66 @@ public extension Latte {
                 latteVC.webView.load()
 
                 try await latteVC.suspendUntilReady()
-                
+
                 let handle = LatteHandle<Bool>(task: Task { try await run1() })
-                
+
                 @Sendable @MainActor
                 func run1() async throws -> Bool {
-                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
-                        latteVC.webView.completion = { (_, result) in
+                    let result: Bool = try await withCheckedThrowingContinuation { next in
+                        var isResumed = false
+                        func resume(_ result: Result<Bool, Error>) {
+                            guard isResumed == false else { return }
+                            isResumed = true
                             next.resume(with: result)
                         }
+                        latteVC.webView.completion = { (_, result) in
+                            do {
+                                let finishURL = try result.get().unwrap()
+                                self.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { r in
+                                    resume(r.flatMap { _ in
+                                        .success(true)
+                                    })
+                                }
+                            } catch {
+                                resume(.failure(wrapError(error: error)))
+                            }
+                        }
+                        if let biometricOptions = biometricOptions {
+                            latteVC.webView.onReauthWithBiometric = { _ in
+                                let context = LAContext(policy: biometricOptions.laPolicy)
+                                context.evaluatePolicy(
+                                    biometricOptions.laPolicy,
+                                    localizedReason: biometricOptions.localizedReason
+                                ) { success, error in
+                                    if (success) {
+                                        resume(.success(true))
+                                        return
+                                    }
+                                    if let error = error {
+                                        if let laError = error as? LAError {
+                                            switch laError.code {
+                                            case .appCancel:
+                                                fallthrough
+                                            case .userCancel:
+                                                fallthrough
+                                            case .systemCancel:
+                                                return
+                                            default:
+                                                break
+                                            }
+                                        }
+                                        resume(.failure(error))
+                                        return
+                                    }
+                                    resume(.success(false))
+                                }
+                            }
+                        }
                     }
-                    let finishURL = try result.unwrap()
-                    let _ = try await withCheckedThrowingContinuation { next in
-                        self.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { next.resume(with: $0) }
-                    }
-                    return true
+                    return result
                 }
                 completion(.success((latteVC, handle)))
-                
+
             } catch {
                 completion(.failure(error))
             }
