@@ -141,13 +141,13 @@ public extension Latte {
                 guard let idTokenHint = self.authgear.idTokenHint else {
                     throw AuthgearError.unauthenticatedUser
                 }
-                
-                var laContext: LatteLAContext? = nil
+
+                var laContext: LatteLAContext?
                 var reauthXState = xState
                 reauthXState["user_initiate"] = "reauth"
-                
+
                 var capabilities: Array<LatteCapability> = []
-                
+
                 if let biometricOptions = biometricOptions {
                     laContext = biometricOptions.laContext
                     let canEvaluate = laContext!.canEvaluatePolicy(biometricOptions.laPolicy)
@@ -155,8 +155,8 @@ public extension Latte {
                         capabilities.append(.biometric)
                     }
                 }
-                
-                reauthXState["capabilities"] = capabilities.map({ $0.rawValue }).joined(separator: ",")
+
+                reauthXState["capabilities"] = capabilities.map { $0.rawValue }.joined(separator: ",")
                 let finalXState = try await makeXStateWithSecrets(
                     xState: reauthXState,
                     xSecrets: xSecrets

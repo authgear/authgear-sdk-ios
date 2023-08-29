@@ -161,20 +161,18 @@ public protocol LatteLAContext {
 
 class DefaultLatteLAContext: LatteLAContext {
     let laPolicy: LAPolicy
-    lazy var laCtx: LAContext = {
-        LAContext(policy: laPolicy)
-    }()
-    
+    lazy var laCtx: LAContext = .init(policy: laPolicy)
+
     init(laPolicy: LAPolicy) {
         self.laPolicy = laPolicy
     }
-    
+
     func canEvaluatePolicy(_ policy: LAPolicy) -> Bool {
         var error: NSError?
         return laCtx.canEvaluatePolicy(laPolicy, error: &error)
     }
-    
+
     func evaluatePolicy(_ policy: LAPolicy, localizedReason: String, reply: @escaping (Bool, Error?) -> Void) {
-        return laCtx.evaluatePolicy(policy, localizedReason: localizedReason, reply: reply)
+        laCtx.evaluatePolicy(policy, localizedReason: localizedReason, reply: reply)
     }
 }
