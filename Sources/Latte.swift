@@ -142,3 +142,7 @@ public struct LatteBiometricOptions {
         self.laPolicy = laPolicy
     }
 }
+
+enum LatteCapability: String {
+    case biometric
+}

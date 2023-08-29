@@ -138,8 +138,22 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                var laContext: LAContext? = nil
                 var reauthXState = xState
                 reauthXState["user_initiate"] = "reauth"
+                
+                var capabilities: Array<LatteCapability> = []
+                
+                if let biometricOptions = biometricOptions {
+                    laContext = LAContext(policy: biometricOptions.laPolicy)
+                    var error: NSError?
+                    let canEvaluate = laContext!.canEvaluatePolicy(biometricOptions.laPolicy, error: &error)
+                    if (canEvaluate) {
+                        capabilities.append(.biometric)
+                    }
+                }
+                
+                reauthXState["capabilities"] = capabilities.map({ $0.rawValue }).joined(separator: ",")
                 let finalXState = try await makeXStateWithSecrets(
                     xState: reauthXState,
                     xSecrets: xSecrets
@@ -180,10 +194,9 @@ public extension Latte {
                                 resume(.failure(wrapError(error: error)))
                             }
                         }
-                        if let biometricOptions = biometricOptions {
+                        if let biometricOptions = biometricOptions, let laContext = laContext {
                             latteVC.webView.onReauthWithBiometric = { _ in
-                                let context = LAContext(policy: biometricOptions.laPolicy)
-                                context.evaluatePolicy(
+                                laContext.evaluatePolicy(
                                     biometricOptions.laPolicy,
                                     localizedReason: biometricOptions.localizedReason
                                 ) { success, error in
