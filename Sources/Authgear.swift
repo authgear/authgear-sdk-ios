@@ -27,6 +27,7 @@ struct AuthenticateOptions {
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
+    let idTokenHint: String?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -40,7 +41,7 @@ struct AuthenticateOptions {
             loginHint: self.loginHint,
             uiLocales: self.uiLocales,
             colorScheme: self.colorScheme,
-            idTokenHint: nil,
+            idTokenHint: self.idTokenHint,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
             page: self.page
@@ -746,7 +747,8 @@ public class Authgear {
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            page: page
+            page: page,
+            idTokenHint: nil
         ), handler: handler)
     }
 
@@ -926,7 +928,8 @@ public class Authgear {
                         uiLocales: uiLocales,
                         colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
-                        page: nil
+                        page: nil,
+                        idTokenHint: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }

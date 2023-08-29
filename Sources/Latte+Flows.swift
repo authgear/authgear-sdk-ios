@@ -124,6 +124,59 @@ public extension Latte {
             }
         }
     }
+    
+    func reauthenticate(
+        xSecrets: [String: String] = [:],
+        xState: [String: String] = [:],
+        uiLocales: [String]? = nil,
+        completion: @escaping Completion<Bool>
+    ) {
+        Task { await run() }
+        
+        @Sendable @MainActor
+        func run() async {
+            do {
+                var reauthXState = xState
+                reauthXState["user_initiate"] = "reauth"
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: reauthXState,
+                    xSecrets: xSecrets
+                )
+                let request = try authgear.experimental.createAuthenticateRequest(
+                    redirectURI: "latte://complete",
+                    xState: finalXState.encodeAsQuery(),
+                    uiLocales: uiLocales,
+                    idTokenHint: self.authgear.idTokenHint
+                ).get()
+                let webViewRequest = LatteWebViewRequest(request: request)
+                let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
+                latteVC.webView.delegate = self
+                latteVC.webView.load()
+
+                try await latteVC.suspendUntilReady()
+                
+                let handle = LatteHandle<Bool>(task: Task { try await run1() })
+                
+                @Sendable @MainActor
+                func run1() async throws -> Bool {
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                        latteVC.webView.completion = { (_, result) in
+                            next.resume(with: result)
+                        }
+                    }
+                    let finishURL = try result.unwrap()
+                    let _ = try await withCheckedThrowingContinuation { next in
+                        self.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { next.resume(with: $0) }
+                    }
+                    return true
+                }
+                completion(.success((latteVC, handle)))
+                
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
 
     func verifyEmail(
         email: String,
