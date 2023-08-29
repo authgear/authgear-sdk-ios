@@ -138,6 +138,10 @@ public extension Latte {
         @Sendable @MainActor
         func run() async {
             do {
+                guard let idTokenHint = self.authgear.idTokenHint else {
+                    throw AuthgearError.unauthenticatedUser
+                }
+                
                 var laContext: LAContext? = nil
                 var reauthXState = xState
                 reauthXState["user_initiate"] = "reauth"
@@ -162,7 +166,7 @@ public extension Latte {
                     redirectURI: "latte://complete",
                     xState: finalXState.encodeAsQuery(),
                     uiLocales: uiLocales,
-                    idTokenHint: self.authgear.idTokenHint
+                    idTokenHint: idTokenHint
                 ).get()
                 let webViewRequest = LatteWebViewRequest(request: request)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
