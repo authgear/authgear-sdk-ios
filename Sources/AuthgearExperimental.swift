@@ -22,8 +22,7 @@ public struct AuthgearExperimental {
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
-        page: AuthenticationPage? = nil,
-        idTokenHint: String? = nil
+        page: AuthenticationPage? = nil
     ) -> Result<AuthenticationRequest, Error> {
         let options = AuthenticateOptions(
             redirectURI: redirectURI,
@@ -35,10 +34,33 @@ public struct AuthgearExperimental {
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            page: page,
-            idTokenHint: idTokenHint
+            page: page
         )
         return self.authgear.createAuthenticateRequest(options).map { request in
+            AuthenticationRequest.fromInternal(request)
+        }
+    }
+
+    public func createReauthenticateRequest(
+        redirectURI: String,
+        state: String? = nil,
+        xState: String? = nil,
+        loginHint: String? = nil,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        wechatRedirectURI: String? = nil
+    ) -> Result<AuthenticationRequest, Error> {
+        let options = ReauthenticateOptions(
+            redirectURI: redirectURI,
+            isSSOEnabled: self.authgear.isSSOEnabled,
+            state: state,
+            xState: xState,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme,
+            wechatRedirectURI: wechatRedirectURI,
+            maxAge: nil
+        )
+        return self.authgear.createReauthenticateRequest(options).map { request in
             AuthenticationRequest.fromInternal(request)
         }
     }

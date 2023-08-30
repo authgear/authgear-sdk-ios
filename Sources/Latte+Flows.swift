@@ -161,11 +161,10 @@ public extension Latte {
                     xState: reauthXState,
                     xSecrets: xSecrets
                 )
-                let request = try authgear.experimental.createAuthenticateRequest(
+                let request = try authgear.experimental.createReauthenticateRequest(
                     redirectURI: "latte://complete",
                     xState: finalXState.encodeAsQuery(),
-                    uiLocales: uiLocales,
-                    idTokenHint: idTokenHint
+                    uiLocales: uiLocales
                 ).get()
                 let webViewRequest = LatteWebViewRequest(request: request)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)

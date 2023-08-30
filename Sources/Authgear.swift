@@ -27,7 +27,6 @@ struct AuthenticateOptions {
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
-    let idTokenHint: String?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -41,7 +40,7 @@ struct AuthenticateOptions {
             loginHint: self.loginHint,
             uiLocales: self.uiLocales,
             colorScheme: self.colorScheme,
-            idTokenHint: self.idTokenHint,
+            idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
             page: self.page
@@ -419,6 +418,18 @@ public class Authgear {
         }
     }
 
+    func createReauthenticateRequest(_ options: ReauthenticateOptions) -> Result<AuthenticationRequest, Error> {
+        Result {
+            guard let idTokenHint = self.idTokenHint else {
+                throw AuthgearError.unauthenticatedUser
+            }
+            let verifier = CodeVerifier()
+            let request = options.toRequest(idTokenHint: idTokenHint)
+            let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
+            return AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
+        }
+    }
+
     private func authenticateWithASWebAuthenticationSession(
         _ options: AuthenticateOptions,
         handler: @escaping UserInfoCompletionHandler
@@ -747,8 +758,7 @@ public class Authgear {
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            page: page,
-            idTokenHint: nil
+            page: page
         ), handler: handler)
     }
 
@@ -928,8 +938,7 @@ public class Authgear {
                         uiLocales: uiLocales,
                         colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
-                        page: nil,
-                        idTokenHint: nil
+                        page: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
