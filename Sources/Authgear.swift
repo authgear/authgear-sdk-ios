@@ -359,7 +359,7 @@ public class Authgear {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    private func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
+    func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
         let queryItems = request.toQueryItems(clientID: self.clientId, verifier: verifier)
         var urlComponents = URLComponents(
@@ -415,18 +415,6 @@ public class Authgear {
 
         return url.map { url in
             AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
-        }
-    }
-
-    func createReauthenticateRequest(_ options: ReauthenticateOptions) -> Result<AuthenticationRequest, Error> {
-        Result {
-            guard let idTokenHint = self.idTokenHint else {
-                throw AuthgearError.unauthenticatedUser
-            }
-            let verifier = CodeVerifier()
-            let request = options.toRequest(idTokenHint: idTokenHint)
-            let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
-            return AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
         }
     }
 

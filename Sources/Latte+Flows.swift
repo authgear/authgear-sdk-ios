@@ -163,6 +163,7 @@ public extension Latte {
                 )
                 let request = try authgear.experimental.createReauthenticateRequest(
                     redirectURI: "latte://complete",
+                    idTokenHint: idTokenHint,
                     xState: finalXState.encodeAsQuery(),
                     uiLocales: uiLocales
                 ).get()

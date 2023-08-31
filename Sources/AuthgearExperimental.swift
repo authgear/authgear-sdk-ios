@@ -43,9 +43,9 @@ public struct AuthgearExperimental {
 
     public func createReauthenticateRequest(
         redirectURI: String,
+        idTokenHint: String,
         state: String? = nil,
         xState: String? = nil,
-        loginHint: String? = nil,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil
@@ -60,8 +60,11 @@ public struct AuthgearExperimental {
             wechatRedirectURI: wechatRedirectURI,
             maxAge: nil
         )
-        return self.authgear.createReauthenticateRequest(options).map { request in
-            AuthenticationRequest.fromInternal(request)
+        return Result<AuthenticationRequest, Error> {
+            let verifier = CodeVerifier()
+            let request = options.toRequest(idTokenHint: idTokenHint)
+            let url = try self.authgear.buildAuthorizationURL(request: request, verifier: verifier)
+            return AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
         }
     }
 
