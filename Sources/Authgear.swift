@@ -359,7 +359,7 @@ public class Authgear {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    private func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
+    func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
         let queryItems = request.toQueryItems(clientID: self.clientId, verifier: verifier)
         var urlComponents = URLComponents(

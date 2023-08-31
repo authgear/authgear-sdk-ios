@@ -7,6 +7,7 @@ enum LatteBuiltInEvents: String {
     case openSMSClient
     case tracking
     case ready
+    case reauthWithBiometric
 }
 
 let initScript = """
@@ -26,6 +27,7 @@ protocol LatteWebViewDelegate: AnyObject {
 class LatteWKWebView: WKWebView, WKNavigationDelegate {
     let request: LatteWebViewRequest
     var onReady: ((_ webview: LatteWKWebView) -> Void)?
+    var onReauthWithBiometric: ((_ webview: LatteWKWebView) -> Void)?
     var completion: ((_ webview: LatteWKWebView, _ result: Result<LatteWebViewResult, Error>) -> Void)?
     weak var viewController: UIViewController?
     weak var delegate: LatteWebViewDelegate?
@@ -148,6 +150,8 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
                 case LatteBuiltInEvents.ready.rawValue:
                     parent.onReady?(parent)
                     parent.onReady = nil
+                case LatteBuiltInEvents.reauthWithBiometric.rawValue:
+                    parent.onReauthWithBiometric?(parent)
                 default:
                     return
                 }

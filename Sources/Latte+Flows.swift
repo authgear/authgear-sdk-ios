@@ -1,4 +1,5 @@
 import Foundation
+import LocalAuthentication
 import UIKit
 
 @available(iOS 13.0, *)
@@ -119,6 +120,118 @@ public extension Latte {
                     return userInfo
                 }
                 completion(.success((latteVC, handle)))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+
+    func reauthenticate(
+        biometricOptions: LatteBiometricOptions? = nil,
+        xSecrets: [String: String] = [:],
+        xState: [String: String] = [:],
+        uiLocales: [String]? = nil,
+        completion: @escaping Completion<Bool>
+    ) {
+        Task { await run() }
+
+        @Sendable @MainActor
+        func run() async {
+            do {
+                guard let idTokenHint = self.authgear.idTokenHint else {
+                    throw AuthgearError.unauthenticatedUser
+                }
+
+                var laContext: LatteLAContext?
+                var reauthXState = xState
+                reauthXState["user_initiate"] = "reauth"
+
+                var capabilities: Array<LatteCapability> = []
+
+                if let biometricOptions = biometricOptions {
+                    laContext = biometricOptions.laContext
+                    let canEvaluate = laContext!.canEvaluatePolicy(biometricOptions.laPolicy)
+                    if (canEvaluate) {
+                        capabilities.append(.biometric)
+                    }
+                }
+
+                reauthXState["capabilities"] = capabilities.map { $0.rawValue }.joined(separator: ",")
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: reauthXState,
+                    xSecrets: xSecrets
+                )
+                let request = try authgear.experimental.createReauthenticateRequest(
+                    redirectURI: "latte://complete",
+                    idTokenHint: idTokenHint,
+                    xState: finalXState.encodeAsQuery(),
+                    uiLocales: uiLocales
+                ).get()
+                let webViewRequest = LatteWebViewRequest(request: request)
+                let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
+                latteVC.webView.delegate = self
+                latteVC.webView.load()
+
+                try await latteVC.suspendUntilReady()
+
+                let handle = LatteHandle<Bool>(task: Task { try await run1() })
+
+                @Sendable @MainActor
+                func run1() async throws -> Bool {
+                    let result: Bool = try await withCheckedThrowingContinuation { next in
+                        var isResumed = false
+                        func resume(_ result: Result<Bool, Error>) {
+                            guard isResumed == false else { return }
+                            isResumed = true
+                            next.resume(with: result)
+                        }
+                        latteVC.webView.completion = { (_, result) in
+                            do {
+                                let finishURL = try result.get().unwrap()
+                                self.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { r in
+                                    resume(r.flatMap { _ in
+                                        .success(true)
+                                    })
+                                }
+                            } catch {
+                                resume(.failure(wrapError(error: error)))
+                            }
+                        }
+                        if let biometricOptions = biometricOptions, let laContext = laContext {
+                            latteVC.webView.onReauthWithBiometric = { _ in
+                                laContext.evaluatePolicy(
+                                    biometricOptions.laPolicy,
+                                    localizedReason: biometricOptions.localizedReason
+                                ) { success, error in
+                                    if (success) {
+                                        resume(.success(true))
+                                        return
+                                    }
+                                    if let error = error {
+                                        if let laError = error as? LAError {
+                                            switch laError.code {
+                                            case .appCancel:
+                                                fallthrough
+                                            case .userCancel:
+                                                fallthrough
+                                            case .systemCancel:
+                                                return
+                                            default:
+                                                break
+                                            }
+                                        }
+                                        resume(.failure(error))
+                                        return
+                                    }
+                                    resume(.success(false))
+                                }
+                            }
+                        }
+                    }
+                    return result
+                }
+                completion(.success((latteVC, handle)))
+
             } catch {
                 completion(.failure(error))
             }

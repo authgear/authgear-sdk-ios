@@ -41,6 +41,33 @@ public struct AuthgearExperimental {
         }
     }
 
+    public func createReauthenticateRequest(
+        redirectURI: String,
+        idTokenHint: String,
+        state: String? = nil,
+        xState: String? = nil,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        wechatRedirectURI: String? = nil
+    ) -> Result<AuthenticationRequest, Error> {
+        let options = ReauthenticateOptions(
+            redirectURI: redirectURI,
+            isSSOEnabled: self.authgear.isSSOEnabled,
+            state: state,
+            xState: xState,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme,
+            wechatRedirectURI: wechatRedirectURI,
+            maxAge: nil
+        )
+        return Result<AuthenticationRequest, Error> {
+            let verifier = CodeVerifier()
+            let request = options.toRequest(idTokenHint: idTokenHint)
+            let url = try self.authgear.buildAuthorizationURL(request: request, verifier: verifier)
+            return AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
+        }
+    }
+
     public func finishAuthentication(
         finishURL: URL,
         request: AuthgearExperimental.AuthenticationRequest,
