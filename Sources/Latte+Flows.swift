@@ -127,8 +127,9 @@ public extension Latte {
     }
 
     func reauthenticate(
+        email: String,
+        phone: String,
         biometricOptions: LatteBiometricOptions? = nil,
-        xSecrets: [String: String] = [:],
         xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<Bool>
@@ -141,6 +142,10 @@ public extension Latte {
                 guard let idTokenHint = self.authgear.idTokenHint else {
                     throw AuthgearError.unauthenticatedUser
                 }
+                let xSecrets = [
+                    "phone": phone,
+                    "email": email
+                ]
 
                 var laContext: LatteLAContext?
                 var reauthXState = xState
