@@ -65,7 +65,6 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
         let userScript = WKUserScript(source: initScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         self.configuration.userContentController.addUserScript(userScript)
         self.configuration.userContentController.add(MessageHandler(self), name: "latteEvent")
-        self.configuration.processPool.perform(Selector(("_setCookieAcceptPolicy:")), with: HTTPCookie.AcceptPolicy.always)
 
         _ = LatteWKWebView.oneTimeOnlySwizzle
     }
