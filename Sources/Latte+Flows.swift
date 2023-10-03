@@ -528,6 +528,7 @@ class LatteViewController: UIViewController {
         if (self.isBeingDismissed || self.isMovingFromParent) {
             // Cancel the flow if view controller being popped
             self.webView.completion?(self.webView, .failure(AuthgearError.cancel))
+            self.webView.completion = nil
         }
     }
 
