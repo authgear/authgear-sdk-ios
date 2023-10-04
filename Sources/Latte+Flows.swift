@@ -523,6 +523,15 @@ class LatteViewController: UIViewController {
         self.webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
     }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if (self.isBeingDismissed || self.isMovingFromParent) {
+            // Cancel the flow if view controller being popped
+            self.webView.completion?(self.webView, .failure(AuthgearError.cancel))
+            self.webView.completion = nil
+        }
+    }
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
