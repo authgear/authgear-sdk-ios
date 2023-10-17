@@ -35,18 +35,21 @@ public class Latte: LatteWebViewDelegate {
     let tokenizeEndpoint: String
     let urlSession: URLSession
     let webviewIsInspectable: Bool
+    let webViewLoadTimeoutMillis: Int
     public weak var delegate: LatteDelegate?
 
     public init(
         authgear: Authgear,
         customUIEndpoint: String,
         tokenizeEndpoint: String,
-        webviewIsInspectable: Bool = false
+        webviewIsInspectable: Bool = false,
+        webViewLoadTimeoutMillis: Int = 15_000
     ) {
         self.authgear = authgear
         self.customUIEndpoint = customUIEndpoint
         self.tokenizeEndpoint = tokenizeEndpoint
         self.webviewIsInspectable = webviewIsInspectable
+        self.webViewLoadTimeoutMillis = webViewLoadTimeoutMillis
         self.urlSession = URLSession(configuration: .default)
     }
 
