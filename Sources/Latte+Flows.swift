@@ -103,7 +103,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                try await latteVC.suspendUntilReady()
+                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -177,7 +177,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                try await latteVC.suspendUntilReady()
+                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<Bool>(task: Task { try await run1() })
 
@@ -285,7 +285,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                try await latteVC.suspendUntilReady()
+                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -343,7 +343,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                try await latteVC.suspendUntilReady()
+                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<Void>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -382,7 +382,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                try await latteVC.suspendUntilReady()
+                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<Void>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -446,7 +446,7 @@ public extension Latte {
                 latteVC.webView.delegate = self
                 latteVC.webView.load()
 
-                try await latteVC.suspendUntilReady()
+                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -537,16 +537,19 @@ class LatteViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func suspendUntilReady() async throws {
+    func suspendUntilReady(timeoutMillis: Int) async throws {
         try await withCheckedThrowingContinuation { next in
             var isResumed = false
+            var timeoutTask: Task<Void, Error>?
             self.webView.onReady = { _ in
                 guard isResumed == false else { return }
+                timeoutTask?.cancel()
                 isResumed = true
                 next.resume()
             }
             self.webView.completion = { (_, result) in
                 guard isResumed == false else { return }
+                timeoutTask?.cancel()
                 switch result {
                 case let .success(r):
                     do {
@@ -559,6 +562,13 @@ class LatteViewController: UIViewController {
                 case let .failure(error):
                     next.resume(throwing: error)
                 }
+            }
+            timeoutTask = Task {
+                try await Task.sleep(nanoseconds: UInt64(timeoutMillis) * 1_000_000)
+                guard isResumed == false else { return }
+                timeoutTask = nil
+                isResumed = true
+                next.resume(throwing: LatteError.timeout)
             }
         }
     }
