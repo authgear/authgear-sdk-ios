@@ -1,6 +1,6 @@
 import Foundation
 
-enum LatteError: LocalizedError, CustomNSError {
+public enum LatteError: LocalizedError, CustomNSError {
     case unexpected(message: String)
     case invalidShortLink
     case timeout
