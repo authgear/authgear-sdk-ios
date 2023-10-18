@@ -8,6 +8,11 @@ enum LatteBuiltInEvents: String {
     case tracking
     case ready
     case reauthWithBiometric
+    case resetPasswordCompleted
+}
+
+enum LatteBuiltInSignals: String {
+    case resetPasswordCompleted
 }
 
 let initScript = """
@@ -28,6 +33,7 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
     let request: LatteWebViewRequest
     var onReady: ((_ webview: LatteWKWebView) -> Void)?
     var onReauthWithBiometric: ((_ webview: LatteWKWebView) -> Void)?
+    var onResetPasswordCompleted: ((_ webview: LatteWKWebView) -> Void)?
     var completion: ((_ webview: LatteWKWebView, _ result: Result<LatteWebViewResult, Error>) -> Void)?
     weak var viewController: UIViewController?
     weak var delegate: LatteWebViewDelegate?
@@ -76,6 +82,12 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
 
     func load() {
         self.initialNavigation = self.load(URLRequest(url: self.request.url))
+    }
+    
+    func dispatchSignal(signal: LatteBuiltInSignals) {
+        self.evaluateJavaScript("""
+            window.dispatchSignal("\(signal.rawValue)");
+        """)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -151,6 +163,8 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
                     parent.onReady = nil
                 case LatteBuiltInEvents.reauthWithBiometric.rawValue:
                     parent.onReauthWithBiometric?(parent)
+                case LatteBuiltInEvents.resetPasswordCompleted.rawValue:
+                    parent.onResetPasswordCompleted?(parent)
                 default:
                     return
                 }
