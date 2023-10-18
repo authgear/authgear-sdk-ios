@@ -27,7 +27,7 @@ class EventBus<EventName: Hashable> {
 
     func dispatch(eventName: EventName) {
         DispatchQueue.main.async {
-            var listeners = self.registry[eventName] ?? []
+            let listeners = self.registry[eventName] ?? []
             listeners.forEach {
                 $0.listener()
             }
