@@ -37,7 +37,7 @@ public class Latte: LatteWebViewDelegate {
     let webviewIsInspectable: Bool
     let webViewLoadTimeoutMillis: Int
     public weak var delegate: LatteDelegate?
-    
+
     let eventBus: EventBus<LatteInternalEvent> = EventBus()
 
     public init(

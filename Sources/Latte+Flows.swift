@@ -109,7 +109,8 @@ public extension Latte {
                 @Sendable @MainActor
                 func run1() async throws -> UserInfo {
                     let result: LatteWebViewResult = try await withCheckedThrowingContinuation { [
-                        weak self] next in
+                        weak self
+                    ] next in
                         let unsubscribe = self?.eventBus.listen(
                             eventName: .resetPasswordCompleted,
                             listener: {
@@ -590,7 +591,7 @@ class LatteViewController: UIViewController {
             }
         }
     }
-    
+
     func dispatchWebViewSignal(signal: LatteBuiltInSignals) {
         self.webView.dispatchSignal(signal: signal)
     }

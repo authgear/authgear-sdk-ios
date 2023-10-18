@@ -83,7 +83,7 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
     func load() {
         self.initialNavigation = self.load(URLRequest(url: self.request.url))
     }
-    
+
     func dispatchSignal(signal: LatteBuiltInSignals) {
         self.evaluateJavaScript("""
             window.dispatchSignal("\(signal.rawValue)");
