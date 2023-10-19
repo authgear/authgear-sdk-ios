@@ -111,14 +111,19 @@ public extension Latte {
                     let result: LatteWebViewResult = try await withCheckedThrowingContinuation { [
                         weak self
                     ] next in
-                        let unsubscribe = self?.eventBus.listen(
-                            eventName: .resetPasswordCompleted,
-                            listener: {
-                                latteVC.dispatchWebViewSignal(signal: .resetPasswordCompleted)
+                        guard let nc = self?.eventNotificationCenter else { return }
+                        let observer = nc.addObserver(
+                            forName: LatteInternalEvent.resetPasswordCompleted.notificationName,
+                            object: nil,
+                            queue: nil,
+                            using: { _ in
+                                Task {
+                                    await latteVC.dispatchWebViewSignal(signal: .resetPasswordCompleted)
+                                }
                             }
                         )
                         latteVC.webView.completion = { (_, result) in
-                            unsubscribe?()
+                            nc.removeObserver(observer)
                             next.resume(with: result)
                         }
                     }
@@ -193,21 +198,26 @@ public extension Latte {
                 @Sendable @MainActor
                 func run1() async throws -> Bool {
                     let result: Bool = try await withCheckedThrowingContinuation { [weak self] next in
+                        guard let nc = self?.eventNotificationCenter else { return }
                         var isResumed = false
                         func resume(_ result: Result<Bool, Error>) {
                             guard isResumed == false else { return }
                             isResumed = true
                             next.resume(with: result)
                         }
-                        let unsubscribe = self?.eventBus.listen(
-                            eventName: .resetPasswordCompleted,
-                            listener: {
-                                latteVC.dispatchWebViewSignal(signal: .resetPasswordCompleted)
+                        let observer = nc.addObserver(
+                            forName: LatteInternalEvent.resetPasswordCompleted.notificationName,
+                            object: nil,
+                            queue: nil,
+                            using: { _ in
+                                Task {
+                                    await latteVC.dispatchWebViewSignal(signal: .resetPasswordCompleted)
+                                }
                             }
                         )
                         latteVC.webView.completion = { (_, result) in
                             do {
-                                unsubscribe?()
+                                nc.removeObserver(observer)
                                 let finishURL = try result.get().unwrap()
                                 self?.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { r in
                                     resume(r.flatMap { _ in
@@ -405,7 +415,10 @@ public extension Latte {
                 func run1() async throws {
                     let result: LatteWebViewResult = try await withCheckedThrowingContinuation { [weak self] next in
                         latteVC.webView.onResetPasswordCompleted = { _ in
-                            self?.eventBus.dispatch(eventName: .resetPasswordCompleted)
+                            self?.eventNotificationCenter.post(
+                                name: LatteInternalEvent.resetPasswordCompleted.notificationName,
+                                object: nil
+                            )
                         }
                         latteVC.webView.completion = { (_, result) in
                             next.resume(with: result)

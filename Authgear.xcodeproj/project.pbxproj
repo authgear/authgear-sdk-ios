@@ -22,7 +22,6 @@
 		A652CEBB2A822D19006E789F /* Dictionary+encodeAsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */; };
 		A652CEE72A84DE72006E789F /* ASN1DERParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */; };
 		A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */; };
-		A679C83F2ADEAEC1002059D4 /* EventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = A679C83E2ADEAEC1002059D4 /* EventBus.swift */; };
 		A68DAD2229AF686000487DAF /* UILocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD1F29AF686000487DAF /* UILocales.swift */; };
 		A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */; };
 		A6D692B92A0CCA2B00B457F9 /* Latte+Tokenize.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */; };
@@ -77,7 +76,6 @@
 		A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+encodeAsQuery.swift"; sourceTree = "<group>"; };
 		A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASN1DERParsing.swift; sourceTree = "<group>"; };
 		A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asn1IntegerConversion.swift; sourceTree = "<group>"; };
-		A679C83E2ADEAEC1002059D4 /* EventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventBus.swift; sourceTree = "<group>"; };
 		A68DAD1F29AF686000487DAF /* UILocales.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILocales.swift; sourceTree = "<group>"; };
 		A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+encodeAsQueryComponent.swift"; sourceTree = "<group>"; };
 		A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Latte+Tokenize.swift"; sourceTree = "<group>"; };
@@ -198,7 +196,6 @@
 				A6D692B82A0CCA2B00B457F9 /* Latte+Tokenize.swift */,
 				A648BE842975316A002D8EA5 /* Latte+EmailClient.swift */,
 				95E6733A29A37E5A00C9466C /* Latte+Flows.swift */,
-				A679C83E2ADEAEC1002059D4 /* EventBus.swift */,
 				A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */,
 				77AE4DD929A72A5B006A3ADB /* Latte+UniversalLink.swift */,
 				95E67330299F652000C9466C /* Latte+WKWebView.swift */,
@@ -322,7 +319,6 @@
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
 				A648BE852975316A002D8EA5 /* Latte+EmailClient.swift in Sources */,
-				A679C83F2ADEAEC1002059D4 /* EventBus.swift in Sources */,
 				A68DAD2229AF686000487DAF /* UILocales.swift in Sources */,
 				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
 				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
