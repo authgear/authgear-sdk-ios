@@ -86,7 +86,11 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
 
     func dispatchSignal(signal: LatteBuiltInSignals) {
         self.evaluateJavaScript("""
-            window.dispatchSignal("\(signal.rawValue)");
+            document.dispatchEvent(
+              new CustomEvent("latte:signal", {
+                detail: { type: "\(signal.rawValue)" },
+              })
+            );
         """)
     }
 
