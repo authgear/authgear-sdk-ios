@@ -38,6 +38,8 @@ public class Latte: LatteWebViewDelegate {
     let webViewLoadTimeoutMillis: Int
     public weak var delegate: LatteDelegate?
 
+    let eventNotificationCenter = NotificationCenter()
+
     public init(
         authgear: Authgear,
         customUIEndpoint: String,
@@ -131,6 +133,14 @@ enum LatteWebViewEvent {
     case openEmailClient
     case openSMSClient
     case trackingEvent(event: LatteTrackingEvent)
+}
+
+enum LatteInternalEvent: String {
+    case resetPasswordCompleted
+
+    var notificationName: Notification.Name {
+        Notification.Name(self.rawValue)
+    }
 }
 
 public struct LatteBiometricOptions {

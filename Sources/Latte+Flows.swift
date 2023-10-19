@@ -108,8 +108,22 @@ public extension Latte {
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
                 func run1() async throws -> UserInfo {
-                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { [
+                        weak self
+                    ] next in
+                        guard let nc = self?.eventNotificationCenter else { return }
+                        let observer = nc.addObserver(
+                            forName: LatteInternalEvent.resetPasswordCompleted.notificationName,
+                            object: nil,
+                            queue: nil,
+                            using: { _ in
+                                Task {
+                                    await latteVC.dispatchWebViewSignal(signal: .resetPasswordCompleted)
+                                }
+                            }
+                        )
                         latteVC.webView.completion = { (_, result) in
+                            nc.removeObserver(observer)
                             next.resume(with: result)
                         }
                     }
@@ -183,17 +197,29 @@ public extension Latte {
 
                 @Sendable @MainActor
                 func run1() async throws -> Bool {
-                    let result: Bool = try await withCheckedThrowingContinuation { next in
+                    let result: Bool = try await withCheckedThrowingContinuation { [weak self] next in
+                        guard let nc = self?.eventNotificationCenter else { return }
                         var isResumed = false
                         func resume(_ result: Result<Bool, Error>) {
                             guard isResumed == false else { return }
                             isResumed = true
                             next.resume(with: result)
                         }
+                        let observer = nc.addObserver(
+                            forName: LatteInternalEvent.resetPasswordCompleted.notificationName,
+                            object: nil,
+                            queue: nil,
+                            using: { _ in
+                                Task {
+                                    await latteVC.dispatchWebViewSignal(signal: .resetPasswordCompleted)
+                                }
+                            }
+                        )
                         latteVC.webView.completion = { (_, result) in
                             do {
+                                nc.removeObserver(observer)
                                 let finishURL = try result.get().unwrap()
-                                self.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { r in
+                                self?.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { r in
                                     resume(r.flatMap { _ in
                                         .success(true)
                                     })
@@ -387,7 +413,13 @@ public extension Latte {
                 let handle = LatteHandle<Void>(task: Task { try await run1() })
                 @Sendable @MainActor
                 func run1() async throws {
-                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { next in
+                    let result: LatteWebViewResult = try await withCheckedThrowingContinuation { [weak self] next in
+                        latteVC.webView.onResetPasswordCompleted = { _ in
+                            self?.eventNotificationCenter.post(
+                                name: LatteInternalEvent.resetPasswordCompleted.notificationName,
+                                object: nil
+                            )
+                        }
                         latteVC.webView.completion = { (_, result) in
                             next.resume(with: result)
                         }
@@ -571,5 +603,9 @@ class LatteViewController: UIViewController {
                 next.resume(throwing: LatteError.timeout)
             }
         }
+    }
+
+    func dispatchWebViewSignal(signal: LatteBuiltInSignals) {
+        self.webView.dispatchSignal(signal: signal)
     }
 }
