@@ -137,9 +137,9 @@ enum LatteWebViewEvent {
 
 enum LatteInternalEvent: String {
     case resetPasswordCompleted
-    
+
     var notificationName: Notification.Name {
-        return Notification.Name(self.rawValue)
+        Notification.Name(self.rawValue)
     }
 }
 
