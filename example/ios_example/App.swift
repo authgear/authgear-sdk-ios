@@ -70,7 +70,8 @@ class App: ObservableObject {
         UserDefaults.standard.set(app2AppEndpoint, forKey: "authgear.demo.app2appendpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: true)
+        let isApp2AppEnabled = !app2AppEndpoint.isEmpty
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: isApp2AppEnabled)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
         self.app2appEndpoint = app2AppEndpoint
