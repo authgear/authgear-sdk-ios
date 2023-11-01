@@ -15,11 +15,11 @@ extension ASWebAuthenticationSession: AuthenticationSession {}
 class AuthenticationSessionProvider: NSObject {
     func makeAuthenticationSession(
         url: URL,
-        callbackURLSchema: String,
+        redirectURI: String,
         prefersEphemeralWebBrowserSession: Bool?,
         completionHandler: @escaping AuthenticationSession.CompletionHandler
     ) -> AuthenticationSession {
-        let handler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
+        let realCompletionHandler: (URL?, Error?) -> Void = { (url: URL?, error: Error?) in
             if let error = error {
                 return completionHandler(.failure(wrapError(error: error)))
             }
@@ -28,11 +28,12 @@ class AuthenticationSessionProvider: NSObject {
                 return completionHandler(.success(url))
             }
         }
+
         if #available(iOS 12.0, *) {
             let session = ASWebAuthenticationSession(
                 url: url,
-                callbackURLScheme: callbackURLSchema,
-                completionHandler: handler
+                callbackURLScheme: getURIScheme(uri: redirectURI),
+                completionHandler: realCompletionHandler
             )
 
             if #available(iOS 13.0, *) {
@@ -44,11 +45,18 @@ class AuthenticationSessionProvider: NSObject {
         } else {
             let session = SFAuthenticationSession(
                 url: url,
-                callbackURLScheme: callbackURLSchema,
-                completionHandler: handler
+                callbackURLScheme: getURIScheme(uri: redirectURI),
+                completionHandler: realCompletionHandler
             )
             return session
         }
+    }
+
+    private func getURIScheme(uri: String) -> String {
+        if let index = uri.firstIndex(of: ":") {
+            return String(uri[..<index])
+        }
+        return uri
     }
 }
 
