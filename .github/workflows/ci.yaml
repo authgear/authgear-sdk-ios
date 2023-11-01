@@ -36,7 +36,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
   ios:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/2023C01-on-main'
     runs-on: macos-13
     steps:
     - uses: actions/checkout@v3
