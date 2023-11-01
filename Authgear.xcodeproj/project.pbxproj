@@ -9,6 +9,16 @@
 /* Begin PBXBuildFile section */
 		775FF72A2603649500B81ECD /* Biometric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF7292603649500B81ECD /* Biometric.swift */; };
 		775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF73326047C7700B81ECD /* DeviceInfo.swift */; };
+		95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E67332299F652000C9466C /* AuthgearExperimental.swift */; };
+		A652CEAE2A812CA9006E789F /* App2AppOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEAD2A812CA9006E789F /* App2AppOptions.swift */; };
+		A652CEB32A8131BF006E789F /* App2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEB22A8131BF006E789F /* App2App.swift */; };
+		A652CEB72A822753006E789F /* App2AppAuthenticationOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEB62A822753006E789F /* App2AppAuthenticationOptions.swift */; };
+		A652CEB92A8227C2006E789F /* App2AppAuthenticateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEB82A8227C2006E789F /* App2AppAuthenticateRequest.swift */; };
+		A652CEBB2A822D19006E789F /* Dictionary+encodeAsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */; };
+		A652CEE72A84DE72006E789F /* ASN1DERParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */; };
+		A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */; };
+		A68DAD2229AF686000487DAF /* UILocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD1F29AF686000487DAF /* UILocales.swift */; };
+		A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
 		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
@@ -46,6 +56,16 @@
 /* Begin PBXFileReference section */
 		775FF7292603649500B81ECD /* Biometric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Biometric.swift; sourceTree = "<group>"; };
 		775FF73326047C7700B81ECD /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
+		95E67332299F652000C9466C /* AuthgearExperimental.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthgearExperimental.swift; sourceTree = "<group>"; };
+		A652CEAD2A812CA9006E789F /* App2AppOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2AppOptions.swift; sourceTree = "<group>"; };
+		A652CEB22A8131BF006E789F /* App2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2App.swift; sourceTree = "<group>"; };
+		A652CEB62A822753006E789F /* App2AppAuthenticationOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2AppAuthenticationOptions.swift; sourceTree = "<group>"; };
+		A652CEB82A8227C2006E789F /* App2AppAuthenticateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2AppAuthenticateRequest.swift; sourceTree = "<group>"; };
+		A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+encodeAsQuery.swift"; sourceTree = "<group>"; };
+		A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASN1DERParsing.swift; sourceTree = "<group>"; };
+		A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asn1IntegerConversion.swift; sourceTree = "<group>"; };
+		A68DAD1F29AF686000487DAF /* UILocales.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILocales.swift; sourceTree = "<group>"; };
+		A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+encodeAsQueryComponent.swift"; sourceTree = "<group>"; };
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20D6F025BAA3C400E579DD /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = example/Pods/Pods.xcodeproj; sourceTree = "<group>"; };
@@ -86,6 +106,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A652CEAA2A812C94006E789F /* app2app */ = {
+			isa = PBXGroup;
+			children = (
+				A652CEAD2A812CA9006E789F /* App2AppOptions.swift */,
+				A652CEB22A8131BF006E789F /* App2App.swift */,
+				A652CEB62A822753006E789F /* App2AppAuthenticationOptions.swift */,
+				A652CEB82A8227C2006E789F /* App2AppAuthenticateRequest.swift */,
+			);
+			path = app2app;
+			sourceTree = "<group>";
+		};
 		CC20D6F125BAA3C400E579DD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -128,8 +159,10 @@
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A652CEAA2A812C94006E789F /* app2app */,
 				F83D84AB24F66D3400B4393C /* APIClient.swift */,
 				F83D84A724F64D0E00B4393C /* Authgear.swift */,
+				95E67332299F652000C9466C /* AuthgearExperimental.swift */,
 				F83D84AF24F860AA00B4393C /* AuthenticationSession.swift */,
 				F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */,
 				F83D84AD24F6A93600B4393C /* CodeVerifier.swift */,
@@ -141,7 +174,12 @@
 				F8A657A42501D31E0027888F /* JWK.swift */,
 				775FF7292603649500B81ECD /* Biometric.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
+				A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */,
+				A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */,
 				F8A657A825055A7C0027888F /* Base64.swift */,
+				A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */,
+				A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */,
+				A68DAD1F29AF686000487DAF /* UILocales.swift */,
 			);
 			path = Sources;
 			sourceTree = SOURCE_ROOT;
@@ -239,17 +277,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				A652CEB32A8131BF006E789F /* App2App.swift in Sources */,
 				F83D84AA24F66C5100B4393C /* OIDCConfiguration.swift in Sources */,
+				A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */,
 				F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */,
+				A652CEE72A84DE72006E789F /* ASN1DERParsing.swift in Sources */,
 				F83392EF24FC344D00A69D3C /* Storage.swift in Sources */,
+				A652CEAE2A812CA9006E789F /* App2AppOptions.swift in Sources */,
+				95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */,
 				F83D84AE24F6A93600B4393C /* CodeVerifier.swift in Sources */,
+				A652CEBB2A822D19006E789F /* Dictionary+encodeAsQuery.swift in Sources */,
+				A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */,
 				F8A657A925055A7C0027888F /* Base64.swift in Sources */,
 				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
 				775FF72A2603649500B81ECD /* Biometric.swift in Sources */,
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
+				A68DAD2229AF686000487DAF /* UILocales.swift in Sources */,
 				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
 				F8A657A32501845D0027888F /* Decodable+Any.swift in Sources */,
+				A652CEB72A822753006E789F /* App2AppAuthenticationOptions.swift in Sources */,
+				A652CEB92A8227C2006E789F /* App2AppAuthenticateRequest.swift in Sources */,
 				F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */,
 				F83D84B024F860AA00B4393C /* AuthenticationSession.swift in Sources */,
 				F83D84A824F64D0E00B4393C /* Authgear.swift in Sources */,
