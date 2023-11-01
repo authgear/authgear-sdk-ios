@@ -11,10 +11,10 @@ on:
       - "!gh-pages"
 
 jobs:
-  deploy:
-    runs-on: macos-11
+  gh-pages:
+    runs-on: macos-12
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -22,9 +22,10 @@ jobs:
       # Latest compatiable version with our codebase is 0.48.0
       - run: brew update
       - run: brew upgrade swiftformat || brew install swiftformat
-      - run: sudo xcode-select -s /Applications/Xcode_13.2.1.app/Contents/Developer
+      - run: sudo xcode-select -s /Applications/Xcode_14.2.app/Contents/Developer
       - run: make lint
       - run: pod install --project-directory=example
+      - run: xcodebuild -showsdks
       - run: make build
       - run: make test
       - run: make docs
@@ -34,3 +35,56 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+  ios:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-13
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: "18.x"
+    - run: sudo xcode-select -s /Applications/Xcode_14.3.1.app/Contents/Developer
+    - run: npm install -g appcenter-cli
+    - working-directory: ./example
+      run: pod install
+    - name: Install the Apple certificate and provisioning profile
+      env:
+        IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+        IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+      run: |
+        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+        PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+        echo -n "$IOS_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+        echo -n "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+        security create-keychain -p "" $KEYCHAIN_PATH
+        security set-keychain-settings $KEYCHAIN_PATH
+        security unlock-keychain -p "" $KEYCHAIN_PATH
+
+        security import $CERTIFICATE_PATH -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH
+
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+    - name: Set CFBundleVersion
+      working-directory: ./example
+      run: |
+        BUILD_NUMBER=$(date +%s)
+        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" ./ios_example/Info.plist
+    - name: Run xcodebuild archive
+      working-directory: ./example
+      run: xcodebuild -workspace ios_example.xcworkspace -scheme iOS-Example -configuration Release -archivePath "$RUNNER_TEMP/ios_example.xcarchive" archive
+    - name: Run xcodebuild -exportArchive
+      working-directory: ./example
+      run: xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/ios_example.xcarchive" -exportPath "$RUNNER_TEMP/ios_example.export" -exportOptionsPlist "./ExportOptions.plist"
+    - name: Distribute to App Center
+      env:
+        APPCENTER_ACCESS_TOKEN: ${{ secrets.IOS_APPCENTER_ACCESS_TOKEN }}
+      run: appcenter distribute release --debug --silent --file "$RUNNER_TEMP/ios_example.export/ios_example.ipa" --store "App Store Connect Users" --app "Oursky/Authgear-demo-iOS" --release-notes "no release notes"
+    - name: Clean up keychain and provisioning profile
+      if: ${{ always() }}
+      run: |
+        security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
+        rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
