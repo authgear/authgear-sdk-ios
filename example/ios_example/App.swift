@@ -3,6 +3,8 @@ import SwiftUI
 
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
+    static let app2appRedirectURI = "https://authgear-demo.pandawork.com/app2app/redirect"
+    static let app2appAuthorizeEndpoint = "https://authgear-demo.pandawork.com/app2app/authorize"
     static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
     static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
     static let wechatAppID = "wxa2f631873c63add1"
@@ -31,10 +33,25 @@ class App: ObservableObject {
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
+    @Published var app2appEndpoint: String = ""
+    @Published var isAuthgearConfigured: Bool = false
+    @Published var app2AppConfirmation: App2AppConfirmation? = nil
+
+    private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
+    var pendingApp2AppRequest: App2AppAuthenticateRequest? {
+        get {
+            mPendingApp2AppRequest
+        }
+        set {
+            mPendingApp2AppRequest = newValue
+            handlePendingApp2AppRequest()
+        }
+    }
 
     func configure(
         clientId: String,
         endpoint: String,
+        app2AppEndpoint: String,
         authenticationPage: AuthenticationPage?,
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
@@ -50,11 +67,14 @@ class App: ObservableObject {
         }
         UserDefaults.standard.set(clientId, forKey: "authgear.demo.clientID")
         UserDefaults.standard.set(endpoint, forKey: "authgear.demo.endpoint")
+        UserDefaults.standard.set(app2AppEndpoint, forKey: "authgear.demo.app2appendpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled)
+        let isApp2AppEnabled = !app2AppEndpoint.isEmpty
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: isApp2AppEnabled)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
+        self.app2appEndpoint = app2AppEndpoint
         self.updateBiometricState()
     }
 
@@ -109,6 +129,16 @@ class App: ObservableObject {
             colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI,
             page: self.authenticationPage,
+            handler: self.handleAuthorizeResult
+        )
+    }
+
+    func authenticateApp2App() {
+        container?.startApp2AppAuthentication(
+            options: App2AppAuthenticateOptions(
+                authorizationEndpoint: self.app2appEndpoint,
+                redirectUri: App.app2appRedirectURI
+            ),
             handler: self.handleAuthorizeResult
         )
     }
@@ -245,5 +275,62 @@ class App: ObservableObject {
                 self.setError(error)
             }
         }
+    }
+
+    func postConfig() {
+        self.isAuthgearConfigured = true
+        handlePendingApp2AppRequest()
+    }
+
+    private func handlePendingApp2AppRequest() {
+        guard isAuthgearConfigured,
+              let request = pendingApp2AppRequest,
+              let container = container else {
+            return
+        }
+        pendingApp2AppRequest = nil
+        if (container.sessionState != .authenticated) {
+            setError(AppError("must be in authenticated state to handle app2app request"))
+            return
+        }
+        let confirmation = App2AppConfirmation(
+            onConfirm: {
+                self.app2AppConfirmation = nil
+                container.approveApp2AppAuthenticationRequest(request: request) { approveResult in
+                    do {
+                        try approveResult.get()
+                    } catch {
+                        self.setError(error)
+                    }
+                }
+            },
+            onReject: {
+                self.app2AppConfirmation = nil
+                container.rejectApp2AppAuthenticationRequest(request: request, reason: AppError("rejected")) { approveResult in
+                    do {
+                        try approveResult.get()
+                    } catch {
+                        self.setError(error)
+                    }
+                }
+            }
+        )
+        self.app2AppConfirmation = confirmation
+    }
+}
+
+struct App2AppConfirmation {
+    let onConfirm: () -> Void
+    let onReject: () -> Void
+}
+
+class AppError: Error, LocalizedError {
+    private let message: String
+    public var errorDescription: String? {
+        message
+    }
+
+    init(_ message: String) {
+        self.message = message
     }
 }
