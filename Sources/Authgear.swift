@@ -1023,6 +1023,45 @@ public class Authgear {
         }
     }
 
+    func generateAuthgearURL(
+        path: String,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        handler: URLCompletionHandler?
+    ) {
+        let handler = handler.map { h in self.withMainQueueHandler(h) }
+        self.workerQueue.async {
+            self.apiClient.makeAuthgearURL(path: path) { result in
+                switch result {
+                case let .failure(err):
+                    handler?(.failure(err))
+                case let .success(url):
+                    var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+                    var queryItems = urlComponents.queryItems ?? []
+                    if let uiLocales = uiLocales {
+                        queryItems.append(URLQueryItem(
+                            name: "ui_locales",
+                            value: uiLocales.joined(separator: " ")
+                        ))
+                    }
+                    if let colorScheme = colorScheme {
+                        queryItems.append(URLQueryItem(name: "x_color_scheme", value: colorScheme.rawValue))
+                    }
+                    urlComponents.queryItems = queryItems
+                    let redirectURI = urlComponents.url!
+                    self.generateURL(redirectURI: redirectURI.absoluteString) { generatedResult in
+                        switch generatedResult {
+                        case let .failure(err):
+                            handler?(.failure(err))
+                        case let .success(url):
+                            handler?(.success(url))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public func openURL(
         path: String,
         uiLocales: [String]? = nil,
@@ -1032,21 +1071,11 @@ public class Authgear {
     ) {
         let handler = handler.map { h in withMainQueueHandler(h) }
 
-        var urlComponents = URLComponents(url: apiClient.endpoint.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
-        var queryItems = urlComponents.queryItems ?? []
-        if let uiLocales = uiLocales {
-            queryItems.append(URLQueryItem(
-                name: "ui_locales",
-                value: uiLocales.joined(separator: " ")
-            ))
-        }
-        if let colorScheme = colorScheme {
-            queryItems.append(URLQueryItem(name: "x_color_scheme", value: colorScheme.rawValue))
-        }
-        urlComponents.queryItems = queryItems
-        let url = urlComponents.url!
-
-        self.generateURL(redirectURI: url.absoluteString) { [weak self] result in
+        self.generateAuthgearURL(
+            path: path,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme
+        ) { [weak self] result in
             guard let self = self else { return }
 
             switch result {

@@ -153,6 +153,7 @@ struct AppSessionTokenResponse: Decodable {
 
 protocol AuthAPIClient: AnyObject {
     var endpoint: URL { get }
+    func makeAuthgearURL(path: String, handler: @escaping (Result<URL, Error>) -> Void)
     func fetchOIDCConfiguration(handler: @escaping (Result<OIDCConfiguration, Error>) -> Void)
     func requestOIDCToken(
         grantType: GrantType,
@@ -397,6 +398,21 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     return .failure(wrapError(error: error))
                 }
             })
+        }
+    }
+
+    func makeAuthgearURL(path: String, handler: @escaping (Result<URL, Error>) -> Void) {
+        fetchOIDCConfiguration { result in
+            switch result {
+            case let .success(config):
+                guard let authgearOrigin = config.authorizationEndpoint.origin() else {
+                    return handler(.failure(wrapError(error: AuthgearError.runtimeError("invalid authorization_endpoint"))))
+                }
+                let resultURL = authgearOrigin.appendingPathComponent(path)
+                return handler(.success(resultURL))
+            case let .failure(error):
+                return handler(.failure(wrapError(error: error)))
+            }
         }
     }
 
