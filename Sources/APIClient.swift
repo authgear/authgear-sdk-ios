@@ -592,28 +592,42 @@ class DefaultAuthAPIClient: AuthAPIClient {
         purpose: String,
         handler: @escaping (Result<ChallengeResponse, Error>) -> Void
     ) {
-        var urlRequest = URLRequest(url: endpoint.appendingPathComponent("/oauth2/challenge"))
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
-        urlRequest.httpBody = try? JSONEncoder().encode(ChallengeBody(purpose: purpose))
+        makeAuthgearURL(path: "/oauth2/challenge") { result in
+            switch result {
+            case let .failure(err):
+                handler(.failure(err))
+            case let .success(url):
+                var urlRequest = URLRequest(url: url)
+                urlRequest.httpMethod = "POST"
+                urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
+                urlRequest.httpBody = try? JSONEncoder().encode(ChallengeBody(purpose: purpose))
 
-        fetch(request: urlRequest, handler: { (result: Result<APIResponse<ChallengeResponse>, Error>) in
-            handler(result.flatMap { $0.toResult() })
-        })
+                self.fetch(request: urlRequest, handler: { (result: Result<APIResponse<ChallengeResponse>, Error>) in
+                    handler(result.flatMap { $0.toResult() })
+                })
+            }
+        }
     }
 
     func requestAppSessionToken(
         refreshToken: String,
         handler: @escaping (Result<AppSessionTokenResponse, Error>) -> Void
     ) {
-        var urlRequest = URLRequest(url: endpoint.appendingPathComponent("/oauth2/app_session_token"))
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
-        urlRequest.httpBody = try? JSONEncoder().encode(AppSessionTokenBody(refreshToken: refreshToken))
+        makeAuthgearURL(path: "/oauth2/app_session_token") { result in
+            switch result {
+            case let .failure(err):
+                handler(.failure(err))
+            case let .success(url):
+                var urlRequest = URLRequest(url: url)
+                urlRequest.httpMethod = "POST"
+                urlRequest.setValue("application/json", forHTTPHeaderField: "content-type")
+                urlRequest.httpBody = try? JSONEncoder().encode(AppSessionTokenBody(refreshToken: refreshToken))
 
-        fetch(request: urlRequest, handler: { (result: Result<APIResponse<AppSessionTokenResponse>, Error>) in
-            handler(result.flatMap { $0.toResult() })
-        })
+                self.fetch(request: urlRequest, handler: { (result: Result<APIResponse<AppSessionTokenResponse>, Error>) in
+                    handler(result.flatMap { $0.toResult() })
+                })
+            }
+        }
     }
 
     func requestWechatAuthCallback(code: String, state: String, handler: @escaping (Result<Void, Error>) -> Void) {
@@ -625,16 +639,22 @@ class DefaultAuthAPIClient: AuthAPIClient {
         var urlComponents = URLComponents()
         urlComponents.queryItems = queryItems
 
-        let u = endpoint.appendingPathComponent("/sso/wechat/callback")
-        var urlRequest = URLRequest(url: u)
-        urlRequest.httpMethod = "POST"
-        urlRequest.setValue(
-            "application/x-www-form-urlencoded",
-            forHTTPHeaderField: "content-type"
-        )
-        urlRequest.httpBody = urlComponents.query?.data(using: .utf8)
-        authgearFetch(urlSession: self.defaultSession, request: urlRequest, handler: { result in
-            handler(result.map { _ in () })
-        })
+        makeAuthgearURL(path: "/sso/wechat/callback") { result in
+            switch result {
+            case let .failure(err):
+                handler(.failure(err))
+            case let .success(url):
+                var urlRequest = URLRequest(url: url)
+                urlRequest.httpMethod = "POST"
+                urlRequest.setValue(
+                    "application/x-www-form-urlencoded",
+                    forHTTPHeaderField: "content-type"
+                )
+                urlRequest.httpBody = urlComponents.query?.data(using: .utf8)
+                authgearFetch(urlSession: self.defaultSession, request: urlRequest, handler: { result in
+                    handler(result.map { _ in () })
+                })
+            }
+        }
     }
 }
