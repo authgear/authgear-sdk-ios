@@ -19,6 +19,7 @@
 		A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */; };
 		A68DAD2229AF686000487DAF /* UILocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD1F29AF686000487DAF /* UILocales.swift */; };
 		A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */; };
+		A6FCB0A52AF37E4300DAC260 /* URL+origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6FCB0A42AF37E4300DAC260 /* URL+origin.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
 		F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F224FE38FE00A69D3C /* URLComponents+QueryParames.swift */; };
@@ -66,6 +67,7 @@
 		A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asn1IntegerConversion.swift; sourceTree = "<group>"; };
 		A68DAD1F29AF686000487DAF /* UILocales.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILocales.swift; sourceTree = "<group>"; };
 		A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+encodeAsQueryComponent.swift"; sourceTree = "<group>"; };
+		A6FCB0A42AF37E4300DAC260 /* URL+origin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+origin.swift"; sourceTree = "<group>"; };
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC20D6F025BAA3C400E579DD /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = example/Pods/Pods.xcodeproj; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 				F8A657A825055A7C0027888F /* Base64.swift */,
 				A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */,
 				A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */,
+				A6FCB0A42AF37E4300DAC260 /* URL+origin.swift */,
 				A68DAD1F29AF686000487DAF /* UILocales.swift */,
 			);
 			path = Sources;
@@ -290,6 +293,7 @@
 				A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */,
 				F8A657A925055A7C0027888F /* Base64.swift in Sources */,
 				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
+				A6FCB0A52AF37E4300DAC260 /* URL+origin.swift in Sources */,
 				775FF72A2603649500B81ECD /* Biometric.swift in Sources */,
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
