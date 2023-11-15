@@ -169,7 +169,7 @@ class App2App {
             )
         } catch {
             resultURL = constructErrorURL(
-                redirectUri: request.redirectUri,
+                request: request,
                 defaultError: "unknown_error",
                 e: error
             )
@@ -184,14 +184,15 @@ class App2App {
         handler: @escaping (Result<Void, Error>) -> Void
     ) {
         let resultURL = constructErrorURL(
-            redirectUri: request.redirectUri,
+            request: request,
             defaultError: "x_app2app_rejected",
             e: reason
         )
         openURLInUniversalLink(url: resultURL, handler: handler)
     }
 
-    private func constructErrorURL(redirectUri: URL, defaultError: String, e: Error) -> URL {
+    private func constructErrorURL(request: App2AppAuthenticateRequest, defaultError: String, e: Error) -> URL {
+        let redirectUri = request.redirectUri
         var error = defaultError
         var errorDescription: String? = "Unknown error"
         if let localizedErr = e as? LocalizedError {
@@ -221,6 +222,9 @@ class App2App {
         ]
         if let errorDescription = errorDescription {
             query["error_description"] = errorDescription
+        }
+        if let state = request.state {
+            query["state"] = state
         }
         var urlcomponents = URLComponents(
             url: redirectUri,
@@ -258,9 +262,12 @@ class App2App {
             xApp2AppDeviceKeyJwt: nil
         )
         let code = oidcTokenResponse.code ?? ""
-        let query: [String: String] = [
+        var query: [String: String] = [
             "code": code
         ]
+        if let state = request.state {
+            query["state"] = state
+        }
         var urlcomponents = URLComponents(
             url: request.redirectUri,
             resolvingAgainstBaseURL: false
