@@ -75,6 +75,7 @@ struct AuthgearConfigurationForm: View {
     @State private var clientID: String = UserDefaults.standard.string(forKey: "authgear.demo.clientID") ?? ""
     @State private var endpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.endpoint") ?? ""
     @State private var app2AppEndpoint: String = UserDefaults.standard.string(forKey: "authgear.demo.app2appendpoint") ?? ""
+    @Binding var app2appState: String
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
     @State private var authenticationPage: String = ""
@@ -105,6 +106,15 @@ struct AuthgearConfigurationForm: View {
                     text: $app2AppEndpoint
                 )
             )
+            if (!app2AppEndpoint.isEmpty) {
+                AuthgearConfigurationInput(
+                    label: "App2App State",
+                    input: AuthgearConfigurationTextField(
+                        placeHolder: "Enter App2App State",
+                        text: $app2appState
+                    )
+                )
+            }
             Picker("Authentication Page", selection: $authenticationPage) {
                 Text("Unset").tag("")
                 Text("Login").tag(AuthenticationPage.login.rawValue)
@@ -330,7 +340,7 @@ struct App2AppAlertView: View {
         }
         .alert(isPresented: shouldShow, content: {
             Alert(
-                title: Text("Approve app2app request?"),
+                title: Text(self.app.app2AppConfirmation?.message ?? ""),
                 primaryButton: .default(Text("OK")) {
                     self.app.app2AppConfirmation?.onConfirm()
                 },
@@ -349,7 +359,8 @@ struct ContentView: View {
         ScrollView {
             VStack(spacing: 20) {
                 AuthgearConfigurationDescription()
-                AuthgearConfigurationForm().environmentObject(app)
+                AuthgearConfigurationForm(app2appState: $app.app2AppState)
+                    .environmentObject(app)
                 AuthgearActionDescription()
                 ActionButtonList()
                     .environmentObject(app)
