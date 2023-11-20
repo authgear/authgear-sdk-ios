@@ -149,6 +149,12 @@ public struct OAuthError: LocalizedError, CustomNSError, Decodable {
     public let errorDescription: String?
     public let errorUri: String?
 
+    public init(error: String, errorDescription: String? = nil, errorUri: String? = nil) {
+        self.error = error
+        self.errorDescription = errorDescription
+        self.errorUri = errorUri
+    }
+
     // Implements CustomNSError
     public static var errorDomain: String { "OAuthError" }
     public var errorCode: Int { 0 }
