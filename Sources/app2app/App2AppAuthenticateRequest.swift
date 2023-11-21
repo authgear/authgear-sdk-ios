@@ -5,18 +5,22 @@ public struct App2AppAuthenticateRequest {
     public let redirectUri: URL
     public let clientID: String
     public let codeChallenge: String
+    public let state: String?
 
     func toURL() throws -> URL {
         let urlcomponents = URLComponents(string: authorizationEndpoint)
         guard var urlcomponents = urlcomponents else {
             throw AuthgearError.runtimeError("invalid authorizationEndpoint")
         }
-        let query: [String: String] = [
+        var query: [String: String] = [
             "client_id": clientID,
             "redirect_uri": redirectUri.absoluteString,
             "code_challenge_method": Authgear.CodeChallengeMethod,
             "code_challenge": codeChallenge
         ]
+        if let state = state {
+            query["state"] = state
+        }
         urlcomponents.percentEncodedQuery = query.encodeAsQuery()
         return urlcomponents.url!.absoluteURL
     }
@@ -49,17 +53,20 @@ public struct App2AppAuthenticateRequest {
         self.redirectUri = redirectUri
         self.clientID = clientID
         self.codeChallenge = codeChallenge
+        self.state = queryParams["state"]
     }
 
     init(
         authorizationEndpoint: String,
         redirectUri: URL,
         clientID: String,
-        codeChallenge: String
+        codeChallenge: String,
+        state: String?
     ) {
         self.authorizationEndpoint = authorizationEndpoint
         self.redirectUri = redirectUri
         self.clientID = clientID
         self.codeChallenge = codeChallenge
+        self.state = state
     }
 }

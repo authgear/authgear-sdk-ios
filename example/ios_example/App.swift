@@ -34,6 +34,7 @@ class App: ObservableObject {
     @Published var successAlertMessage: String?
     @Published var biometricEnabled: Bool = false
     @Published var app2appEndpoint: String = ""
+    @Published var app2AppState: String = ""
     @Published var isAuthgearConfigured: Bool = false
     @Published var app2AppConfirmation: App2AppConfirmation? = nil
 
@@ -137,7 +138,8 @@ class App: ObservableObject {
         container?.startApp2AppAuthentication(
             options: App2AppAuthenticateOptions(
                 authorizationEndpoint: self.app2appEndpoint,
-                redirectUri: App.app2appRedirectURI
+                redirectUri: App.app2appRedirectURI,
+                state: self.app2AppState
             ),
             handler: self.handleAuthorizeResult
         )
@@ -293,33 +295,62 @@ class App: ObservableObject {
             setError(AppError("must be in authenticated state to handle app2app request"))
             return
         }
-        let confirmation = App2AppConfirmation(
-            onConfirm: {
-                self.app2AppConfirmation = nil
-                container.approveApp2AppAuthenticationRequest(request: request) { approveResult in
-                    do {
-                        try approveResult.get()
-                    } catch {
-                        self.setError(error)
-                    }
+        container.fetchUserInfo {
+            let r = $0.map { userInfo in
+                var message = "Approve app2app request?"
+                var userIdentity = ""
+                if let email = userInfo.email {
+                    userIdentity += "\n  email: \(email)"
                 }
-            },
-            onReject: {
-                self.app2AppConfirmation = nil
-                container.rejectApp2AppAuthenticationRequest(request: request, reason: AppError("rejected")) { approveResult in
-                    do {
-                        try approveResult.get()
-                    } catch {
-                        self.setError(error)
-                    }
+                if let phone = userInfo.phoneNumber {
+                    userIdentity += "\n  phone: \(phone)"
                 }
+                if let userName = userInfo.preferredUsername {
+                    userIdentity += "\n  username: \(userName)"
+                }
+                if !userIdentity.isEmpty {
+                    message += "\ncurrent user: \(userIdentity)"
+                }
+                if let s = request.state, !s.isEmpty {
+                    let stateMsg = "\nstate: \(s)"
+                    message += "\n\(stateMsg)"
+                }
+                return App2AppConfirmation(
+                    message: message,
+                    onConfirm: {
+                        self.app2AppConfirmation = nil
+                        container.approveApp2AppAuthenticationRequest(request: request) { approveResult in
+                            do {
+                                try approveResult.get()
+                            } catch {
+                                self.setError(error)
+                            }
+                        }
+                    },
+                    onReject: {
+                        self.app2AppConfirmation = nil
+                        container.rejectApp2AppAuthenticationRequest(request: request, reason: AppError("rejected")) { approveResult in
+                            do {
+                                try approveResult.get()
+                            } catch {
+                                self.setError(error)
+                            }
+                        }
+                    }
+                )
             }
-        )
-        self.app2AppConfirmation = confirmation
+            switch r {
+            case let .success(app2appConfirmation):
+                self.app2AppConfirmation = app2appConfirmation
+            case let .failure(err):
+                self.setError(err)
+            }
+        }
     }
 }
 
 struct App2AppConfirmation {
+    let message: String
     let onConfirm: () -> Void
     let onReject: () -> Void
 }
