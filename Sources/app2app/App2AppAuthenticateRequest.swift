@@ -18,7 +18,9 @@ public struct App2AppAuthenticateRequest {
             "code_challenge_method": Authgear.CodeChallengeMethod,
             "code_challenge": codeChallenge
         ]
-        state.map { query["state"] = $0 }
+        if let state = state {
+            query["state"] = state
+        }
         urlcomponents.percentEncodedQuery = query.encodeAsQuery()
         return urlcomponents.url!.absoluteURL
     }
