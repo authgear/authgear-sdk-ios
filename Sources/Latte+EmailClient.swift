@@ -15,6 +15,11 @@ public extension Latte {
             name: "Gmail",
             openURL: "googlegmail://"
         )
+
+        public init(name: String, openURL: String) {
+            self.name = name
+            self.openURL = openURL
+        }
     }
 
     static func makeChooseEmailClientAlertController(
