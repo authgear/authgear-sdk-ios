@@ -219,7 +219,7 @@ public extension Latte {
                             do {
                                 nc.removeObserver(observer)
                                 let finishURL = try result.get().unwrap()
-                                self?.authgear.experimental.finishAuthentication(finishURL: finishURL, request: request) { r in
+                                self?.authgear.experimental.finishReauthentication(finishURL: finishURL, request: request) { r in
                                     resume(r.flatMap { _ in
                                         .success(true)
                                     })
