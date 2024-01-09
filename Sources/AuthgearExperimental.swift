@@ -79,6 +79,18 @@ public struct AuthgearExperimental {
             handler: handler
         )
     }
+
+    public func finishReauthentication(
+        finishURL: URL,
+        request: AuthgearExperimental.AuthenticationRequest,
+        handler: @escaping UserInfoCompletionHandler
+    ) {
+        self.authgear.finishReauthentication(
+            url: finishURL,
+            verifier: request.verifier,
+            handler: handler
+        )
+    }
 }
 
 extension AuthgearExperimental.AuthenticationRequest {
