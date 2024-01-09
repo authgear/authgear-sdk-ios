@@ -582,6 +582,14 @@ public class Authgear {
         }()
 
         do {
+            var xApp2AppDeviceKeyJwt: String?
+            if (app2AppOptions.isEnabled) {
+                if #available(iOS 11.3, *) {
+                    xApp2AppDeviceKeyJwt = try app2app.generateApp2AppJWT(forceNew: false)
+                } else {
+                    try app2app.requireMinimumApp2AppIOSVersion()
+                }
+            }
             let oidcTokenResponse = try apiClient.syncRequestOIDCToken(
                 grantType: GrantType.authorizationCode,
                 clientId: clientId,
@@ -594,7 +602,7 @@ public class Authgear {
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
-                xApp2AppDeviceKeyJwt: nil
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
