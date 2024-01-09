@@ -537,7 +537,7 @@ public class Authgear {
         }
     }
 
-    private func finishReauthentication(
+    func finishReauthentication(
         url: URL,
         verifier: CodeVerifier,
         handler: @escaping UserInfoCompletionHandler
