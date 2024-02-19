@@ -229,6 +229,9 @@ func wrapError(error: Error) -> Error {
     let nsError = error as NSError
 
     // Cancel
+    if nsError.domain == AGWKWebViewControllerErrorDomain && nsError.code == AGWKWebViewControllerErrorCodeCanceledLogin {
+        return AuthgearError.cancel
+    }
     if (nsError.domain == kLAErrorDomain && nsError.code == kLAErrorUserCancel) {
         return AuthgearError.cancel
     }
