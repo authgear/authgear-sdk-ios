@@ -36,6 +36,7 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
         self.webView.navigationDelegate = self
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

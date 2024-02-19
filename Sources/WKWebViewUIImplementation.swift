@@ -7,7 +7,7 @@ public class WKWebViewUIImplementation: NSObject, UIImplementation, AGWKWebViewC
     public var navigationBarButtonTintColor: UIColor? = nil
 
     public func openAuthorizationURL(url: URL, redirectURI: URL, shareCookiesWithDeviceBrowser: Bool, completion: @escaping CompletionHandler) {
-        let controller = AGWKWebViewController.init(url: url, redirectURI: redirectURI) { url, error in
+        let controller = AGWKWebViewController(url: url, redirectURI: redirectURI) { url, error in
             if let error = error {
                 completion(.failure(wrapError(error: error)))
             }

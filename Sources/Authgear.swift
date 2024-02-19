@@ -250,9 +250,7 @@ public class Authgear {
     var tokenStorage: TokenStorage
     public let isSSOEnabled: Bool
     private var shareCookiesWithDeviceBrowser: Bool {
-        get {
-            return self.isSSOEnabled
-        }
+        self.isSSOEnabled
     }
 
     var uiImplementation: UIImplementation
