@@ -56,7 +56,8 @@ class App: ObservableObject {
         authenticationPage: AuthenticationPage?,
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
-        isSSOEnabled: Bool
+        isSSOEnabled: Bool,
+        useWKWebView: Bool
     ) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
@@ -72,7 +73,7 @@ class App: ObservableObject {
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
         let isApp2AppEnabled = !app2AppEndpoint.isEmpty
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: isApp2AppEnabled)
+        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: isApp2AppEnabled, useWKWebView: useWKWebView)
         self.authenticationPage = authenticationPage
         self.explicitColorScheme = colorScheme
         self.app2appEndpoint = app2AppEndpoint

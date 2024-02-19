@@ -78,6 +78,7 @@ struct AuthgearConfigurationForm: View {
     @Binding var app2appState: String
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
+    @State private var useWKWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWKWebView")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
 
@@ -133,6 +134,10 @@ struct AuthgearConfigurationForm: View {
                 label: "Is SSO Enabled",
                 input: Toggle(isOn: $isSSOEnabled) { EmptyView() }
             )
+            AuthgearConfigurationInput(
+                label: "Use WKWebView",
+                input: Toggle(isOn: $useWKWebView) { EmptyView() }
+            )
             TextLabelValue(
                 label: "SessionState",
                 value: app.sessionState.rawValue
@@ -145,7 +150,8 @@ struct AuthgearConfigurationForm: View {
                     authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
-                    isSSOEnabled: self.isSSOEnabled
+                    isSSOEnabled: self.isSSOEnabled,
+                    useWKWebView: self.useWKWebView
                 )
             }) {
                 ActionButton(text: "Configure")
