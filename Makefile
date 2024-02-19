@@ -1,10 +1,10 @@
 # The installed SDKs are listed here.
 # Note that this also depends on the runner image.
-# macos-12 is now being used.
-# https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md
-DEVICE_SDK=iphoneos16.2
-SIMULATOR_SDK=iphonesimulator16.2
-TEST_DESTINATION="platform=iOS Simulator,name=iPhone 14,OS=16.2"
+# macos-13 is now being used.
+# https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md
+DEVICE_SDK=iphoneos17.2
+SIMULATOR_SDK=iphonesimulator17.2
+TEST_DESTINATION="platform=iOS Simulator,name=iPhone 15,OS=17.2"
 
 GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
 
