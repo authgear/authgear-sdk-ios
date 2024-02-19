@@ -221,15 +221,8 @@ func wrapError(error: Error) -> Error {
         return error
     }
 
-    if #available(iOS 12.0, *) {
-        if let asError = error as? ASWebAuthenticationSessionError,
-           asError.code == ASWebAuthenticationSessionError.canceledLogin {
-            return AuthgearError.cancel
-        }
-    }
-
-    if let sfError = error as? SFAuthenticationError,
-       sfError.code == SFAuthenticationError.canceledLogin {
+    if let asError = error as? ASWebAuthenticationSessionError,
+       asError.code == ASWebAuthenticationSessionError.canceledLogin {
         return AuthgearError.cancel
     }
 

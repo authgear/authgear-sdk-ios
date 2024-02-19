@@ -1,5 +1,4 @@
 import AuthenticationServices
-import SafariServices
 
 protocol AuthenticationSession {
     typealias CompletionHandler = (Result<URL, Error>) -> Void
@@ -7,9 +6,6 @@ protocol AuthenticationSession {
     func cancel()
 }
 
-extension SFAuthenticationSession: AuthenticationSession {}
-
-@available(iOS 12.0, *)
 extension ASWebAuthenticationSession: AuthenticationSession {}
 
 class AuthenticationSessionProvider: NSObject {
@@ -29,27 +25,18 @@ class AuthenticationSessionProvider: NSObject {
             }
         }
 
-        if #available(iOS 12.0, *) {
-            let session = ASWebAuthenticationSession(
-                url: url,
-                callbackURLScheme: getURIScheme(uri: redirectURI),
-                completionHandler: realCompletionHandler
-            )
+        let session = ASWebAuthenticationSession(
+            url: url,
+            callbackURLScheme: getURIScheme(uri: redirectURI),
+            completionHandler: realCompletionHandler
+        )
 
-            if #available(iOS 13.0, *) {
-                session.prefersEphemeralWebBrowserSession = prefersEphemeralWebBrowserSession ?? false
-                session.presentationContextProvider = self
-            }
-
-            return session
-        } else {
-            let session = SFAuthenticationSession(
-                url: url,
-                callbackURLScheme: getURIScheme(uri: redirectURI),
-                completionHandler: realCompletionHandler
-            )
-            return session
+        if #available(iOS 13.0, *) {
+            session.prefersEphemeralWebBrowserSession = prefersEphemeralWebBrowserSession ?? false
+            session.presentationContextProvider = self
         }
+
+        return session
     }
 
     private func getURIScheme(uri: String) -> String {
