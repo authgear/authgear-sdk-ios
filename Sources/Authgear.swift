@@ -249,9 +249,11 @@ public class Authgear {
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
     public let isSSOEnabled: Bool
+    private var shareCookiesWithDeviceBrowser: Bool {
+        self.isSSOEnabled
+    }
 
-    private let authenticationSessionProvider = AuthenticationSessionProvider()
-    private var authenticationSession: AuthenticationSession?
+    var uiImplementation: UIImplementation
 
     public private(set) var accessToken: String?
     private var refreshToken: String?
@@ -308,6 +310,7 @@ public class Authgear {
         clientId: String,
         endpoint: String,
         tokenStorage: TokenStorage = PersistentTokenStorage(),
+        uiImplementation: UIImplementation = ASWebAuthenticationSessionUIImplementation(),
         isSSOEnabled: Bool = false,
         name: String? = nil,
         app2AppOptions: App2AppOptions = App2AppOptions(
@@ -318,6 +321,7 @@ public class Authgear {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
+        self.uiImplementation = uiImplementation
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
@@ -381,27 +385,20 @@ public class Authgear {
             let request = options.toRequest(idTokenHint: idTokenHint)
             let verifier = CodeVerifier()
             let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
-            let prefersEphemeralWebBrowserSession = self.shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession()
 
             DispatchQueue.main.async {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
-                self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
-                    url: url,
-                    redirectURI: request.redirectURI,
-                    prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
-                    completionHandler: { [weak self] result in
-                        self?.unregisterCurrentWechatRedirectURI()
-                        switch result {
-                        case let .success(url):
-                            self?.workerQueue.async {
-                                self?.finishReauthentication(url: url, verifier: verifier, handler: handler)
-                            }
-                        case let .failure(error):
-                            return handler(.failure(wrapError(error: error)))
+                self.uiImplementation.openAuthorizationURL(url: url, redirectURI: URL(string: request.redirectURI)!, shareCookiesWithDeviceBrowser: self.shareCookiesWithDeviceBrowser) { result in
+                    self.unregisterCurrentWechatRedirectURI()
+                    switch result {
+                    case let .success(url):
+                        self.workerQueue.async {
+                            self.finishReauthentication(url: url, verifier: verifier, handler: handler)
                         }
+                    case let .failure(error):
+                        return handler(.failure(wrapError(error: error)))
                     }
-                )
-                self.authenticationSession?.start()
+                }
             }
         } catch {
             handler(.failure(wrapError(error: error)))
@@ -423,29 +420,22 @@ public class Authgear {
         handler: @escaping UserInfoCompletionHandler
     ) {
         let request = self.createAuthenticateRequest(options)
-        let prefersEphemeralWebBrowserSession = self.shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession()
 
         DispatchQueue.main.async {
             switch request {
             case let .success(request):
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
-                self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
-                    url: request.url,
-                    redirectURI: request.redirectURI,
-                    prefersEphemeralWebBrowserSession: prefersEphemeralWebBrowserSession,
-                    completionHandler: { [weak self] result in
-                        self?.unregisterCurrentWechatRedirectURI()
-                        switch result {
-                        case let .success(url):
-                            self?.workerQueue.async {
-                                self?.finishAuthentication(url: url, verifier: request.verifier, handler: handler)
-                            }
-                        case let .failure(error):
-                            return handler(.failure(wrapError(error: error)))
+                self.uiImplementation.openAuthorizationURL(url: request.url, redirectURI: URL(string: request.redirectURI)!, shareCookiesWithDeviceBrowser: self.shareCookiesWithDeviceBrowser) { result in
+                    self.unregisterCurrentWechatRedirectURI()
+                    switch result {
+                    case let .success(url):
+                        self.workerQueue.async {
+                            self.finishAuthentication(url: url, verifier: request.verifier, handler: handler)
                         }
+                    case let .failure(error):
+                        return handler(.failure(wrapError(error: error)))
                     }
-                )
-                self.authenticationSession?.start()
+                }
             case let .failure(error):
                 handler(.failure(wrapError(error: error)))
             }
@@ -1099,31 +1089,30 @@ public class Authgear {
                 // registerCurrentWeChatRedirectURI will be called and overwrite
                 // previous registered wechatRedirectURI
                 self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
-                self.authenticationSession = self.authenticationSessionProvider.makeAuthenticationSession(
+
+                self.uiImplementation.openAuthorizationURL(
                     url: endpoint,
                     // Opening an arbitrary URL does not have a clear goal.
                     // So here we pass a placeholder redirect uri.
-                    redirectURI: "nocallback",
+                    redirectURI: URL(string: "nocallback://host/path")!,
                     // prefersEphemeralWebBrowserSession is true so that
                     // the alert dialog is never prompted and
                     // the app session token cookie is forgotten when the webview is closed.
-                    prefersEphemeralWebBrowserSession: true,
-                    completionHandler: { [weak self] result in
-                        self?.unregisterCurrentWechatRedirectURI()
-                        switch result {
-                        case .success:
-                            // This branch is unreachable.
+                    shareCookiesWithDeviceBrowser: true
+                ) { result in
+                    self.unregisterCurrentWechatRedirectURI()
+                    switch result {
+                    case .success:
+                        // This branch is unreachable.
+                        handler?(.success(()))
+                    case let .failure(error):
+                        if case AuthgearError.cancel = error {
                             handler?(.success(()))
-                        case let .failure(error):
-                            if case AuthgearError.cancel = error {
-                                handler?(.success(()))
-                            } else {
-                                handler?(.failure(wrapError(error: error)))
-                            }
+                        } else {
+                            handler?(.failure(wrapError(error: error)))
                         }
                     }
-                )
-                self.authenticationSession?.start()
+                }
             }
         }
     }
@@ -1140,10 +1129,6 @@ public class Authgear {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI
         )
-    }
-
-    private func shouldASWebAuthenticationSessionPrefersEphemeralWebBrowserSession() -> Bool {
-        !self.isSSOEnabled
     }
 
     private func shouldRefreshAccessToken() -> Bool {

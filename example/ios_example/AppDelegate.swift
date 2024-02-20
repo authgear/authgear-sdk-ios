@@ -10,30 +10,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         endpoint: String,
         tokenStorage: String,
         isSSOEnabled: Bool,
-        isApp2AppEnabled: Bool
+        isApp2AppEnabled: Bool,
+        useWKWebView: Bool
     ) {
         let app2AppOptions = App2AppOptions(
             isEnabled: isApp2AppEnabled,
             authorizationEndpoint: App.app2appAuthorizeEndpoint
         )
+
+        let tokenStorageInstance: TokenStorage
         switch tokenStorage {
         case TokenStorageClassName.TransientTokenStorage.rawValue:
-            appContainer.container = Authgear(
-                clientId: clientId,
-                endpoint: endpoint,
-                tokenStorage: TransientTokenStorage(),
-                isSSOEnabled: isSSOEnabled,
-                app2AppOptions: app2AppOptions
-            )
+            tokenStorageInstance = TransientTokenStorage()
         default:
-            appContainer.container = Authgear(
-                clientId: clientId,
-                endpoint: endpoint,
-                tokenStorage: PersistentTokenStorage(),
-                isSSOEnabled: isSSOEnabled,
-                app2AppOptions: app2AppOptions
-            )
+            tokenStorageInstance = PersistentTokenStorage()
         }
+
+        let uiImplementation: UIImplementation
+        if useWKWebView {
+            uiImplementation = WKWebViewUIImplementation()
+        } else {
+            uiImplementation = ASWebAuthenticationSessionUIImplementation()
+        }
+
+        appContainer.container = Authgear(
+            clientId: clientId,
+            endpoint: endpoint,
+            tokenStorage: tokenStorageInstance,
+            uiImplementation: uiImplementation,
+            isSSOEnabled: isSSOEnabled,
+            app2AppOptions: app2AppOptions
+        )
         appContainer.container?.configure() { _ in
             self.appContainer.postConfig()
         }

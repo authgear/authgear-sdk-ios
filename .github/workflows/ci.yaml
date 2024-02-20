@@ -12,7 +12,7 @@ on:
 
 jobs:
   gh-pages:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -22,7 +22,7 @@ jobs:
       # Latest compatiable version with our codebase is 0.48.0
       - run: brew update
       - run: brew upgrade swiftformat || brew install swiftformat
-      - run: sudo xcode-select -s /Applications/Xcode_14.2.app/Contents/Developer
+      - run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
       - run: make lint
       - run: pod install --project-directory=example
       - run: xcodebuild -showsdks
@@ -43,7 +43,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: "18.x"
-    - run: sudo xcode-select -s /Applications/Xcode_14.3.1.app/Contents/Developer
+    - run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
     - run: npm install -g appcenter-cli
     - working-directory: ./example
       run: pod install

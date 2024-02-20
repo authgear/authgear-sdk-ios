@@ -221,21 +221,17 @@ func wrapError(error: Error) -> Error {
         return error
     }
 
-    if #available(iOS 12.0, *) {
-        if let asError = error as? ASWebAuthenticationSessionError,
-           asError.code == ASWebAuthenticationSessionError.canceledLogin {
-            return AuthgearError.cancel
-        }
-    }
-
-    if let sfError = error as? SFAuthenticationError,
-       sfError.code == SFAuthenticationError.canceledLogin {
+    if let asError = error as? ASWebAuthenticationSessionError,
+       asError.code == ASWebAuthenticationSessionError.canceledLogin {
         return AuthgearError.cancel
     }
 
     let nsError = error as NSError
 
     // Cancel
+    if nsError.domain == AGWKWebViewControllerErrorDomain && nsError.code == AGWKWebViewControllerErrorCodeCanceledLogin {
+        return AuthgearError.cancel
+    }
     if (nsError.domain == kLAErrorDomain && nsError.code == kLAErrorUserCancel) {
         return AuthgearError.cancel
     }
