@@ -206,6 +206,7 @@ public enum AuthenticationPage: String {
 
 public enum SettingsPage: String {
     case settings = "/settings"
+    case changePassword = "/settings/change_password"
     case identity = "/settings/identities"
 }
 
@@ -245,6 +246,7 @@ public class Authgear {
     private static let ExpireInPercentage = 0.9
 
     static let CodeChallengeMethod = "S256"
+    static let SDKRedirectURI = "authgearsdk://host/path"
 
     let name: String
     let clientId: String
@@ -1028,6 +1030,7 @@ public class Authgear {
         path: String,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
+        closeOnSuccess: Bool? = false,
         handler: URLCompletionHandler?
     ) {
         let handler = handler.map { h in self.withMainQueueHandler(h) }
@@ -1047,6 +1050,9 @@ public class Authgear {
                     }
                     if let colorScheme = colorScheme {
                         queryItems.append(URLQueryItem(name: "x_color_scheme", value: colorScheme.rawValue))
+                    }
+                    if closeOnSuccess == true {
+                        queryItems.append(URLQueryItem(name: "redirect_uri", value: Authgear.SDKRedirectURI))
                     }
                     urlComponents.queryItems = queryItems
                     let redirectURI = urlComponents.url!
@@ -1068,14 +1074,16 @@ public class Authgear {
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
-        handler: VoidCompletionHandler? = nil
+        handler: VoidCompletionHandler? = nil,
+        closeOnSuccess: Bool? = false
     ) {
         let handler = handler.map { h in withMainQueueHandler(h) }
 
         self.generateAuthgearURL(
             path: path,
             uiLocales: uiLocales,
-            colorScheme: colorScheme
+            colorScheme: colorScheme,
+            closeOnSuccess: closeOnSuccess
         ) { [weak self] result in
             guard let self = self else { return }
 
@@ -1095,9 +1103,7 @@ public class Authgear {
 
                 self.uiImplementation.openAuthorizationURL(
                     url: endpoint,
-                    // Opening an arbitrary URL does not have a clear goal.
-                    // So here we pass a placeholder redirect uri.
-                    redirectURI: URL(string: "nocallback://host/path")!,
+                    redirectURI: URL(string: Authgear.SDKRedirectURI)!,
                     // prefersEphemeralWebBrowserSession is true so that
                     // the alert dialog is never prompted and
                     // the app session token cookie is forgotten when the webview is closed.
@@ -1106,7 +1112,6 @@ public class Authgear {
                     self.unregisterCurrentWechatRedirectURI()
                     switch result {
                     case .success:
-                        // This branch is unreachable.
                         handler?(.success(()))
                     case let .failure(error):
                         if case AuthgearError.cancel = error {
@@ -1124,13 +1129,15 @@ public class Authgear {
         page: SettingsPage,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
-        wechatRedirectURI: String? = nil
+        wechatRedirectURI: String? = nil,
+        closeOnSuccess: Bool? = false
     ) {
         openURL(
             path: page.rawValue,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
-            wechatRedirectURI: wechatRedirectURI
+            wechatRedirectURI: wechatRedirectURI,
+            closeOnSuccess: closeOnSuccess
         )
     }
 

@@ -233,6 +233,15 @@ class App: ObservableObject {
         )
     }
 
+    func changePassword() {
+        container?.open(
+            page: .changePassword,
+            colorScheme: self.colorScheme,
+            wechatRedirectURI: App.wechatRedirectURI,
+            closeOnSuccess: true
+        )
+    }
+
     func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,

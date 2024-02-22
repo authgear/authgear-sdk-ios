@@ -273,6 +273,12 @@ struct ActionButtonList: View {
                 }.disabled(!configured || !loggedIn || isAnonymous)
 
                 Button(action: {
+                    self.app.changePassword()
+                }) {
+                    ActionButton(text: "Change Password")
+                }.disabled(!configured || !loggedIn || isAnonymous)
+
+                Button(action: {
                     self.app.showAuthTime()
                 }) {
                     ActionButton(text: "Show auth_time")
