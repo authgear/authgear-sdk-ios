@@ -150,7 +150,6 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        
         if let navigationURL = navigationAction.request.url {
             // Handle target="_blank" links
             if (navigationAction.targetFrame == nil) {
