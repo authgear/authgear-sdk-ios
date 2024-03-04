@@ -2,9 +2,9 @@ import Foundation
 import UIKit
 
 public class WKWebViewUIImplementation: NSObject, UIImplementation, AGWKWebViewControllerPresentationContextProviding {
-    public var modalPresentationStyle: UIModalPresentationStyle? = nil
-    public var navigationBarBackgroundColor: UIColor? = nil
-    public var navigationBarButtonTintColor: UIColor? = nil
+    public var modalPresentationStyle: UIModalPresentationStyle?
+    public var navigationBarBackgroundColor: UIColor?
+    public var navigationBarButtonTintColor: UIColor?
 
     public func openAuthorizationURL(url: URL, redirectURI: URL, shareCookiesWithDeviceBrowser: Bool, completion: @escaping CompletionHandler) {
         let controller = AGWKWebViewController(url: url, redirectURI: redirectURI) { url, error in
