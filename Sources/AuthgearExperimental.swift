@@ -10,7 +10,7 @@ public struct AuthgearExperimental {
     }
 
     public func generateURL(redirectURI: String, handler: URLCompletionHandler?) {
-        self.authgear.generateURL(redirectURI: redirectURI, handler: handler)
+        self.authgear.generateURL(redirectURI: redirectURI, responseType: .none, handler: handler)
     }
 
     public func createAuthenticateRequest(

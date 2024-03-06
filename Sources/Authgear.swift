@@ -982,11 +982,11 @@ public class Authgear {
 
     func generateURL(
         redirectURI: String,
+        responseType: ResponseType,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         settingsAction: SettingsAction? = nil,
         idTokenHint: String? = nil,
-        responseType: ResponseType = ResponseType.none,
         verifier: CodeVerifier? = nil,
         wechatRedirectURI: String? = nil,
         handler: URLCompletionHandler?
@@ -1062,7 +1062,7 @@ public class Authgear {
                     }
                     urlComponents.queryItems = queryItems
                     let redirectURI = urlComponents.url!
-                    self.generateURL(redirectURI: redirectURI.absoluteString) { generatedResult in
+                    self.generateURL(redirectURI: redirectURI.absoluteString, responseType: .none) { generatedResult in
                         switch generatedResult {
                         case let .failure(err):
                             handler?(.failure(err))
@@ -1159,11 +1159,11 @@ public class Authgear {
             case .success:
                 self.generateURL(
                     redirectURI: redirectURI,
+                    responseType: .settingsAction,
                     uiLocales: uiLocales,
                     colorScheme: colorScheme,
                     settingsAction: action,
                     idTokenHint: self.idTokenHint,
-                    responseType: ResponseType.settingsAction,
                     verifier: verifier
                 ) { generatedResult in
                     switch generatedResult {
