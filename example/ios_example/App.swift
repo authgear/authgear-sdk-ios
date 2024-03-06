@@ -3,7 +3,6 @@ import SwiftUI
 
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
-    static let changePasswordRedirectURI = "com.authgear.example://host/after-changing-password"
 
     static let app2appRedirectURI = "https://authgear-demo.pandawork.com/app2app/redirect"
     static let app2appAuthorizeEndpoint = "https://authgear-demo.pandawork.com/app2app/authorize"
@@ -239,7 +238,7 @@ class App: ObservableObject {
         container?.changePassword(
             colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI,
-            redirectURI: App.changePasswordRedirectURI
+            redirectURI: App.redirectURI
         ) { result in
             switch result {
             case .success:
