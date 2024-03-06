@@ -251,7 +251,7 @@ public class Authgear {
     private static let ExpireInPercentage = 0.9
 
     static let CodeChallengeMethod = "S256"
-    static let SDKRedirectURI = "nocallback://host/path"
+    private static let SDKRedirectURI = "nocallback://host/path"
 
     let name: String
     let clientId: String
@@ -1144,11 +1144,11 @@ public class Authgear {
     }
 
     private func openSettingsAction(
+        redirectURI: String,
         action: SettingsAction,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
-        redirectURI: String,
         handler: VoidCompletionHandler? = nil
     ) {
         let verifier = CodeVerifier()
@@ -1181,7 +1181,7 @@ public class Authgear {
 
                         self.uiImplementation.openAuthorizationURL(
                             url: url,
-                            redirectURI: URL(string: Authgear.SDKRedirectURI)!,
+                            redirectURI: URL(string: redirectURI)!,
                             // prefersEphemeralWebBrowserSession is true so that
                             // the alert dialog is never prompted and
                             // the app session token cookie is forgotten when the webview is closed.
@@ -1277,11 +1277,11 @@ public class Authgear {
         handler: VoidCompletionHandler? = nil
     ) {
         openSettingsAction(
+            redirectURI: redirectURI,
             action: .changePassword,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
-            redirectURI: redirectURI,
             handler: handler
         )
     }
