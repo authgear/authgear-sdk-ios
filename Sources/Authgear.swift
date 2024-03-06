@@ -1108,10 +1108,10 @@ public class Authgear {
                 self.uiImplementation.openAuthorizationURL(
                     url: endpoint,
                     redirectURI: URL(string: Authgear.SDKRedirectURI)!,
-                    // prefersEphemeralWebBrowserSession is true so that
-                    // the alert dialog is never prompted and
+                    // shareCookiesWithDeviceBrowser is false so that
+                    // ASWebAuthenticationSession alert dialog is never prompted and
                     // the app session token cookie is forgotten when the webview is closed.
-                    shareCookiesWithDeviceBrowser: true
+                    shareCookiesWithDeviceBrowser: false
                 ) { result in
                     self.unregisterCurrentWechatRedirectURI()
                     switch result {
@@ -1182,10 +1182,10 @@ public class Authgear {
                         self.uiImplementation.openAuthorizationURL(
                             url: url,
                             redirectURI: URL(string: redirectURI)!,
-                            // prefersEphemeralWebBrowserSession is true so that
-                            // the alert dialog is never prompted and
+                            // shareCookiesWithDeviceBrowser is false so that
+                            // ASWebAuthenticationSession alert dialog is never prompted and
                             // the app session token cookie is forgotten when the webview is closed.
-                            shareCookiesWithDeviceBrowser: true
+                            shareCookiesWithDeviceBrowser: false
                         ) { result in
                             self.unregisterCurrentWechatRedirectURI()
                             switch result {
