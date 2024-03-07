@@ -7,6 +7,13 @@ enum GrantType: String {
     case biometric = "urn:authgear:params:oauth:grant-type:biometric-request"
     case idToken = "urn:authgear:params:oauth:grant-type:id-token"
     case app2app = "urn:authgear:params:oauth:grant-type:app2app-request"
+    case settingsAction = "urn:authgear:params:oauth:grant-type:settings-action"
+}
+
+enum ResponseType: String {
+    case code
+    case settingsAction = "urn:authgear:params:oauth:response-type:settings-action"
+    case none
 }
 
 struct APIResponse<T: Decodable>: Decodable {
@@ -36,6 +43,7 @@ struct OIDCAuthenticationRequest {
     let maxAge: Int?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
+    let settingsAction: SettingsAction?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -106,6 +114,10 @@ struct OIDCAuthenticationRequest {
 
         if let page = self.page {
             queryItems.append(URLQueryItem(name: "x_page", value: page.rawValue))
+        }
+
+        if let settingsAction = self.settingsAction {
+            queryItems.append(URLQueryItem(name: "x_settings_action", value: settingsAction.rawValue))
         }
 
         if self.isSSOEnabled == false {

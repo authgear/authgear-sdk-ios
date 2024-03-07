@@ -3,6 +3,7 @@ import SwiftUI
 
 class App: ObservableObject {
     static let redirectURI = "com.authgear.example://host/path"
+
     static let app2appRedirectURI = "https://authgear-demo.pandawork.com/app2app/redirect"
     static let app2appAuthorizeEndpoint = "https://authgear-demo.pandawork.com/app2app/authorize"
     static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
@@ -231,6 +232,21 @@ class App: ObservableObject {
             colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI
         )
+    }
+
+    func changePassword() {
+        container?.changePassword(
+            colorScheme: self.colorScheme,
+            wechatRedirectURI: App.wechatRedirectURI,
+            redirectURI: App.redirectURI
+        ) { result in
+            switch result {
+            case .success:
+                self.successAlertMessage = "Changed password successfully"
+            case let .failure(error):
+                self.setError(error)
+            }
+        }
     }
 
     func promoteAnonymousUser() {

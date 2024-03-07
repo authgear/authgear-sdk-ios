@@ -43,7 +43,8 @@ struct AuthenticateOptions {
             idTokenHint: nil,
             maxAge: nil,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: self.page
+            page: self.page,
+            settingsAction: nil
         )
     }
 }
@@ -79,7 +80,8 @@ struct ReauthenticateOptions {
             idTokenHint: idTokenHint,
             maxAge: self.maxAge ?? 0,
             wechatRedirectURI: self.wechatRedirectURI,
-            page: nil
+            page: nil,
+            settingsAction: nil
         )
     }
 }
@@ -209,6 +211,10 @@ public enum SettingsPage: String {
     case identity = "/settings/identities"
 }
 
+public enum SettingsAction: String {
+    case changePassword = "change_password"
+}
+
 public enum SessionStateChangeReason: String {
     case noToken = "NO_TOKEN"
     case foundToken = "FOUND_TOKEN"
@@ -245,6 +251,7 @@ public class Authgear {
     private static let ExpireInPercentage = 0.9
 
     static let CodeChallengeMethod = "S256"
+    private static let SDKRedirectURI = "nocallback://host/path"
 
     let name: String
     let clientId: String
@@ -975,8 +982,12 @@ public class Authgear {
 
     func generateURL(
         redirectURI: String,
+        responseType: ResponseType,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
+        settingsAction: SettingsAction? = nil,
+        idTokenHint: String? = nil,
+        verifier: CodeVerifier? = nil,
         wechatRedirectURI: String? = nil,
         handler: URLCompletionHandler?
     ) {
@@ -1002,7 +1013,7 @@ public class Authgear {
 
                 let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
                     redirectURI: redirectURI,
-                    responseType: "none",
+                    responseType: responseType.rawValue,
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
                     isSSOEnabled: self.isSSOEnabled,
                     state: nil,
@@ -1011,11 +1022,12 @@ public class Authgear {
                     loginHint: loginHint,
                     uiLocales: uiLocales,
                     colorScheme: colorScheme,
-                    idTokenHint: nil,
+                    idTokenHint: idTokenHint,
                     maxAge: nil,
                     wechatRedirectURI: wechatRedirectURI,
-                    page: nil
-                ), verifier: nil)
+                    page: nil,
+                    settingsAction: settingsAction
+                ), verifier: verifier)
 
                 handler?(.success(endpoint))
             } catch {
@@ -1050,7 +1062,7 @@ public class Authgear {
                     }
                     urlComponents.queryItems = queryItems
                     let redirectURI = urlComponents.url!
-                    self.generateURL(redirectURI: redirectURI.absoluteString) { generatedResult in
+                    self.generateURL(redirectURI: redirectURI.absoluteString, responseType: .none) { generatedResult in
                         switch generatedResult {
                         case let .failure(err):
                             handler?(.failure(err))
@@ -1095,18 +1107,15 @@ public class Authgear {
 
                 self.uiImplementation.openAuthorizationURL(
                     url: endpoint,
-                    // Opening an arbitrary URL does not have a clear goal.
-                    // So here we pass a placeholder redirect uri.
-                    redirectURI: URL(string: "nocallback://host/path")!,
-                    // prefersEphemeralWebBrowserSession is true so that
-                    // the alert dialog is never prompted and
+                    redirectURI: URL(string: Authgear.SDKRedirectURI)!,
+                    // shareCookiesWithDeviceBrowser is false so that
+                    // ASWebAuthenticationSession alert dialog is never prompted and
                     // the app session token cookie is forgotten when the webview is closed.
-                    shareCookiesWithDeviceBrowser: true
+                    shareCookiesWithDeviceBrowser: false
                 ) { result in
                     self.unregisterCurrentWechatRedirectURI()
                     switch result {
                     case .success:
-                        // This branch is unreachable.
                         handler?(.success(()))
                     case let .failure(error):
                         if case AuthgearError.cancel = error {
@@ -1131,6 +1140,149 @@ public class Authgear {
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI
+        )
+    }
+
+    private func openSettingsAction(
+        redirectURI: String,
+        action: SettingsAction,
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        wechatRedirectURI: String? = nil,
+        handler: VoidCompletionHandler? = nil
+    ) {
+        let verifier = CodeVerifier()
+        let this = self
+
+        self.refreshIDToken(handler: { result in
+            switch result {
+            case .success:
+                self.generateURL(
+                    redirectURI: redirectURI,
+                    responseType: .settingsAction,
+                    uiLocales: uiLocales,
+                    colorScheme: colorScheme,
+                    settingsAction: action,
+                    idTokenHint: self.idTokenHint,
+                    verifier: verifier
+                ) { generatedResult in
+                    switch generatedResult {
+                    case let .failure(err):
+                        handler?(.failure(err))
+                    case let .success(url):
+                        // For opening setting page, sdk will not know when user end
+                        // the setting page.
+                        // So we cannot unregister the wechat uri in this case
+                        // It is fine to not unresgister it, as everytime we open a
+                        // new authorize section (authorize or setting page)
+                        // registerCurrentWeChatRedirectURI will be called and overwrite
+                        // previous registered wechatRedirectURI
+                        self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
+
+                        self.uiImplementation.openAuthorizationURL(
+                            url: url,
+                            redirectURI: URL(string: redirectURI)!,
+                            // shareCookiesWithDeviceBrowser is false so that
+                            // ASWebAuthenticationSession alert dialog is never prompted and
+                            // the app session token cookie is forgotten when the webview is closed.
+                            shareCookiesWithDeviceBrowser: false
+                        ) { result in
+                            self.unregisterCurrentWechatRedirectURI()
+                            switch result {
+                            case let .success(url):
+                                this.finishSettingsAction(url: url, redirectURI: redirectURI, verifier: verifier) { result in
+                                    switch (result) {
+                                    case .success:
+                                        handler?(result)
+                                    case let .failure(error):
+                                        handler?(.failure(wrapError(error: error)))
+                                    }
+                                }
+                            case let .failure(error):
+                                handler?(.failure(wrapError(error: error)))
+                            }
+                        }
+                    }
+                }
+            case let .failure(error):
+                handler?(.failure(wrapError(error: error)))
+            }
+        })
+    }
+
+    func finishSettingsAction(
+        url: URL,
+        redirectURI: String,
+        verifier: CodeVerifier,
+        handler: VoidCompletionHandler
+    ) {
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        let params = urlComponents.queryParams
+
+        if let errorParams = params["error"] {
+            if errorParams == "cancel" {
+                return handler(
+                    .failure(AuthgearError.cancel)
+                )
+            }
+            return handler(
+                .failure(AuthgearError.oauthError(
+                    OAuthError(
+                        error: errorParams,
+                        errorDescription: params["error_description"],
+                        errorUri: params["error_uri"]
+                    )
+                ))
+            )
+        }
+
+        guard let code = params["code"] else {
+            return handler(
+                .failure(AuthgearError.oauthError(
+                    OAuthError(
+                        error: "invalid_request",
+                        errorDescription: "Missing parameter: code",
+                        errorUri: nil
+                    )
+                ))
+            )
+        }
+
+        do {
+            _ = try apiClient.syncRequestOIDCToken(
+                grantType: GrantType.settingsAction,
+                clientId: clientId,
+                deviceInfo: getDeviceInfo(),
+                redirectURI: redirectURI,
+                code: code,
+                codeVerifier: verifier.value,
+                codeChallenge: nil,
+                codeChallengeMethod: nil,
+                refreshToken: nil,
+                jwt: nil,
+                accessToken: nil,
+                xApp2AppDeviceKeyJwt: nil
+            )
+            handler(.success(()))
+        } catch {
+            return handler(.failure(wrapError(error: error)))
+        }
+    }
+
+    public func changePassword(
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        wechatRedirectURI: String? = nil,
+        redirectURI: String,
+        handler: VoidCompletionHandler? = nil
+    ) {
+        openSettingsAction(
+            redirectURI: redirectURI,
+            action: .changePassword,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme,
+            wechatRedirectURI: wechatRedirectURI,
+            handler: handler
         )
     }
 
