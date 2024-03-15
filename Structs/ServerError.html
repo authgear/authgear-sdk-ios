@@ -17,7 +17,7 @@
     <a title="ServerError Structure Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear iOS SDK git-9c4fb3ce6584</a></p>
+        <p><a href="../index.html">Authgear iOS SDK git-458d4bab1e11</a></p>
         <div class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -39,6 +39,9 @@
             <a href="../Classes.html">Classes</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Classes/ASWebAuthenticationSessionUIImplementation.html">ASWebAuthenticationSessionUIImplementation</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Classes/Authgear.html">Authgear</a>
               </li>
               <li class="nav-group-task">
@@ -46,6 +49,12 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Classes/TransientTokenStorage.html">TransientTokenStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes.html#/s:8Authgear9UILocalesC">UILocales</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/WKWebViewUIImplementation.html">WKWebViewUIImplementation</a>
               </li>
             </ul>
           </li>
@@ -77,6 +86,9 @@
                 <a href="../Enums/SessionStateChangeReason.html">SessionStateChangeReason</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Enums/SettingsAction.html">SettingsAction</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Enums/SettingsPage.html">SettingsPage</a>
               </li>
             </ul>
@@ -90,13 +102,31 @@
               <li class="nav-group-task">
                 <a href="../Protocols/TokenStorage.html">TokenStorage</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/UIImplementation.html">UIImplementation</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Structs.html#/s:8Authgear10OAuthErrorV">OAuthError</a>
+                <a href="../Structs/App2AppAuthenticateOptions.html">App2AppAuthenticateOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/App2AppAuthenticateRequest.html">App2AppAuthenticateRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/App2AppOptions.html">App2AppOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/AuthgearExperimental.html">AuthgearExperimental</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/AuthgearExperimental/AuthenticationRequest.html">– AuthenticationRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/OAuthError.html">OAuthError</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/ServerError.html">ServerError</a>
@@ -112,6 +142,9 @@
           <li class="nav-group-name">
             <a href="../Typealiases.html">Type Aliases</a>
             <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:8Authgear20URLCompletionHandlera">URLCompletionHandler</a>
+              </li>
               <li class="nav-group-task">
                 <a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a>
               </li>
@@ -129,7 +162,7 @@
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ServerError</span> <span class="p">:</span> <span class="kt">Error</span><span class="p">,</span> <span class="kt">Decodable</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ServerError</span> <span class="p">:</span> <span class="kt">CustomNSError</span><span class="p">,</span> <span class="kt">LocalizedError</span><span class="p">,</span> <span class="kt">Decodable</span></code></pre>
 
                 </div>
               </div>
@@ -139,6 +172,114 @@
           <section class="section task-group-section">
             <div class="task-group">
               <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear11ServerErrorV4nameSSvp"></a>
+                    <a name="//apple_ref/swift/Property/name" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear11ServerErrorV4nameSSvp">name</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear11ServerErrorV7messageSSvp"></a>
+                    <a name="//apple_ref/swift/Property/message" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear11ServerErrorV7messageSSvp">message</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear11ServerErrorV6reasonSSvp"></a>
+                    <a name="//apple_ref/swift/Property/reason" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear11ServerErrorV6reasonSSvp">reason</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">reason</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8Authgear11ServerErrorV4infoSDySSypGSgvp"></a>
+                    <a name="//apple_ref/swift/Property/info" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear11ServerErrorV4infoSDySSypGSgvp">info</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">info</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
                 <li class="item">
                   <div>
                     <code>
@@ -165,12 +306,116 @@
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10Foundation13CustomNSErrorP11errorDomainSSvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/errorDomain" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10Foundation13CustomNSErrorP11errorDomainSSvpZ">errorDomain</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">errorDomain</span><span class="p">:</span> <span class="kt">String</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10Foundation13CustomNSErrorP9errorCodeSivp"></a>
+                    <a name="//apple_ref/swift/Property/errorCode" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10Foundation13CustomNSErrorP9errorCodeSivp">errorCode</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">errorCode</span><span class="p">:</span> <span class="kt">Int</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10Foundation13CustomNSErrorP13errorUserInfoSDySSypGvp"></a>
+                    <a name="//apple_ref/swift/Property/errorUserInfo" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10Foundation13CustomNSErrorP13errorUserInfoSDySSypGvp">errorUserInfo</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">errorUserInfo</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:10Foundation14LocalizedErrorP16errorDescriptionSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/errorDescription" class="dashAnchor"></a>
+                    <a class="token" href="#/s:10Foundation14LocalizedErrorP16errorDescriptionSSSgvp">errorDescription</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">errorDescription</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2023 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2023-01-12)</p>
+          <p>&copy; 2024 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2024-03-15)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>

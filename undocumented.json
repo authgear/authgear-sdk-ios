@@ -1,9 +1,23 @@
 {
   "warnings": [
     {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthenticationSession.swift",
-      "line": 57,
-      "symbol": "AuthenticationSessionProvider.presentationAnchor(for:)",
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/ASWebAuthenticationSessionUIImplementation.swift",
+      "line": 3,
+      "symbol": "ASWebAuthenticationSessionUIImplementation",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/ASWebAuthenticationSessionUIImplementation.swift",
+      "line": 4,
+      "symbol": "ASWebAuthenticationSessionUIImplementation.openAuthorizationURL(url:redirectURI:shareCookiesWithDeviceBrowser:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/ASWebAuthenticationSessionUIImplementation.swift",
+      "line": 20,
+      "symbol": "ASWebAuthenticationSessionUIImplementation.presentationAnchor(for:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
@@ -23,638 +37,715 @@
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 11,
+      "line": 10,
+      "symbol": "URLCompletionHandler",
+      "symbol_kind": "source.lang.swift.decl.typealias",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 12,
       "symbol": "PromptOption",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 12,
+      "line": 13,
       "symbol": "PromptOption.none",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 13,
+      "line": 14,
       "symbol": "PromptOption.login",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 14,
+      "line": 15,
       "symbol": "PromptOption.consent",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 15,
+      "line": 16,
       "symbol": "PromptOption.selectAccount",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 76,
+      "line": 89,
       "symbol": "UserInfoAddress",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 86,
+      "line": 99,
       "symbol": "UserInfoAddress.formatted",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 87,
+      "line": 100,
       "symbol": "UserInfoAddress.streetAddress",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 88,
+      "line": 101,
       "symbol": "UserInfoAddress.locality",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 89,
+      "line": 102,
       "symbol": "UserInfoAddress.region",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 90,
+      "line": 103,
       "symbol": "UserInfoAddress.postalCode",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 91,
+      "line": 104,
       "symbol": "UserInfoAddress.country",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 94,
+      "line": 106,
+      "symbol": "Authgear",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 107,
       "symbol": "UserInfo",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 121,
+      "line": 135,
       "symbol": "UserInfo.sub",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 122,
+      "line": 136,
       "symbol": "UserInfo.isAnonymous",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 123,
+      "line": 137,
       "symbol": "UserInfo.isVerified",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 124,
+      "line": 138,
       "symbol": "UserInfo.canReauthenticate",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 126,
-      "symbol": "UserInfo.customAttributes",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 128,
-      "symbol": "UserInfo.email",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 129,
-      "symbol": "UserInfo.emailVerified",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 130,
-      "symbol": "UserInfo.phoneNumber",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 131,
-      "symbol": "UserInfo.phoneNumberVerified",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 132,
-      "symbol": "UserInfo.preferredUsername",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 133,
-      "symbol": "UserInfo.familyName",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 134,
-      "symbol": "UserInfo.givenName",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 135,
-      "symbol": "UserInfo.middleName",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 136,
-      "symbol": "UserInfo.name",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 137,
-      "symbol": "UserInfo.nickname",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 138,
-      "symbol": "UserInfo.picture",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
       "line": 139,
-      "symbol": "UserInfo.profile",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 140,
-      "symbol": "UserInfo.website",
+      "symbol": "UserInfo.roles",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
       "line": 141,
-      "symbol": "UserInfo.gender",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 142,
-      "symbol": "UserInfo.birthdate",
+      "symbol": "UserInfo.customAttributes",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
       "line": 143,
-      "symbol": "UserInfo.zoneinfo",
+      "symbol": "UserInfo.email",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
       "line": 144,
-      "symbol": "UserInfo.locale",
+      "symbol": "UserInfo.emailVerified",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
       "line": 145,
+      "symbol": "UserInfo.phoneNumber",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 146,
+      "symbol": "UserInfo.phoneNumberVerified",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 147,
+      "symbol": "UserInfo.preferredUsername",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 148,
+      "symbol": "UserInfo.familyName",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 149,
+      "symbol": "UserInfo.givenName",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 150,
+      "symbol": "UserInfo.middleName",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 151,
+      "symbol": "UserInfo.name",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 152,
+      "symbol": "UserInfo.nickname",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 153,
+      "symbol": "UserInfo.picture",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 154,
+      "symbol": "UserInfo.profile",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 155,
+      "symbol": "UserInfo.website",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 156,
+      "symbol": "UserInfo.gender",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 157,
+      "symbol": "UserInfo.birthdate",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 158,
+      "symbol": "UserInfo.zoneinfo",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 159,
+      "symbol": "UserInfo.locale",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 160,
       "symbol": "UserInfo.address",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 177,
+      "line": 193,
       "symbol": "SessionState",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 178,
+      "line": 194,
       "symbol": "SessionState.unknown",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 179,
+      "line": 195,
       "symbol": "SessionState.noSession",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 180,
+      "line": 196,
       "symbol": "SessionState.authenticated",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 183,
+      "line": 199,
       "symbol": "ColorScheme",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 184,
+      "line": 200,
       "symbol": "ColorScheme.light",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 185,
+      "line": 201,
       "symbol": "ColorScheme.dark",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 188,
+      "line": 204,
       "symbol": "AuthenticationPage",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 189,
+      "line": 205,
       "symbol": "AuthenticationPage.login",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 190,
+      "line": 206,
       "symbol": "AuthenticationPage.signup",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 193,
+      "line": 209,
       "symbol": "SettingsPage",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 194,
+      "line": 210,
       "symbol": "SettingsPage.settings",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 195,
+      "line": 211,
       "symbol": "SettingsPage.identity",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 198,
+      "line": 214,
+      "symbol": "SettingsAction",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 215,
+      "symbol": "SettingsAction.changePassword",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 218,
       "symbol": "SessionStateChangeReason",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 199,
+      "line": 219,
       "symbol": "SessionStateChangeReason.noToken",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 200,
+      "line": 220,
       "symbol": "SessionStateChangeReason.foundToken",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 201,
+      "line": 221,
       "symbol": "SessionStateChangeReason.authenticated",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 202,
+      "line": 222,
       "symbol": "SessionStateChangeReason.logout",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 203,
+      "line": 223,
       "symbol": "SessionStateChangeReason.invalid",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 204,
+      "line": 224,
       "symbol": "SessionStateChangeReason.clear",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 207,
+      "line": 227,
       "symbol": "AuthgearDelegate",
       "symbol_kind": "source.lang.swift.decl.protocol",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 208,
+      "line": 228,
       "symbol": "AuthgearDelegate.authgearSessionStateDidChange(_:reason:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 209,
+      "line": 229,
       "symbol": "AuthgearDelegate.sendWechatAuthRequest(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 212,
+      "line": 232,
       "symbol": "AuthgearDelegate",
       "symbol_kind": "source.lang.swift.decl.extension",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 213,
+      "line": 233,
       "symbol": "AuthgearDelegate.authgearSessionStateDidChange(_:reason:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 214,
+      "line": 234,
       "symbol": "AuthgearDelegate.sendWechatAuthRequest(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 217,
+      "line": 237,
       "symbol": "Authgear",
       "symbol_kind": "source.lang.swift.decl.class",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 238,
+      "line": 261,
       "symbol": "Authgear.isSSOEnabled",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 243,
+      "line": 268,
       "symbol": "Authgear.accessToken",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 249,
+      "line": 274,
       "symbol": "Authgear.idTokenHint",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 253,
+      "line": 278,
       "symbol": "Authgear.canReauthenticate",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 266,
+      "line": 291,
       "symbol": "Authgear.authTime",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 284,
+      "line": 315,
       "symbol": "Authgear.sessionState",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 286,
+      "line": 317,
       "symbol": "Authgear.delegate",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 288,
-      "symbol": "Authgear.init(clientId:endpoint:tokenStorage:isSSOEnabled:name:)",
+      "line": 319,
+      "symbol": "Authgear.init(clientId:endpoint:tokenStorage:uiImplementation:isSSOEnabled:name:app2AppOptions:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 298,
+      "line": 350,
       "symbol": "Authgear.configure(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 636,
+      "line": 714,
       "symbol": "Authgear.application(_:continue:restorationHandler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 649,
+      "line": 727,
       "symbol": "Authgear.scene(_:continue:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 657,
-      "symbol": "Authgear.authenticate(redirectURI:state:prompt:loginHint:uiLocales:colorScheme:wechatRedirectURI:page:handler:)",
+      "line": 735,
+      "symbol": "Authgear.authenticate(redirectURI:state:xState:prompt:loginHint:uiLocales:colorScheme:wechatRedirectURI:page:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 691,
-      "symbol": "Authgear.reauthenticate(redirectURI:state:uiLocales:colorScheme:wechatRedirectURI:maxAge:localizedReason:policy:handler:)",
+      "line": 771,
+      "symbol": "Authgear.reauthenticate(redirectURI:state:xState:uiLocales:colorScheme:wechatRedirectURI:maxAge:localizedReason:policy:customUIQuery:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 746,
+      "line": 829,
       "symbol": "Authgear.authenticateAnonymously(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 804,
-      "symbol": "Authgear.promoteAnonymousUser(redirectURI:state:uiLocales:colorScheme:wechatRedirectURI:handler:)",
+      "line": 889,
+      "symbol": "Authgear.promoteAnonymousUser(redirectURI:state:xState:uiLocales:colorScheme:wechatRedirectURI:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 871,
+      "line": 958,
       "symbol": "Authgear.logout(force:redirectURI:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 896,
+      "line": 1078,
       "symbol": "Authgear.openURL(path:uiLocales:colorScheme:wechatRedirectURI:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 994,
+      "line": 1132,
       "symbol": "Authgear.open(page:uiLocales:colorScheme:wechatRedirectURI:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1066,
+      "line": 1272,
+      "symbol": "Authgear.changePassword(uiLocales:colorScheme:wechatRedirectURI:redirectURI:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 1345,
       "symbol": "Authgear.refreshAccessTokenIfNeeded(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1078,
+      "line": 1364,
       "symbol": "Authgear.clearSessionState(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1085,
+      "line": 1370,
       "symbol": "Authgear.fetchUserInfo(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1102,
+      "line": 1387,
       "symbol": "Authgear.refreshIDToken(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1134,
+      "line": 1422,
       "symbol": "Authgear.wechatAuthCallback(code:state:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1150,
+      "line": 1438,
       "symbol": "Authgear.checkBiometricSupported()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1161,
+      "line": 1449,
       "symbol": "Authgear.isBiometricEnabled()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1170,
+      "line": 1458,
       "symbol": "Authgear.disableBiometric()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1179,
+      "line": 1467,
       "symbol": "Authgear.enableBiometric(localizedReason:constraint:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1230,
+      "line": 1518,
       "symbol": "Authgear.authenticateBiometric(localizedReason:policy:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 1590,
+      "symbol": "Authgear.startApp2AppAuthentication(options:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 1629,
+      "symbol": "Authgear.parseApp2AppAuthenticationRequest(userActivity:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 1645,
+      "symbol": "Authgear.approveApp2AppAuthenticationRequest(request:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 1660,
+      "symbol": "Authgear.rejectApp2AppAuthenticationRequest(request:reason:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
+      "line": 1676,
+      "symbol": "Authgear.handleApp2AppAuthenticationResult(userActivity:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
@@ -772,16 +863,142 @@
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
-      "line": 29,
+      "line": 27,
+      "symbol": "AuthgearError.runtimeError(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 147,
       "symbol": "OAuthError",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
-      "line": 35,
+      "line": 148,
+      "symbol": "OAuthError.error",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 150,
+      "symbol": "OAuthError.errorUri",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 152,
+      "symbol": "OAuthError.init(error:errorDescription:errorUri:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 175,
       "symbol": "ServerError",
       "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 176,
+      "symbol": "ServerError.name",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 177,
+      "symbol": "ServerError.message",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 178,
+      "symbol": "ServerError.reason",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearError.swift",
+      "line": 179,
+      "symbol": "ServerError.info",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 3,
+      "symbol": "AuthgearExperimental",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 6,
+      "symbol": "AuthgearExperimental.AuthenticationRequest",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 7,
+      "symbol": "AuthgearExperimental.AuthenticationRequest.url",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 8,
+      "symbol": "AuthgearExperimental.AuthenticationRequest.redirectURI",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 12,
+      "symbol": "AuthgearExperimental.generateURL(redirectURI:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 16,
+      "symbol": "AuthgearExperimental.createAuthenticateRequest(redirectURI:state:xState:prompt:loginHint:uiLocales:colorScheme:wechatRedirectURI:page:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 44,
+      "symbol": "AuthgearExperimental.createReauthenticateRequest(redirectURI:idTokenHint:state:xState:uiLocales:colorScheme:wechatRedirectURI:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 71,
+      "symbol": "AuthgearExperimental.finishAuthentication(finishURL:request:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 83,
+      "symbol": "AuthgearExperimental.finishReauthentication(finishURL:request:handler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/AuthgearExperimental.swift",
+      "line": 107,
+      "symbol": "Authgear.experimental",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
@@ -863,71 +1080,204 @@
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 20,
+      "line": 24,
       "symbol": "TransientTokenStorage",
       "symbol_kind": "source.lang.swift.decl.class",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 24,
+      "line": 28,
       "symbol": "TransientTokenStorage.init()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 26,
+      "line": 30,
       "symbol": "TransientTokenStorage.setRefreshToken(namespace:token:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 30,
+      "line": 34,
       "symbol": "TransientTokenStorage.getRefreshToken(namespace:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 34,
+      "line": 38,
       "symbol": "TransientTokenStorage.delRefreshToken(namespace:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 39,
+      "line": 43,
       "symbol": "PersistentTokenStorage",
       "symbol_kind": "source.lang.swift.decl.class",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 43,
+      "line": 47,
       "symbol": "PersistentTokenStorage.init()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 45,
+      "line": 49,
       "symbol": "PersistentTokenStorage.setRefreshToken(namespace:token:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 49,
+      "line": 53,
       "symbol": "PersistentTokenStorage.getRefreshToken(namespace:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Storage.swift",
-      "line": 53,
+      "line": 57,
       "symbol": "PersistentTokenStorage.delRefreshToken(namespace:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/UIImplementation.swift",
+      "line": 3,
+      "symbol": "UIImplementation",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/UIImplementation.swift",
+      "line": 4,
+      "symbol": "UIImplementation.CompletionHandler",
+      "symbol_kind": "source.lang.swift.decl.typealias",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/UIImplementation.swift",
+      "line": 5,
+      "symbol": "UIImplementation.openAuthorizationURL(url:redirectURI:shareCookiesWithDeviceBrowser:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/UILocales.swift",
+      "line": 1,
+      "symbol": "UILocales",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
+      "line": 4,
+      "symbol": "WKWebViewUIImplementation",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
+      "line": 5,
+      "symbol": "WKWebViewUIImplementation.modalPresentationStyle",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
+      "line": 6,
+      "symbol": "WKWebViewUIImplementation.navigationBarBackgroundColor",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
+      "line": 7,
+      "symbol": "WKWebViewUIImplementation.navigationBarButtonTintColor",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
+      "line": 9,
+      "symbol": "WKWebViewUIImplementation.openAuthorizationURL(url:redirectURI:shareCookiesWithDeviceBrowser:completion:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticateRequest.swift",
+      "line": 3,
+      "symbol": "App2AppAuthenticateRequest",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticateRequest.swift",
+      "line": 4,
+      "symbol": "App2AppAuthenticateRequest.authorizationEndpoint",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticateRequest.swift",
+      "line": 5,
+      "symbol": "App2AppAuthenticateRequest.redirectUri",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticateRequest.swift",
+      "line": 6,
+      "symbol": "App2AppAuthenticateRequest.clientID",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticateRequest.swift",
+      "line": 7,
+      "symbol": "App2AppAuthenticateRequest.codeChallenge",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticateRequest.swift",
+      "line": 8,
+      "symbol": "App2AppAuthenticateRequest.state",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticationOptions.swift",
+      "line": 3,
+      "symbol": "App2AppAuthenticateOptions",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppAuthenticationOptions.swift",
+      "line": 8,
+      "symbol": "App2AppAuthenticateOptions.init(authorizationEndpoint:redirectUri:state:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppOptions.swift",
+      "line": 3,
+      "symbol": "App2AppOptions",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/app2app/App2AppOptions.swift",
+      "line": 14,
+      "symbol": "App2AppOptions.init(isEnabled:authorizationEndpoint:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     }
