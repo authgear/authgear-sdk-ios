@@ -5,9 +5,22 @@ public class WKWebViewUIImplementation: NSObject, UIImplementation, AGWKWebViewC
     public var modalPresentationStyle: UIModalPresentationStyle?
     public var navigationBarBackgroundColor: UIColor?
     public var navigationBarButtonTintColor: UIColor?
+    public var isInspectable: Bool
+
+    public init(
+        modalPresentationStyle: UIModalPresentationStyle? = nil,
+        navigationBarBackgroundColor: UIColor? = nil,
+        navigationBarButtonTintColor: UIColor? = nil,
+        isInspectable: Bool = false
+    ) {
+        self.modalPresentationStyle = modalPresentationStyle
+        self.navigationBarBackgroundColor = navigationBarBackgroundColor
+        self.navigationBarButtonTintColor = navigationBarButtonTintColor
+        self.isInspectable = isInspectable
+    }
 
     public func openAuthorizationURL(url: URL, redirectURI: URL, shareCookiesWithDeviceBrowser: Bool, completion: @escaping CompletionHandler) {
-        let controller = AGWKWebViewController(url: url, redirectURI: redirectURI) { url, error in
+        let controller = AGWKWebViewController(url: url, redirectURI: redirectURI, isInspectable: isInspectable) { url, error in
             if let error = error {
                 completion(.failure(wrapError(error: error)))
             }
