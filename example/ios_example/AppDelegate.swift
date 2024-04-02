@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let uiImplementation: UIImplementation
         if useWKWebView {
-            uiImplementation = WKWebViewUIImplementation()
+            uiImplementation = WKWebViewUIImplementation(isInspectable: true)
         } else {
             uiImplementation = ASWebAuthenticationSessionUIImplementation()
         }
