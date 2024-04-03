@@ -1206,7 +1206,21 @@
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
-      "line": 9,
+      "line": 8,
+      "symbol": "WKWebViewUIImplementation.isInspectable",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
+      "line": 10,
+      "symbol": "WKWebViewUIImplementation.init(modalPresentationStyle:navigationBarBackgroundColor:navigationBarButtonTintColor:isInspectable:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
+      "line": 22,
       "symbol": "WKWebViewUIImplementation.openAuthorizationURL(url:redirectURI:shareCookiesWithDeviceBrowser:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
