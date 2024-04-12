@@ -3,13 +3,16 @@ import Foundation
 
 struct CodeVerifier {
     static func generateValue() -> String {
+        // https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
+        // It is RECOMMENDED that the output of
+        // a suitable random number generator be used to create a 32-octet
+        // sequence.  The octet sequence is then base64url-encoded to produce a
+        // 43-octet URL safe string to use as the code verifier.
         var buffer = [UInt8](repeating: 0, count: 32)
         _ = SecRandomCopyBytes(kSecRandomDefault, buffer.count, &buffer)
 
-        return buffer
-            .map { $0 & 0xFF }
-            .map { String(format: "%02X", $0) }
-            .joined()
+        let data = Data(buffer)
+        return data.base64urlEncodedString()
     }
 
     static func computeCodeChallenge(_ value: String) -> String {
@@ -20,7 +23,7 @@ struct CodeVerifier {
             _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &buffer)
         }
 
-        let hash = Data(buffer.map { $0 & 0xFF })
+        let hash = Data(buffer)
 
         return hash.base64urlEncodedString()
     }
