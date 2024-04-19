@@ -27,7 +27,7 @@ struct AuthenticateOptions {
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
-    let xAuthenticationFlowGroup: String?
+    let authenticationFlowGroup: String?
 
     var request: OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -46,7 +46,7 @@ struct AuthenticateOptions {
             wechatRedirectURI: self.wechatRedirectURI,
             page: self.page,
             settingsAction: nil,
-            xAuthenticationFlowGroup: self.xAuthenticationFlowGroup
+            authenticationFlowGroup: self.authenticationFlowGroup
         )
     }
 }
@@ -66,7 +66,7 @@ struct ReauthenticateOptions {
     let colorScheme: ColorScheme?
     let wechatRedirectURI: String?
     let maxAge: Int?
-    let xAuthenticationFlowGroup: String?
+    let authenticationFlowGroup: String?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -85,7 +85,7 @@ struct ReauthenticateOptions {
             wechatRedirectURI: self.wechatRedirectURI,
             page: nil,
             settingsAction: nil,
-            xAuthenticationFlowGroup: self.xAuthenticationFlowGroup
+            authenticationFlowGroup: self.authenticationFlowGroup
         )
     }
 }
@@ -746,7 +746,7 @@ public class Authgear {
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         page: AuthenticationPage? = nil,
-        xAuthenticationFlowGroup: String? = nil,
+        authenticationFlowGroup: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         self.authenticate(AuthenticateOptions(
@@ -760,7 +760,7 @@ public class Authgear {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             page: page,
-            xAuthenticationFlowGroup: xAuthenticationFlowGroup
+            authenticationFlowGroup: authenticationFlowGroup
         ), handler: handler)
     }
 
@@ -785,7 +785,7 @@ public class Authgear {
         localizedReason: String? = nil,
         policy: BiometricLAPolicy? = nil,
         customUIQuery: String? = nil,
-        xAuthenticationFlowGroup: String? = nil,
+        authenticationFlowGroup: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
@@ -826,7 +826,7 @@ public class Authgear {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             maxAge: maxAge,
-            xAuthenticationFlowGroup: xAuthenticationFlowGroup
+            authenticationFlowGroup: authenticationFlowGroup
         )
 
         self.workerQueue.async {
@@ -943,7 +943,7 @@ public class Authgear {
                         colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
                         page: nil,
-                        xAuthenticationFlowGroup: nil
+                        authenticationFlowGroup: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -1036,7 +1036,7 @@ public class Authgear {
                     wechatRedirectURI: wechatRedirectURI,
                     page: nil,
                     settingsAction: settingsAction,
-                    xAuthenticationFlowGroup: nil
+                    authenticationFlowGroup: nil
                 ), verifier: nil)
 
                 handler?(.success(endpoint))

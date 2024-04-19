@@ -44,7 +44,7 @@ struct OIDCAuthenticationRequest {
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
     let settingsAction: SettingsAction?
-    let xAuthenticationFlowGroup: String?
+    let authenticationFlowGroup: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -129,8 +129,8 @@ struct OIDCAuthenticationRequest {
 
         queryItems.append(URLQueryItem(name: "x_sso_enabled", value: self.isSSOEnabled ? "true" : "false"))
 
-        if let xAuthenticationFlowGroup = self.xAuthenticationFlowGroup {
-            queryItems.append(URLQueryItem(name: "x_authentication_flow_group", value: xAuthenticationFlowGroup))
+        if let authenticationFlowGroup = self.authenticationFlowGroup {
+            queryItems.append(URLQueryItem(name: "x_authentication_flow_group", value: authenticationFlowGroup))
         }
 
         return queryItems

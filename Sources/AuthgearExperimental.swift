@@ -23,7 +23,7 @@ public struct AuthgearExperimental {
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         page: AuthenticationPage? = nil,
-        xAuthenticationFlowGroup: String? = nil
+        authenticationFlowGroup: String? = nil
     ) -> Result<AuthenticationRequest, Error> {
         let options = AuthenticateOptions(
             redirectURI: redirectURI,
@@ -36,7 +36,7 @@ public struct AuthgearExperimental {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             page: page,
-            xAuthenticationFlowGroup: xAuthenticationFlowGroup
+            authenticationFlowGroup: authenticationFlowGroup
         )
         return self.authgear.createAuthenticateRequest(options).map { request in
             AuthenticationRequest.fromInternal(request)
@@ -51,7 +51,7 @@ public struct AuthgearExperimental {
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
-        xAuthenticationFlowGroup: String? = nil
+        authenticationFlowGroup: String? = nil
     ) -> Result<AuthenticationRequest, Error> {
         let options = ReauthenticateOptions(
             redirectURI: redirectURI,
@@ -62,7 +62,7 @@ public struct AuthgearExperimental {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             maxAge: nil,
-            xAuthenticationFlowGroup: xAuthenticationFlowGroup
+            authenticationFlowGroup: authenticationFlowGroup
         )
         return Result<AuthenticationRequest, Error> {
             let verifier = CodeVerifier()
