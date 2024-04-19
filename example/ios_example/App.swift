@@ -30,6 +30,7 @@ class App: ObservableObject {
     @Published var sessionState = SessionState.unknown
     @Published var user: UserInfo?
     @Published var authenticationPage: AuthenticationPage?
+    @Published var authenticationFlowGroup: String? = nil
     @Published var explicitColorScheme: AuthgearColorScheme?
     @Published var authgearActionErrorMessage: String?
     @Published var successAlertMessage: String?
@@ -55,6 +56,7 @@ class App: ObservableObject {
         endpoint: String,
         app2AppEndpoint: String,
         authenticationPage: AuthenticationPage?,
+        authenticationFlowGroup: String?,
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
         isSSOEnabled: Bool,
@@ -76,6 +78,7 @@ class App: ObservableObject {
         let isApp2AppEnabled = !app2AppEndpoint.isEmpty
         appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: isApp2AppEnabled, useWKWebView: useWKWebView)
         self.authenticationPage = authenticationPage
+        self.authenticationFlowGroup = authenticationFlowGroup
         self.explicitColorScheme = colorScheme
         self.app2appEndpoint = app2AppEndpoint
         self.updateBiometricState()
@@ -132,6 +135,7 @@ class App: ObservableObject {
             colorScheme: self.colorScheme,
             wechatRedirectURI: App.wechatRedirectURI,
             page: self.authenticationPage,
+            authenticationFlowGroup: self.authenticationFlowGroup,
             handler: self.handleAuthorizeResult
         )
     }
