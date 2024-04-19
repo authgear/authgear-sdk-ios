@@ -81,6 +81,7 @@ struct AuthgearConfigurationForm: View {
     @State private var useWKWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWKWebView")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
+    @State private var authenticationFlowGroup: String = ""
 
     private let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
 
@@ -116,6 +117,13 @@ struct AuthgearConfigurationForm: View {
                     )
                 )
             }
+            AuthgearConfigurationInput(
+                label: "Authentication flow group",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Override authentication flow group",
+                    text: $authenticationFlowGroup
+                )
+            )
             Picker("Authentication Page", selection: $authenticationPage) {
                 Text("Unset").tag("")
                 Text("Login").tag(AuthenticationPage.login.rawValue)
@@ -148,6 +156,7 @@ struct AuthgearConfigurationForm: View {
                     endpoint: self.endpoint,
                     app2AppEndpoint: self.app2AppEndpoint,
                     authenticationPage: AuthenticationPage(rawValue: self.authenticationPage),
+                    authenticationFlowGroup: self.authenticationFlowGroup == "" ? nil : self.authenticationFlowGroup,
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
                     isSSOEnabled: self.isSSOEnabled,
