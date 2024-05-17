@@ -87,43 +87,45 @@ struct AuthgearConfigurationForm: View {
 
     var body: some View {
         VStack {
-            AuthgearConfigurationInput(
-                label: "ClientID",
-                input: AuthgearConfigurationTextField(
-                    placeHolder: "Enter Client ID",
-                    text: $clientID
-                )
-            )
-            AuthgearConfigurationInput(
-                label: "Endpoint",
-                input: AuthgearConfigurationTextField(
-                    placeHolder: "Enter Endpoint",
-                    text: $endpoint
-                )
-            )
-            AuthgearConfigurationInput(
-                label: "App2App Endpoint",
-                input: AuthgearConfigurationTextField(
-                    placeHolder: "Enter App2App Endpoint",
-                    text: $app2AppEndpoint
-                )
-            )
-            if (!app2AppEndpoint.isEmpty) {
+            Group {
                 AuthgearConfigurationInput(
-                    label: "App2App State",
+                    label: "ClientID",
                     input: AuthgearConfigurationTextField(
-                        placeHolder: "Enter App2App State",
-                        text: $app2appState
+                        placeHolder: "Enter Client ID",
+                        text: $clientID
+                    )
+                )
+                AuthgearConfigurationInput(
+                    label: "Endpoint",
+                    input: AuthgearConfigurationTextField(
+                        placeHolder: "Enter Endpoint",
+                        text: $endpoint
+                    )
+                )
+                AuthgearConfigurationInput(
+                    label: "App2App Endpoint",
+                    input: AuthgearConfigurationTextField(
+                        placeHolder: "Enter App2App Endpoint",
+                        text: $app2AppEndpoint
+                    )
+                )
+                if (!app2AppEndpoint.isEmpty) {
+                    AuthgearConfigurationInput(
+                        label: "App2App State",
+                        input: AuthgearConfigurationTextField(
+                            placeHolder: "Enter App2App State",
+                            text: $app2appState
+                        )
+                    )
+                }
+                AuthgearConfigurationInput(
+                    label: "Authentication flow group",
+                    input: AuthgearConfigurationTextField(
+                        placeHolder: "Override authentication flow group",
+                        text: $authenticationFlowGroup
                     )
                 )
             }
-            AuthgearConfigurationInput(
-                label: "Authentication flow group",
-                input: AuthgearConfigurationTextField(
-                    placeHolder: "Override authentication flow group",
-                    text: $authenticationFlowGroup
-                )
-            )
             Picker("Authentication Page", selection: $authenticationPage) {
                 Text("Unset").tag("")
                 Text("Login").tag(AuthenticationPage.login.rawValue)
