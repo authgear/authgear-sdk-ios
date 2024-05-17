@@ -267,13 +267,16 @@ class App: ObservableObject {
             switch userInfoResult {
             case let .success(userInfo):
                 self.user = userInfo
-                self.successAlertMessage = [
-                    "User Info:",
-                    "",
-                    "User ID: \(userInfo.sub)",
-                    "Is Verified: \(userInfo.isVerified)",
-                    "Is Anonymous: \(userInfo.isAnonymous)"
-                ].joined(separator: "\n")
+                let mirror = Mirror(reflecting: userInfo)
+                var userInfoDetails = ["User Info:"]
+
+                for child in mirror.children {
+                    if let propertyName = child.label {
+                        userInfoDetails.append("\(propertyName): \(child.value)")
+                    }
+                }
+
+                self.successAlertMessage = userInfoDetails.joined(separator: "\n")
             case let .failure(error):
                 self.setError(error)
             }
