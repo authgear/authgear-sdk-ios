@@ -193,6 +193,7 @@ protocol AuthAPIClient: AnyObject {
         actorTokenType: String?,
         actorToken: String?,
         audience: String?,
+        deviceSecret: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
     func requestBiometricSetup(
@@ -265,7 +266,8 @@ extension AuthAPIClient {
         subjectToken: String?,
         actorTokenType: String?,
         actorToken: String?,
-        audience: String?
+        audience: String?,
+        deviceSecret: String?
     ) throws -> OIDCTokenResponse {
         try withSemaphore { handler in
             self.requestOIDCToken(
@@ -288,6 +290,7 @@ extension AuthAPIClient {
                 actorTokenType: actorTokenType,
                 actorToken: actorToken,
                 audience: audience,
+                deviceSecret: deviceSecret,
                 handler: handler
             )
         }
@@ -475,6 +478,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
         actorTokenType: String?,
         actorToken: String?,
         audience: String?,
+        deviceSecret: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     ) {
         fetchOIDCConfiguration { [weak self] result in
@@ -549,6 +553,10 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
                 if let audience = audience {
                     queryParams["audience"] = audience
+                }
+                
+                if let deviceSecret = deviceSecret {
+                    queryParams["device_secret"] = deviceSecret
                 }
 
                 var urlComponents = URLComponents()

@@ -538,7 +538,8 @@ public class Authgear {
                 subjectToken: nil,
                 actorTokenType: nil,
                 actorToken: nil,
-                audience: nil
+                audience: nil,
+                deviceSecret: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -630,7 +631,8 @@ public class Authgear {
                 subjectToken: nil,
                 actorTokenType: nil,
                 actorToken: nil,
-                audience: nil
+                audience: nil,
+                deviceSecret: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -930,7 +932,8 @@ public class Authgear {
                     subjectToken: nil,
                     actorTokenType: nil,
                     actorToken: nil,
-                    audience: nil
+                    audience: nil,
+                    deviceSecret: nil
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -1337,7 +1340,8 @@ public class Authgear {
                 subjectToken: nil,
                 actorTokenType: nil,
                 actorToken: nil,
-                audience: nil
+                audience: nil,
+                deviceSecret: nil
             )
             handler(.success(()))
         } catch {
@@ -1417,6 +1421,11 @@ public class Authgear {
                     }
                     return
                 }
+                
+                var deviceSecret: String? = nil
+                if let ds = try self.tokenStorage.getDeviceSecret(namespace: self.name) {
+                    deviceSecret = ds
+                }
 
                 let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                     grantType: GrantType.refreshToken,
@@ -1437,7 +1446,8 @@ public class Authgear {
                     subjectToken: nil,
                     actorTokenType: nil,
                     actorToken: nil,
-                    audience: nil
+                    audience: nil,
+                    deviceSecret: deviceSecret
                 )
 
                 self.persistSession(oidcTokenResponse, reason: .foundToken) { result in handler?(result) }
@@ -1500,6 +1510,10 @@ public class Authgear {
         let task = {
             self.workerQueue.async {
                 do {
+                    var deviceSecret: String? = nil
+                    if let ds = try self.tokenStorage.getDeviceSecret(namespace: self.name) {
+                        deviceSecret = ds
+                    }
                     let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                         grantType: .idToken,
                         clientId: self.clientId,
@@ -1519,7 +1533,8 @@ public class Authgear {
                         subjectToken: nil,
                         actorTokenType: nil,
                         actorToken: nil,
-                        audience: nil
+                        audience: nil,
+                        deviceSecret: deviceSecret
                     )
                     if let idToken = oidcTokenResponse.idToken {
                         let result = Result { try self.tokenStorage.setIDToken(namespace: self.name, token: idToken) }
@@ -1707,7 +1722,8 @@ public class Authgear {
                         subjectToken: nil,
                         actorTokenType: nil,
                         actorToken: nil,
-                        audience: nil
+                        audience: nil,
+                        deviceSecret: nil
                     )
 
                     let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
