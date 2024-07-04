@@ -19,6 +19,7 @@ public enum PromptOption: String {
 struct AuthenticateOptions {
     let redirectURI: String
     let isSSOEnabled: Bool
+    let isAppInitiatedSSOToWebEnabled: Bool
     let state: String?
     let xState: String?
     let prompt: [PromptOption]?
@@ -30,10 +31,15 @@ struct AuthenticateOptions {
     let authenticationFlowGroup: String?
 
     var request: OIDCAuthenticationRequest {
-        OIDCAuthenticationRequest(
+        var scopes = ["openid", "offline_access", "https://authgear.com/scopes/full-access"]
+        if isAppInitiatedSSOToWebEnabled {
+            scopes.append("device_sso")
+            scopes.append("https://authgear.com/scopes/app-initiated-sso-to-web")
+        }
+        return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
-            scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+            scope: scopes,
             isSSOEnabled: isSSOEnabled,
             state: self.state,
             xState: self.xState,
@@ -267,6 +273,7 @@ public class Authgear {
     private var shareCookiesWithDeviceBrowser: Bool {
         self.isSSOEnabled
     }
+    public let isAppInitiatedSSOToWebEnabled: Bool
 
     var uiImplementation: UIImplementation
 
@@ -327,6 +334,7 @@ public class Authgear {
         tokenStorage: TokenStorage = PersistentTokenStorage(),
         uiImplementation: UIImplementation = ASWebAuthenticationSessionUIImplementation(),
         isSSOEnabled: Bool = false,
+        isAppInitiatedSSOToWebEnabled: Bool = false,
         name: String? = nil,
         app2AppOptions: App2AppOptions = App2AppOptions(
             isEnabled: false,
@@ -339,6 +347,7 @@ public class Authgear {
         self.uiImplementation = uiImplementation
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
+        self.isAppInitiatedSSOToWebEnabled = isAppInitiatedSSOToWebEnabled
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
@@ -753,6 +762,7 @@ public class Authgear {
         self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
+            isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled,
             state: state,
             xState: xState,
             prompt: prompt,
@@ -936,6 +946,7 @@ public class Authgear {
                     AuthenticateOptions(
                         redirectURI: redirectURI,
                         isSSOEnabled: self.isSSOEnabled,
+                        isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled,
                         state: state,
                         xState: xState,
                         prompt: [.login],
