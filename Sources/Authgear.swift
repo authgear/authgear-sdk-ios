@@ -639,6 +639,22 @@ public class Authgear {
                 return
             }
         }
+        
+        if let idToken = oidcTokenResponse.idToken {
+            let result = Result { try self.tokenStorage.setIDToken(namespace: self.name, token: idToken) }
+            guard case .success = result else {
+                handler(result)
+                return
+            }
+        }
+        
+        if let deviceSecret = oidcTokenResponse.deviceSecret {
+            let result = Result { try self.tokenStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
+            guard case .success = result else {
+                handler(result)
+                return
+            }
+        }
 
         DispatchQueue.main.async {
             self.accessToken = oidcTokenResponse.accessToken
@@ -656,6 +672,16 @@ public class Authgear {
 
     private func cleanupSession(force: Bool, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
         if case let .failure(error) = Result(catching: { try tokenStorage.delRefreshToken(namespace: name) }) {
+            if !force {
+                return handler(.failure(wrapError(error: error)))
+            }
+        }
+        if case let .failure(error) = Result(catching: { try tokenStorage.delIDToken(namespace: name) }) {
+            if !force {
+                return handler(.failure(wrapError(error: error)))
+            }
+        }
+        if case let .failure(error) = Result(catching: { try tokenStorage.delDeviceSecret(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
             }
@@ -1454,9 +1480,25 @@ public class Authgear {
                         xApp2AppDeviceKeyJwt: nil
                     )
                     if let idToken = oidcTokenResponse.idToken {
-                        self.idToken = idToken
+                        let result = Result { try self.tokenStorage.setIDToken(namespace: self.name, token: idToken) }
+                        guard case .success = result else {
+                            handler(result)
+                            return
+                        }
                     }
-                    handler(.success(()))
+                    if let deviceSecret = oidcTokenResponse.deviceSecret {
+                        let result = Result { try self.tokenStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
+                        guard case .success = result else {
+                            handler(result)
+                            return
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        if let idToken = oidcTokenResponse.idToken {
+                            self.idToken = idToken
+                        }
+                        handler(.success(()))
+                    }
                 } catch {
                     self._handleInvalidGrantException(error: error)
                     handler(.failure(wrapError(error: error)))

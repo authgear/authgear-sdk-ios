@@ -143,6 +143,7 @@ struct OIDCTokenResponse: Decodable {
     let accessToken: String?
     let expiresIn: Int?
     let refreshToken: String?
+    let deviceSecret: String?
     let code: String?
 }
 
