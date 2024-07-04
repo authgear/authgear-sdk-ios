@@ -186,6 +186,13 @@ protocol AuthAPIClient: AnyObject {
         jwt: String?,
         accessToken: String?,
         xApp2AppDeviceKeyJwt: String?,
+        scope: [String]?,
+        requestedTokenType: String?,
+        subjectTokenType: String?,
+        subjectToken: String?,
+        actorTokenType: String?,
+        actorToken: String?,
+        audience: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     )
     func requestBiometricSetup(
@@ -251,7 +258,14 @@ extension AuthAPIClient {
         refreshToken: String?,
         jwt: String?,
         accessToken: String?,
-        xApp2AppDeviceKeyJwt: String?
+        xApp2AppDeviceKeyJwt: String?,
+        scope: [String]?,
+        requestedTokenType: String?,
+        subjectTokenType: String?,
+        subjectToken: String?,
+        actorTokenType: String?,
+        actorToken: String?,
+        audience: String?
     ) throws -> OIDCTokenResponse {
         try withSemaphore { handler in
             self.requestOIDCToken(
@@ -267,6 +281,13 @@ extension AuthAPIClient {
                 jwt: jwt,
                 accessToken: accessToken,
                 xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt,
+                scope: scope,
+                requestedTokenType: requestedTokenType,
+                subjectTokenType: subjectTokenType,
+                subjectToken: subjectToken,
+                actorTokenType: actorTokenType,
+                actorToken: actorToken,
+                audience: audience,
                 handler: handler
             )
         }
@@ -447,6 +468,13 @@ class DefaultAuthAPIClient: AuthAPIClient {
         jwt: String? = nil,
         accessToken: String? = nil,
         xApp2AppDeviceKeyJwt: String? = nil,
+        scope: [String]?,
+        requestedTokenType: String?,
+        subjectTokenType: String?,
+        subjectToken: String?,
+        actorTokenType: String?,
+        actorToken: String?,
+        audience: String?,
         handler: @escaping (Result<OIDCTokenResponse, Error>) -> Void
     ) {
         fetchOIDCConfiguration { [weak self] result in
@@ -493,6 +521,34 @@ class DefaultAuthAPIClient: AuthAPIClient {
 
                 if let xApp2AppDeviceKeyJwt = xApp2AppDeviceKeyJwt {
                     queryParams["x_app2app_device_key_jwt"] = xApp2AppDeviceKeyJwt
+                }
+                
+                if let scope = scope {
+                    queryParams["scope"] = scope.joined(separator: " ")
+                }
+                
+                if let requestedTokenType = requestedTokenType {
+                    queryParams["requested_token_type"] = requestedTokenType
+                }
+                
+                if let subjectToken = subjectToken {
+                    queryParams["subject_token"] = subjectToken
+                }
+                
+                if let subjectTokenType = subjectTokenType {
+                    queryParams["subject_token_type"] = subjectTokenType
+                }
+                
+                if let actorToken = actorToken {
+                    queryParams["actor_token"] = actorToken
+                }
+                
+                if let actorTokenType = actorTokenType {
+                    queryParams["actor_token_type"] = actorTokenType
+                }
+
+                if let audience = audience {
+                    queryParams["audience"] = audience
                 }
 
                 var urlComponents = URLComponents()

@@ -531,7 +531,14 @@ public class Authgear {
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
-                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt,
+                scope: nil,
+                requestedTokenType: nil,
+                subjectTokenType: nil,
+                subjectToken: nil,
+                actorTokenType: nil,
+                actorToken: nil,
+                audience: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -616,7 +623,14 @@ public class Authgear {
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
-                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt,
+                scope: nil,
+                requestedTokenType: nil,
+                subjectTokenType: nil,
+                subjectToken: nil,
+                actorTokenType: nil,
+                actorToken: nil,
+                audience: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -909,7 +923,14 @@ public class Authgear {
                     refreshToken: nil,
                     jwt: signedJWT,
                     accessToken: nil,
-                    xApp2AppDeviceKeyJwt: nil
+                    xApp2AppDeviceKeyJwt: nil,
+                    scope: nil,
+                    requestedTokenType: nil,
+                    subjectTokenType: nil,
+                    subjectToken: nil,
+                    actorTokenType: nil,
+                    actorToken: nil,
+                    audience: nil
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -1309,7 +1330,14 @@ public class Authgear {
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
-                xApp2AppDeviceKeyJwt: nil
+                xApp2AppDeviceKeyJwt: nil,
+                scope: nil,
+                requestedTokenType: nil,
+                subjectTokenType: nil,
+                subjectToken: nil,
+                actorTokenType: nil,
+                actorToken: nil,
+                audience: nil
             )
             handler(.success(()))
         } catch {
@@ -1402,7 +1430,14 @@ public class Authgear {
                     refreshToken: refreshToken,
                     jwt: nil,
                     accessToken: nil,
-                    xApp2AppDeviceKeyJwt: nil
+                    xApp2AppDeviceKeyJwt: nil,
+                    scope: nil,
+                    requestedTokenType: nil,
+                    subjectTokenType: nil,
+                    subjectToken: nil,
+                    actorTokenType: nil,
+                    actorToken: nil,
+                    audience: nil
                 )
 
                 self.persistSession(oidcTokenResponse, reason: .foundToken) { result in handler?(result) }
@@ -1477,7 +1512,14 @@ public class Authgear {
                         refreshToken: nil,
                         jwt: nil,
                         accessToken: self.accessToken,
-                        xApp2AppDeviceKeyJwt: nil
+                        xApp2AppDeviceKeyJwt: nil,
+                        scope: nil,
+                        requestedTokenType: nil,
+                        subjectTokenType: nil,
+                        subjectToken: nil,
+                        actorTokenType: nil,
+                        actorToken: nil,
+                        audience: nil
                     )
                     if let idToken = oidcTokenResponse.idToken {
                         let result = Result { try self.tokenStorage.setIDToken(namespace: self.name, token: idToken) }
@@ -1658,7 +1700,14 @@ public class Authgear {
                         refreshToken: nil,
                         jwt: signedJWT,
                         accessToken: nil,
-                        xApp2AppDeviceKeyJwt: nil
+                        xApp2AppDeviceKeyJwt: nil,
+                        scope: nil,
+                        requestedTokenType: nil,
+                        subjectTokenType: nil,
+                        subjectToken: nil,
+                        actorTokenType: nil,
+                        actorToken: nil,
+                        audience: nil
                     )
 
                     let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
