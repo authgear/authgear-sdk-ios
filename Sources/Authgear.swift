@@ -16,6 +16,17 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
+func getAuthenticationScopes(
+    isAppInitiatedSSOToWebEnabled: Bool
+) -> [String] {
+    var scopes = ["openid", "offline_access", "https://authgear.com/scopes/full-access"]
+    if isAppInitiatedSSOToWebEnabled {
+        scopes.append("device_sso")
+        scopes.append("https://authgear.com/scopes/app-initiated-sso-to-web")
+    }
+    return scopes
+}
+
 struct AuthenticateOptions {
     let redirectURI: String
     let isSSOEnabled: Bool
@@ -31,11 +42,8 @@ struct AuthenticateOptions {
     let authenticationFlowGroup: String?
 
     var request: OIDCAuthenticationRequest {
-        var scopes = ["openid", "offline_access", "https://authgear.com/scopes/full-access"]
-        if isAppInitiatedSSOToWebEnabled {
-            scopes.append("device_sso")
-            scopes.append("https://authgear.com/scopes/app-initiated-sso-to-web")
-        }
+        let scopes = getAuthenticationScopes(
+            isAppInitiatedSSOToWebEnabled: isAppInitiatedSSOToWebEnabled)
         return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
@@ -1723,7 +1731,8 @@ public class Authgear {
                         jwt: signedJWT,
                         accessToken: nil,
                         xApp2AppDeviceKeyJwt: nil,
-                        scope: nil,
+                        scope: getAuthenticationScopes(
+                            isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled),
                         requestedTokenType: nil,
                         subjectTokenType: nil,
                         subjectToken: nil,
