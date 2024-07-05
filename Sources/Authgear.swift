@@ -277,6 +277,7 @@ public class Authgear {
     private var shareCookiesWithDeviceBrowser: Bool {
         self.isSSOEnabled
     }
+
     public let isAppInitiatedSSOToWebEnabled: Bool
 
     var uiImplementation: UIImplementation
@@ -659,7 +660,7 @@ public class Authgear {
                 return
             }
         }
-        
+
         if let idToken = oidcTokenResponse.idToken {
             let result = Result { try self.tokenStorage.setIDToken(namespace: self.name, token: idToken) }
             guard case .success = result else {
@@ -667,7 +668,7 @@ public class Authgear {
                 return
             }
         }
-        
+
         if let deviceSecret = oidcTokenResponse.deviceSecret {
             let result = Result { try self.tokenStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
             guard case .success = result else {
@@ -1427,8 +1428,8 @@ public class Authgear {
                     }
                     return
                 }
-                
-                var deviceSecret: String? = nil
+
+                var deviceSecret: String?
                 if let ds = try self.tokenStorage.getDeviceSecret(namespace: self.name) {
                     deviceSecret = ds
                 }
@@ -1516,7 +1517,7 @@ public class Authgear {
         let task = {
             self.workerQueue.async {
                 do {
-                    var deviceSecret: String? = nil
+                    var deviceSecret: String?
                     if let ds = try self.tokenStorage.getDeviceSecret(namespace: self.name) {
                         deviceSecret = ds
                     }
@@ -1847,7 +1848,7 @@ public class Authgear {
         }
         return app2app.handleApp2AppAuthenticationResult(url: incomingURL)
     }
-    
+
     public func makeAppInitiatedSSOToWebURL(
         clientID: String,
         redirectURI: String,
@@ -1897,8 +1898,8 @@ public class Authgear {
                 )
                 // Here access_token is app-initiated-sso-to-web-token
                 let appInitiatedSSOToWebToken = tokenExchangeResult.accessToken
-                let newDeviceSecret = tokenExchangeResult.deviceSecret;
-                let newIDToken = tokenExchangeResult.idToken;
+                let newDeviceSecret = tokenExchangeResult.deviceSecret
+                let newIDToken = tokenExchangeResult.idToken
                 guard let appInitiatedSSOToWebToken = appInitiatedSSOToWebToken else {
                     handler(.failure(AuthgearError.runtimeError("unexpected: access_token is not returned")))
                     return

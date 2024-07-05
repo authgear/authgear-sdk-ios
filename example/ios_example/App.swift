@@ -89,7 +89,8 @@ class App: ObservableObject {
             isSSOEnabled: isSSOEnabled,
             isApp2AppEnabled: isApp2AppEnabled,
             isAppInitiatedSSOToWebEnabled: isAppInitiatedSSOToWebEnabled,
-            useWKWebView: useWKWebView)
+            useWKWebView: useWKWebView
+        )
         self.authenticationPage = authenticationPage
         self.authenticationFlowGroup = authenticationFlowGroup
         self.explicitColorScheme = colorScheme
@@ -337,12 +338,13 @@ class App: ObservableObject {
         self.isAuthgearConfigured = true
         handlePendingApp2AppRequest()
     }
-    
+
     func appInitiatedSSOToWeb(clientID: String) {
         container?.makeAppInitiatedSSOToWebURL(
             clientID: clientID,
             redirectURI: App.redirectURI,
-            state: nil) { result in
+            state: nil
+        ) { result in
             switch result {
             case let .success(url):
                 // Use ASWebAuthenticationSession to open the url and set the cookie
@@ -351,14 +353,15 @@ class App: ObservableObject {
                     url: url,
                     redirectURI: URL(string: App.redirectURI)!,
                     shareCookiesWithDeviceBrowser: true,
-                    completion: { r in
+                    completion: { _ in
                         switch result {
                         case .success:
                             break
                         case let .failure(error):
                             self.setError(error)
                         }
-                    })
+                    }
+                )
             case let .failure(error):
                 self.setError(error)
             }

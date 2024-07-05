@@ -69,7 +69,7 @@ struct OIDCAuthenticationRequest {
             URLQueryItem(name: "redirect_uri", value: self.redirectURI),
             URLQueryItem(name: "x_platform", value: "ios")
         ]
-        
+
         if let scope = scope {
             queryItems.append(URLQueryItem(
                 name: "scope",
@@ -139,15 +139,15 @@ struct OIDCAuthenticationRequest {
         if let settingsAction = self.settingsAction {
             queryItems.append(URLQueryItem(name: "x_settings_action", value: settingsAction.rawValue))
         }
-        
+
         if let responseMode = self.responseMode {
             queryItems.append(URLQueryItem(name: "response_mode", value: responseMode))
         }
-        
+
         if let xAppInitiatedSSOToWebToken = self.xAppInitiatedSSOToWebToken {
             queryItems.append(URLQueryItem(name: "x_app_initiated_sso_to_web_token", value: xAppInitiatedSSOToWebToken))
         }
-        
+
         if let isSSOEnabled = self.isSSOEnabled {
             if isSSOEnabled == false {
                 // For backward compatibility
@@ -554,27 +554,27 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 if let xApp2AppDeviceKeyJwt = xApp2AppDeviceKeyJwt {
                     queryParams["x_app2app_device_key_jwt"] = xApp2AppDeviceKeyJwt
                 }
-                
+
                 if let scope = scope {
                     queryParams["scope"] = scope.joined(separator: " ")
                 }
-                
+
                 if let requestedTokenType = requestedTokenType {
                     queryParams["requested_token_type"] = requestedTokenType.rawValue
                 }
-                
+
                 if let subjectToken = subjectToken {
                     queryParams["subject_token"] = subjectToken
                 }
-                
+
                 if let subjectTokenType = subjectTokenType {
                     queryParams["subject_token_type"] = subjectTokenType.rawValue
                 }
-                
+
                 if let actorToken = actorToken {
                     queryParams["actor_token"] = actorToken
                 }
-                
+
                 if let actorTokenType = actorTokenType {
                     queryParams["actor_token_type"] = actorTokenType.rawValue
                 }
@@ -582,7 +582,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 if let audience = audience {
                     queryParams["audience"] = audience
                 }
-                
+
                 if let deviceSecret = deviceSecret {
                     queryParams["device_secret"] = deviceSecret
                 }

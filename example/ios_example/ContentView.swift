@@ -217,7 +217,7 @@ struct ActionButtonList: View {
     private var app2appConfigured: Bool {
         !app.app2appEndpoint.isEmpty
     }
-    
+
     private var isAppInitiatedSSOToWebEnabled: Bool {
         app.isAppInitiatedSSOToWebEnabled
     }
@@ -259,7 +259,7 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Authenticate Biometric")
                 }.disabled(!configured || loggedIn || !biometricEnabled)
-                
+
                 Button(action: {
                     self.app.appInitiatedSSOToWeb(clientID: self.app.appInitiatedSSOToWebClientID)
                 }) {
