@@ -52,7 +52,9 @@ struct AuthenticateOptions {
             wechatRedirectURI: self.wechatRedirectURI,
             page: self.page,
             settingsAction: nil,
-            authenticationFlowGroup: self.authenticationFlowGroup
+            authenticationFlowGroup: self.authenticationFlowGroup,
+            responseMode: nil,
+            xAppInitiatedSSOToWebToken: nil
         )
     }
 }
@@ -91,7 +93,9 @@ struct ReauthenticateOptions {
             wechatRedirectURI: self.wechatRedirectURI,
             page: nil,
             settingsAction: nil,
-            authenticationFlowGroup: self.authenticationFlowGroup
+            authenticationFlowGroup: self.authenticationFlowGroup,
+            responseMode: nil,
+            xAppInitiatedSSOToWebToken: nil
         )
     }
 }
@@ -387,9 +391,9 @@ public class Authgear {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
+    func buildAuthorizationURL(request: OIDCAuthenticationRequest, clientID: String, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
-        let queryItems = request.toQueryItems(clientID: self.clientId, verifier: verifier)
+        let queryItems = request.toQueryItems(clientID: clientID, verifier: verifier)
         var urlComponents = URLComponents(
             url: configuration.authorizationEndpoint,
             resolvingAgainstBaseURL: false
@@ -408,7 +412,7 @@ public class Authgear {
             }
             let request = options.toRequest(idTokenHint: idTokenHint)
             let verifier = CodeVerifier()
-            let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
+            let url = try self.buildAuthorizationURL(request: request, clientID: self.clientId, verifier: verifier)
 
             DispatchQueue.main.async {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
@@ -432,7 +436,7 @@ public class Authgear {
     func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthenticationRequest, Error> {
         let verifier = CodeVerifier()
         let request = options.request
-        let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
+        let url = Result { try self.buildAuthorizationURL(request: request, clientID: self.clientId, verifier: verifier) }
 
         return url.map { url in
             AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
@@ -1098,8 +1102,10 @@ public class Authgear {
                     wechatRedirectURI: wechatRedirectURI,
                     page: nil,
                     settingsAction: settingsAction,
-                    authenticationFlowGroup: nil
-                ), verifier: verifier)
+                    authenticationFlowGroup: nil,
+                    responseMode: nil,
+                    xAppInitiatedSSOToWebToken: nil
+                ), clientID: self.clientId, verifier: verifier)
 
                 handler?(.success(endpoint))
             } catch {
@@ -1840,6 +1846,103 @@ public class Authgear {
             return false
         }
         return app2app.handleApp2AppAuthenticationResult(url: incomingURL)
+    }
+    
+    public func makeAppInitiatedSSOToWebURL(
+        clientID: String,
+        redirectURI: String,
+        state: String?,
+        handler: @escaping URLCompletionHandler
+    ) {
+        let handler = withMainQueueHandler(handler)
+        if !isAppInitiatedSSOToWebEnabled {
+            handler(.failure(AuthgearError.runtimeError("makeAppInitiatedSSOToWebURL requires isAppInitiatedSSOToWebEnabled to be true")))
+            return
+        }
+        if sessionState != .authenticated {
+            handler(.failure(AuthgearError.runtimeError("makeAppInitiatedSSOToWebURL requires authenticated user")))
+            return
+        }
+        workerQueue.async {
+            do {
+                guard var idToken = try self.tokenStorage.getIDToken(namespace: self.name) else {
+                    handler(.failure(AuthgearError.notAllowed("id_token not found. isAppInitiatedSSOToWebEnabled must be true when the user was authenticated.")))
+                    return
+                }
+                guard let deviceSecret = try self.tokenStorage.getDeviceSecret(namespace: self.name) else {
+                    handler(.failure(AuthgearError.notAllowed("device_secret not found. isAppInitiatedSSOToWebEnabled must be true when the user was authenticated.")))
+                    return
+                }
+                let tokenExchangeResult = try self.apiClient.syncRequestOIDCToken(
+                    grantType: .tokenExchange,
+                    clientId: clientID,
+                    deviceInfo: nil,
+                    redirectURI: redirectURI,
+                    code: nil,
+                    codeVerifier: nil,
+                    codeChallenge: nil,
+                    codeChallengeMethod: nil,
+                    refreshToken: nil,
+                    jwt: nil,
+                    accessToken: nil,
+                    xApp2AppDeviceKeyJwt: nil,
+                    scope: nil,
+                    requestedTokenType: .appInitiatedSSOToWebToken,
+                    subjectTokenType: .idToken,
+                    subjectToken: idToken,
+                    actorTokenType: .deviceSecret,
+                    actorToken: deviceSecret,
+                    audience: self.apiClient.endpoint.origin()!.absoluteString,
+                    deviceSecret: nil
+                )
+                // Here access_token is app-initiated-sso-to-web-token
+                let appInitiatedSSOToWebToken = tokenExchangeResult.accessToken
+                let newDeviceSecret = tokenExchangeResult.deviceSecret;
+                let newIDToken = tokenExchangeResult.idToken;
+                guard let appInitiatedSSOToWebToken = appInitiatedSSOToWebToken else {
+                    handler(.failure(AuthgearError.runtimeError("unexpected: access_token is not returned")))
+                    return
+                }
+                if let newDeviceSecret = newDeviceSecret {
+                    try self.tokenStorage.setDeviceSecret(namespace: self.name, secret: newDeviceSecret)
+                }
+                if let newIDToken = newIDToken {
+                    idToken = newIDToken
+                    self.idToken = newIDToken
+                    try self.tokenStorage.setIDToken(namespace: self.name, token: newIDToken)
+                }
+                let url = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
+                    redirectURI: redirectURI,
+                    responseType: ResponseType.appInitiatedSSOToWebToken.rawValue,
+                    scope: nil,
+                    isSSOEnabled: nil,
+                    state: nil,
+                    xState: nil,
+                    prompt: [.none],
+                    loginHint: nil,
+                    uiLocales: nil,
+                    colorScheme: nil,
+                    idTokenHint: idToken,
+                    maxAge: nil,
+                    wechatRedirectURI: nil,
+                    page: nil,
+                    settingsAction: nil,
+                    authenticationFlowGroup: nil,
+                    responseMode: "cookie",
+                    xAppInitiatedSSOToWebToken: appInitiatedSSOToWebToken
+                ), clientID: clientID, verifier: nil)
+                handler(.success(url))
+                return
+            } catch let error as OAuthError {
+                if error.error == "insufficient_scope" {
+                    handler(.failure(AuthgearError.notAllowed("Insufficient scope. isAppInitiatedSSOToWebEnabled must be true when the user was authenticated.")))
+                    return
+                }
+                handler(.failure(wrapError(error: error)))
+            } catch {
+                handler(.failure(wrapError(error: error)))
+            }
+        }
     }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {

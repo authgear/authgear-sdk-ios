@@ -8,12 +8,26 @@ enum GrantType: String {
     case idToken = "urn:authgear:params:oauth:grant-type:id-token"
     case app2app = "urn:authgear:params:oauth:grant-type:app2app-request"
     case settingsAction = "urn:authgear:params:oauth:grant-type:settings-action"
+    case tokenExchange = "urn:ietf:params:oauth:grant-type:token-exchange"
+}
+
+enum RequestedTokenType: String {
+    case appInitiatedSSOToWebToken = "urn:authgear:params:oauth:token-type:app-initiated-sso-to-web-token"
+}
+
+enum SubjectTokenType: String {
+    case idToken = "urn:ietf:params:oauth:token-type:id_token"
+}
+
+enum ActorTokenType: String {
+    case deviceSecret = "urn:x-oath:params:oauth:token-type:device-secret"
 }
 
 enum ResponseType: String {
     case code
     case settingsAction = "urn:authgear:params:oauth:response-type:settings-action"
     case none
+    case appInitiatedSSOToWebToken = "urn:authgear:params:oauth:response-type:app_initiated_sso_to_web token"
 }
 
 struct APIResponse<T: Decodable>: Decodable {
@@ -31,8 +45,8 @@ struct APIErrorResponse: Decodable {
 struct OIDCAuthenticationRequest {
     let redirectURI: String
     let responseType: String
-    let scope: [String]
-    let isSSOEnabled: Bool
+    let scope: [String]?
+    let isSSOEnabled: Bool?
     let state: String?
     let xState: String?
     let prompt: [PromptOption]?
@@ -45,18 +59,23 @@ struct OIDCAuthenticationRequest {
     let page: AuthenticationPage?
     let settingsAction: SettingsAction?
     let authenticationFlowGroup: String?
+    let responseMode: String?
+    let xAppInitiatedSSOToWebToken: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
             URLQueryItem(name: "response_type", value: self.responseType),
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: self.redirectURI),
-            URLQueryItem(
-                name: "scope",
-                value: scope.joined(separator: " ")
-            ),
             URLQueryItem(name: "x_platform", value: "ios")
         ]
+        
+        if let scope = scope {
+            queryItems.append(URLQueryItem(
+                name: "scope",
+                value: scope.joined(separator: " ")
+            ))
+        }
 
         if let verifier = verifier {
             queryItems.append(contentsOf: [
@@ -120,14 +139,23 @@ struct OIDCAuthenticationRequest {
         if let settingsAction = self.settingsAction {
             queryItems.append(URLQueryItem(name: "x_settings_action", value: settingsAction.rawValue))
         }
-
-        if self.isSSOEnabled == false {
-            // For backward compatibility
-            // If the developer updates the SDK but not the server
-            queryItems.append(URLQueryItem(name: "x_suppress_idp_session_cookie", value: "true"))
+        
+        if let responseMode = self.responseMode {
+            queryItems.append(URLQueryItem(name: "response_mode", value: responseMode))
         }
-
-        queryItems.append(URLQueryItem(name: "x_sso_enabled", value: self.isSSOEnabled ? "true" : "false"))
+        
+        if let xAppInitiatedSSOToWebToken = self.xAppInitiatedSSOToWebToken {
+            queryItems.append(URLQueryItem(name: "x_app_initiated_sso_to_web_token", value: xAppInitiatedSSOToWebToken))
+        }
+        
+        if let isSSOEnabled = self.isSSOEnabled {
+            if isSSOEnabled == false {
+                // For backward compatibility
+                // If the developer updates the SDK but not the server
+                queryItems.append(URLQueryItem(name: "x_suppress_idp_session_cookie", value: "true"))
+            }
+            queryItems.append(URLQueryItem(name: "x_sso_enabled", value: isSSOEnabled ? "true" : "false"))
+        }
 
         if let authenticationFlowGroup = self.authenticationFlowGroup {
             queryItems.append(URLQueryItem(name: "x_authentication_flow_group", value: authenticationFlowGroup))
@@ -187,10 +215,10 @@ protocol AuthAPIClient: AnyObject {
         accessToken: String?,
         xApp2AppDeviceKeyJwt: String?,
         scope: [String]?,
-        requestedTokenType: String?,
-        subjectTokenType: String?,
+        requestedTokenType: RequestedTokenType?,
+        subjectTokenType: SubjectTokenType?,
         subjectToken: String?,
-        actorTokenType: String?,
+        actorTokenType: ActorTokenType?,
         actorToken: String?,
         audience: String?,
         deviceSecret: String?,
@@ -261,10 +289,10 @@ extension AuthAPIClient {
         accessToken: String?,
         xApp2AppDeviceKeyJwt: String?,
         scope: [String]?,
-        requestedTokenType: String?,
-        subjectTokenType: String?,
+        requestedTokenType: RequestedTokenType?,
+        subjectTokenType: SubjectTokenType?,
         subjectToken: String?,
-        actorTokenType: String?,
+        actorTokenType: ActorTokenType?,
         actorToken: String?,
         audience: String?,
         deviceSecret: String?
@@ -472,10 +500,10 @@ class DefaultAuthAPIClient: AuthAPIClient {
         accessToken: String? = nil,
         xApp2AppDeviceKeyJwt: String? = nil,
         scope: [String]?,
-        requestedTokenType: String?,
-        subjectTokenType: String?,
+        requestedTokenType: RequestedTokenType?,
+        subjectTokenType: SubjectTokenType?,
         subjectToken: String?,
-        actorTokenType: String?,
+        actorTokenType: ActorTokenType?,
         actorToken: String?,
         audience: String?,
         deviceSecret: String?,
@@ -532,7 +560,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 }
                 
                 if let requestedTokenType = requestedTokenType {
-                    queryParams["requested_token_type"] = requestedTokenType
+                    queryParams["requested_token_type"] = requestedTokenType.rawValue
                 }
                 
                 if let subjectToken = subjectToken {
@@ -540,7 +568,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 }
                 
                 if let subjectTokenType = subjectTokenType {
-                    queryParams["subject_token_type"] = subjectTokenType
+                    queryParams["subject_token_type"] = subjectTokenType.rawValue
                 }
                 
                 if let actorToken = actorToken {
@@ -548,7 +576,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 }
                 
                 if let actorTokenType = actorTokenType {
-                    queryParams["actor_token_type"] = actorTokenType
+                    queryParams["actor_token_type"] = actorTokenType.rawValue
                 }
 
                 if let audience = audience {

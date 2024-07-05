@@ -25,6 +25,7 @@ public enum AuthgearError: CustomNSError, LocalizedError {
     case publicKeyNotFound
     case error(Error)
     case runtimeError(String)
+    case notAllowed(String)
 
     // Implements CustomNSError
     public static var errorDomain: String { "AuthgearError" }
@@ -62,6 +63,8 @@ public enum AuthgearError: CustomNSError, LocalizedError {
             return 14
         case .runtimeError:
             return 15
+        case .notAllowed:
+            return 16
         }
     }
 
@@ -128,6 +131,8 @@ public enum AuthgearError: CustomNSError, LocalizedError {
             message = "error"
         case let .runtimeError(errmsg):
             message = errmsg
+        case let .notAllowed(errmsg):
+            message = "not allowed: \(errmsg)"
         }
         return "\(Self.errorDomain): \(message)"
     }
