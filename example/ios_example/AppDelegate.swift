@@ -11,6 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tokenStorage: String,
         isSSOEnabled: Bool,
         isApp2AppEnabled: Bool,
+        isAppInitiatedSSOToWebEnabled: Bool,
         useWKWebView: Bool
     ) {
         let app2AppOptions = App2AppOptions(
@@ -39,6 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             tokenStorage: tokenStorageInstance,
             uiImplementation: uiImplementation,
             isSSOEnabled: isSSOEnabled,
+            isAppInitiatedSSOToWebEnabled: isAppInitiatedSSOToWebEnabled,
             app2AppOptions: app2AppOptions
         )
         appContainer.container?.configure() { _ in

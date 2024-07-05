@@ -78,6 +78,8 @@ struct AuthgearConfigurationForm: View {
     @Binding var app2appState: String
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
+    @State private var isAppInitiatedSSOToWebEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isAppInitiatedSSOToWebEnabled")
+    @State private var appInitiatedSSOToWebClientID: String = UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebClientID") ?? ""
     @State private var useWKWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWKWebView")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
@@ -148,6 +150,17 @@ struct AuthgearConfigurationForm: View {
                 label: "Use WKWebView",
                 input: Toggle(isOn: $useWKWebView) { EmptyView() }
             )
+            AuthgearConfigurationInput(
+                label: "Is App Initiated SSO To Web Enabled",
+                input: Toggle(isOn: $isAppInitiatedSSOToWebEnabled) { EmptyView() }
+            )
+            AuthgearConfigurationInput(
+                label: "App Initiated SSO To Web Client ID",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter Client ID",
+                    text: $appInitiatedSSOToWebClientID
+                )
+            )
             TextLabelValue(
                 label: "SessionState",
                 value: app.sessionState.rawValue
@@ -162,6 +175,8 @@ struct AuthgearConfigurationForm: View {
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
                     isSSOEnabled: self.isSSOEnabled,
+                    isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled,
+                    appInitiatedSSOToWebClientID: self.appInitiatedSSOToWebClientID,
                     useWKWebView: self.useWKWebView
                 )
             }) {
@@ -202,6 +217,10 @@ struct ActionButtonList: View {
     private var app2appConfigured: Bool {
         !app.app2appEndpoint.isEmpty
     }
+    
+    private var isAppInitiatedSSOToWebEnabled: Bool {
+        app.isAppInitiatedSSOToWebEnabled
+    }
 
     var body: some View {
         VStack(spacing: 30) {
@@ -240,6 +259,12 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Authenticate Biometric")
                 }.disabled(!configured || loggedIn || !biometricEnabled)
+                
+                Button(action: {
+                    self.app.appInitiatedSSOToWeb(clientID: self.app.appInitiatedSSOToWebClientID)
+                }) {
+                    ActionButton(text: "App Initiated SSO To Web")
+                }.disabled(!configured || !loggedIn || !isAppInitiatedSSOToWebEnabled)
             }
 
             Group {

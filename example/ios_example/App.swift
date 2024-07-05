@@ -39,6 +39,8 @@ class App: ObservableObject {
     @Published var app2AppState: String = ""
     @Published var isAuthgearConfigured: Bool = false
     @Published var app2AppConfirmation: App2AppConfirmation? = nil
+    @Published var isAppInitiatedSSOToWebEnabled: Bool = false
+    @Published var appInitiatedSSOToWebClientID: String = ""
 
     private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
@@ -60,6 +62,8 @@ class App: ObservableObject {
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
         isSSOEnabled: Bool,
+        isAppInitiatedSSOToWebEnabled: Bool,
+        appInitiatedSSOToWebClientID: String,
         useWKWebView: Bool
     ) {
         guard clientId != "", endpoint != "" else {
@@ -75,12 +79,23 @@ class App: ObservableObject {
         UserDefaults.standard.set(app2AppEndpoint, forKey: "authgear.demo.app2appendpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
+        UserDefaults.standard.set(isAppInitiatedSSOToWebEnabled, forKey: "authgear.demo.isAppInitiatedSSOToWebEnabled")
+        UserDefaults.standard.set(appInitiatedSSOToWebClientID, forKey: "authgear.demo.appInitiatedSSOToWebClientID")
         let isApp2AppEnabled = !app2AppEndpoint.isEmpty
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: isApp2AppEnabled, useWKWebView: useWKWebView)
+        appDelegate.configureAuthgear(
+            clientId: clientId,
+            endpoint: endpoint,
+            tokenStorage: tokenStorage,
+            isSSOEnabled: isSSOEnabled,
+            isApp2AppEnabled: isApp2AppEnabled,
+            isAppInitiatedSSOToWebEnabled: isAppInitiatedSSOToWebEnabled,
+            useWKWebView: useWKWebView)
         self.authenticationPage = authenticationPage
         self.authenticationFlowGroup = authenticationFlowGroup
         self.explicitColorScheme = colorScheme
         self.app2appEndpoint = app2AppEndpoint
+        self.isAppInitiatedSSOToWebEnabled = isAppInitiatedSSOToWebEnabled
+        self.appInitiatedSSOToWebClientID = appInitiatedSSOToWebClientID
         self.updateBiometricState()
     }
 
@@ -321,6 +336,33 @@ class App: ObservableObject {
     func postConfig() {
         self.isAuthgearConfigured = true
         handlePendingApp2AppRequest()
+    }
+    
+    func appInitiatedSSOToWeb(clientID: String) {
+        container?.makeAppInitiatedSSOToWebURL(
+            clientID: clientID,
+            redirectURI: App.redirectURI,
+            state: nil) { result in
+            switch result {
+            case let .success(url):
+                // Use ASWebAuthenticationSession to open the url and set the cookie
+                let uiImpl = ASWebAuthenticationSessionUIImplementation()
+                uiImpl.openAuthorizationURL(
+                    url: url,
+                    redirectURI: URL(string: App.redirectURI)!,
+                    shareCookiesWithDeviceBrowser: true,
+                    completion: { r in
+                        switch result {
+                        case .success:
+                            break
+                        case let .failure(error):
+                            self.setError(error)
+                        }
+                    })
+            case let .failure(error):
+                self.setError(error)
+            }
+        }
     }
 
     private func handlePendingApp2AppRequest() {
