@@ -300,7 +300,7 @@ class App: ObservableObject {
             handler: self.handleAuthorizeResult
         )
     }
-    
+
     private func fetchUserInfo(container: Authgear) {
         container.fetchUserInfo { userInfoResult in
             switch userInfoResult {
@@ -353,14 +353,14 @@ class App: ObservableObject {
     }
 
     func appInitiatedSSOToWeb() {
-        let shouldUseAnotherBrowser = appInitiatedSSOToWebRedirectURI != "";
-        var targetRedirectURI = App.redirectURI;
-        var targetClientID = clientID;
+        let shouldUseAnotherBrowser = appInitiatedSSOToWebRedirectURI != ""
+        var targetRedirectURI = App.redirectURI
+        var targetClientID = clientID
         if (appInitiatedSSOToWebRedirectURI != "") {
-          targetRedirectURI = appInitiatedSSOToWebRedirectURI;
+            targetRedirectURI = appInitiatedSSOToWebRedirectURI
         }
         if (appInitiatedSSOToWebClientID != "") {
-          targetClientID = appInitiatedSSOToWebClientID;
+            targetClientID = appInitiatedSSOToWebClientID
         }
         container?.makeAppInitiatedSSOToWebURL(
             clientID: targetClientID,
@@ -408,7 +408,8 @@ class App: ObservableObject {
                     uiImpl.openAuthorizationURL(
                         url: url,
                         redirectURI: URL(string: App.redirectURI)!,
-                        shareCookiesWithDeviceBrowser: true) { _ in }
+                        shareCookiesWithDeviceBrowser: true
+                    ) { _ in }
                 }
             case let .failure(error):
                 self.setError(error)

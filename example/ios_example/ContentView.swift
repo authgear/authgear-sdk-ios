@@ -80,7 +80,7 @@ struct AuthgearConfigurationForm: View {
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
     @State private var isAppInitiatedSSOToWebEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isAppInitiatedSSOToWebEnabled")
     @State private var appInitiatedSSOToWebClientID: String = UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebClientID") ?? ""
-    @State private var appInitiatedSSOToWebRedirectURI: String =  UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebRedirectURI") ?? ""
+    @State private var appInitiatedSSOToWebRedirectURI: String = UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebRedirectURI") ?? ""
     @State private var useWKWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWKWebView")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""

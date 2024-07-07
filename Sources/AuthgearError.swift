@@ -224,7 +224,7 @@ public enum AppInitiatedSSOToWebNotAllowedError: LocalizedError {
     case insufficientScope
     case idTokenNotFound
     case deviceSecretNotFound
-    
+
     public var errorDescription: String? {
         switch self {
         case .insufficientScope:
