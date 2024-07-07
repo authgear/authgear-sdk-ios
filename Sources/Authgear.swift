@@ -281,6 +281,7 @@ public class Authgear {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
+    var sharedStorage: SharedStorage
     public let isSSOEnabled: Bool
     private var shareCookiesWithDeviceBrowser: Bool {
         self.isSSOEnabled
@@ -357,6 +358,7 @@ public class Authgear {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
+        self.sharedStorage = PersistentSharedStorage()
         self.uiImplementation = uiImplementation
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
@@ -670,7 +672,7 @@ public class Authgear {
         }
 
         if let idToken = oidcTokenResponse.idToken {
-            let result = Result { try self.tokenStorage.setIDToken(namespace: self.name, token: idToken) }
+            let result = Result { try self.sharedStorage.setIDToken(namespace: self.name, token: idToken) }
             guard case .success = result else {
                 handler(result)
                 return
@@ -678,7 +680,7 @@ public class Authgear {
         }
 
         if let deviceSecret = oidcTokenResponse.deviceSecret {
-            let result = Result { try self.tokenStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
+            let result = Result { try self.sharedStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
             guard case .success = result else {
                 handler(result)
                 return
@@ -705,12 +707,12 @@ public class Authgear {
                 return handler(.failure(wrapError(error: error)))
             }
         }
-        if case let .failure(error) = Result(catching: { try tokenStorage.delIDToken(namespace: name) }) {
+        if case let .failure(error) = Result(catching: { try sharedStorage.delIDToken(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
             }
         }
-        if case let .failure(error) = Result(catching: { try tokenStorage.delDeviceSecret(namespace: name) }) {
+        if case let .failure(error) = Result(catching: { try sharedStorage.delDeviceSecret(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
             }
@@ -1438,7 +1440,7 @@ public class Authgear {
                 }
 
                 var deviceSecret: String?
-                if let ds = try self.tokenStorage.getDeviceSecret(namespace: self.name) {
+                if let ds = try self.sharedStorage.getDeviceSecret(namespace: self.name) {
                     deviceSecret = ds
                 }
 
@@ -1526,7 +1528,7 @@ public class Authgear {
             self.workerQueue.async {
                 do {
                     var deviceSecret: String?
-                    if let ds = try self.tokenStorage.getDeviceSecret(namespace: self.name) {
+                    if let ds = try self.sharedStorage.getDeviceSecret(namespace: self.name) {
                         deviceSecret = ds
                     }
                     let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
@@ -1552,14 +1554,14 @@ public class Authgear {
                         deviceSecret: deviceSecret
                     )
                     if let idToken = oidcTokenResponse.idToken {
-                        let result = Result { try self.tokenStorage.setIDToken(namespace: self.name, token: idToken) }
+                        let result = Result { try self.sharedStorage.setIDToken(namespace: self.name, token: idToken) }
                         guard case .success = result else {
                             handler(result)
                             return
                         }
                     }
                     if let deviceSecret = oidcTokenResponse.deviceSecret {
-                        let result = Result { try self.tokenStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
+                        let result = Result { try self.sharedStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
                         guard case .success = result else {
                             handler(result)
                             return
@@ -1875,12 +1877,12 @@ public class Authgear {
         }
         workerQueue.async {
             do {
-                guard var idToken = try self.tokenStorage.getIDToken(namespace: self.name) else {
-                    handler(.failure(AuthgearError.notAllowed("id_token not found. isAppInitiatedSSOToWebEnabled must be true when the user was authenticated.")))
+                guard var idToken = try self.sharedStorage.getIDToken(namespace: self.name) else {
+                    handler(.failure(AuthgearError.appInitiatedSSOToWebNotAllowed(.idTokenNotFound)))
                     return
                 }
-                guard let deviceSecret = try self.tokenStorage.getDeviceSecret(namespace: self.name) else {
-                    handler(.failure(AuthgearError.notAllowed("device_secret not found. isAppInitiatedSSOToWebEnabled must be true when the user was authenticated.")))
+                guard let deviceSecret = try self.sharedStorage.getDeviceSecret(namespace: self.name) else {
+                    handler(.failure(AuthgearError.appInitiatedSSOToWebNotAllowed(.deviceSecretNotFound)))
                     return
                 }
                 let tokenExchangeResult = try self.apiClient.syncRequestOIDCToken(
@@ -1914,12 +1916,12 @@ public class Authgear {
                     return
                 }
                 if let newDeviceSecret = newDeviceSecret {
-                    try self.tokenStorage.setDeviceSecret(namespace: self.name, secret: newDeviceSecret)
+                    try self.sharedStorage.setDeviceSecret(namespace: self.name, secret: newDeviceSecret)
                 }
                 if let newIDToken = newIDToken {
                     idToken = newIDToken
                     self.idToken = newIDToken
-                    try self.tokenStorage.setIDToken(namespace: self.name, token: newIDToken)
+                    try self.sharedStorage.setIDToken(namespace: self.name, token: newIDToken)
                 }
                 let url = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
                     redirectURI: redirectURI,
@@ -1945,7 +1947,7 @@ public class Authgear {
                 return
             } catch let error as OAuthError {
                 if error.error == "insufficient_scope" {
-                    handler(.failure(AuthgearError.notAllowed("Insufficient scope. isAppInitiatedSSOToWebEnabled must be true when the user was authenticated.")))
+                    handler(.failure(AuthgearError.appInitiatedSSOToWebNotAllowed(.insufficientScope)))
                     return
                 }
                 handler(.failure(wrapError(error: error)))

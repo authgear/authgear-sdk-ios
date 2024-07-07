@@ -5,7 +5,9 @@ public protocol TokenStorage {
     func setRefreshToken(namespace: String, token: String) throws
     func getRefreshToken(namespace: String) throws -> String?
     func delRefreshToken(namespace: String) throws
+}
 
+protocol SharedStorage {
     func setIDToken(namespace: String, token: String) throws
     func getIDToken(namespace: String) throws -> String?
     func delIDToken(namespace: String) throws
@@ -89,6 +91,11 @@ public class PersistentTokenStorage: TokenStorage {
     public func delRefreshToken(namespace: String) throws {
         try self.driver.del(key: self.keyMaker.keyRefreshToken(namespace: namespace))
     }
+}
+
+class PersistentSharedStorage: SharedStorage {
+    private let driver = KeychainStorageDriver()
+    private let keyMaker = KeyMaker()
 
     public func setIDToken(namespace: String, token: String) throws {
         try self.driver.set(key: self.keyMaker.keyIDToken(namespace: namespace), value: token)
