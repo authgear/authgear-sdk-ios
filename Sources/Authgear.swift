@@ -88,6 +88,9 @@ struct ReauthenticateOptions {
         OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
+            // offline_access is not needed because we don't want a new refresh token to be generated
+            // device_sso and app-initiated-sso-to-web is also not needed,
+            // because no new session should be generated so the scopes are not important.
             scope: ["openid", "https://authgear.com/scopes/full-access"],
             isSSOEnabled: isSSOEnabled,
             state: self.state,
@@ -1100,6 +1103,8 @@ public class Authgear {
                 let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
                     redirectURI: redirectURI,
                     responseType: responseType.rawValue,
+                    // device_sso and app-initiated-sso-to-web is also not needed,
+                    // because session for settings should not be used to perform SSO.
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
                     isSSOEnabled: self.isSSOEnabled,
                     state: nil,
