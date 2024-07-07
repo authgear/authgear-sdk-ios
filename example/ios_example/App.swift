@@ -40,7 +40,10 @@ class App: ObservableObject {
     @Published var isAuthgearConfigured: Bool = false
     @Published var app2AppConfirmation: App2AppConfirmation? = nil
     @Published var isAppInitiatedSSOToWebEnabled: Bool = false
+    @Published var clientID: String = ""
+    @Published var endpoint: String = ""
     @Published var appInitiatedSSOToWebClientID: String = ""
+    @Published var appInitiatedSSOToWebRedirectURI: String = ""
 
     private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
@@ -64,6 +67,7 @@ class App: ObservableObject {
         isSSOEnabled: Bool,
         isAppInitiatedSSOToWebEnabled: Bool,
         appInitiatedSSOToWebClientID: String,
+        appInitiatedSSOToWebRedirectURI: String,
         useWKWebView: Bool
     ) {
         guard clientId != "", endpoint != "" else {
@@ -81,6 +85,7 @@ class App: ObservableObject {
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
         UserDefaults.standard.set(isAppInitiatedSSOToWebEnabled, forKey: "authgear.demo.isAppInitiatedSSOToWebEnabled")
         UserDefaults.standard.set(appInitiatedSSOToWebClientID, forKey: "authgear.demo.appInitiatedSSOToWebClientID")
+        UserDefaults.standard.set(appInitiatedSSOToWebRedirectURI, forKey: "authgear.demo.appInitiatedSSOToWebRedirectURI")
         let isApp2AppEnabled = !app2AppEndpoint.isEmpty
         appDelegate.configureAuthgear(
             clientId: clientId,
@@ -91,12 +96,15 @@ class App: ObservableObject {
             isAppInitiatedSSOToWebEnabled: isAppInitiatedSSOToWebEnabled,
             useWKWebView: useWKWebView
         )
+        self.clientID = clientId
+        self.endpoint = endpoint
         self.authenticationPage = authenticationPage
         self.authenticationFlowGroup = authenticationFlowGroup
         self.explicitColorScheme = colorScheme
         self.app2appEndpoint = app2AppEndpoint
         self.isAppInitiatedSSOToWebEnabled = isAppInitiatedSSOToWebEnabled
         self.appInitiatedSSOToWebClientID = appInitiatedSSOToWebClientID
+        self.appInitiatedSSOToWebRedirectURI = appInitiatedSSOToWebRedirectURI
         self.updateBiometricState()
     }
 
@@ -292,9 +300,9 @@ class App: ObservableObject {
             handler: self.handleAuthorizeResult
         )
     }
-
-    func fetchUserInfo() {
-        container?.fetchUserInfo { userInfoResult in
+    
+    private func fetchUserInfo(container: Authgear) {
+        container.fetchUserInfo { userInfoResult in
             switch userInfoResult {
             case let .success(userInfo):
                 self.user = userInfo
@@ -312,6 +320,11 @@ class App: ObservableObject {
                 self.setError(error)
             }
         }
+    }
+
+    func fetchUserInfo() {
+        guard let container = container else { return }
+        self.fetchUserInfo(container: container)
     }
 
     func showAuthTime() {
@@ -339,29 +352,64 @@ class App: ObservableObject {
         handlePendingApp2AppRequest()
     }
 
-    func appInitiatedSSOToWeb(clientID: String) {
+    func appInitiatedSSOToWeb() {
+        let shouldUseAnotherBrowser = appInitiatedSSOToWebRedirectURI != "";
+        var targetRedirectURI = App.redirectURI;
+        var targetClientID = clientID;
+        if (appInitiatedSSOToWebRedirectURI != "") {
+          targetRedirectURI = appInitiatedSSOToWebRedirectURI;
+        }
+        if (appInitiatedSSOToWebClientID != "") {
+          targetClientID = appInitiatedSSOToWebClientID;
+        }
         container?.makeAppInitiatedSSOToWebURL(
-            clientID: clientID,
-            redirectURI: App.redirectURI,
+            clientID: targetClientID,
+            redirectURI: targetRedirectURI,
             state: nil
         ) { result in
             switch result {
             case let .success(url):
-                // Use ASWebAuthenticationSession to open the url and set the cookie
-                let uiImpl = ASWebAuthenticationSessionUIImplementation()
-                uiImpl.openAuthorizationURL(
-                    url: url,
-                    redirectURI: URL(string: App.redirectURI)!,
-                    shareCookiesWithDeviceBrowser: true,
-                    completion: { _ in
-                        switch result {
-                        case .success:
-                            break
-                        case let .failure(error):
-                            self.setError(error)
+                let uiImpl = WKWebViewUIImplementation()
+                if (!shouldUseAnotherBrowser) {
+                    // Use wkwebview to open the url and set the cookie
+                    uiImpl.openAuthorizationURL(
+                        url: url,
+                        redirectURI: URL(string: App.redirectURI)!,
+                        shareCookiesWithDeviceBrowser: true,
+                        completion: { _ in
+                            switch result {
+                            case .success:
+                                let newContainer = Authgear(
+                                    clientId: targetClientID,
+                                    endpoint: self.endpoint,
+                                    tokenStorage: TransientTokenStorage(),
+                                    uiImplementation: uiImpl,
+                                    isSSOEnabled: true,
+                                    name: "appInitiatedSSOToWeb"
+                                )
+                                newContainer.authenticate(
+                                    redirectURI: App.redirectURI
+                                ) { result in
+                                    switch result {
+                                    case .success:
+                                        break
+                                    case let .failure(error):
+                                        self.setError(error)
+                                    }
+                                }
+                                self.fetchUserInfo(container: newContainer)
+                            case let .failure(error):
+                                self.setError(error)
+                            }
                         }
-                    }
-                )
+                    )
+                } else {
+                    // This will be redirected to appInitiatedSSOToWebRedirectURI and never close.
+                    uiImpl.openAuthorizationURL(
+                        url: url,
+                        redirectURI: URL(string: App.redirectURI)!,
+                        shareCookiesWithDeviceBrowser: true) { _ in }
+                }
             case let .failure(error):
                 self.setError(error)
             }

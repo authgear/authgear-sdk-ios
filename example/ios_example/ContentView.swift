@@ -80,6 +80,7 @@ struct AuthgearConfigurationForm: View {
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
     @State private var isAppInitiatedSSOToWebEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isAppInitiatedSSOToWebEnabled")
     @State private var appInitiatedSSOToWebClientID: String = UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebClientID") ?? ""
+    @State private var appInitiatedSSOToWebRedirectURI: String =  UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebRedirectURI") ?? ""
     @State private var useWKWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWKWebView")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
@@ -161,6 +162,13 @@ struct AuthgearConfigurationForm: View {
                     text: $appInitiatedSSOToWebClientID
                 )
             )
+            AuthgearConfigurationInput(
+                label: "App Initiated SSO To Web Redirect URI",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter Redirect URI",
+                    text: $appInitiatedSSOToWebRedirectURI
+                )
+            )
             TextLabelValue(
                 label: "SessionState",
                 value: app.sessionState.rawValue
@@ -177,6 +185,7 @@ struct AuthgearConfigurationForm: View {
                     isSSOEnabled: self.isSSOEnabled,
                     isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled,
                     appInitiatedSSOToWebClientID: self.appInitiatedSSOToWebClientID,
+                    appInitiatedSSOToWebRedirectURI: self.appInitiatedSSOToWebRedirectURI,
                     useWKWebView: self.useWKWebView
                 )
             }) {
@@ -261,7 +270,7 @@ struct ActionButtonList: View {
                 }.disabled(!configured || loggedIn || !biometricEnabled)
 
                 Button(action: {
-                    self.app.appInitiatedSSOToWeb(clientID: self.app.appInitiatedSSOToWebClientID)
+                    self.app.appInitiatedSSOToWeb()
                 }) {
                     ActionButton(text: "App Initiated SSO To Web")
                 }.disabled(!configured || !loggedIn || !isAppInitiatedSSOToWebEnabled)
