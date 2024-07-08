@@ -1933,7 +1933,7 @@ public class Authgear {
                     responseType: ResponseType.appInitiatedSSOToWebToken.rawValue,
                     scope: nil,
                     isSSOEnabled: nil,
-                    state: nil,
+                    state: state,
                     xState: nil,
                     prompt: [.none],
                     loginHint: nil,
