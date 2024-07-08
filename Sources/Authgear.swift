@@ -284,7 +284,7 @@ public class Authgear {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
-    var sharedStorage: SharedStorage
+    var sharedStorage: InterAppSharedStorage
     public let isSSOEnabled: Bool
     private var shareCookiesWithDeviceBrowser: Bool {
         self.isSSOEnabled
@@ -361,7 +361,7 @@ public class Authgear {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
-        self.sharedStorage = PersistentSharedStorage()
+        self.sharedStorage = PersistentInterAppSharedStorage()
         self.uiImplementation = uiImplementation
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled

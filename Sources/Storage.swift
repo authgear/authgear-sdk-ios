@@ -7,7 +7,7 @@ public protocol TokenStorage {
     func delRefreshToken(namespace: String) throws
 }
 
-protocol SharedStorage {
+protocol InterAppSharedStorage {
     func setIDToken(namespace: String, token: String) throws
     func getIDToken(namespace: String) throws -> String?
     func delIDToken(namespace: String) throws
@@ -93,7 +93,7 @@ public class PersistentTokenStorage: TokenStorage {
     }
 }
 
-class PersistentSharedStorage: SharedStorage {
+class PersistentInterAppSharedStorage: InterAppSharedStorage {
     private let driver = KeychainStorageDriver()
     private let keyMaker = KeyMaker()
 
