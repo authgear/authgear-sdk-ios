@@ -290,7 +290,7 @@ public class Authgear {
         self.isSSOEnabled
     }
 
-    public let isAppInitiatedSSOToWebEnabled: Bool
+    public let preAuthenticatedURLEnabled: Bool
 
     var uiImplementation: UIImplementation
 
@@ -351,7 +351,7 @@ public class Authgear {
         tokenStorage: TokenStorage = PersistentTokenStorage(),
         uiImplementation: UIImplementation = ASWebAuthenticationSessionUIImplementation(),
         isSSOEnabled: Bool = false,
-        isAppInitiatedSSOToWebEnabled: Bool = false,
+        preAuthenticatedURLEnabled: Bool = false,
         name: String? = nil,
         app2AppOptions: App2AppOptions = App2AppOptions(
             isEnabled: false,
@@ -365,7 +365,7 @@ public class Authgear {
         self.uiImplementation = uiImplementation
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
-        self.isAppInitiatedSSOToWebEnabled = isAppInitiatedSSOToWebEnabled
+        self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
@@ -822,7 +822,7 @@ public class Authgear {
         self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
-            isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled,
+            isAppInitiatedSSOToWebEnabled: self.preAuthenticatedURLEnabled,
             state: state,
             xState: xState,
             prompt: prompt,
@@ -1014,7 +1014,7 @@ public class Authgear {
                     AuthenticateOptions(
                         redirectURI: redirectURI,
                         isSSOEnabled: self.isSSOEnabled,
-                        isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled,
+                        isAppInitiatedSSOToWebEnabled: self.preAuthenticatedURLEnabled,
                         state: state,
                         xState: xState,
                         prompt: [.login],
@@ -1739,7 +1739,7 @@ public class Authgear {
                         accessToken: nil,
                         xApp2AppDeviceKeyJwt: nil,
                         scope: getAuthenticationScopes(
-                            isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled),
+                            isAppInitiatedSSOToWebEnabled: self.preAuthenticatedURLEnabled),
                         requestedTokenType: nil,
                         subjectTokenType: nil,
                         subjectToken: nil,
@@ -1872,7 +1872,7 @@ public class Authgear {
         handler: @escaping URLCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
-        if !isAppInitiatedSSOToWebEnabled {
+        if !preAuthenticatedURLEnabled {
             handler(.failure(AuthgearError.runtimeError("makeAppInitiatedSSOToWebURL requires isAppInitiatedSSOToWebEnabled to be true")))
             return
         }

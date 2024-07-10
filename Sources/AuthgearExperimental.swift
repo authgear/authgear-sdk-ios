@@ -28,7 +28,7 @@ public struct AuthgearExperimental {
         let options = AuthenticateOptions(
             redirectURI: redirectURI,
             isSSOEnabled: self.authgear.isSSOEnabled,
-            isAppInitiatedSSOToWebEnabled: self.authgear.isAppInitiatedSSOToWebEnabled,
+            isAppInitiatedSSOToWebEnabled: self.authgear.preAuthenticatedURLEnabled,
             state: state,
             xState: xState,
             prompt: prompt,
