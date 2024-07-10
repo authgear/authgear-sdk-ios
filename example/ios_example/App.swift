@@ -362,7 +362,7 @@ class App: ObservableObject {
         if (appInitiatedSSOToWebClientID != "") {
             targetClientID = appInitiatedSSOToWebClientID
         }
-        container?.makeAppInitiatedSSOToWebURL(
+        container?.makePreAuthenticatedURL(
             clientID: targetClientID,
             redirectURI: targetRedirectURI,
             state: nil

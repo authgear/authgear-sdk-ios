@@ -1865,19 +1865,19 @@ public class Authgear {
         return app2app.handleApp2AppAuthenticationResult(url: incomingURL)
     }
 
-    public func makeAppInitiatedSSOToWebURL(
-        clientID: String,
-        redirectURI: String,
+    public func makePreAuthenticatedURL(
+        webApplicationClientID: String,
+        webApplicationURI: String,
         state: String?,
         handler: @escaping URLCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
         if !preAuthenticatedURLEnabled {
-            handler(.failure(AuthgearError.runtimeError("makeAppInitiatedSSOToWebURL requires isAppInitiatedSSOToWebEnabled to be true")))
+            handler(.failure(AuthgearError.runtimeError("makePreAuthenticatedURL requires preAuthenticatedURLEnabled to be true")))
             return
         }
         if sessionState != .authenticated {
-            handler(.failure(AuthgearError.runtimeError("makeAppInitiatedSSOToWebURL requires authenticated user")))
+            handler(.failure(AuthgearError.runtimeError("makePreAuthenticatedURL requires authenticated user")))
             return
         }
         workerQueue.async {
@@ -1892,9 +1892,9 @@ public class Authgear {
                 }
                 let tokenExchangeResult = try self.apiClient.syncRequestOIDCToken(
                     grantType: .tokenExchange,
-                    clientId: clientID,
+                    clientId: webApplicationClientID,
                     deviceInfo: nil,
-                    redirectURI: redirectURI,
+                    redirectURI:         webApplicationURI,
                     code: nil,
                     codeVerifier: nil,
                     codeChallenge: nil,
@@ -1929,7 +1929,7 @@ public class Authgear {
                     try self.sharedStorage.setIDToken(namespace: self.name, token: newIDToken)
                 }
                 let url = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
-                    redirectURI: redirectURI,
+                    redirectURI:         webApplicationURI,
                     responseType: ResponseType.appInitiatedSSOToWebToken.rawValue,
                     scope: nil,
                     isSSOEnabled: nil,
@@ -1947,7 +1947,7 @@ public class Authgear {
                     authenticationFlowGroup: nil,
                     responseMode: "cookie",
                     xPreAuthenticatedURLToken: appInitiatedSSOToWebToken
-                ), clientID: clientID, verifier: nil)
+                ), clientID: webApplicationClientID, verifier: nil)
                 handler(.success(url))
                 return
             } catch let error as OAuthError {
