@@ -22,7 +22,7 @@ func getAuthenticationScopes(
     var scopes = ["openid", "offline_access", "https://authgear.com/scopes/full-access"]
     if isAppInitiatedSSOToWebEnabled {
         scopes.append("device_sso")
-        scopes.append("https://authgear.com/scopes/app-initiated-sso-to-web")
+        scopes.append("https://authgear.com/scopes/pre-authenticated-url")
     }
     return scopes
 }
