@@ -62,7 +62,7 @@ struct AuthenticateOptions {
             settingsAction: nil,
             authenticationFlowGroup: self.authenticationFlowGroup,
             responseMode: nil,
-            xAppInitiatedSSOToWebToken: nil
+            xPreAuthenticatedURLToken: nil
         )
     }
 }
@@ -106,7 +106,7 @@ struct ReauthenticateOptions {
             settingsAction: nil,
             authenticationFlowGroup: self.authenticationFlowGroup,
             responseMode: nil,
-            xAppInitiatedSSOToWebToken: nil
+            xPreAuthenticatedURLToken: nil
         )
     }
 }
@@ -1120,7 +1120,7 @@ public class Authgear {
                     settingsAction: settingsAction,
                     authenticationFlowGroup: nil,
                     responseMode: nil,
-                    xAppInitiatedSSOToWebToken: nil
+                    xPreAuthenticatedURLToken: nil
                 ), clientID: self.clientId, verifier: verifier)
 
                 handler?(.success(endpoint))
@@ -1904,7 +1904,7 @@ public class Authgear {
                     accessToken: nil,
                     xApp2AppDeviceKeyJwt: nil,
                     scope: nil,
-                    requestedTokenType: .appInitiatedSSOToWebToken,
+                    requestedTokenType: .preAuthenticatedURLToken,
                     subjectTokenType: .idToken,
                     subjectToken: idToken,
                     actorTokenType: .deviceSecret,
@@ -1946,7 +1946,7 @@ public class Authgear {
                     settingsAction: nil,
                     authenticationFlowGroup: nil,
                     responseMode: "cookie",
-                    xAppInitiatedSSOToWebToken: appInitiatedSSOToWebToken
+                    xPreAuthenticatedURLToken: appInitiatedSSOToWebToken
                 ), clientID: clientID, verifier: nil)
                 handler(.success(url))
                 return

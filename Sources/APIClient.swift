@@ -12,7 +12,7 @@ enum GrantType: String {
 }
 
 enum RequestedTokenType: String {
-    case appInitiatedSSOToWebToken = "urn:authgear:params:oauth:token-type:app-initiated-sso-to-web-token"
+    case preAuthenticatedURLToken = "urn:authgear:params:oauth:token-type:pre-authenticated-url-token"
 }
 
 enum SubjectTokenType: String {
@@ -60,7 +60,7 @@ struct OIDCAuthenticationRequest {
     let settingsAction: SettingsAction?
     let authenticationFlowGroup: String?
     let responseMode: String?
-    let xAppInitiatedSSOToWebToken: String?
+    let xPreAuthenticatedURLToken: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -144,8 +144,8 @@ struct OIDCAuthenticationRequest {
             queryItems.append(URLQueryItem(name: "response_mode", value: responseMode))
         }
 
-        if let xAppInitiatedSSOToWebToken = self.xAppInitiatedSSOToWebToken {
-            queryItems.append(URLQueryItem(name: "x_app_initiated_sso_to_web_token", value: xAppInitiatedSSOToWebToken))
+        if let xPreAuthenticatedURLToken = self.xPreAuthenticatedURLToken {
+            queryItems.append(URLQueryItem(name: "x_pre_authenticated_url_token", value: xPreAuthenticatedURLToken))
         }
 
         if let isSSOEnabled = self.isSSOEnabled {
