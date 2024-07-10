@@ -39,11 +39,11 @@ class App: ObservableObject {
     @Published var app2AppState: String = ""
     @Published var isAuthgearConfigured: Bool = false
     @Published var app2AppConfirmation: App2AppConfirmation? = nil
-    @Published var isAppInitiatedSSOToWebEnabled: Bool = false
+    @Published var preAuthenticatedURLEnabled: Bool = false
     @Published var clientID: String = ""
     @Published var endpoint: String = ""
-    @Published var appInitiatedSSOToWebClientID: String = ""
-    @Published var appInitiatedSSOToWebRedirectURI: String = ""
+    @Published var preAuthenticatedURLClientID: String = ""
+    @Published var preAuthenticatedURLRedirectURI: String = ""
 
     private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
@@ -65,9 +65,9 @@ class App: ObservableObject {
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
         isSSOEnabled: Bool,
-        isAppInitiatedSSOToWebEnabled: Bool,
-        appInitiatedSSOToWebClientID: String,
-        appInitiatedSSOToWebRedirectURI: String,
+        preAuthenticatedURLEnabled: Bool,
+        preAuthenticatedURLClientID: String,
+        preAuthenticatedURLRedirectURI: String,
         useWKWebView: Bool
     ) {
         guard clientId != "", endpoint != "" else {
@@ -83,9 +83,9 @@ class App: ObservableObject {
         UserDefaults.standard.set(app2AppEndpoint, forKey: "authgear.demo.app2appendpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
-        UserDefaults.standard.set(isAppInitiatedSSOToWebEnabled, forKey: "authgear.demo.isAppInitiatedSSOToWebEnabled")
-        UserDefaults.standard.set(appInitiatedSSOToWebClientID, forKey: "authgear.demo.appInitiatedSSOToWebClientID")
-        UserDefaults.standard.set(appInitiatedSSOToWebRedirectURI, forKey: "authgear.demo.appInitiatedSSOToWebRedirectURI")
+        UserDefaults.standard.set(preAuthenticatedURLEnabled, forKey: "authgear.demo.preAuthenticatedURLEnabled")
+        UserDefaults.standard.set(preAuthenticatedURLClientID, forKey: "authgear.demo.preAuthenticatedURLClientID")
+        UserDefaults.standard.set(preAuthenticatedURLRedirectURI, forKey: "authgear.demo.preAuthenticatedURLRedirectURI")
         let isApp2AppEnabled = !app2AppEndpoint.isEmpty
         appDelegate.configureAuthgear(
             clientId: clientId,
@@ -93,7 +93,7 @@ class App: ObservableObject {
             tokenStorage: tokenStorage,
             isSSOEnabled: isSSOEnabled,
             isApp2AppEnabled: isApp2AppEnabled,
-            isAppInitiatedSSOToWebEnabled: isAppInitiatedSSOToWebEnabled,
+            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
             useWKWebView: useWKWebView
         )
         self.clientID = clientId
@@ -102,9 +102,9 @@ class App: ObservableObject {
         self.authenticationFlowGroup = authenticationFlowGroup
         self.explicitColorScheme = colorScheme
         self.app2appEndpoint = app2AppEndpoint
-        self.isAppInitiatedSSOToWebEnabled = isAppInitiatedSSOToWebEnabled
-        self.appInitiatedSSOToWebClientID = appInitiatedSSOToWebClientID
-        self.appInitiatedSSOToWebRedirectURI = appInitiatedSSOToWebRedirectURI
+        self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
+        self.preAuthenticatedURLClientID = preAuthenticatedURLClientID
+        self.preAuthenticatedURLRedirectURI = preAuthenticatedURLRedirectURI
         self.updateBiometricState()
     }
 
@@ -352,15 +352,15 @@ class App: ObservableObject {
         handlePendingApp2AppRequest()
     }
 
-    func appInitiatedSSOToWeb() {
-        let shouldUseAnotherBrowser = appInitiatedSSOToWebRedirectURI != ""
+    func preAuthenticatedURL() {
+        let shouldUseAnotherBrowser = preAuthenticatedURLRedirectURI != ""
         var targetRedirectURI = App.redirectURI
         var targetClientID = clientID
-        if (appInitiatedSSOToWebRedirectURI != "") {
-            targetRedirectURI = appInitiatedSSOToWebRedirectURI
+        if (preAuthenticatedURLRedirectURI != "") {
+            targetRedirectURI = preAuthenticatedURLRedirectURI
         }
-        if (appInitiatedSSOToWebClientID != "") {
-            targetClientID = appInitiatedSSOToWebClientID
+        if (preAuthenticatedURLClientID != "") {
+            targetClientID = preAuthenticatedURLClientID
         }
         container?.makePreAuthenticatedURL(
             clientID: targetClientID,
@@ -385,7 +385,7 @@ class App: ObservableObject {
                                     tokenStorage: TransientTokenStorage(),
                                     uiImplementation: uiImpl,
                                     isSSOEnabled: true,
-                                    name: "appInitiatedSSOToWeb"
+                                    name: "preAuthenticatedURL"
                                 )
                                 newContainer.authenticate(
                                     redirectURI: App.redirectURI
@@ -404,7 +404,7 @@ class App: ObservableObject {
                         }
                     )
                 } else {
-                    // This will be redirected to appInitiatedSSOToWebRedirectURI and never close.
+                    // This will be redirected to preAuthenticatedURLRedirectURI and never close.
                     uiImpl.openAuthorizationURL(
                         url: url,
                         redirectURI: URL(string: App.redirectURI)!,

@@ -27,7 +27,7 @@ enum ResponseType: String {
     case code
     case settingsAction = "urn:authgear:params:oauth:response-type:settings-action"
     case none
-    case appInitiatedSSOToWebToken = "urn:authgear:params:oauth:response-type:app_initiated_sso_to_web token"
+    case preAuthenticatedURLToken = "urn:authgear:params:oauth:response-type:pre-authenticated-url token"
 }
 
 struct APIResponse<T: Decodable>: Decodable {

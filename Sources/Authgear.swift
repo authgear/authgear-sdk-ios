@@ -17,10 +17,10 @@ public enum PromptOption: String {
 }
 
 func getAuthenticationScopes(
-    isAppInitiatedSSOToWebEnabled: Bool
+    preAuthenticatedURLEnabled: Bool
 ) -> [String] {
     var scopes = ["openid", "offline_access", "https://authgear.com/scopes/full-access"]
-    if isAppInitiatedSSOToWebEnabled {
+    if preAuthenticatedURLEnabled {
         scopes.append("device_sso")
         scopes.append("https://authgear.com/scopes/pre-authenticated-url")
     }
@@ -30,7 +30,7 @@ func getAuthenticationScopes(
 struct AuthenticateOptions {
     let redirectURI: String
     let isSSOEnabled: Bool
-    let isAppInitiatedSSOToWebEnabled: Bool
+    let preAuthenticatedURLEnabled: Bool
     let state: String?
     let xState: String?
     let prompt: [PromptOption]?
@@ -43,7 +43,7 @@ struct AuthenticateOptions {
 
     var request: OIDCAuthenticationRequest {
         let scopes = getAuthenticationScopes(
-            isAppInitiatedSSOToWebEnabled: isAppInitiatedSSOToWebEnabled)
+            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled)
         return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
@@ -89,7 +89,7 @@ struct ReauthenticateOptions {
             redirectURI: self.redirectURI,
             responseType: "code",
             // offline_access is not needed because we don't want a new refresh token to be generated
-            // device_sso and app-initiated-sso-to-web is also not needed,
+            // device_sso and pre-authenticated-url is also not needed,
             // because no new session should be generated so the scopes are not important.
             scope: ["openid", "https://authgear.com/scopes/full-access"],
             isSSOEnabled: isSSOEnabled,
@@ -822,7 +822,7 @@ public class Authgear {
         self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
-            isAppInitiatedSSOToWebEnabled: self.preAuthenticatedURLEnabled,
+            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
             state: state,
             xState: xState,
             prompt: prompt,
@@ -1014,7 +1014,7 @@ public class Authgear {
                     AuthenticateOptions(
                         redirectURI: redirectURI,
                         isSSOEnabled: self.isSSOEnabled,
-                        isAppInitiatedSSOToWebEnabled: self.preAuthenticatedURLEnabled,
+                        preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
                         state: state,
                         xState: xState,
                         prompt: [.login],
@@ -1103,7 +1103,7 @@ public class Authgear {
                 let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
                     redirectURI: redirectURI,
                     responseType: responseType.rawValue,
-                    // device_sso and app-initiated-sso-to-web is also not needed,
+                    // device_sso and pre-authenticated-url is also not needed,
                     // because session for settings should not be used to perform SSO.
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
                     isSSOEnabled: self.isSSOEnabled,
@@ -1739,7 +1739,7 @@ public class Authgear {
                         accessToken: nil,
                         xApp2AppDeviceKeyJwt: nil,
                         scope: getAuthenticationScopes(
-                            isAppInitiatedSSOToWebEnabled: self.preAuthenticatedURLEnabled),
+                            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled),
                         requestedTokenType: nil,
                         subjectTokenType: nil,
                         subjectToken: nil,
@@ -1883,11 +1883,11 @@ public class Authgear {
         workerQueue.async {
             do {
                 guard var idToken = try self.sharedStorage.getIDToken(namespace: self.name) else {
-                    handler(.failure(AuthgearError.appInitiatedSSOToWebNotAllowed(.idTokenNotFound)))
+                    handler(.failure(AuthgearError.preAuthenticatedURLNotAllowed(.idTokenNotFound)))
                     return
                 }
                 guard let deviceSecret = try self.sharedStorage.getDeviceSecret(namespace: self.name) else {
-                    handler(.failure(AuthgearError.appInitiatedSSOToWebNotAllowed(.deviceSecretNotFound)))
+                    handler(.failure(AuthgearError.preAuthenticatedURLNotAllowed(.deviceSecretNotFound)))
                     return
                 }
                 let tokenExchangeResult = try self.apiClient.syncRequestOIDCToken(
@@ -1912,11 +1912,11 @@ public class Authgear {
                     audience: self.apiClient.endpoint.origin()!.absoluteString,
                     deviceSecret: nil
                 )
-                // Here access_token is app-initiated-sso-to-web-token
-                let appInitiatedSSOToWebToken = tokenExchangeResult.accessToken
+                // Here access_token is pre-authenticated-url-token
+                let preAuthenticatedURLToken = tokenExchangeResult.accessToken
                 let newDeviceSecret = tokenExchangeResult.deviceSecret
                 let newIDToken = tokenExchangeResult.idToken
-                guard let appInitiatedSSOToWebToken = appInitiatedSSOToWebToken else {
+                guard let preAuthenticatedURLToken = preAuthenticatedURLToken else {
                     handler(.failure(AuthgearError.runtimeError("unexpected: access_token is not returned")))
                     return
                 }
@@ -1930,7 +1930,7 @@ public class Authgear {
                 }
                 let url = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
                     redirectURI:         webApplicationURI,
-                    responseType: ResponseType.appInitiatedSSOToWebToken.rawValue,
+                    responseType: ResponseType.preAuthenticatedURLToken.rawValue,
                     scope: nil,
                     isSSOEnabled: nil,
                     state: state,
@@ -1946,13 +1946,13 @@ public class Authgear {
                     settingsAction: nil,
                     authenticationFlowGroup: nil,
                     responseMode: "cookie",
-                    xPreAuthenticatedURLToken: appInitiatedSSOToWebToken
+                    xPreAuthenticatedURLToken: preAuthenticatedURLToken
                 ), clientID: webApplicationClientID, verifier: nil)
                 handler(.success(url))
                 return
             } catch let error as OAuthError {
                 if error.error == "insufficient_scope" {
-                    handler(.failure(AuthgearError.appInitiatedSSOToWebNotAllowed(.insufficientScope)))
+                    handler(.failure(AuthgearError.preAuthenticatedURLNotAllowed(.insufficientScope)))
                     return
                 }
                 handler(.failure(wrapError(error: error)))

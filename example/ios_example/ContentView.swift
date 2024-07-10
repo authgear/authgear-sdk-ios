@@ -78,9 +78,9 @@ struct AuthgearConfigurationForm: View {
     @Binding var app2appState: String
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
-    @State private var isAppInitiatedSSOToWebEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isAppInitiatedSSOToWebEnabled")
-    @State private var appInitiatedSSOToWebClientID: String = UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebClientID") ?? ""
-    @State private var appInitiatedSSOToWebRedirectURI: String = UserDefaults.standard.string(forKey: "authgear.demo.appInitiatedSSOToWebRedirectURI") ?? ""
+    @State private var preAuthenticatedURLEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.preAuthenticatedURLEnabled")
+    @State private var preAuthenticatedURLClientID: String = UserDefaults.standard.string(forKey: "authgear.demo.preAuthenticatedURLClientID") ?? ""
+    @State private var preAuthenticatedURLRedirectURI: String = UserDefaults.standard.string(forKey: "authgear.demo.preAuthenticatedURLRedirectURI") ?? ""
     @State private var useWKWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWKWebView")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
@@ -152,21 +152,21 @@ struct AuthgearConfigurationForm: View {
                 input: Toggle(isOn: $useWKWebView) { EmptyView() }
             )
             AuthgearConfigurationInput(
-                label: "Is App Initiated SSO To Web Enabled",
-                input: Toggle(isOn: $isAppInitiatedSSOToWebEnabled) { EmptyView() }
+                label: "Is Pre-Authenticated URL Enabled",
+                input: Toggle(isOn: $preAuthenticatedURLEnabled) { EmptyView() }
             )
             AuthgearConfigurationInput(
-                label: "App Initiated SSO To Web Client ID",
+                label: "Pre-Authenticated URL Client ID",
                 input: AuthgearConfigurationTextField(
                     placeHolder: "Enter Client ID",
-                    text: $appInitiatedSSOToWebClientID
+                    text: $preAuthenticatedURLClientID
                 )
             )
             AuthgearConfigurationInput(
-                label: "App Initiated SSO To Web Redirect URI",
+                label: "Pre-Authenticated URL Redirect URI",
                 input: AuthgearConfigurationTextField(
                     placeHolder: "Enter Redirect URI",
-                    text: $appInitiatedSSOToWebRedirectURI
+                    text: $preAuthenticatedURLRedirectURI
                 )
             )
             TextLabelValue(
@@ -183,9 +183,9 @@ struct AuthgearConfigurationForm: View {
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
                     isSSOEnabled: self.isSSOEnabled,
-                    isAppInitiatedSSOToWebEnabled: self.isAppInitiatedSSOToWebEnabled,
-                    appInitiatedSSOToWebClientID: self.appInitiatedSSOToWebClientID,
-                    appInitiatedSSOToWebRedirectURI: self.appInitiatedSSOToWebRedirectURI,
+                    preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
+                    preAuthenticatedURLClientID: self.preAuthenticatedURLClientID,
+                    preAuthenticatedURLRedirectURI: self.preAuthenticatedURLRedirectURI,
                     useWKWebView: self.useWKWebView
                 )
             }) {
@@ -227,8 +227,8 @@ struct ActionButtonList: View {
         !app.app2appEndpoint.isEmpty
     }
 
-    private var isAppInitiatedSSOToWebEnabled: Bool {
-        app.isAppInitiatedSSOToWebEnabled
+    private var preAuthenticatedURLEnabled: Bool {
+        app.preAuthenticatedURLEnabled
     }
 
     var body: some View {
@@ -270,10 +270,10 @@ struct ActionButtonList: View {
                 }.disabled(!configured || loggedIn || !biometricEnabled)
 
                 Button(action: {
-                    self.app.appInitiatedSSOToWeb()
+                    self.app.preAuthenticatedURL()
                 }) {
-                    ActionButton(text: "App Initiated SSO To Web")
-                }.disabled(!configured || !loggedIn || !isAppInitiatedSSOToWebEnabled)
+                    ActionButton(text: "Pre-Authenticated URL")
+                }.disabled(!configured || !loggedIn || !preAuthenticatedURLEnabled)
             }
 
             Group {
