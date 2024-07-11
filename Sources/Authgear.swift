@@ -1894,7 +1894,7 @@ public class Authgear {
                     grantType: .tokenExchange,
                     clientId: webApplicationClientID,
                     deviceInfo: nil,
-                    redirectURI:         webApplicationURI,
+                    redirectURI: webApplicationURI,
                     code: nil,
                     codeVerifier: nil,
                     codeChallenge: nil,
@@ -1929,7 +1929,7 @@ public class Authgear {
                     try self.sharedStorage.setIDToken(namespace: self.name, token: newIDToken)
                 }
                 let url = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
-                    redirectURI:         webApplicationURI,
+                    redirectURI: webApplicationURI,
                     responseType: ResponseType.preAuthenticatedURLToken.rawValue,
                     scope: nil,
                     isSSOEnabled: nil,
