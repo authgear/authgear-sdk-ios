@@ -363,8 +363,8 @@ class App: ObservableObject {
             targetClientID = preAuthenticatedURLClientID
         }
         container?.makePreAuthenticatedURL(
-            clientID: targetClientID,
-            redirectURI: targetRedirectURI,
+            webApplicationClientID: targetClientID,
+            webApplicationURI: targetRedirectURI,
             state: nil
         ) { result in
             switch result {
