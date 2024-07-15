@@ -1,13 +1,13 @@
-import Foundation
 import CommonCrypto
+import Foundation
 
 // Reference: https://github.com/airsidemobile/JOSESwift/blob/master/JOSESwift/Sources/CryptoImplementation/Thumbprint.swift#L47
 
-internal enum JWKThumbprintAlgorithm: String {
+enum JWKThumbprintAlgorithm: String {
     case SHA256
 }
 
-fileprivate extension JWKThumbprintAlgorithm {
+private extension JWKThumbprintAlgorithm {
     var outputLenght: Int {
         switch self {
         case .SHA256:
@@ -23,7 +23,7 @@ fileprivate extension JWKThumbprintAlgorithm {
     }
 }
 
-internal struct Thumbprint {
+enum Thumbprint {
     /// Calculates a hash of an input with a specific hash algorithm.
     ///
     /// - Parameters:
@@ -31,7 +31,7 @@ internal struct Thumbprint {
     ///   - algorithm: The algorithm used to calculate the hash.
     /// - Returns: The calculated hash in base64URLEncoding.
     static func calculate(from input: Data, algorithm: JWKThumbprintAlgorithm) throws -> String {
-        guard input.count > 0 else {
+        guard !input.isEmpty else {
             throw AuthgearError.runtimeError("input must be > 0")
         }
 

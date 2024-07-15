@@ -338,7 +338,7 @@ public class Authgear {
 
     private let app2AppOptions: App2AppOptions
     private let app2app: App2App
-    
+
     private let dpopProvider: DPoPProvider
 
     private var currentWechatRedirectURI: String?
@@ -370,10 +370,12 @@ public class Authgear {
         self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
         self.dpopProvider = DefaultDPoPProvider(
             namespace: self.name,
-            sharedStorage: self.sharedStorage)
+            sharedStorage: self.sharedStorage
+        )
         self.apiClient = DefaultAuthAPIClient(
             endpoint: URL(string: endpoint)!,
-            dpopProvider: self.dpopProvider)
+            dpopProvider: self.dpopProvider
+        )
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.app2AppOptions = app2AppOptions

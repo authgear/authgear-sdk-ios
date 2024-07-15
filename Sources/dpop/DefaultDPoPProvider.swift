@@ -3,7 +3,7 @@ import Foundation
 class DefaultDPoPProvider: DPoPProvider {
     private let namespace: String
     private let sharedStorage: InterAppSharedStorage
-    
+
     init(namespace: String, sharedStorage: InterAppSharedStorage) {
         self.namespace = namespace
         self.sharedStorage = sharedStorage
@@ -20,12 +20,13 @@ class DefaultDPoPProvider: DPoPProvider {
         let payload = JWTPayload(
             jti: UUID().uuidString,
             htm: htm,
-            htu: htu)
+            htu: htu
+        )
         let jwt = JWT(header: header, payload: payload)
         let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
         return signedJWT
     }
-    
+
     func computeJKT() throws -> String {
         if #unavailable(iOS 11.3) {
             return ""
@@ -35,8 +36,7 @@ class DefaultDPoPProvider: DPoPProvider {
         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
         return try jwk.thumbprint(algorithm: .SHA256)
     }
-    
-    
+
     @available(iOS 11.3, *)
     private func generatePrivateKey(tag: String) throws -> SecKey {
         var error: Unmanaged<CFError>?
@@ -54,7 +54,7 @@ class DefaultDPoPProvider: DPoPProvider {
         }
         return privateKey
     }
-    
+
     @available(iOS 11.3, *)
     private func getPrivateKey(tag: String) throws -> SecKey? {
         let query: NSDictionary = [
@@ -78,7 +78,7 @@ class DefaultDPoPProvider: DPoPProvider {
         let privateKey = item as! SecKey
         return privateKey
     }
-    
+
     @available(iOS 11.3, *)
     private func getOrCreateDPoPPrivateKey() throws -> (String, SecKey) {
         let existingKid = try sharedStorage.getDPoPKeyId(namespace: namespace)
@@ -94,8 +94,8 @@ class DefaultDPoPProvider: DPoPProvider {
         try sharedStorage.setDPoPKeyId(namespace: namespace, kid: kid)
         return (kid, privateKey)
     }
-    
+
     private func getDPoPPrivateKeyTag(kid: String) -> String {
-        return "com.authgear.keys.dpop.\(kid)"
+        "com.authgear.keys.dpop.\(kid)"
     }
 }

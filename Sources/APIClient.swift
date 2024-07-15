@@ -161,7 +161,7 @@ struct OIDCAuthenticationRequest {
         if let authenticationFlowGroup = self.authenticationFlowGroup {
             queryItems.append(URLQueryItem(name: "x_authentication_flow_group", value: authenticationFlowGroup))
         }
-        
+
         if let dpopJKT = self.dpopJKT {
             queryItems.append(URLQueryItem(name: "dpop_jkt", value: dpopJKT))
         }
@@ -468,7 +468,8 @@ class DefaultAuthAPIClient: AuthAPIClient {
         do {
             let dpopProof = try self.dpopProvider.generateDPoPProof(
                 htm: request.httpMethod ?? "GET",
-                htu: request.url!.absoluteString)
+                htu: request.url!.absoluteString
+            )
             r.setValue(dpopProof, forHTTPHeaderField: "DPoP")
         } catch {
             handler(.failure(wrapError(error: error)))

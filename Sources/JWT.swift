@@ -71,12 +71,12 @@ struct JWTPayload: Encodable {
         self.challenge = challenge
         self.action = action
         self.deviceInfo = getDeviceInfo()
-        
+
         self.jti = nil
         self.htm = nil
         self.htu = nil
     }
-    
+
     init(jti: String, htm: String, htu: String) {
         let now = Int(Date().timeIntervalSince1970)
         iat = now
@@ -84,7 +84,7 @@ struct JWTPayload: Encodable {
         self.challenge = nil
         self.action = nil
         self.deviceInfo = nil
-        
+
         self.jti = jti
         self.htm = htm
         self.htu = htu

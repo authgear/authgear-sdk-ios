@@ -38,9 +38,9 @@ struct JWK: Encodable {
         self.n = nil
         self.e = nil
     }
-    
+
     public var thumbprintParameters: [String: String] {
-        var p: [String:String] = [:]
+        var p: [String: String] = [:]
         p["kty"] = kty
         // EC Keys Specific Parameters
         if let crv = crv {
@@ -61,7 +61,7 @@ struct JWK: Encodable {
         }
         return p
     }
-    
+
     public func thumbprint(algorithm: JWKThumbprintAlgorithm) throws -> String {
         guard let json = try? JSONSerialization.data(withJSONObject: thumbprintParameters, options: .sortedKeys) else {
             throw AuthgearError.runtimeError("unable to compute jwk thumbprint")
