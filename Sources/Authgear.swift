@@ -1894,7 +1894,7 @@ public class Authgear {
                     grantType: .tokenExchange,
                     clientId: webApplicationClientID,
                     deviceInfo: nil,
-                    redirectURI: webApplicationURI,
+                    redirectURI: nil,
                     code: nil,
                     codeVerifier: nil,
                     codeChallenge: nil,
