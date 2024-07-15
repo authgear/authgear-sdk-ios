@@ -62,6 +62,9 @@ struct JWTPayload: Encodable {
         case challenge
         case action
         case deviceInfo = "device_info"
+        case jti
+        case htm
+        case htu
     }
 
     init(challenge: String, action: String) {
