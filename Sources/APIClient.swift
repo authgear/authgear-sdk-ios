@@ -61,6 +61,7 @@ struct OIDCAuthenticationRequest {
     let authenticationFlowGroup: String?
     let responseMode: String?
     let xPreAuthenticatedURLToken: String?
+    var dpopJKT: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -159,6 +160,10 @@ struct OIDCAuthenticationRequest {
 
         if let authenticationFlowGroup = self.authenticationFlowGroup {
             queryItems.append(URLQueryItem(name: "x_authentication_flow_group", value: authenticationFlowGroup))
+        }
+        
+        if let dpopJKT = self.dpopJKT {
+            queryItems.append(URLQueryItem(name: "dpop_jkt", value: dpopJKT))
         }
 
         return queryItems

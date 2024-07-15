@@ -338,6 +338,8 @@ public class Authgear {
 
     private let app2AppOptions: App2AppOptions
     private let app2app: App2App
+    
+    private let dpopProvider: DPoPProvider
 
     private var currentWechatRedirectURI: String?
 
@@ -366,12 +368,12 @@ public class Authgear {
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
         self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
-        let dpopProvider = DefaultDPoPProvider(
+        self.dpopProvider = DefaultDPoPProvider(
             namespace: self.name,
             sharedStorage: self.sharedStorage)
         self.apiClient = DefaultAuthAPIClient(
             endpoint: URL(string: endpoint)!,
-            dpopProvider: dpopProvider)
+            dpopProvider: self.dpopProvider)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.app2AppOptions = app2AppOptions
@@ -454,7 +456,10 @@ public class Authgear {
 
     func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthenticationRequest, Error> {
         let verifier = CodeVerifier()
-        let request = options.request
+        var request = options.request
+        // Ignore the error if jkt cannot be computed
+        // The SDK should still work without DPoP
+        request.dpopJKT = try? dpopProvider.computeJKT()
         let url = Result { try self.buildAuthorizationURL(request: request, clientID: self.clientId, verifier: verifier) }
 
         return url.map { url in
