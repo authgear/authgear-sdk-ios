@@ -130,7 +130,7 @@ class App2App {
         }
         let publicKey = SecKeyCopyPublicKey(privateKey)!
         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-        let header = JWTHeader(typ: .app2app, jwk: jwk, new: true)
+        let header = JWTHeader(typ: .app2app, jwk: jwk, includeJWK: true)
         let payload = JWTPayload(challenge: challenge, action: App2AppPayloadAction.setup.rawValue)
         let jwt = JWT(header: header, payload: payload)
         let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))

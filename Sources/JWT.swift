@@ -14,11 +14,11 @@ struct JWTHeader: Encodable {
     let alg: String
     let jwk: JWK?
 
-    init(typ: JWTHeaderType, jwk: JWK, new: Bool) {
+    init(typ: JWTHeaderType, jwk: JWK, includeJWK: Bool) {
         self.typ = typ
         kid = jwk.kid
         alg = jwk.alg
-        if new {
+        if includeJWK {
             self.jwk = jwk
         } else {
             self.jwk = nil

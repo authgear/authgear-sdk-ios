@@ -929,10 +929,10 @@ public class Authgear {
 
                 let header: JWTHeader
                 if let key = try self.jwkStore.loadKey(keyId: keyId, tag: tag) {
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: false)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: false)
                 } else {
                     let key = try self.jwkStore.generateKey(keyId: keyId, tag: tag)
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: true)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: true)
                 }
 
                 let payload = JWTPayload(challenge: token, action: AnonymousPayloadAction.auth.rawValue)
@@ -1006,10 +1006,10 @@ public class Authgear {
 
                 let header: JWTHeader
                 if let key = try self.jwkStore.loadKey(keyId: keyId, tag: tag) {
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: false)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: false)
                 } else {
                     let key = try self.jwkStore.generateKey(keyId: keyId, tag: tag)
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: true)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: true)
                 }
 
                 let payload = JWTPayload(challenge: token, action: AnonymousPayloadAction.promote.rawValue)
@@ -1677,7 +1677,7 @@ public class Authgear {
                         try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint, laContext: context)
                         let publicKey = SecKeyCopyPublicKey(privateKey)!
                         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-                        let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
+                        let header = JWTHeader(typ: .biometric, jwk: jwk, includeJWK: true)
                         let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.setup.rawValue)
                         let jwt = JWT(header: header, payload: payload)
                         let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
@@ -1733,7 +1733,7 @@ public class Authgear {
                     }
                     let publicKey = SecKeyCopyPublicKey(privateKey)!
                     let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-                    let header = JWTHeader(typ: .biometric, jwk: jwk, new: false)
+                    let header = JWTHeader(typ: .biometric, jwk: jwk, includeJWK: false)
                     let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.authenticate.rawValue)
                     let jwt = JWT(header: header, payload: payload)
                     let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))

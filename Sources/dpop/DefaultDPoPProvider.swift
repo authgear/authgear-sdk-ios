@@ -16,7 +16,7 @@ class DefaultDPoPProvider: DPoPProvider {
         let (kid, privateKey) = try getOrCreateDPoPPrivateKey()
         let publicKey = SecKeyCopyPublicKey(privateKey)!
         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-        let header = JWTHeader(typ: .dpopjwt, jwk: jwk, new: true)
+        let header = JWTHeader(typ: .dpopjwt, jwk: jwk, includeJWK: true)
         let payload = JWTPayload(
             jti: UUID().uuidString,
             htm: htm,
