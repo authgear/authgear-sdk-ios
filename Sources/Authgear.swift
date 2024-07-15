@@ -366,7 +366,12 @@ public class Authgear {
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
         self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
-        self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
+        let dpopProvider = DefaultDPoPProvider(
+            namespace: self.name,
+            sharedStorage: self.sharedStorage)
+        self.apiClient = DefaultAuthAPIClient(
+            endpoint: URL(string: endpoint)!,
+            dpopProvider: dpopProvider)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.app2AppOptions = app2AppOptions
