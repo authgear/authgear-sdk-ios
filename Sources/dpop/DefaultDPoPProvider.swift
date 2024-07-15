@@ -10,6 +10,9 @@ class DefaultDPoPProvider: DPoPProvider {
     }
 
     func generateDPoPProof(htm: String, htu: String) throws -> String {
+        if #unavailable(iOS 11.3) {
+            return ""
+        }
         let (kid, privateKey) = try getOrCreateDPoPPrivateKey()
         let publicKey = SecKeyCopyPublicKey(privateKey)!
         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
@@ -24,6 +27,9 @@ class DefaultDPoPProvider: DPoPProvider {
     }
     
     func computeJKT() throws -> String {
+        if #unavailable(iOS 11.3) {
+            return ""
+        }
         let (kid, privateKey) = try getOrCreateDPoPPrivateKey()
         let publicKey = SecKeyCopyPublicKey(privateKey)!
         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
