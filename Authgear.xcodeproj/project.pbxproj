@@ -22,6 +22,9 @@
 		A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */; };
 		A68DAD2229AF686000487DAF /* UILocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD1F29AF686000487DAF /* UILocales.swift */; };
 		A68DAD2929AF688E00487DAF /* String+encodeAsQueryComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */; };
+		A6E210C12C44FFE800D00D6E /* DPoPProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E210C02C44FFE800D00D6E /* DPoPProvider.swift */; };
+		A6E210C42C45001700D00D6E /* DefaultDPoPProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E210C32C45001700D00D6E /* DefaultDPoPProvider.swift */; };
+		A6E210C62C45112F00D00D6E /* JWK+Thumbprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E210C52C45112F00D00D6E /* JWK+Thumbprint.swift */; };
 		A6FCB0A52AF37E4300DAC260 /* URL+origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6FCB0A42AF37E4300DAC260 /* URL+origin.swift */; };
 		F83392EF24FC344D00A69D3C /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392EE24FC344D00A69D3C /* Storage.swift */; };
 		F83392F124FDA87900A69D3C /* AuthgearError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83392F024FDA87900A69D3C /* AuthgearError.swift */; };
@@ -73,6 +76,9 @@
 		A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asn1IntegerConversion.swift; sourceTree = "<group>"; };
 		A68DAD1F29AF686000487DAF /* UILocales.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UILocales.swift; sourceTree = "<group>"; };
 		A68DAD2629AF688E00487DAF /* String+encodeAsQueryComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+encodeAsQueryComponent.swift"; sourceTree = "<group>"; };
+		A6E210C02C44FFE800D00D6E /* DPoPProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPoPProvider.swift; sourceTree = "<group>"; };
+		A6E210C32C45001700D00D6E /* DefaultDPoPProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDPoPProvider.swift; sourceTree = "<group>"; };
+		A6E210C52C45112F00D00D6E /* JWK+Thumbprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JWK+Thumbprint.swift"; sourceTree = "<group>"; };
 		A6FCB0A42AF37E4300DAC260 /* URL+origin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+origin.swift"; sourceTree = "<group>"; };
 		"Authgear::Authgear::Product" /* Authgear.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Authgear.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Authgear::AuthgearTests::Product" /* Authgear-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = "Authgear-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -125,6 +131,15 @@
 			path = app2app;
 			sourceTree = "<group>";
 		};
+		A6E210BF2C44FFD700D00D6E /* dpop */ = {
+			isa = PBXGroup;
+			children = (
+				A6E210C02C44FFE800D00D6E /* DPoPProvider.swift */,
+				A6E210C32C45001700D00D6E /* DefaultDPoPProvider.swift */,
+			);
+			path = dpop;
+			sourceTree = "<group>";
+		};
 		CC20D6F125BAA3C400E579DD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -167,6 +182,7 @@
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A6E210BF2C44FFD700D00D6E /* dpop */,
 				A652CEAA2A812C94006E789F /* app2app */,
 				F83D84AB24F66D3400B4393C /* APIClient.swift */,
 				F83D84A724F64D0E00B4393C /* Authgear.swift */,
@@ -186,6 +202,7 @@
 				775FF7292603649500B81ECD /* Biometric.swift */,
 				F8A657A6250551ED0027888F /* JWT.swift */,
 				A652CEE62A84DE72006E789F /* ASN1DERParsing.swift */,
+				A6E210C52C45112F00D00D6E /* JWK+Thumbprint.swift */,
 				A652CEF92A8A2C8F006E789F /* Asn1IntegerConversion.swift */,
 				F8A657A825055A7C0027888F /* Base64.swift */,
 				A652CEBA2A822D19006E789F /* Dictionary+encodeAsQuery.swift */,
@@ -302,10 +319,12 @@
 				A652CEFA2A8A2C8F006E789F /* Asn1IntegerConversion.swift in Sources */,
 				F8A657A925055A7C0027888F /* Base64.swift in Sources */,
 				F83392F324FE38FE00A69D3C /* URLComponents+QueryParames.swift in Sources */,
+				A6E210C62C45112F00D00D6E /* JWK+Thumbprint.swift in Sources */,
 				77EBB6182B833BC600EEDFD2 /* ASWebAuthenticationSessionUIImplementation.swift in Sources */,
 				A6FCB0A52AF37E4300DAC260 /* URL+origin.swift in Sources */,
 				775FF72A2603649500B81ECD /* Biometric.swift in Sources */,
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
+				A6E210C42C45001700D00D6E /* DefaultDPoPProvider.swift in Sources */,
 				77EBB61C2B833C5F00EEDFD2 /* AGWKWebViewController.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
 				A68DAD2229AF686000487DAF /* UILocales.swift in Sources */,
@@ -316,6 +335,7 @@
 				F83D84AC24F66D3400B4393C /* APIClient.swift in Sources */,
 				77EBB61E2B833CAA00EEDFD2 /* WKWebViewUIImplementation.swift in Sources */,
 				F83D84B024F860AA00B4393C /* UIImplementation.swift in Sources */,
+				A6E210C12C44FFE800D00D6E /* DPoPProvider.swift in Sources */,
 				F83D84A824F64D0E00B4393C /* Authgear.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
