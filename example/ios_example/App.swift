@@ -267,7 +267,7 @@ class App: ObservableObject {
             }
         }
     }
-    
+
     func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,
