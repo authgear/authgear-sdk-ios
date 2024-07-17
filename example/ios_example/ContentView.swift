@@ -290,6 +290,12 @@ struct ActionButtonList: View {
                 }.disabled(!configured || !loggedIn || isAnonymous)
 
                 Button(action: {
+                    self.app.deleteAccount()
+                }) {
+                    ActionButton(text: "Delete Account")
+                }.disabled(!configured || !loggedIn || isAnonymous)
+                
+                Button(action: {
                     self.app.showAuthTime()
                 }) {
                     ActionButton(text: "Show auth_time")

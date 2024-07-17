@@ -217,6 +217,7 @@ public enum SettingsPage: String {
 
 public enum SettingsAction: String {
     case changePassword = "change_password"
+    case deleteAccount = "delete_account"
 }
 
 public enum SessionStateChangeReason: String {
@@ -1037,7 +1038,7 @@ public class Authgear {
                     page: nil,
                     settingsAction: settingsAction,
                     authenticationFlowGroup: nil
-                ), verifier: nil)
+                ), verifier: verifier)
 
                 handler?(.success(endpoint))
             } catch {
@@ -1296,6 +1297,34 @@ public class Authgear {
         )
     }
 
+    public func deleteAccount(
+        uiLocales: [String]? = nil,
+        colorScheme: ColorScheme? = nil,
+        wechatRedirectURI: String? = nil,
+        redirectURI: String,
+        handler: VoidCompletionHandler? = nil
+    ) {
+        openSettingsAction(
+            redirectURI: redirectURI,
+            action: .deleteAccount,
+            uiLocales: uiLocales,
+            colorScheme: colorScheme,
+            wechatRedirectURI: wechatRedirectURI,
+            handler: { result in
+                switch result {
+                case .success:
+                    self.cleanupSession(force: true, reason: .invalid) { cleanupResult in
+                        handler?(cleanupResult)
+                    }
+                    return
+                case .failure:
+                    handler?(result)
+                    return
+                }
+            }
+        )
+    }
+    
     private func shouldRefreshAccessToken() -> Bool {
         // 1. We must have refresh token.
         guard refreshToken != nil else { return false }

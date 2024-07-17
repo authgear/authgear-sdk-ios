@@ -253,6 +253,21 @@ class App: ObservableObject {
         }
     }
 
+    func deleteAccount() {
+        container?.deleteAccount(
+            colorScheme: self.colorScheme,
+            wechatRedirectURI: App.wechatRedirectURI,
+            redirectURI: App.redirectURI
+        ) { result in
+            switch result {
+            case .success:
+                self.successAlertMessage = "Deleted account successfully"
+            case let .failure(error):
+                self.setError(error)
+            }
+        }
+    }
+    
     func promoteAnonymousUser() {
         container?.promoteAnonymousUser(
             redirectURI: App.redirectURI,

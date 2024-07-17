@@ -428,7 +428,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-l\"WeChatSDK\"",
 					"-l\"c++\"",
 					"-l\"sqlite3.0\"",
 					"-l\"z\"",
@@ -472,7 +471,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-l\"WeChatSDK\"",
 					"-l\"c++\"",
 					"-l\"sqlite3.0\"",
 					"-l\"z\"",
