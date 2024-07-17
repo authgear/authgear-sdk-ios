@@ -996,8 +996,6 @@ public class Authgear {
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         settingsAction: SettingsAction? = nil,
-        state: String? = nil,
-        xState: String? = nil,
         idTokenHint: String? = nil,
         verifier: CodeVerifier? = nil,
         wechatRedirectURI: String? = nil,
@@ -1028,8 +1026,8 @@ public class Authgear {
                     responseType: responseType.rawValue,
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
                     isSSOEnabled: self.isSSOEnabled,
-                    state: state,
-                    xState: xState,
+                    state: nil,
+                    xState: nil,
                     prompt: [.none],
                     loginHint: loginHint,
                     uiLocales: uiLocales,
@@ -1176,7 +1174,6 @@ public class Authgear {
                     uiLocales: uiLocales,
                     colorScheme: colorScheme,
                     settingsAction: action,
-                    state: action.rawValue,
                     idTokenHint: self.idTokenHint,
                     verifier: verifier
                 ) { generatedResult in
