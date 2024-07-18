@@ -1324,7 +1324,7 @@ public class Authgear {
             }
         )
     }
-    
+
     private func shouldRefreshAccessToken() -> Bool {
         // 1. We must have refresh token.
         guard refreshToken != nil else { return false }
