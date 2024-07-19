@@ -392,12 +392,11 @@ class App: ObservableObject {
                                 ) { result in
                                     switch result {
                                     case .success:
-                                        break
+                                        self.fetchUserInfo(container: newContainer)
                                     case let .failure(error):
                                         self.setError(error)
                                     }
                                 }
-                                self.fetchUserInfo(container: newContainer)
                             case let .failure(error):
                                 self.setError(error)
                             }
