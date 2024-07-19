@@ -722,17 +722,7 @@ public class Authgear {
                 return handler(.failure(wrapError(error: error)))
             }
         }
-        if case let .failure(error) = Result(catching: { try sharedStorage.delIDToken(namespace: name) }) {
-            if !force {
-                return handler(.failure(wrapError(error: error)))
-            }
-        }
-        if case let .failure(error) = Result(catching: { try sharedStorage.delDeviceSecret(namespace: name) }) {
-            if !force {
-                return handler(.failure(wrapError(error: error)))
-            }
-        }
-        if case let .failure(error) = Result(catching: { try sharedStorage.delDPoPKeyId(namespace: name) }) {
+        if case let .failure(error) = Result(catching: { try sharedStorage.onLogout(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
             }

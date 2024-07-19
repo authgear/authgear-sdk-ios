@@ -19,6 +19,8 @@ protocol InterAppSharedStorage {
     func setDPoPKeyId(namespace: String, kid: String) throws
     func getDPoPKeyId(namespace: String) throws -> String?
     func delDPoPKeyId(namespace: String) throws
+    
+    func onLogout(namespace: String) throws
 }
 
 protocol ContainerStorage {
@@ -135,6 +137,12 @@ class PersistentInterAppSharedStorage: InterAppSharedStorage {
 
     public func delDPoPKeyId(namespace: String) throws {
         try self.driver.del(key: self.keyMaker.keyDPoPKeyId(namespace: namespace))
+    }
+    
+    public func onLogout(namespace: String) throws {
+        try self.delIDToken(namespace: namespace)
+        try self.delDeviceSecret(namespace: namespace)
+        try self.delDPoPKeyId(namespace: namespace)
     }
 }
 
