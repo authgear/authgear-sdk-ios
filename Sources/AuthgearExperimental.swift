@@ -28,6 +28,7 @@ public struct AuthgearExperimental {
         let options = AuthenticateOptions(
             redirectURI: redirectURI,
             isSSOEnabled: self.authgear.isSSOEnabled,
+            preAuthenticatedURLEnabled: self.authgear.preAuthenticatedURLEnabled,
             state: state,
             xState: xState,
             prompt: prompt,
@@ -67,7 +68,7 @@ public struct AuthgearExperimental {
         return Result<AuthenticationRequest, Error> {
             let verifier = CodeVerifier()
             let request = options.toRequest(idTokenHint: idTokenHint)
-            let url = try self.authgear.buildAuthorizationURL(request: request, verifier: verifier)
+            let url = try self.authgear.buildAuthorizationURL(request: request, clientID: self.authgear.clientId, verifier: verifier)
             return AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
         }
     }

@@ -25,6 +25,7 @@ public enum AuthgearError: CustomNSError, LocalizedError {
     case publicKeyNotFound
     case error(Error)
     case runtimeError(String)
+    case preAuthenticatedURLNotAllowed(PreAuthenticatedURLNotAllowedError)
 
     // Implements CustomNSError
     public static var errorDomain: String { "AuthgearError" }
@@ -62,6 +63,8 @@ public enum AuthgearError: CustomNSError, LocalizedError {
             return 14
         case .runtimeError:
             return 15
+        case .preAuthenticatedURLNotAllowed:
+            return 16
         }
     }
 
@@ -128,6 +131,8 @@ public enum AuthgearError: CustomNSError, LocalizedError {
             message = "error"
         case let .runtimeError(errmsg):
             message = errmsg
+        case let .preAuthenticatedURLNotAllowed(internalErr):
+            message = "not allowed: \(internalErr.errorDescription ?? "unknown")"
         }
         return "\(Self.errorDomain): \(message)"
     }
@@ -212,6 +217,23 @@ public struct ServerError: CustomNSError, LocalizedError, Decodable {
     public var errorDescription: String? {
         let message = "\(reason): \(message)"
         return "\(Self.errorDomain): \(message)"
+    }
+}
+
+public enum PreAuthenticatedURLNotAllowedError: LocalizedError {
+    case insufficientScope
+    case idTokenNotFound
+    case deviceSecretNotFound
+
+    public var errorDescription: String? {
+        switch self {
+        case .insufficientScope:
+            return "insufficient scope"
+        case .idTokenNotFound:
+            return "id_token not found"
+        case .deviceSecretNotFound:
+            return "device_secret not found"
+        }
     }
 }
 

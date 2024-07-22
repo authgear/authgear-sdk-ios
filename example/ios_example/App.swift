@@ -39,6 +39,11 @@ class App: ObservableObject {
     @Published var app2AppState: String = ""
     @Published var isAuthgearConfigured: Bool = false
     @Published var app2AppConfirmation: App2AppConfirmation? = nil
+    @Published var preAuthenticatedURLEnabled: Bool = false
+    @Published var clientID: String = ""
+    @Published var endpoint: String = ""
+    @Published var preAuthenticatedURLClientID: String = ""
+    @Published var preAuthenticatedURLRedirectURI: String = ""
 
     private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
@@ -60,6 +65,9 @@ class App: ObservableObject {
         colorScheme: AuthgearColorScheme?,
         tokenStorage: String,
         isSSOEnabled: Bool,
+        preAuthenticatedURLEnabled: Bool,
+        preAuthenticatedURLClientID: String,
+        preAuthenticatedURLRedirectURI: String,
         useWKWebView: Bool
     ) {
         guard clientId != "", endpoint != "" else {
@@ -75,12 +83,28 @@ class App: ObservableObject {
         UserDefaults.standard.set(app2AppEndpoint, forKey: "authgear.demo.app2appendpoint")
         UserDefaults.standard.set(tokenStorage, forKey: "authgear.demo.tokenStorage")
         UserDefaults.standard.set(isSSOEnabled, forKey: "authgear.demo.isSSOEnabled")
+        UserDefaults.standard.set(preAuthenticatedURLEnabled, forKey: "authgear.demo.preAuthenticatedURLEnabled")
+        UserDefaults.standard.set(preAuthenticatedURLClientID, forKey: "authgear.demo.preAuthenticatedURLClientID")
+        UserDefaults.standard.set(preAuthenticatedURLRedirectURI, forKey: "authgear.demo.preAuthenticatedURLRedirectURI")
         let isApp2AppEnabled = !app2AppEndpoint.isEmpty
-        appDelegate.configureAuthgear(clientId: clientId, endpoint: endpoint, tokenStorage: tokenStorage, isSSOEnabled: isSSOEnabled, isApp2AppEnabled: isApp2AppEnabled, useWKWebView: useWKWebView)
+        appDelegate.configureAuthgear(
+            clientId: clientId,
+            endpoint: endpoint,
+            tokenStorage: tokenStorage,
+            isSSOEnabled: isSSOEnabled,
+            isApp2AppEnabled: isApp2AppEnabled,
+            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
+            useWKWebView: useWKWebView
+        )
+        self.clientID = clientId
+        self.endpoint = endpoint
         self.authenticationPage = authenticationPage
         self.authenticationFlowGroup = authenticationFlowGroup
         self.explicitColorScheme = colorScheme
         self.app2appEndpoint = app2AppEndpoint
+        self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
+        self.preAuthenticatedURLClientID = preAuthenticatedURLClientID
+        self.preAuthenticatedURLRedirectURI = preAuthenticatedURLRedirectURI
         self.updateBiometricState()
     }
 
@@ -277,8 +301,8 @@ class App: ObservableObject {
         )
     }
 
-    func fetchUserInfo() {
-        container?.fetchUserInfo { userInfoResult in
+    private func fetchUserInfo(container: Authgear) {
+        container.fetchUserInfo { userInfoResult in
             switch userInfoResult {
             case let .success(userInfo):
                 self.user = userInfo
@@ -296,6 +320,11 @@ class App: ObservableObject {
                 self.setError(error)
             }
         }
+    }
+
+    func fetchUserInfo() {
+        guard let container = container else { return }
+        self.fetchUserInfo(container: container)
     }
 
     func showAuthTime() {
@@ -321,6 +350,70 @@ class App: ObservableObject {
     func postConfig() {
         self.isAuthgearConfigured = true
         handlePendingApp2AppRequest()
+    }
+
+    func preAuthenticatedURL() {
+        let shouldUseAnotherBrowser = preAuthenticatedURLRedirectURI != ""
+        var targetRedirectURI = App.redirectURI
+        var targetClientID = clientID
+        if (preAuthenticatedURLRedirectURI != "") {
+            targetRedirectURI = preAuthenticatedURLRedirectURI
+        }
+        if (preAuthenticatedURLClientID != "") {
+            targetClientID = preAuthenticatedURLClientID
+        }
+        container?.makePreAuthenticatedURL(
+            webApplicationClientID: targetClientID,
+            webApplicationURI: targetRedirectURI,
+            state: nil
+        ) { result in
+            switch result {
+            case let .success(url):
+                let uiImpl = WKWebViewUIImplementation()
+                if (!shouldUseAnotherBrowser) {
+                    // Use wkwebview to open the url and set the cookie
+                    uiImpl.openAuthorizationURL(
+                        url: url,
+                        redirectURI: URL(string: App.redirectURI)!,
+                        shareCookiesWithDeviceBrowser: true,
+                        completion: { _ in
+                            switch result {
+                            case .success:
+                                let newContainer = Authgear(
+                                    clientId: targetClientID,
+                                    endpoint: self.endpoint,
+                                    tokenStorage: TransientTokenStorage(),
+                                    uiImplementation: uiImpl,
+                                    isSSOEnabled: true,
+                                    name: "preAuthenticatedURL"
+                                )
+                                newContainer.authenticate(
+                                    redirectURI: App.redirectURI
+                                ) { result in
+                                    switch result {
+                                    case .success:
+                                        self.fetchUserInfo(container: newContainer)
+                                    case let .failure(error):
+                                        self.setError(error)
+                                    }
+                                }
+                            case let .failure(error):
+                                self.setError(error)
+                            }
+                        }
+                    )
+                } else {
+                    // This will be redirected to preAuthenticatedURLRedirectURI and never close.
+                    uiImpl.openAuthorizationURL(
+                        url: url,
+                        redirectURI: URL(string: App.redirectURI)!,
+                        shareCookiesWithDeviceBrowser: true
+                    ) { _ in }
+                }
+            case let .failure(error):
+                self.setError(error)
+            }
+        }
     }
 
     private func handlePendingApp2AppRequest() {

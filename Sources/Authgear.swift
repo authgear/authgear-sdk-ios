@@ -16,9 +16,21 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
+func getAuthenticationScopes(
+    preAuthenticatedURLEnabled: Bool
+) -> [String] {
+    var scopes = ["openid", "offline_access", "https://authgear.com/scopes/full-access"]
+    if preAuthenticatedURLEnabled {
+        scopes.append("device_sso")
+        scopes.append("https://authgear.com/scopes/pre-authenticated-url")
+    }
+    return scopes
+}
+
 struct AuthenticateOptions {
     let redirectURI: String
     let isSSOEnabled: Bool
+    let preAuthenticatedURLEnabled: Bool
     let state: String?
     let xState: String?
     let prompt: [PromptOption]?
@@ -30,10 +42,12 @@ struct AuthenticateOptions {
     let authenticationFlowGroup: String?
 
     var request: OIDCAuthenticationRequest {
-        OIDCAuthenticationRequest(
+        let scopes = getAuthenticationScopes(
+            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled)
+        return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
-            scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
+            scope: scopes,
             isSSOEnabled: isSSOEnabled,
             state: self.state,
             xState: self.xState,
@@ -46,7 +60,9 @@ struct AuthenticateOptions {
             wechatRedirectURI: self.wechatRedirectURI,
             page: self.page,
             settingsAction: nil,
-            authenticationFlowGroup: self.authenticationFlowGroup
+            authenticationFlowGroup: self.authenticationFlowGroup,
+            responseMode: nil,
+            xPreAuthenticatedURLToken: nil
         )
     }
 }
@@ -72,6 +88,9 @@ struct ReauthenticateOptions {
         OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
+            // offline_access is not needed because we don't want a new refresh token to be generated
+            // device_sso and pre-authenticated-url is also not needed,
+            // because no new session should be generated so the scopes are not important.
             scope: ["openid", "https://authgear.com/scopes/full-access"],
             isSSOEnabled: isSSOEnabled,
             state: self.state,
@@ -85,7 +104,9 @@ struct ReauthenticateOptions {
             wechatRedirectURI: self.wechatRedirectURI,
             page: nil,
             settingsAction: nil,
-            authenticationFlowGroup: self.authenticationFlowGroup
+            authenticationFlowGroup: self.authenticationFlowGroup,
+            responseMode: nil,
+            xPreAuthenticatedURLToken: nil
         )
     }
 }
@@ -263,10 +284,13 @@ public class Authgear {
     let apiClient: AuthAPIClient
     let storage: ContainerStorage
     var tokenStorage: TokenStorage
+    var sharedStorage: InterAppSharedStorage
     public let isSSOEnabled: Bool
     private var shareCookiesWithDeviceBrowser: Bool {
         self.isSSOEnabled
     }
+
+    public let preAuthenticatedURLEnabled: Bool
 
     var uiImplementation: UIImplementation
 
@@ -327,6 +351,7 @@ public class Authgear {
         tokenStorage: TokenStorage = PersistentTokenStorage(),
         uiImplementation: UIImplementation = ASWebAuthenticationSessionUIImplementation(),
         isSSOEnabled: Bool = false,
+        preAuthenticatedURLEnabled: Bool = false,
         name: String? = nil,
         app2AppOptions: App2AppOptions = App2AppOptions(
             isEnabled: false,
@@ -336,9 +361,11 @@ public class Authgear {
         self.clientId = clientId
         self.name = name ?? "default"
         self.tokenStorage = tokenStorage
+        self.sharedStorage = PersistentInterAppSharedStorage()
         self.uiImplementation = uiImplementation
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
+        self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
         self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
@@ -378,9 +405,9 @@ public class Authgear {
         delegate?.authgearSessionStateDidChange(self, reason: reason)
     }
 
-    func buildAuthorizationURL(request: OIDCAuthenticationRequest, verifier: CodeVerifier?) throws -> URL {
+    func buildAuthorizationURL(request: OIDCAuthenticationRequest, clientID: String, verifier: CodeVerifier?) throws -> URL {
         let configuration = try apiClient.syncFetchOIDCConfiguration()
-        let queryItems = request.toQueryItems(clientID: self.clientId, verifier: verifier)
+        let queryItems = request.toQueryItems(clientID: clientID, verifier: verifier)
         var urlComponents = URLComponents(
             url: configuration.authorizationEndpoint,
             resolvingAgainstBaseURL: false
@@ -399,7 +426,7 @@ public class Authgear {
             }
             let request = options.toRequest(idTokenHint: idTokenHint)
             let verifier = CodeVerifier()
-            let url = try self.buildAuthorizationURL(request: request, verifier: verifier)
+            let url = try self.buildAuthorizationURL(request: request, clientID: self.clientId, verifier: verifier)
 
             DispatchQueue.main.async {
                 self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
@@ -423,7 +450,7 @@ public class Authgear {
     func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthenticationRequest, Error> {
         let verifier = CodeVerifier()
         let request = options.request
-        let url = Result { try self.buildAuthorizationURL(request: request, verifier: verifier) }
+        let url = Result { try self.buildAuthorizationURL(request: request, clientID: self.clientId, verifier: verifier) }
 
         return url.map { url in
             AuthenticationRequest(url: url, redirectURI: request.redirectURI, verifier: verifier)
@@ -522,7 +549,15 @@ public class Authgear {
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
-                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt,
+                scope: nil,
+                requestedTokenType: nil,
+                subjectTokenType: nil,
+                subjectToken: nil,
+                actorTokenType: nil,
+                actorToken: nil,
+                audience: nil,
+                deviceSecret: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -607,7 +642,15 @@ public class Authgear {
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
-                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt
+                xApp2AppDeviceKeyJwt: xApp2AppDeviceKeyJwt,
+                scope: nil,
+                requestedTokenType: nil,
+                subjectTokenType: nil,
+                subjectToken: nil,
+                actorTokenType: nil,
+                actorToken: nil,
+                audience: nil,
+                deviceSecret: nil
             )
 
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -631,6 +674,22 @@ public class Authgear {
             }
         }
 
+        if let idToken = oidcTokenResponse.idToken {
+            let result = Result { try self.sharedStorage.setIDToken(namespace: self.name, token: idToken) }
+            guard case .success = result else {
+                handler(result)
+                return
+            }
+        }
+
+        if let deviceSecret = oidcTokenResponse.deviceSecret {
+            let result = Result { try self.sharedStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
+            guard case .success = result else {
+                handler(result)
+                return
+            }
+        }
+
         DispatchQueue.main.async {
             self.accessToken = oidcTokenResponse.accessToken
             if let refreshToken = oidcTokenResponse.refreshToken {
@@ -647,6 +706,16 @@ public class Authgear {
 
     private func cleanupSession(force: Bool, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
         if case let .failure(error) = Result(catching: { try tokenStorage.delRefreshToken(namespace: name) }) {
+            if !force {
+                return handler(.failure(wrapError(error: error)))
+            }
+        }
+        if case let .failure(error) = Result(catching: { try sharedStorage.delIDToken(namespace: name) }) {
+            if !force {
+                return handler(.failure(wrapError(error: error)))
+            }
+        }
+        if case let .failure(error) = Result(catching: { try sharedStorage.delDeviceSecret(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
             }
@@ -753,6 +822,7 @@ public class Authgear {
         self.authenticate(AuthenticateOptions(
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
+            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
             state: state,
             xState: xState,
             prompt: prompt,
@@ -873,7 +943,15 @@ public class Authgear {
                     refreshToken: nil,
                     jwt: signedJWT,
                     accessToken: nil,
-                    xApp2AppDeviceKeyJwt: nil
+                    xApp2AppDeviceKeyJwt: nil,
+                    scope: nil,
+                    requestedTokenType: nil,
+                    subjectTokenType: nil,
+                    subjectToken: nil,
+                    actorTokenType: nil,
+                    actorToken: nil,
+                    audience: nil,
+                    deviceSecret: nil
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -936,6 +1014,7 @@ public class Authgear {
                     AuthenticateOptions(
                         redirectURI: redirectURI,
                         isSSOEnabled: self.isSSOEnabled,
+                        preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
                         state: state,
                         xState: xState,
                         prompt: [.login],
@@ -1024,6 +1103,8 @@ public class Authgear {
                 let endpoint = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
                     redirectURI: redirectURI,
                     responseType: responseType.rawValue,
+                    // device_sso and pre-authenticated-url is also not needed,
+                    // because session for settings should not be used to perform SSO.
                     scope: ["openid", "offline_access", "https://authgear.com/scopes/full-access"],
                     isSSOEnabled: self.isSSOEnabled,
                     state: nil,
@@ -1037,8 +1118,10 @@ public class Authgear {
                     wechatRedirectURI: wechatRedirectURI,
                     page: nil,
                     settingsAction: settingsAction,
-                    authenticationFlowGroup: nil
-                ), verifier: verifier)
+                    authenticationFlowGroup: nil,
+                    responseMode: nil,
+                    xPreAuthenticatedURLToken: nil
+                ), clientID: self.clientId, verifier: verifier)
 
                 handler?(.success(endpoint))
             } catch {
@@ -1272,7 +1355,15 @@ public class Authgear {
                 refreshToken: nil,
                 jwt: nil,
                 accessToken: nil,
-                xApp2AppDeviceKeyJwt: nil
+                xApp2AppDeviceKeyJwt: nil,
+                scope: nil,
+                requestedTokenType: nil,
+                subjectTokenType: nil,
+                subjectToken: nil,
+                actorTokenType: nil,
+                actorToken: nil,
+                audience: nil,
+                deviceSecret: nil
             )
             handler(.success(()))
         } catch {
@@ -1353,6 +1444,11 @@ public class Authgear {
                     return
                 }
 
+                var deviceSecret: String?
+                if let ds = try self.sharedStorage.getDeviceSecret(namespace: self.name) {
+                    deviceSecret = ds
+                }
+
                 let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                     grantType: GrantType.refreshToken,
                     clientId: self.clientId,
@@ -1365,7 +1461,15 @@ public class Authgear {
                     refreshToken: refreshToken,
                     jwt: nil,
                     accessToken: nil,
-                    xApp2AppDeviceKeyJwt: nil
+                    xApp2AppDeviceKeyJwt: nil,
+                    scope: nil,
+                    requestedTokenType: nil,
+                    subjectTokenType: nil,
+                    subjectToken: nil,
+                    actorTokenType: nil,
+                    actorToken: nil,
+                    audience: nil,
+                    deviceSecret: deviceSecret
                 )
 
                 self.persistSession(oidcTokenResponse, reason: .foundToken) { result in handler?(result) }
@@ -1428,6 +1532,10 @@ public class Authgear {
         let task = {
             self.workerQueue.async {
                 do {
+                    var deviceSecret: String?
+                    if let ds = try self.sharedStorage.getDeviceSecret(namespace: self.name) {
+                        deviceSecret = ds
+                    }
                     let oidcTokenResponse = try self.apiClient.syncRequestOIDCToken(
                         grantType: .idToken,
                         clientId: self.clientId,
@@ -1440,12 +1548,36 @@ public class Authgear {
                         refreshToken: nil,
                         jwt: nil,
                         accessToken: self.accessToken,
-                        xApp2AppDeviceKeyJwt: nil
+                        xApp2AppDeviceKeyJwt: nil,
+                        scope: nil,
+                        requestedTokenType: nil,
+                        subjectTokenType: nil,
+                        subjectToken: nil,
+                        actorTokenType: nil,
+                        actorToken: nil,
+                        audience: nil,
+                        deviceSecret: deviceSecret
                     )
                     if let idToken = oidcTokenResponse.idToken {
-                        self.idToken = idToken
+                        let result = Result { try self.sharedStorage.setIDToken(namespace: self.name, token: idToken) }
+                        guard case .success = result else {
+                            handler(result)
+                            return
+                        }
                     }
-                    handler(.success(()))
+                    if let deviceSecret = oidcTokenResponse.deviceSecret {
+                        let result = Result { try self.sharedStorage.setDeviceSecret(namespace: self.name, secret: deviceSecret) }
+                        guard case .success = result else {
+                            handler(result)
+                            return
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        if let idToken = oidcTokenResponse.idToken {
+                            self.idToken = idToken
+                        }
+                        handler(.success(()))
+                    }
                 } catch {
                     self._handleInvalidGrantException(error: error)
                     handler(.failure(wrapError(error: error)))
@@ -1605,7 +1737,16 @@ public class Authgear {
                         refreshToken: nil,
                         jwt: signedJWT,
                         accessToken: nil,
-                        xApp2AppDeviceKeyJwt: nil
+                        xApp2AppDeviceKeyJwt: nil,
+                        scope: getAuthenticationScopes(
+                            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled),
+                        requestedTokenType: nil,
+                        subjectTokenType: nil,
+                        subjectToken: nil,
+                        actorTokenType: nil,
+                        actorToken: nil,
+                        audience: nil,
+                        deviceSecret: nil
                     )
 
                     let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -1722,6 +1863,103 @@ public class Authgear {
             return false
         }
         return app2app.handleApp2AppAuthenticationResult(url: incomingURL)
+    }
+
+    public func makePreAuthenticatedURL(
+        webApplicationClientID: String,
+        webApplicationURI: String,
+        state: String?,
+        handler: @escaping URLCompletionHandler
+    ) {
+        let handler = withMainQueueHandler(handler)
+        if !preAuthenticatedURLEnabled {
+            handler(.failure(AuthgearError.runtimeError("makePreAuthenticatedURL requires preAuthenticatedURLEnabled to be true")))
+            return
+        }
+        if sessionState != .authenticated {
+            handler(.failure(AuthgearError.runtimeError("makePreAuthenticatedURL requires authenticated user")))
+            return
+        }
+        workerQueue.async {
+            do {
+                guard var idToken = try self.sharedStorage.getIDToken(namespace: self.name) else {
+                    handler(.failure(AuthgearError.preAuthenticatedURLNotAllowed(.idTokenNotFound)))
+                    return
+                }
+                guard let deviceSecret = try self.sharedStorage.getDeviceSecret(namespace: self.name) else {
+                    handler(.failure(AuthgearError.preAuthenticatedURLNotAllowed(.deviceSecretNotFound)))
+                    return
+                }
+                let tokenExchangeResult = try self.apiClient.syncRequestOIDCToken(
+                    grantType: .tokenExchange,
+                    clientId: webApplicationClientID,
+                    deviceInfo: nil,
+                    redirectURI: nil,
+                    code: nil,
+                    codeVerifier: nil,
+                    codeChallenge: nil,
+                    codeChallengeMethod: nil,
+                    refreshToken: nil,
+                    jwt: nil,
+                    accessToken: nil,
+                    xApp2AppDeviceKeyJwt: nil,
+                    scope: nil,
+                    requestedTokenType: .preAuthenticatedURLToken,
+                    subjectTokenType: .idToken,
+                    subjectToken: idToken,
+                    actorTokenType: .deviceSecret,
+                    actorToken: deviceSecret,
+                    audience: self.apiClient.endpoint.origin()!.absoluteString,
+                    deviceSecret: nil
+                )
+                // Here access_token is pre-authenticated-url-token
+                let preAuthenticatedURLToken = tokenExchangeResult.accessToken
+                let newDeviceSecret = tokenExchangeResult.deviceSecret
+                let newIDToken = tokenExchangeResult.idToken
+                guard let preAuthenticatedURLToken = preAuthenticatedURLToken else {
+                    handler(.failure(AuthgearError.runtimeError("unexpected: access_token is not returned")))
+                    return
+                }
+                if let newDeviceSecret = newDeviceSecret {
+                    try self.sharedStorage.setDeviceSecret(namespace: self.name, secret: newDeviceSecret)
+                }
+                if let newIDToken = newIDToken {
+                    idToken = newIDToken
+                    self.idToken = newIDToken
+                    try self.sharedStorage.setIDToken(namespace: self.name, token: newIDToken)
+                }
+                let url = try self.buildAuthorizationURL(request: OIDCAuthenticationRequest(
+                    redirectURI: webApplicationURI,
+                    responseType: ResponseType.preAuthenticatedURLToken.rawValue,
+                    scope: nil,
+                    isSSOEnabled: nil,
+                    state: state,
+                    xState: nil,
+                    prompt: [.none],
+                    loginHint: nil,
+                    uiLocales: nil,
+                    colorScheme: nil,
+                    idTokenHint: idToken,
+                    maxAge: nil,
+                    wechatRedirectURI: nil,
+                    page: nil,
+                    settingsAction: nil,
+                    authenticationFlowGroup: nil,
+                    responseMode: "cookie",
+                    xPreAuthenticatedURLToken: preAuthenticatedURLToken
+                ), clientID: webApplicationClientID, verifier: nil)
+                handler(.success(url))
+                return
+            } catch let error as OAuthError {
+                if error.error == "insufficient_scope" {
+                    handler(.failure(AuthgearError.preAuthenticatedURLNotAllowed(.insufficientScope)))
+                    return
+                }
+                handler(.failure(wrapError(error: error)))
+            } catch {
+                handler(.failure(wrapError(error: error)))
+            }
+        }
     }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {

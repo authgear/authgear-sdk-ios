@@ -7,6 +7,16 @@ public protocol TokenStorage {
     func delRefreshToken(namespace: String) throws
 }
 
+protocol InterAppSharedStorage {
+    func setIDToken(namespace: String, token: String) throws
+    func getIDToken(namespace: String) throws -> String?
+    func delIDToken(namespace: String) throws
+
+    func setDeviceSecret(namespace: String, secret: String) throws
+    func getDeviceSecret(namespace: String) throws -> String?
+    func delDeviceSecret(namespace: String) throws
+}
+
 protocol ContainerStorage {
     func setAnonymousKeyId(namespace: String, kid: String) throws
     func getAnonymousKeyId(namespace: String) throws -> String?
@@ -38,6 +48,30 @@ public class TransientTokenStorage: TokenStorage {
     public func delRefreshToken(namespace: String) throws {
         try self.driver.del(key: self.keyMaker.keyRefreshToken(namespace: namespace))
     }
+
+    public func setIDToken(namespace: String, token: String) throws {
+        try self.driver.set(key: self.keyMaker.keyIDToken(namespace: namespace), value: token)
+    }
+
+    public func getIDToken(namespace: String) throws -> String? {
+        try self.driver.get(key: self.keyMaker.keyIDToken(namespace: namespace))
+    }
+
+    public func delIDToken(namespace: String) throws {
+        try self.driver.del(key: self.keyMaker.keyIDToken(namespace: namespace))
+    }
+
+    public func setDeviceSecret(namespace: String, secret: String) throws {
+        try self.driver.set(key: self.keyMaker.keyDeviceSecret(namespace: namespace), value: secret)
+    }
+
+    public func getDeviceSecret(namespace: String) throws -> String? {
+        try self.driver.get(key: self.keyMaker.keyDeviceSecret(namespace: namespace))
+    }
+
+    public func delDeviceSecret(namespace: String) throws {
+        try self.driver.del(key: self.keyMaker.keyDeviceSecret(namespace: namespace))
+    }
 }
 
 public class PersistentTokenStorage: TokenStorage {
@@ -56,6 +90,35 @@ public class PersistentTokenStorage: TokenStorage {
 
     public func delRefreshToken(namespace: String) throws {
         try self.driver.del(key: self.keyMaker.keyRefreshToken(namespace: namespace))
+    }
+}
+
+class PersistentInterAppSharedStorage: InterAppSharedStorage {
+    private let driver = KeychainStorageDriver()
+    private let keyMaker = KeyMaker()
+
+    public func setIDToken(namespace: String, token: String) throws {
+        try self.driver.set(key: self.keyMaker.keyIDToken(namespace: namespace), value: token)
+    }
+
+    public func getIDToken(namespace: String) throws -> String? {
+        try self.driver.get(key: self.keyMaker.keyIDToken(namespace: namespace))
+    }
+
+    public func delIDToken(namespace: String) throws {
+        try self.driver.del(key: self.keyMaker.keyIDToken(namespace: namespace))
+    }
+
+    public func setDeviceSecret(namespace: String, secret: String) throws {
+        try self.driver.set(key: self.keyMaker.keyDeviceSecret(namespace: namespace), value: secret)
+    }
+
+    public func getDeviceSecret(namespace: String) throws -> String? {
+        try self.driver.get(key: self.keyMaker.keyDeviceSecret(namespace: namespace))
+    }
+
+    public func delDeviceSecret(namespace: String) throws {
+        try self.driver.del(key: self.keyMaker.keyDeviceSecret(namespace: namespace))
     }
 }
 
@@ -107,6 +170,14 @@ class KeyMaker {
 
     func keyRefreshToken(namespace: String) -> String {
         scopedKey("\(namespace)_refreshToken")
+    }
+
+    func keyIDToken(namespace: String) -> String {
+        scopedKey("\(namespace)_idToken")
+    }
+
+    func keyDeviceSecret(namespace: String) -> String {
+        scopedKey("\(namespace)_deviceSecret")
     }
 
     func keyAnonymousKeyId(namespace: String) -> String {

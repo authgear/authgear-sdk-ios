@@ -78,6 +78,9 @@ struct AuthgearConfigurationForm: View {
     @Binding var app2appState: String
     @State private var tokenStorage: String = UserDefaults.standard.string(forKey: "authgear.demo.tokenStorage") ?? TokenStorageClassName.PersistentTokenStorage.rawValue
     @State private var isSSOEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.isSSOEnabled")
+    @State private var preAuthenticatedURLEnabled: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.preAuthenticatedURLEnabled")
+    @State private var preAuthenticatedURLClientID: String = UserDefaults.standard.string(forKey: "authgear.demo.preAuthenticatedURLClientID") ?? ""
+    @State private var preAuthenticatedURLRedirectURI: String = UserDefaults.standard.string(forKey: "authgear.demo.preAuthenticatedURLRedirectURI") ?? ""
     @State private var useWKWebView: Bool = UserDefaults.standard.bool(forKey: "authgear.demo.useWKWebView")
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
@@ -148,6 +151,24 @@ struct AuthgearConfigurationForm: View {
                 label: "Use WKWebView",
                 input: Toggle(isOn: $useWKWebView) { EmptyView() }
             )
+            AuthgearConfigurationInput(
+                label: "Is Pre-Authenticated URL Enabled",
+                input: Toggle(isOn: $preAuthenticatedURLEnabled) { EmptyView() }
+            )
+            AuthgearConfigurationInput(
+                label: "Pre-Authenticated URL Client ID",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter Client ID",
+                    text: $preAuthenticatedURLClientID
+                )
+            )
+            AuthgearConfigurationInput(
+                label: "Pre-Authenticated URL Redirect URI",
+                input: AuthgearConfigurationTextField(
+                    placeHolder: "Enter Redirect URI",
+                    text: $preAuthenticatedURLRedirectURI
+                )
+            )
             TextLabelValue(
                 label: "SessionState",
                 value: app.sessionState.rawValue
@@ -162,6 +183,9 @@ struct AuthgearConfigurationForm: View {
                     colorScheme: ColorScheme(rawValue: self.explicitColorSchemeString),
                     tokenStorage: self.tokenStorage,
                     isSSOEnabled: self.isSSOEnabled,
+                    preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
+                    preAuthenticatedURLClientID: self.preAuthenticatedURLClientID,
+                    preAuthenticatedURLRedirectURI: self.preAuthenticatedURLRedirectURI,
                     useWKWebView: self.useWKWebView
                 )
             }) {
@@ -203,6 +227,10 @@ struct ActionButtonList: View {
         !app.app2appEndpoint.isEmpty
     }
 
+    private var preAuthenticatedURLEnabled: Bool {
+        app.preAuthenticatedURLEnabled
+    }
+
     var body: some View {
         VStack(spacing: 30) {
             // We have to start using Group here because
@@ -240,6 +268,12 @@ struct ActionButtonList: View {
                 }) {
                     ActionButton(text: "Authenticate Biometric")
                 }.disabled(!configured || loggedIn || !biometricEnabled)
+
+                Button(action: {
+                    self.app.preAuthenticatedURL()
+                }) {
+                    ActionButton(text: "Pre-Authenticated URL")
+                }.disabled(!configured || !loggedIn || !preAuthenticatedURLEnabled)
             }
 
             Group {

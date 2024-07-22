@@ -11,6 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         tokenStorage: String,
         isSSOEnabled: Bool,
         isApp2AppEnabled: Bool,
+        preAuthenticatedURLEnabled: Bool,
         useWKWebView: Bool
     ) {
         let app2AppOptions = App2AppOptions(
@@ -39,6 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             tokenStorage: tokenStorageInstance,
             uiImplementation: uiImplementation,
             isSSOEnabled: isSSOEnabled,
+            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
             app2AppOptions: app2AppOptions
         )
         appContainer.container?.configure() { _ in

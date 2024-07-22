@@ -259,7 +259,15 @@ class App2App {
             refreshToken: refreshToken,
             jwt: jwt,
             accessToken: nil,
-            xApp2AppDeviceKeyJwt: nil
+            xApp2AppDeviceKeyJwt: nil,
+            scope: nil,
+            requestedTokenType: nil,
+            subjectTokenType: nil,
+            subjectToken: nil,
+            actorTokenType: nil,
+            actorToken: nil,
+            audience: nil,
+            deviceSecret: nil
         )
         let code = oidcTokenResponse.code ?? ""
         var query: [String: String] = [
