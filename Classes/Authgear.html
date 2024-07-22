@@ -17,7 +17,7 @@
     <a title="Authgear Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear iOS SDK git-ada2938e2568</a></p>
+        <p><a href="../index.html">Authgear iOS SDK git-5419ad846706</a></p>
         <div class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -77,6 +77,9 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/ColorScheme.html">ColorScheme</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/PreAuthenticatedURLNotAllowedError.html">PreAuthenticatedURLNotAllowedError</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/PromptOption.html">PromptOption</a>
@@ -195,6 +198,33 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">isSSOEnabled</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8AuthgearAAC26preAuthenticatedURLEnabledSbvp"></a>
+                    <a name="//apple_ref/swift/Property/preAuthenticatedURLEnabled" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC26preAuthenticatedURLEnabledSbvp">preAuthenticatedURLEnabled</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">preAuthenticatedURLEnabled</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -366,9 +396,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC8clientId8endpoint12tokenStorage16uiImplementation12isSSOEnabled4name14app2AppOptionsABSS_SSAA05TokenF0_pAA16UIImplementation_pSbSSSgAA04App2mN0Vtcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(clientId:endpoint:tokenStorage:uiImplementation:isSSOEnabled:name:app2AppOptions:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC8clientId8endpoint12tokenStorage16uiImplementation12isSSOEnabled4name14app2AppOptionsABSS_SSAA05TokenF0_pAA16UIImplementation_pSbSSSgAA04App2mN0Vtcfc">init(clientId:<wbr>endpoint:<wbr>tokenStorage:<wbr>uiImplementation:<wbr>isSSOEnabled:<wbr>name:<wbr>app2AppOptions:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC8clientId8endpoint12tokenStorage16uiImplementation12isSSOEnabled26preAuthenticatedURLEnabled4name14app2AppOptionsABSS_SSAA05TokenF0_pAA16UIImplementation_pS2bSSSgAA04App2pQ0Vtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(clientId:endpoint:tokenStorage:uiImplementation:isSSOEnabled:preAuthenticatedURLEnabled:name:app2AppOptions:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC8clientId8endpoint12tokenStorage16uiImplementation12isSSOEnabled26preAuthenticatedURLEnabled4name14app2AppOptionsABSS_SSAA05TokenF0_pAA16UIImplementation_pS2bSSSgAA04App2pQ0Vtcfc">init(clientId:<wbr>endpoint:<wbr>tokenStorage:<wbr>uiImplementation:<wbr>isSSOEnabled:<wbr>preAuthenticatedURLEnabled:<wbr>name:<wbr>app2AppOptions:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -389,6 +419,7 @@
     <span class="nv">tokenStorage</span><span class="p">:</span> <span class="kt"><a href="../Protocols/TokenStorage.html">TokenStorage</a></span> <span class="o">=</span> <span class="kt"><a href="../Classes/PersistentTokenStorage.html">PersistentTokenStorage</a></span><span class="p">(),</span>
     <span class="nv">uiImplementation</span><span class="p">:</span> <span class="kt"><a href="../Protocols/UIImplementation.html">UIImplementation</a></span> <span class="o">=</span> <span class="kt"><a href="../Classes/ASWebAuthenticationSessionUIImplementation.html">ASWebAuthenticationSessionUIImplementation</a></span><span class="p">(),</span>
     <span class="nv">isSSOEnabled</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nv">preAuthenticatedURLEnabled</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
     <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">app2AppOptions</span><span class="p">:</span> <span class="kt"><a href="../Structs/App2AppOptions.html">App2AppOptions</a></span> <span class="o">=</span> <span class="kt"><a href="../Structs/App2AppOptions.html">App2AppOptions</a></span><span class="p">(</span>
         <span class="nv">isEnabled</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
@@ -1225,6 +1256,38 @@
                 <li class="item">
                   <div>
                     <code>
+                    <a name="/s:8AuthgearAAC23makePreAuthenticatedURL22webApplicationClientID0fG3URI5state7handlerySS_S2SSgys6ResultOy10Foundation0E0Vs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/makePreAuthenticatedURL(webApplicationClientID:webApplicationURI:state:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC23makePreAuthenticatedURL22webApplicationClientID0fG3URI5state7handlerySS_S2SSgys6ResultOy10Foundation0E0Vs5Error_pGctF">makePreAuthenticatedURL(webApplicationClientID:<wbr>webApplicationURI:<wbr>state:<wbr>handler:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">makePreAuthenticatedURL</span><span class="p">(</span>
+    <span class="nv">webApplicationClientID</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+    <span class="nv">webApplicationURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+    <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span>
+    <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear20URLCompletionHandlera">URLCompletionHandler</a></span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
                     <a name="/s:8AuthgearAAC12experimentalAA0A12ExperimentalVvp"></a>
                     <a name="//apple_ref/swift/Property/experimental" class="dashAnchor"></a>
                     <a class="token" href="#/s:8AuthgearAAC12experimentalAA0A12ExperimentalVvp">experimental</a>
@@ -1254,7 +1317,7 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2024 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2024-07-18)</p>
+          <p>&copy; 2024 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2024-07-22)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
