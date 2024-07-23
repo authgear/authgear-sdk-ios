@@ -9,9 +9,9 @@ class DefaultDPoPProvider: DPoPProvider {
         self.sharedStorage = sharedStorage
     }
 
-    func generateDPoPProof(htm: String, htu: String) throws -> String {
+    func generateDPoPProof(htm: String, htu: String) throws -> String? {
         if #unavailable(iOS 11.3) {
-            return ""
+            return nil
         }
         let (kid, privateKey) = try getOrCreateDPoPPrivateKey()
         let publicKey = SecKeyCopyPublicKey(privateKey)!
@@ -27,9 +27,9 @@ class DefaultDPoPProvider: DPoPProvider {
         return signedJWT
     }
 
-    func computeJKT() throws -> String {
+    func computeJKT() throws -> String? {
         if #unavailable(iOS 11.3) {
-            return ""
+            return nil
         }
         let (kid, privateKey) = try getOrCreateDPoPPrivateKey()
         let publicKey = SecKeyCopyPublicKey(privateKey)!

@@ -466,11 +466,12 @@ class DefaultAuthAPIClient: AuthAPIClient {
     ) {
         var r = request
         do {
-            let dpopProof = try self.dpopProvider.generateDPoPProof(
+            if let dpopProof = try self.dpopProvider.generateDPoPProof(
                 htm: request.httpMethod ?? "GET",
                 htu: request.url!.absoluteString
-            )
-            r.setValue(dpopProof, forHTTPHeaderField: "DPoP")
+            ) {
+                r.setValue(dpopProof, forHTTPHeaderField: "DPoP")
+            }
         } catch {
             handler(.failure(wrapError(error: error)))
             return
