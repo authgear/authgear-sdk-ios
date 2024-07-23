@@ -61,6 +61,7 @@ struct OIDCAuthenticationRequest {
     let authenticationFlowGroup: String?
     let responseMode: String?
     let xPreAuthenticatedURLToken: String?
+    var dpopJKT: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -159,6 +160,10 @@ struct OIDCAuthenticationRequest {
 
         if let authenticationFlowGroup = self.authenticationFlowGroup {
             queryItems.append(URLQueryItem(name: "x_authentication_flow_group", value: authenticationFlowGroup))
+        }
+
+        if let dpopJKT = self.dpopJKT {
+            queryItems.append(URLQueryItem(name: "dpop_jkt", value: dpopJKT))
         }
 
         return queryItems
@@ -427,9 +432,11 @@ func authgearFetch(
 
 class DefaultAuthAPIClient: AuthAPIClient {
     public let endpoint: URL
+    private let dpopProvider: DPoPProvider
 
-    init(endpoint: URL) {
+    init(endpoint: URL, dpopProvider: DPoPProvider) {
         self.endpoint = endpoint
+        self.dpopProvider = dpopProvider
     }
 
     private let defaultSession = URLSession(configuration: .default)
@@ -457,7 +464,19 @@ class DefaultAuthAPIClient: AuthAPIClient {
         keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .convertFromSnakeCase,
         handler: @escaping (Result<T, Error>) -> Void
     ) {
-        authgearFetch(urlSession: defaultSession, request: request) { result in
+        var r = request
+        do {
+            if let dpopProof = try self.dpopProvider.generateDPoPProof(
+                htm: request.httpMethod ?? "GET",
+                htu: request.url!.absoluteString
+            ) {
+                r.setValue(dpopProof, forHTTPHeaderField: "DPoP")
+            }
+        } catch {
+            handler(.failure(wrapError(error: error)))
+            return
+        }
+        authgearFetch(urlSession: defaultSession, request: r) { result in
             handler(result.flatMap { (data, _) -> Result<T, Error> in
                 do {
                     let decorder = JSONDecoder()

@@ -15,6 +15,12 @@ protocol InterAppSharedStorage {
     func setDeviceSecret(namespace: String, secret: String) throws
     func getDeviceSecret(namespace: String) throws -> String?
     func delDeviceSecret(namespace: String) throws
+
+    func setDPoPKeyId(namespace: String, kid: String) throws
+    func getDPoPKeyId(namespace: String) throws -> String?
+    func delDPoPKeyId(namespace: String) throws
+
+    func onLogout(namespace: String) throws
 }
 
 protocol ContainerStorage {
@@ -120,6 +126,24 @@ class PersistentInterAppSharedStorage: InterAppSharedStorage {
     public func delDeviceSecret(namespace: String) throws {
         try self.driver.del(key: self.keyMaker.keyDeviceSecret(namespace: namespace))
     }
+
+    public func setDPoPKeyId(namespace: String, kid: String) throws {
+        try self.driver.set(key: self.keyMaker.keyDPoPKeyId(namespace: namespace), value: kid)
+    }
+
+    public func getDPoPKeyId(namespace: String) throws -> String? {
+        try self.driver.get(key: self.keyMaker.keyDPoPKeyId(namespace: namespace))
+    }
+
+    public func delDPoPKeyId(namespace: String) throws {
+        try self.driver.del(key: self.keyMaker.keyDPoPKeyId(namespace: namespace))
+    }
+
+    public func onLogout(namespace: String) throws {
+        try self.delIDToken(namespace: namespace)
+        try self.delDeviceSecret(namespace: namespace)
+        try self.delDPoPKeyId(namespace: namespace)
+    }
 }
 
 class PersistentContainerStorage: ContainerStorage {
@@ -190,6 +214,10 @@ class KeyMaker {
 
     func keyApp2AppDeviceKeyId(namespace: String) -> String {
         scopedKey("\(namespace)_app2AppDeviceKeyID")
+    }
+
+    func keyDPoPKeyId(namespace: String) -> String {
+        scopedKey("\(namespace)_dpopKeyID")
     }
 }
 

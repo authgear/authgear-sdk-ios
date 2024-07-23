@@ -339,6 +339,8 @@ public class Authgear {
     private let app2AppOptions: App2AppOptions
     private let app2app: App2App
 
+    private let dpopProvider: DPoPProvider
+
     private var currentWechatRedirectURI: String?
 
     public private(set) var sessionState: SessionState = .unknown
@@ -366,7 +368,14 @@ public class Authgear {
         self.storage = PersistentContainerStorage()
         self.isSSOEnabled = isSSOEnabled
         self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
-        self.apiClient = DefaultAuthAPIClient(endpoint: URL(string: endpoint)!)
+        self.dpopProvider = DefaultDPoPProvider(
+            namespace: self.name,
+            sharedStorage: self.sharedStorage
+        )
+        self.apiClient = DefaultAuthAPIClient(
+            endpoint: URL(string: endpoint)!,
+            dpopProvider: self.dpopProvider
+        )
         self.workerQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.accessTokenRefreshQueue = DispatchQueue(label: "authgear:\(self.name)", qos: .utility)
         self.app2AppOptions = app2AppOptions
@@ -449,7 +458,10 @@ public class Authgear {
 
     func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthenticationRequest, Error> {
         let verifier = CodeVerifier()
-        let request = options.request
+        var request = options.request
+        // Ignore the error if jkt cannot be computed
+        // The SDK should still work without DPoP
+        request.dpopJKT = try? dpopProvider.computeJKT()
         let url = Result { try self.buildAuthorizationURL(request: request, clientID: self.clientId, verifier: verifier) }
 
         return url.map { url in
@@ -710,12 +722,7 @@ public class Authgear {
                 return handler(.failure(wrapError(error: error)))
             }
         }
-        if case let .failure(error) = Result(catching: { try sharedStorage.delIDToken(namespace: name) }) {
-            if !force {
-                return handler(.failure(wrapError(error: error)))
-            }
-        }
-        if case let .failure(error) = Result(catching: { try sharedStorage.delDeviceSecret(namespace: name) }) {
+        if case let .failure(error) = Result(catching: { try sharedStorage.onLogout(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
             }
@@ -917,10 +924,10 @@ public class Authgear {
 
                 let header: JWTHeader
                 if let key = try self.jwkStore.loadKey(keyId: keyId, tag: tag) {
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: false)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: false)
                 } else {
                     let key = try self.jwkStore.generateKey(keyId: keyId, tag: tag)
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: true)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: true)
                 }
 
                 let payload = JWTPayload(challenge: token, action: AnonymousPayloadAction.auth.rawValue)
@@ -994,10 +1001,10 @@ public class Authgear {
 
                 let header: JWTHeader
                 if let key = try self.jwkStore.loadKey(keyId: keyId, tag: tag) {
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: false)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: false)
                 } else {
                     let key = try self.jwkStore.generateKey(keyId: keyId, tag: tag)
-                    header = JWTHeader(typ: .anonymous, jwk: key, new: true)
+                    header = JWTHeader(typ: .anonymous, jwk: key, includeJWK: true)
                 }
 
                 let payload = JWTPayload(challenge: token, action: AnonymousPayloadAction.promote.rawValue)
@@ -1665,7 +1672,7 @@ public class Authgear {
                         try addPrivateKey(privateKey: privateKey, tag: tag, constraint: constraint, laContext: context)
                         let publicKey = SecKeyCopyPublicKey(privateKey)!
                         let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-                        let header = JWTHeader(typ: .biometric, jwk: jwk, new: true)
+                        let header = JWTHeader(typ: .biometric, jwk: jwk, includeJWK: true)
                         let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.setup.rawValue)
                         let jwt = JWT(header: header, payload: payload)
                         let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
@@ -1721,7 +1728,7 @@ public class Authgear {
                     }
                     let publicKey = SecKeyCopyPublicKey(privateKey)!
                     let jwk = try publicKeyToJWK(kid: kid, publicKey: publicKey)
-                    let header = JWTHeader(typ: .biometric, jwk: jwk, new: false)
+                    let header = JWTHeader(typ: .biometric, jwk: jwk, includeJWK: false)
                     let payload = JWTPayload(challenge: challenge, action: BiometricPayloadAction.authenticate.rawValue)
                     let jwt = JWT(header: header, payload: payload)
                     let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))

@@ -38,6 +38,36 @@ struct JWK: Encodable {
         self.n = nil
         self.e = nil
     }
+
+    public var thumbprintParameters: [String: String] {
+        var p: [String: String] = [:]
+        p["kty"] = kty
+        // EC Keys Specific Parameters
+        if let crv = crv {
+            p["crv"] = crv
+        }
+        if let x = x {
+            p["x"] = x
+        }
+        if let y = y {
+            p["y"] = y
+        }
+        // RS Keys specific parameters
+        if let n = n {
+            p["n"] = n
+        }
+        if let e = e {
+            p["e"] = e
+        }
+        return p
+    }
+
+    public func thumbprint(algorithm: JWKThumbprintAlgorithm) throws -> String {
+        guard let json = try? JSONSerialization.data(withJSONObject: thumbprintParameters, options: .sortedKeys) else {
+            throw AuthgearError.runtimeError("unable to compute jwk thumbprint")
+        }
+        return try Thumbprint.calculate(from: json, algorithm: algorithm)
+    }
 }
 
 enum KeyType {

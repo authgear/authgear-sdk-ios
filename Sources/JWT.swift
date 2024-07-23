@@ -5,6 +5,7 @@ enum JWTHeaderType: String, Encodable {
     case anonymous = "vnd.authgear.anonymous-request"
     case biometric = "vnd.authgear.biometric-request"
     case app2app = "vnd.authgear.app2app-request"
+    case dpopjwt = "dpop+jwt"
 }
 
 struct JWTHeader: Encodable {
@@ -13,11 +14,11 @@ struct JWTHeader: Encodable {
     let alg: String
     let jwk: JWK?
 
-    init(typ: JWTHeaderType, jwk: JWK, new: Bool) {
+    init(typ: JWTHeaderType, jwk: JWK, includeJWK: Bool) {
         self.typ = typ
         kid = jwk.kid
         alg = jwk.alg
-        if new {
+        if includeJWK {
             self.jwk = jwk
         } else {
             self.jwk = nil
@@ -48,9 +49,12 @@ enum App2AppPayloadAction: String, Encodable {
 struct JWTPayload: Encodable {
     let iat: Int
     let exp: Int
-    let challenge: String
-    let action: String
-    let deviceInfo: DeviceInfoRoot
+    let jti: String?
+    let htm: String?
+    let htu: String?
+    let challenge: String?
+    let action: String?
+    let deviceInfo: DeviceInfoRoot?
 
     enum CodingKeys: String, CodingKey {
         case iat
@@ -58,6 +62,9 @@ struct JWTPayload: Encodable {
         case challenge
         case action
         case deviceInfo = "device_info"
+        case jti
+        case htm
+        case htu
     }
 
     init(challenge: String, action: String) {
@@ -67,6 +74,23 @@ struct JWTPayload: Encodable {
         self.challenge = challenge
         self.action = action
         self.deviceInfo = getDeviceInfo()
+
+        self.jti = nil
+        self.htm = nil
+        self.htu = nil
+    }
+
+    init(jti: String, htm: String, htu: String) {
+        let now = Int(Date().timeIntervalSince1970)
+        iat = now
+        exp = now + 60
+        self.challenge = nil
+        self.action = nil
+        self.deviceInfo = nil
+
+        self.jti = jti
+        self.htm = htm
+        self.htu = htu
     }
 
     func encode() throws -> String {
