@@ -818,10 +818,8 @@ public class Authgear {
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
     public func authenticate(
         redirectURI: String,
-        state: String? = nil,
         xState: String? = nil,
         prompt: [PromptOption]? = nil,
-        loginHint: String? = nil,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
@@ -833,10 +831,10 @@ public class Authgear {
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
             preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
-            state: state,
+            state: nil,
             xState: xState,
             prompt: prompt,
-            loginHint: loginHint,
+            loginHint: nil,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
