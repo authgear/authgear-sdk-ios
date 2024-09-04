@@ -813,6 +813,9 @@ public class Authgear {
         _ = handleWechatRedirectURI(url)
     }
 
+    
+    /// - Parameters:
+    ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
     public func authenticate(
         redirectURI: String,
         state: String? = nil,
