@@ -17,7 +17,7 @@
     <a title="Authgear Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear iOS SDK git-06aec6f836ee</a></p>
+        <p><a href="../index.html">Authgear iOS SDK git-db167f39664f</a></p>
         <div class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -522,9 +522,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC12authenticate11redirectURI5state6xState6prompt9loginHint9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup7handlerySS_SSSgAOSayAA12PromptOptionOGSgAOSaySSGSgAA05ColorM0OSgAoA18AuthenticationPageOSgAOys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/authenticate(redirectURI:state:xState:prompt:loginHint:uiLocales:colorScheme:wechatRedirectURI:page:authenticationFlowGroup:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC12authenticate11redirectURI5state6xState6prompt9loginHint9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup7handlerySS_SSSgAOSayAA12PromptOptionOGSgAOSaySSGSgAA05ColorM0OSgAoA18AuthenticationPageOSgAOys6ResultOyAA8UserInfoVs5Error_pGctF">authenticate(redirectURI:<wbr>state:<wbr>xState:<wbr>prompt:<wbr>loginHint:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>page:<wbr>authenticationFlowGroup:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC12authenticate11redirectURI6xState6prompt9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup7handlerySS_SSSgSayAA12PromptOptionOGSgSaySSGSgAA05ColorJ0OSgAmA18AuthenticationPageOSgAMys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/authenticate(redirectURI:xState:prompt:uiLocales:colorScheme:wechatRedirectURI:page:authenticationFlowGroup:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC12authenticate11redirectURI6xState6prompt9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup7handlerySS_SSSgSayAA12PromptOptionOGSgSaySSGSgAA05ColorJ0OSgAmA18AuthenticationPageOSgAMys6ResultOyAA8UserInfoVs5Error_pGctF">authenticate(redirectURI:<wbr>xState:<wbr>prompt:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>page:<wbr>authenticationFlowGroup:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -532,8 +532,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -541,10 +540,8 @@
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticate</span><span class="p">(</span>
     <span class="nv">redirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
-    <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">xState</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">prompt</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Enums/PromptOption.html">PromptOption</a></span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
-    <span class="nv">loginHint</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">uiLocales</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">colorScheme</span><span class="p">:</span> <span class="kt"><a href="../Enums/ColorScheme.html">ColorScheme</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">wechatRedirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
@@ -555,15 +552,34 @@
 
                         </div>
                       </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>xState</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </section>
                   </div>
                 </li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC14reauthenticate11redirectURI5state6xState9uiLocales11colorScheme014wechatRedirectD06maxAge15localizedReason6policy13customUIQuery23authenticationFlowGroup7handlerySS_SSSgAPSaySSGSgAA05ColorJ0OSgAPSiSgApA17BiometricLAPolicyOSgA2Pys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/reauthenticate(redirectURI:state:xState:uiLocales:colorScheme:wechatRedirectURI:maxAge:localizedReason:policy:customUIQuery:authenticationFlowGroup:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC14reauthenticate11redirectURI5state6xState9uiLocales11colorScheme014wechatRedirectD06maxAge15localizedReason6policy13customUIQuery23authenticationFlowGroup7handlerySS_SSSgAPSaySSGSgAA05ColorJ0OSgAPSiSgApA17BiometricLAPolicyOSgA2Pys6ResultOyAA8UserInfoVs5Error_pGctF">reauthenticate(redirectURI:<wbr>state:<wbr>xState:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>maxAge:<wbr>localizedReason:<wbr>policy:<wbr>customUIQuery:<wbr>authenticationFlowGroup:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC14reauthenticate11redirectURI6xState9uiLocales11colorScheme014wechatRedirectD06maxAge15localizedReason6policy13customUIQuery23authenticationFlowGroup7handlerySS_SSSgSaySSGSgAA05ColorI0OSgAOSiSgAoA17BiometricLAPolicyOSgA2Oys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/reauthenticate(redirectURI:xState:uiLocales:colorScheme:wechatRedirectURI:maxAge:localizedReason:policy:customUIQuery:authenticationFlowGroup:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC14reauthenticate11redirectURI6xState9uiLocales11colorScheme014wechatRedirectD06maxAge15localizedReason6policy13customUIQuery23authenticationFlowGroup7handlerySS_SSSgSaySSGSgAA05ColorI0OSgAOSiSgAoA17BiometricLAPolicyOSgA2Oys6ResultOyAA8UserInfoVs5Error_pGctF">reauthenticate(redirectURI:<wbr>xState:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>maxAge:<wbr>localizedReason:<wbr>policy:<wbr>customUIQuery:<wbr>authenticationFlowGroup:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -571,8 +587,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -580,7 +595,6 @@
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">reauthenticate</span><span class="p">(</span>
     <span class="nv">redirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
-    <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">xState</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">uiLocales</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">colorScheme</span><span class="p">:</span> <span class="kt"><a href="../Enums/ColorScheme.html">ColorScheme</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
@@ -594,6 +608,25 @@
 <span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>xState</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -630,9 +663,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC20promoteAnonymousUser11redirectURI5state6xState9uiLocales11colorScheme014wechatRedirectF07handlerySS_SSSgAKSaySSGSgAA05ColorL0OSgAKys6ResultOyAA0D4InfoVs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/promoteAnonymousUser(redirectURI:state:xState:uiLocales:colorScheme:wechatRedirectURI:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC20promoteAnonymousUser11redirectURI5state6xState9uiLocales11colorScheme014wechatRedirectF07handlerySS_SSSgAKSaySSGSgAA05ColorL0OSgAKys6ResultOyAA0D4InfoVs5Error_pGctF">promoteAnonymousUser(redirectURI:<wbr>state:<wbr>xState:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC20promoteAnonymousUser11redirectURI6xState9uiLocales11colorScheme014wechatRedirectF07handlerySS_SSSgSaySSGSgAA05ColorK0OSgAJys6ResultOyAA0D4InfoVs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/promoteAnonymousUser(redirectURI:xState:uiLocales:colorScheme:wechatRedirectURI:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC20promoteAnonymousUser11redirectURI6xState9uiLocales11colorScheme014wechatRedirectF07handlerySS_SSSgSaySSGSgAA05ColorK0OSgAJys6ResultOyAA0D4InfoVs5Error_pGctF">promoteAnonymousUser(redirectURI:<wbr>xState:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -640,8 +673,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -649,7 +681,6 @@
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">promoteAnonymousUser</span><span class="p">(</span>
     <span class="nv">redirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
-    <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">xState</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">uiLocales</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">colorScheme</span><span class="p">:</span> <span class="kt"><a href="../Enums/ColorScheme.html">ColorScheme</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
@@ -658,6 +689,25 @@
 <span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>xState</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -1317,7 +1367,7 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2024 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2024-07-23)</p>
+          <p>&copy; 2024 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2024-09-05)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
