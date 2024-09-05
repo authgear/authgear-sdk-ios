@@ -813,7 +813,6 @@ public class Authgear {
         _ = handleWechatRedirectURI(url)
     }
 
-    
     /// - Parameters:
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
     public func authenticate(
@@ -853,9 +852,10 @@ public class Authgear {
         }
     }
 
+    /// - Parameters:
+    ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
     public func reauthenticate(
         redirectURI: String,
-        state: String? = nil,
         xState: String? = nil,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
@@ -899,7 +899,7 @@ public class Authgear {
         let options = ReauthenticateOptions(
             redirectURI: redirectURI,
             isSSOEnabled: self.isSSOEnabled,
-            state: state,
+            state: nil,
             xState: xState,
             uiLocales: uiLocales,
             colorScheme: colorScheme,
@@ -981,9 +981,10 @@ public class Authgear {
         }
     }
 
+    /// - Parameters:
+    ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
     public func promoteAnonymousUser(
         redirectURI: String,
-        state: String? = nil,
         xState: String? = nil,
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
@@ -1023,7 +1024,7 @@ public class Authgear {
                         redirectURI: redirectURI,
                         isSSOEnabled: self.isSSOEnabled,
                         preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
-                        state: state,
+                        state: nil,
                         xState: xState,
                         prompt: [.login],
                         loginHint: loginHint,
