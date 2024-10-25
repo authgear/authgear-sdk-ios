@@ -6,7 +6,7 @@ target 'ios_example' do
   use_frameworks!
 
   # Pods for ios_example
-  pod 'WechatOpenSDK', '~> 2.0.4'
+  pod 'WechatOpenSDK-XCFramework', '~> 2.0.4'
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|
