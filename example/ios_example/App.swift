@@ -44,6 +44,7 @@ class App: ObservableObject {
     @Published var endpoint: String = ""
     @Published var preAuthenticatedURLClientID: String = ""
     @Published var preAuthenticatedURLRedirectURI: String = ""
+    @Published var oauthProviderAlias: String? = nil
 
     private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
@@ -68,7 +69,8 @@ class App: ObservableObject {
         preAuthenticatedURLEnabled: Bool,
         preAuthenticatedURLClientID: String,
         preAuthenticatedURLRedirectURI: String,
-        useWKWebView: Bool
+        useWKWebView: Bool,
+        oauthProviderAlias: String?
     ) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
@@ -105,6 +107,7 @@ class App: ObservableObject {
         self.preAuthenticatedURLEnabled = preAuthenticatedURLEnabled
         self.preAuthenticatedURLClientID = preAuthenticatedURLClientID
         self.preAuthenticatedURLRedirectURI = preAuthenticatedURLRedirectURI
+        self.oauthProviderAlias = oauthProviderAlias
         self.updateBiometricState()
     }
 
@@ -160,6 +163,7 @@ class App: ObservableObject {
             wechatRedirectURI: App.wechatRedirectURI,
             page: self.authenticationPage,
             authenticationFlowGroup: self.authenticationFlowGroup,
+            oauthProviderAlias: self.oauthProviderAlias,
             handler: self.handleAuthorizeResult
         )
     }

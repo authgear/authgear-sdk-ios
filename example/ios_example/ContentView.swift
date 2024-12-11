@@ -85,6 +85,7 @@ struct AuthgearConfigurationForm: View {
     @State private var authenticationPage: String = ""
     @State private var explicitColorSchemeString: String = ""
     @State private var authenticationFlowGroup: String = ""
+    @State private var oauthProviderAlias: String = ""
 
     private let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
 
@@ -121,6 +122,13 @@ struct AuthgearConfigurationForm: View {
                         )
                     )
                 }
+                AuthgearConfigurationInput(
+                    label: "Pre-select OAuth Provider",
+                    input: AuthgearConfigurationTextField(
+                        placeHolder: "Enter OAuth Provider Alias",
+                        text: $oauthProviderAlias
+                    )
+                )
                 AuthgearConfigurationInput(
                     label: "Authentication flow group",
                     input: AuthgearConfigurationTextField(
@@ -186,7 +194,8 @@ struct AuthgearConfigurationForm: View {
                     preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
                     preAuthenticatedURLClientID: self.preAuthenticatedURLClientID,
                     preAuthenticatedURLRedirectURI: self.preAuthenticatedURLRedirectURI,
-                    useWKWebView: self.useWKWebView
+                    useWKWebView: self.useWKWebView,
+                    oauthProviderAlias: self.oauthProviderAlias == "" ? nil : self.oauthProviderAlias
                 )
             }) {
                 ActionButton(text: "Configure")

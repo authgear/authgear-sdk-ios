@@ -40,6 +40,7 @@ struct AuthenticateOptions {
     let wechatRedirectURI: String?
     let page: AuthenticationPage?
     let authenticationFlowGroup: String?
+    let oauthProviderAlias: String?
 
     var request: OIDCAuthenticationRequest {
         let scopes = getAuthenticationScopes(
@@ -62,7 +63,8 @@ struct AuthenticateOptions {
             settingsAction: nil,
             authenticationFlowGroup: self.authenticationFlowGroup,
             responseMode: nil,
-            xPreAuthenticatedURLToken: nil
+            xPreAuthenticatedURLToken: nil,
+            oauthProviderAlias: self.oauthProviderAlias
         )
     }
 }
@@ -83,6 +85,7 @@ struct ReauthenticateOptions {
     let wechatRedirectURI: String?
     let maxAge: Int?
     let authenticationFlowGroup: String?
+    let oauthProviderAlias: String?
 
     func toRequest(idTokenHint: String) -> OIDCAuthenticationRequest {
         OIDCAuthenticationRequest(
@@ -106,7 +109,8 @@ struct ReauthenticateOptions {
             settingsAction: nil,
             authenticationFlowGroup: self.authenticationFlowGroup,
             responseMode: nil,
-            xPreAuthenticatedURLToken: nil
+            xPreAuthenticatedURLToken: nil,
+            oauthProviderAlias: self.oauthProviderAlias
         )
     }
 }
@@ -824,6 +828,7 @@ public class Authgear {
         wechatRedirectURI: String? = nil,
         page: AuthenticationPage? = nil,
         authenticationFlowGroup: String? = nil,
+        oauthProviderAlias: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         self.authenticate(AuthenticateOptions(
@@ -838,7 +843,8 @@ public class Authgear {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             page: page,
-            authenticationFlowGroup: authenticationFlowGroup
+            authenticationFlowGroup: authenticationFlowGroup,
+            oauthProviderAlias: oauthProviderAlias
         ), handler: handler)
     }
 
@@ -865,6 +871,7 @@ public class Authgear {
         policy: BiometricLAPolicy? = nil,
         customUIQuery: String? = nil,
         authenticationFlowGroup: String? = nil,
+        oauthProviderAlias: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = self.withMainQueueHandler(handler)
@@ -905,7 +912,8 @@ public class Authgear {
             colorScheme: colorScheme,
             wechatRedirectURI: wechatRedirectURI,
             maxAge: maxAge,
-            authenticationFlowGroup: authenticationFlowGroup
+            authenticationFlowGroup: authenticationFlowGroup,
+            oauthProviderAlias: oauthProviderAlias
         )
 
         self.workerQueue.async {
@@ -989,6 +997,7 @@ public class Authgear {
         uiLocales: [String]? = nil,
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
+        oauthProviderAlias: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
@@ -1032,7 +1041,8 @@ public class Authgear {
                         colorScheme: colorScheme,
                         wechatRedirectURI: wechatRedirectURI,
                         page: nil,
-                        authenticationFlowGroup: nil
+                        authenticationFlowGroup: nil,
+                        oauthProviderAlias: oauthProviderAlias
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
