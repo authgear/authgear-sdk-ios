@@ -62,6 +62,7 @@ struct OIDCAuthenticationRequest {
     let responseMode: String?
     let xPreAuthenticatedURLToken: String?
     var dpopJKT: String?
+    var oauthProviderAlias: String?
 
     func toQueryItems(clientID: String, verifier: CodeVerifier?) -> [URLQueryItem] {
         var queryItems = [
@@ -164,6 +165,10 @@ struct OIDCAuthenticationRequest {
 
         if let dpopJKT = self.dpopJKT {
             queryItems.append(URLQueryItem(name: "dpop_jkt", value: dpopJKT))
+        }
+
+        if let oauthProviderAlias = self.oauthProviderAlias {
+            queryItems.append(URLQueryItem(name: "x_oauth_provider_alias", value: oauthProviderAlias))
         }
 
         return queryItems
