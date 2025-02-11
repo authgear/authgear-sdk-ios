@@ -943,6 +943,31 @@ public class Authgear {
         }
     }
 
+    public func authenticateWithMigratedSession(
+        migratedSession: MigratedSession,
+        handler: @escaping UserInfoCompletionHandler
+    ) {
+        workerQueue.async (execute: {
+            do {
+                let oidcTokenResponse = OIDCTokenResponse(
+                    idToken: nil,
+                    tokenType: migratedSession.tokenType,
+                    accessToken: migratedSession.accessToken,
+                    expiresIn: migratedSession.expiresIn,
+                    refreshToken: migratedSession.refreshToken,
+                    code: nil)
+
+                let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
+
+                self.persistSession(oidcTokenResponse, reason: .authenticated) { result in
+                    handler(result.map { userInfo })
+                }
+            } catch {
+                handler(.failure(wrapError(error: error)))
+            }
+        })
+    }
+
     /// - Parameters:
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
     public func promoteAnonymousUser(
