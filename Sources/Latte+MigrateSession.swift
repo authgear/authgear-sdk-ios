@@ -15,9 +15,19 @@ public extension Latte {
     ) {
         var request = URLRequest(url: URL(string: migrationEndpoint)!)
         request.httpMethod = "POST"
+
+        let deviceInfo = getDeviceInfo()
+        let deviceInfoJSON = try! JSONEncoder().encode(deviceInfo)
+        let xDeviceInfo = deviceInfoJSON.base64urlEncodedString()
+
         let jsonEncoder = JSONEncoder()
-        let body = try! jsonEncoder.encode(["client_id": authgear.clientId, "access_token": accessToken])
+        let body = try! jsonEncoder.encode([
+            "client_id": authgear.clientId,
+            "access_token": accessToken,
+            "device_info": xDeviceInfo
+        ])
         request.httpBody = body
+
         authgearFetch(urlSession: urlSession, request: request) { result in
             switch result {
             case let .failure(error):
