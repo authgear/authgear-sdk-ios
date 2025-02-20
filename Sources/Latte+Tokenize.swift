@@ -5,6 +5,7 @@ extension Latte {
         data: Data,
         handler: @escaping (Result<String, Error>) -> Void
     ) {
+        var tokenizeEndpoint = self.middlewareEndpoint + "/token"
         var request = URLRequest(url: URL(string: tokenizeEndpoint)!)
         request.httpMethod = "POST"
         request.httpBody = data
