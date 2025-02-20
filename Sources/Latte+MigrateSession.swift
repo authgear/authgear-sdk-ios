@@ -10,9 +10,9 @@ public struct MigratedSession: Decodable {
 public extension Latte {
     func migrateSession(
         accessToken: String,
-        migrationEndpoint: String,
         handler: @escaping (Result<UserInfo, Error>) -> Void
     ) {
+        var migrationEndpoint = self.middlewareEndpoint + "/session_migration"
         var request = URLRequest(url: URL(string: migrationEndpoint)!)
         request.httpMethod = "POST"
 
