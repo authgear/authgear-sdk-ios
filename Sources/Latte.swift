@@ -32,7 +32,7 @@ public extension LatteDelegate {
 public class Latte: LatteWebViewDelegate {
     let authgear: Authgear
     let customUIEndpoint: String
-    let tokenizeEndpoint: String
+    let middlewareEndpoint: String
     let urlSession: URLSession
     let webviewIsInspectable: Bool
     let webViewLoadTimeoutMillis: Int
@@ -43,13 +43,13 @@ public class Latte: LatteWebViewDelegate {
     public init(
         authgear: Authgear,
         customUIEndpoint: String,
-        tokenizeEndpoint: String,
+        middlewareEndpoint: String,
         webviewIsInspectable: Bool = false,
         webViewLoadTimeoutMillis: Int = 15_000
     ) {
         self.authgear = authgear
         self.customUIEndpoint = customUIEndpoint
-        self.tokenizeEndpoint = tokenizeEndpoint
+        self.middlewareEndpoint = middlewareEndpoint
         self.webviewIsInspectable = webviewIsInspectable
         self.webViewLoadTimeoutMillis = webViewLoadTimeoutMillis
         self.urlSession = URLSession(configuration: .default)

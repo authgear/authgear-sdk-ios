@@ -943,7 +943,7 @@ public class Authgear {
         }
     }
 
-    public func authenticateWithMigratedSession(
+    internal func authenticateWithMigratedSession(
         migratedSession: MigratedSession,
         handler: @escaping UserInfoCompletionHandler
     ) {
