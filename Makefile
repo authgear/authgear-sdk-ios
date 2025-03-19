@@ -1,16 +1,8 @@
-# The installed SDKs are listed here.
-# Note that this also depends on the runner image.
-# macos-13 is now being used.
-# https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md
-DEVICE_SDK=iphoneos17.2
-SIMULATOR_SDK=iphonesimulator17.2
-TEST_DESTINATION="platform=iOS Simulator,name=iPhone 15,OS=17.2"
+# xcodebuild test requires a concrete device.
+# -destination="generic/platform=iOS Simulator" does not work.
+TEST_DESTINATION="platform=iOS Simulator,name=iPhone 16,OS=18.2"
 
 GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
-
-.PHONY: vendor
-vendor:
-	bundle install
 
 .PHONY: format
 format:
@@ -20,25 +12,52 @@ format:
 clean:
 	rm -rf ./build
 
+# It turns out SKIP_INSTALL=NO and BUILD_LIBRARY_FOR_DISTRIBUTION=YES are essential
+# so that the archive contains a .framework output.
+#
+# We no longer use -sdk, we use -destination, as recommended by
+# See https://developer.apple.com/documentation/xcode/creating-a-multi-platform-binary-framework-bundle
 .PHONY: framework
-framework:
-	xcodebuild archive -sdk $(DEVICE_SDK) -workspace Authgear.xcworkspace -scheme Authgear-iOS -configuration Release -archivePath ./build/Release/$(DEVICE_SDK)/Authgear
-	xcodebuild archive -sdk $(SIMULATOR_SDK) -workspace Authgear.xcworkspace -scheme Authgear-iOS -configuration Release -archivePath ./build/Release/$(SIMULATOR_SDK)/Authgear
+framework: clean
+	xcodebuild archive \
+		-destination "generic/platform=iOS" \
+		-workspace Authgear.xcworkspace \
+		-scheme Authgear-iOS \
+		-configuration Release \
+		-archivePath ./build/Release/iOS/Authgear \
+		SKIP_INSTALL=NO \
+		BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
+	xcodebuild archive \
+		-destination "generic/platform=iOS Simulator" \
+		-workspace Authgear.xcworkspace \
+		-scheme Authgear-iOS \
+		-configuration Release \
+		-archivePath ./build/Release/iOS_Simulator/Authgear \
+		SKIP_INSTALL=NO \
+		BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+
+# See https://developer.apple.com/documentation/xcode/creating-a-multi-platform-binary-framework-bundle
 .PHONY: xcframework
-xcframework:
+xcframework: framework
 	xcodebuild -create-xcframework \
-		-framework ./build/Release/$(DEVICE_SDK)/Authgear.xcarchive/Products/Library/Frameworks/Authgear.framework \
-		-framework ./build/Release/$(SIMULATOR_SDK)/Authgear.xcarchive/Products/Library/Frameworks/Authgear.framework \
+		-archive ./build/Release/iOS/Authgear.xcarchive -framework Authgear.framework \
+		-archive ./build/Release/iOS_Simulator/Authgear.xcarchive -framework Authgear.framework \
 		-output ./build/Release/Authgear.xcframework
 
 .PHONY: build
-build: framework
-	xcodebuild build -sdk $(SIMULATOR_SDK) -workspace Authgear.xcworkspace -scheme 'iOS-Example'
+build:
+	xcodebuild build \
+		-destination "generic/platform=iOS" \
+		-workspace Authgear.xcworkspace \
+		-scheme 'iOS-Example'
 
 .PHONY: test
 test:
-	xcodebuild -workspace Authgear.xcworkspace -scheme Authgear-iOS -destination ${TEST_DESTINATION} test
+	xcodebuild test \
+		-destination $(TEST_DESTINATION) \
+		-workspace Authgear.xcworkspace \
+		-scheme Authgear-iOS
 
 .PHONY: docs
 docs:
