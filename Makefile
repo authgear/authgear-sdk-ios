@@ -54,13 +54,6 @@ xcframework: framework
 		-archive ./build/Release/iOS_Simulator/Authgear.xcarchive -framework Authgear.framework \
 		-output ./build/Release/Authgear.xcframework
 
-.PHONY: build
-build:
-	xcodebuild build \
-		-destination "generic/platform=iOS" \
-		-workspace Authgear.xcworkspace \
-		-scheme 'iOS-Example'
-
 .PHONY: test
 test:
 	xcodebuild test \

@@ -27,7 +27,6 @@ jobs:
       - run: xcodebuild -showsdks
       - run: bundle exec pod install --project-directory=example
       - run: make xcframework
-      - run: make build
       - run: make test
       - run: make docs
       - name: Deploy docs to gh-pages
