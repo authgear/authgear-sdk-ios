@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -30,6 +30,23 @@
             # GitHub Actions runner macos-14 uses ruby 3.3.x
             # See https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md
             pkgs.ruby_3_3
+
+            (
+              let
+                version = "0.55.5";
+              in
+              pkgs.swiftformat.overrideAttrs {
+                # GitHub Actions runner macos-14 includes this version of swiftformat.
+                # See https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md#tools
+                inherit version;
+                src = pkgs.fetchFromGitHub {
+                  owner = "nicklockwood";
+                  repo = "SwiftFormat";
+                  rev = version;
+                  hash = "sha256-AZAQSwmGNHN6ykh9ufeQLC1dEXvTt32X24MPTDh6bI8=";
+                };
+              }
+            )
           ];
           # Even we use mkShellNoCC, DEVELOPER_DIR, SDKROOT, MACOSX_DEPLOYMENT_TARGET is still set.
           # We undo that.

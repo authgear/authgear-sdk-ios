@@ -14,11 +14,7 @@ vendor:
 
 .PHONY: format
 format:
-	swiftformat .
-
-.PHONY: lint
-lint:
-	swiftformat -lint .
+	swiftformat --strict .
 
 .PHONY: clean
 clean:
