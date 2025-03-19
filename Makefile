@@ -77,13 +77,16 @@ exportArchive:
 		-exportOptionsPlist ./example/ExportOptions.plist \
 		-exportPath $(EXPORT_PATH)
 
-.PHONY: upload-app
-upload-app:
+.PHONY:	validate-app
+validate-app:
 	xcrun altool --validate-app \
 		--file $(IPA_PATH) \
 		--type ios \
 		--apiKey $(API_KEY) \
 		--apiIssuer $(API_ISSUER)
+
+.PHONY: upload-app
+upload-app:
 	xcrun altool --upload-app \
 		--file $(IPA_PATH) \
 		--type ios \

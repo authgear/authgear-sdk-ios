@@ -36,7 +36,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
   ios:
-    if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.repository == 'authgear/authgear-sdk-ios' }}
     runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
@@ -85,7 +85,16 @@ jobs:
         export ARCHIVE_PATH="$RUNNER_TEMP/ios_example.xcarchive"
         export EXPORT_PATH="$RUNNER_TEMP/ios_example.export"
         make exportArchive
+    - name: Validate .ipa
+      env:
+        API_ISSUER: ${{ secrets.IOS_API_KEY_ISSUER }}
+        API_KEY: ${{ secrets.IOS_API_KEY_ID }}
+      run: |
+        export API_PRIVATE_KEYS_DIR="$RUNNER_TEMP"
+        export IPA_PATH="$RUNNER_TEMP/ios_example.export/ios_example.ipa"
+        make validate-app
     - name: Upload to TestFlight
+      if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.ref == 'refs/heads/main' }}
       env:
         API_ISSUER: ${{ secrets.IOS_API_KEY_ISSUER }}
         API_KEY: ${{ secrets.IOS_API_KEY_ID }}
