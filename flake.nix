@@ -26,7 +26,6 @@
         # We need to use the clang from Xcode.
         devShells.default = pkgs.mkShellNoCC {
           packages = [
-            pkgs.nodejs_20
             # GitHub Actions runner macos-14 uses ruby 3.3.x
             # See https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md
             pkgs.ruby_3_3
