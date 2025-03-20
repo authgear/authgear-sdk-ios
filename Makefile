@@ -30,7 +30,7 @@ pod-install:
 
 .PHONY: build-app
 build-app:
-	bundle exec fastlane example_build_app
+	bundle exec fastlane example_build_app CURRENT_PROJECT_VERSION:$(shell date +%s)
 
 .PHONY: fastlane-api-key-json
 fastlane-api-key-json:
@@ -47,7 +47,3 @@ upload-app:
 .PHONY: docs
 docs:
 	bundle exec jazzy --module Authgear --title "Authgear iOS SDK $(GIT_HASH)" --hide-documentation-coverage
-
-.PHONY: set-CFBundleVersion
-set-CFBundleVersion:
-	/usr/libexec/PlistBuddy -c "Set CFBundleVersion $(shell date +%s)" ./example/ios_example/Info.plist

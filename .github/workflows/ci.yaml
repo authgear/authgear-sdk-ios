@@ -73,7 +73,6 @@ jobs:
       run: |
         API_KEY_PATH=$RUNNER_TEMP/AuthKey_${IOS_API_KEY_ID}.p8
         echo -n "$IOS_API_KEY_BASE64" | base64 --decode -o $API_KEY_PATH
-    - run: make set-CFBundleVersion
     - run: make build-app
     - name: Create fastlane api key json
       env:

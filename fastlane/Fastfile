@@ -44,7 +44,7 @@ platform :ios do
     )
   end
 
-  lane :example_build_app do
+  lane :example_build_app do |options|
     build_app(
       destination: "generic/platform=iOS",
       workspace: "./example/ios_example.xcworkspace",
@@ -54,6 +54,7 @@ platform :ios do
       clean: true,
       output_directory: "./build/Release/iOS/ios_example",
       output_name: "ios_example.ipa",
+      xcargs: "CURRENT_PROJECT_VERSION=#{options[:CURRENT_PROJECT_VERSION]}",
     )
   end
 
