@@ -4,6 +4,7 @@ API_ISSUER ?= "invalid"
 # The filename of the API key must conform to a specific format.
 # With `altool --apiKey ABC`, altool looks for the key file AuthKey_ABC.p8 in API_PRIVATE_KEYS_DIR
 API_KEY ?= "invalid"
+API_KEY_PATH ?= ./AuthKey_invalid.p8
 
 GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
 
@@ -31,21 +32,17 @@ pod-install:
 build-app:
 	bundle exec fastlane example_build_app
 
-.PHONY:	validate-app
-validate-app:
-	xcrun altool --validate-app \
-		--file $(IPA_PATH) \
-		--type ios \
-		--apiKey $(API_KEY) \
-		--apiIssuer $(API_ISSUER)
+.PHONY: fastlane-api-key-json
+fastlane-api-key-json:
+	jq --slurp --raw-input > ./build/fastlane-api-key.json \
+		--arg key_id $(API_KEY) \
+		--arg issuer_id $(API_ISSUER) \
+		'{key_id: $$key_id, issuer_id: $$issuer_id, key: .}' \
+		$(API_KEY_PATH)
 
 .PHONY: upload-app
 upload-app:
-	xcrun altool --upload-app \
-		--file $(IPA_PATH) \
-		--type ios \
-		--apiKey $(API_KEY) \
-		--apiIssuer $(API_ISSUER)
+	bundle exec fastlane example_upload_app
 
 .PHONY: docs
 docs:

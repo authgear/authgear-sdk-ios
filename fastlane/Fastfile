@@ -56,4 +56,12 @@ platform :ios do
       output_name: "ios_example.ipa",
     )
   end
+
+  lane :example_upload_app do
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      api_key_path: "./build/fastlane-api-key.json",
+      ipa: "./build/Release/iOS/ios_example/ios_example.ipa"
+    )
+  end
 end
