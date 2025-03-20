@@ -1,0 +1,35 @@
+default_platform(:ios)
+
+platform :ios do
+  lane :sdk_xcframework do
+    # It turns out SKIP_INSTALL=NO and BUILD_LIBRARY_FOR_DISTRIBUTION=YES are essential
+    # so that the archive contains a .framework output.
+
+    # .framework for the device
+    xcarchive(
+      destination: "generic/platform=iOS",
+      workspace: "./Authgear.xcworkspace",
+      scheme: "Authgear-iOS",
+      configuration: "Release",
+      xcargs: "SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES",
+      archive_path: "./build/Release/iOS/Authgear.xcarchive"
+    )
+    # .framework for the simulator
+    xcarchive(
+      destination: "generic/platform=iOS Simulator",
+      workspace: "./Authgear.xcworkspace",
+      scheme: "Authgear-iOS",
+      configuration: "Release",
+      xcargs: "SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES",
+      archive_path: "./build/Release/iOS_Simulator/Authgear.xcarchive"
+    )
+    # .xcframework
+    create_xcframework(
+      frameworks: [
+        "./build/Release/iOS/Authgear.xcarchive/Products/Library/Frameworks/Authgear.framework",
+        "./build/Release/iOS_Simulator/Authgear.xcarchive/Products/Library/Frameworks/Authgear.framework"
+      ],
+      output: "./build/Release/Authgear.xcframework"
+    )
+  end
+end

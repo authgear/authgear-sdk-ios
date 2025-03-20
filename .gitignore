@@ -47,3 +47,7 @@ docs
 # We use .bundle/config to set BUNDLE_PATH to /vendor/bundle
 # So we ignore the downloaded gems stored there.
 /vendor/bundle
+
+# Fastlane
+/fastlane/README.md
+/fastlane/report.xml
