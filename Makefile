@@ -61,6 +61,10 @@ test:
 		-workspace Authgear.xcworkspace \
 		-scheme Authgear-iOS
 
+.PHONY: pod-install
+pod-install:
+	cd ./example; bundle exec pod install
+
 .PHONY: archive
 archive:
 	xcodebuild archive \
