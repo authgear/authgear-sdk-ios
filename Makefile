@@ -1,6 +1,3 @@
-# xcodebuild test requires a concrete device.
-# -destination="generic/platform=iOS Simulator" does not work.
-TEST_DESTINATION="platform=iOS Simulator,name=iPhone 16,OS=18.2"
 ARCHIVE_PATH ?= ./build/Release/iOS/ios_example.xcarchive
 EXPORT_PATH ?= ./build/Release/iOS/ios_example.export
 IPA_PATH ?= ./build/Release/iOS/ios_example.export/ios_example.ipa
@@ -27,10 +24,7 @@ xcframework: clean
 
 .PHONY: test
 test:
-	xcodebuild test \
-		-destination $(TEST_DESTINATION) \
-		-workspace Authgear.xcworkspace \
-		-scheme Authgear-iOS
+	bundle exec fastlane sdk_test
 
 .PHONY: pod-install
 pod-install:

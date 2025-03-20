@@ -32,4 +32,15 @@ platform :ios do
       output: "./build/Release/Authgear.xcframework"
     )
   end
+
+  lane :sdk_test do
+    xcodebuild(
+      test: true,
+      # xcodebuild test requires a concrete device.
+      # -destination="generic/platform=iOS Simulator" does not work.
+      destination: "platform=iOS Simulator,name=iPhone 16,OS=18.2",
+      workspace: "./Authgear.xcworkspace",
+      scheme: "Authgear-iOS"
+    )
+  end
 end
