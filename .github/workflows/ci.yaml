@@ -12,46 +12,39 @@ on:
 
 jobs:
   gh-pages:
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
-      # Install the latest version of swiftformat.
-      # Latest compatiable version with our codebase is 0.48.0
-      - run: brew update
-      - run: brew upgrade swiftformat || brew install swiftformat
-      - run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
-      - run: make lint
-      - run: bundle exec pod install --project-directory=example
-      - run: xcodebuild -showsdks
-      - run: make build
+      # swiftformat is pre-installed on the runner.
+      # Output its version.
+      - run: swiftformat --version
+      - run: make format
+      - run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+      - run: make pod-install
+      - run: make xcframework
       - run: make test
       - run: make docs
       - name: Deploy docs to gh-pages
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
   ios:
-    if: github.ref == 'refs/heads/main'
-    runs-on: macos-13
+    if: ${{ github.repository == 'authgear/authgear-sdk-ios' }}
+    runs-on: macos-14
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
         # runs 'bundle install' and caches installed gems automatically
         bundler-cache: true
-    - uses: actions/setup-node@v3
-      with:
-        node-version: "18.x"
-    - run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
-    - run: npm install -g appcenter-cli
-    - working-directory: ./example
-      run: bundle exec pod install
+    - run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+    - run: make pod-install
     - name: Install the Apple certificate and provisioning profile
       env:
         IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
@@ -73,21 +66,24 @@ jobs:
 
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-    - name: Set CFBundleVersion
-      working-directory: ./example
-      run: |
-        BUILD_NUMBER=$(date +%s)
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" ./ios_example/Info.plist
-    - name: Run xcodebuild archive
-      working-directory: ./example
-      run: xcodebuild -workspace ios_example.xcworkspace -scheme iOS-Example -configuration Release -archivePath "$RUNNER_TEMP/ios_example.xcarchive" archive
-    - name: Run xcodebuild -exportArchive
-      working-directory: ./example
-      run: xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/ios_example.xcarchive" -exportPath "$RUNNER_TEMP/ios_example.export" -exportOptionsPlist "./ExportOptions.plist"
-    - name: Distribute to App Center
+    - name: Install App Store Connect API key
       env:
-        APPCENTER_ACCESS_TOKEN: ${{ secrets.IOS_APPCENTER_ACCESS_TOKEN }}
-      run: appcenter distribute release --debug --silent --file "$RUNNER_TEMP/ios_example.export/ios_example.ipa" --store "App Store Connect Users" --app "Oursky/Authgear-demo-iOS" --release-notes "no release notes"
+        IOS_API_KEY_BASE64: ${{ secrets.IOS_API_KEY_BASE64 }}
+        IOS_API_KEY_ID: ${{ secrets.IOS_API_KEY_ID }}
+      run: |
+        API_KEY_PATH=$RUNNER_TEMP/AuthKey_${IOS_API_KEY_ID}.p8
+        echo -n "$IOS_API_KEY_BASE64" | base64 --decode -o $API_KEY_PATH
+    - run: make build-app
+    - name: Create fastlane api key json
+      env:
+        API_ISSUER: ${{ secrets.IOS_API_KEY_ISSUER }}
+        API_KEY: ${{ secrets.IOS_API_KEY_ID }}
+      run: |
+        export API_KEY_PATH=$RUNNER_TEMP/AuthKey_${API_KEY}.p8
+        make fastlane-api-key-json
+    - name: Upload to TestFlight
+      if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.ref == 'refs/heads/main' }}
+      run: make upload-app
     - name: Clean up keychain and provisioning profile
       if: ${{ always() }}
       run: |

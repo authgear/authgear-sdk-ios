@@ -1,48 +1,48 @@
-# The installed SDKs are listed here.
-# Note that this also depends on the runner image.
-# macos-13 is now being used.
-# https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md
-DEVICE_SDK=iphoneos17.2
-SIMULATOR_SDK=iphonesimulator17.2
-TEST_DESTINATION="platform=iOS Simulator,name=iPhone 15,OS=17.2"
+# API key issuer is the Issuer you see on App Store Connect.
+# It looks like a UUID.
+API_ISSUER ?= "invalid"
+# The filename of the API key must conform to a specific format.
+# With `altool --apiKey ABC`, altool looks for the key file AuthKey_ABC.p8 in API_PRIVATE_KEYS_DIR
+API_KEY ?= "invalid"
+API_KEY_PATH ?= ./AuthKey_invalid.p8
 
 GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
 
-.PHONY: vendor
-vendor:
-	bundle install
-
 .PHONY: format
 format:
-	swiftformat .
-
-.PHONY: lint
-lint:
-	swiftformat -lint .
+	swiftformat --strict .
 
 .PHONY: clean
 clean:
 	rm -rf ./build
 
-.PHONY: framework
-framework:
-	xcodebuild archive -sdk $(DEVICE_SDK) -workspace Authgear.xcworkspace -scheme Authgear-iOS -configuration Release -archivePath ./build/Release/$(DEVICE_SDK)/Authgear
-	xcodebuild archive -sdk $(SIMULATOR_SDK) -workspace Authgear.xcworkspace -scheme Authgear-iOS -configuration Release -archivePath ./build/Release/$(SIMULATOR_SDK)/Authgear
-
 .PHONY: xcframework
-xcframework:
-	xcodebuild -create-xcframework \
-		-framework ./build/Release/$(DEVICE_SDK)/Authgear.xcarchive/Products/Library/Frameworks/Authgear.framework \
-		-framework ./build/Release/$(SIMULATOR_SDK)/Authgear.xcarchive/Products/Library/Frameworks/Authgear.framework \
-		-output ./build/Release/Authgear.xcframework
-
-.PHONY: build
-build: framework
-	xcodebuild build -sdk $(SIMULATOR_SDK) -workspace Authgear.xcworkspace -scheme 'iOS-Example'
+xcframework: clean
+	bundle exec fastlane sdk_xcframework
 
 .PHONY: test
 test:
-	xcodebuild -workspace Authgear.xcworkspace -scheme Authgear-iOS -destination ${TEST_DESTINATION} test
+	bundle exec fastlane sdk_test
+
+.PHONY: pod-install
+pod-install:
+	cd ./example; bundle exec pod install
+
+.PHONY: build-app
+build-app:
+	bundle exec fastlane example_build_app CURRENT_PROJECT_VERSION:$(shell date +%s)
+
+.PHONY: fastlane-api-key-json
+fastlane-api-key-json:
+	jq --slurp --raw-input > ./build/fastlane-api-key.json \
+		--arg key_id $(API_KEY) \
+		--arg issuer_id $(API_ISSUER) \
+		'{key_id: $$key_id, issuer_id: $$issuer_id, key: .}' \
+		$(API_KEY_PATH)
+
+.PHONY: upload-app
+upload-app:
+	bundle exec fastlane example_upload_app
 
 .PHONY: docs
 docs:
