@@ -74,15 +74,7 @@ jobs:
         API_KEY_PATH=$RUNNER_TEMP/AuthKey_${IOS_API_KEY_ID}.p8
         echo -n "$IOS_API_KEY_BASE64" | base64 --decode -o $API_KEY_PATH
     - run: make set-CFBundleVersion
-    - name: Run xcodebuild archive
-      run: |
-        export ARCHIVE_PATH="$RUNNER_TEMP/ios_example.xcarchive"
-        make archive
-    - name: Run xcodebuild -exportArchive
-      run: |
-        export ARCHIVE_PATH="$RUNNER_TEMP/ios_example.xcarchive"
-        export EXPORT_PATH="$RUNNER_TEMP/ios_example.export"
-        make exportArchive
+    - run: make build-app
     - name: Validate .ipa
       env:
         API_ISSUER: ${{ secrets.IOS_API_KEY_ISSUER }}

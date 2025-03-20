@@ -43,4 +43,17 @@ platform :ios do
       scheme: "Authgear-iOS"
     )
   end
+
+  lane :example_build_app do
+    build_app(
+      destination: "generic/platform=iOS",
+      workspace: "./example/ios_example.xcworkspace",
+      scheme: "iOS-Example",
+      configuration: "Release",
+      export_options: "./example/ExportOptions.plist",
+      clean: true,
+      output_directory: "./build/Release/iOS/ios_example",
+      output_name: "ios_example.ipa",
+    )
+  end
 end

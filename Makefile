@@ -1,6 +1,3 @@
-ARCHIVE_PATH ?= ./build/Release/iOS/ios_example.xcarchive
-EXPORT_PATH ?= ./build/Release/iOS/ios_example.export
-IPA_PATH ?= ./build/Release/iOS/ios_example.export/ios_example.ipa
 # API key issuer is the Issuer you see on App Store Connect.
 # It looks like a UUID.
 API_ISSUER ?= "invalid"
@@ -30,21 +27,9 @@ test:
 pod-install:
 	cd ./example; bundle exec pod install
 
-.PHONY: archive
-archive:
-	xcodebuild archive \
-		-destination "generic/platform=iOS" \
-		-workspace ./example/ios_example.xcworkspace \
-		-scheme iOS-Example \
-		-configuration Release \
-		-archivePath $(ARCHIVE_PATH)
-
-.PHONY: exportArchive
-exportArchive:
-	xcodebuild -exportArchive \
-		-archivePath $(ARCHIVE_PATH) \
-		-exportOptionsPlist ./example/ExportOptions.plist \
-		-exportPath $(EXPORT_PATH)
+.PHONY: build-app
+build-app:
+	bundle exec fastlane example_build_app
 
 .PHONY:	validate-app
 validate-app:
