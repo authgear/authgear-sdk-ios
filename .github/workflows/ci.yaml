@@ -49,21 +49,13 @@ jobs:
       with:
         certificate_base64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
         provisioning_profile_base64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
-    - name: Install App Store Connect API key
-      env:
-        IOS_API_KEY_BASE64: ${{ secrets.IOS_API_KEY_BASE64 }}
-        IOS_API_KEY_ID: ${{ secrets.IOS_API_KEY_ID }}
-      run: |
-        API_KEY_PATH=$RUNNER_TEMP/AuthKey_${IOS_API_KEY_ID}.p8
-        echo -n "$IOS_API_KEY_BASE64" | base64 --decode -o $API_KEY_PATH
+    - uses: authgear/gh-actions-create-fastlane-api-key-json-file@v1
+      with:
+        api_key_id: ${{ secrets.IOS_API_KEY_ID }}
+        api_key_issuer: ${{ secrets.IOS_API_KEY_ISSUER }}
+        api_key_base64: ${{ secrets.IOS_API_KEY_BASE64 }}
+        output_path: ./build/fastlane-api-key.json
     - run: make build-app
-    - name: Create fastlane api key json
-      env:
-        API_ISSUER: ${{ secrets.IOS_API_KEY_ISSUER }}
-        API_KEY: ${{ secrets.IOS_API_KEY_ID }}
-      run: |
-        export API_KEY_PATH=$RUNNER_TEMP/AuthKey_${API_KEY}.p8
-        make fastlane-api-key-json
     - name: Upload to TestFlight
       if: ${{ github.ref == 'refs/heads/main' }}
       run: make upload-app
