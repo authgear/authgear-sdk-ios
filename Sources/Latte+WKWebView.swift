@@ -94,6 +94,12 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
         """)
     }
 
+    func openURLExternally(_ url: URL) -> Bool {
+        guard UIApplication.shared.canOpenURL(url) else { return false }
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        return true
+    }
+
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         if navigation == self.initialNavigation {
             self.completion?(self, .failure(error))
@@ -109,17 +115,27 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-        if let navigationURL = navigationAction.request.url {
-            var parts = URLComponents(url: navigationURL, resolvingAgainstBaseURL: false)!
-            parts.query = nil
-            parts.fragment = nil
-            if parts.string == self.request.redirectURI {
-                let result = Result<LatteWebViewResult, Error>.success(
-                    LatteWebViewResult(finishURL: navigationURL)
-                )
+        guard let navigationURL = navigationAction.request.url else {
+            return .allow
+        }
 
-                self.completion?(self, result)
-                self.completion = nil
+        // Check if URL is redirect URI
+        var parts = URLComponents(url: navigationURL, resolvingAgainstBaseURL: false)!
+        parts.query = nil
+        parts.fragment = nil
+        if parts.string == self.request.redirectURI {
+            let result = Result<LatteWebViewResult, Error>.success(
+                LatteWebViewResult(finishURL: navigationURL)
+            )
+
+            self.completion?(self, result)
+            self.completion = nil
+            return .cancel
+        }
+
+        // Handle target="_blank" links
+        if navigationAction.targetFrame == nil {
+            if openURLExternally(navigationURL) {
                 return .cancel
             }
         }
