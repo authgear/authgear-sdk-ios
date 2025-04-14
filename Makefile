@@ -1,5 +1,9 @@
 GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
 
+.PHONY: ruby-audit
+ruby-audit:
+	bundle exec bundler-audit check --update
+
 .PHONY: format
 format:
 	swiftformat --strict .

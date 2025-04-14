@@ -19,6 +19,7 @@ jobs:
         with:
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
+      - run: make ruby-audit
       # swiftformat is pre-installed on the runner.
       # Output its version.
       - run: swiftformat --version
@@ -43,6 +44,7 @@ jobs:
       with:
         # runs 'bundle install' and caches installed gems automatically
         bundler-cache: true
+    - run: make ruby-audit
     - run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
     - run: make pod-install
     - uses: authgear/gh-actions-install-apple-certificate-and-provisioning-profile@v1
