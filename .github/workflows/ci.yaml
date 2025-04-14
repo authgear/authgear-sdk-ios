@@ -36,7 +36,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
   ios:
-    if: ${{ github.repository == 'authgear/authgear-sdk-ios' }}
+    if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.event_name == 'push' }}
     runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
