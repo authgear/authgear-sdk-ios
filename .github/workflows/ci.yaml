@@ -19,6 +19,7 @@ jobs:
         with:
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
+      - run: make ruby-audit
       # swiftformat is pre-installed on the runner.
       # Output its version.
       - run: swiftformat --version
@@ -35,7 +36,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
   ios:
-    if: ${{ github.repository == 'authgear/authgear-sdk-ios' }}
+    if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.event_name == 'push' }}
     runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
@@ -43,6 +44,7 @@ jobs:
       with:
         # runs 'bundle install' and caches installed gems automatically
         bundler-cache: true
+    - run: make ruby-audit
     - run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
     - run: make pod-install
     - uses: authgear/gh-actions-install-apple-certificate-and-provisioning-profile@v1
