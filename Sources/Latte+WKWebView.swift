@@ -94,12 +94,6 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
         """)
     }
 
-    func openURLExternally(_ url: URL) -> Bool {
-        guard UIApplication.shared.canOpenURL(url) else { return false }
-        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        return true
-    }
-
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         if navigation == self.initialNavigation {
             self.completion?(self, .failure(error))
@@ -135,9 +129,8 @@ class LatteWKWebView: WKWebView, WKNavigationDelegate {
 
         // Handle target="_blank" links
         if navigationAction.targetFrame == nil {
-            if openURLExternally(navigationURL) {
-                return .cancel
-            }
+            self.delegate?.latteWebView(onEvent: self, event: .openExternalURL(url: navigationURL))
+            return .cancel
         }
 
         if #available(iOS 14.5, *) {
