@@ -6,6 +6,7 @@ public protocol LatteDelegate: AnyObject {
     func latte(_: Latte, onTrackingEvent: LatteTrackingEvent)
     func latte(_: Latte, onOpenEmailClient source: UIViewController)
     func latte(_: Latte, onOpenSMSClient source: UIViewController)
+    func latte(_: Latte, onOpenExternalURL url: URL)
 }
 
 // Default implemetations
@@ -66,6 +67,8 @@ public class Latte: LatteWebViewDelegate {
         case .openSMSClient:
             guard let vc = webView.viewController else { return }
             self.delegate?.latte(_: self, onOpenSMSClient: vc)
+        case let .openExternalURL(url: u):
+            self.delegate?.latte(_: self, onOpenExternalURL: u)
         }
     }
 }
@@ -133,6 +136,7 @@ enum LatteWebViewEvent {
     case openEmailClient
     case openSMSClient
     case trackingEvent(event: LatteTrackingEvent)
+    case openExternalURL(url: URL)
 }
 
 enum LatteInternalEvent: String {
