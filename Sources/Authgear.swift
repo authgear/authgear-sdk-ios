@@ -756,13 +756,11 @@ public class Authgear {
         continue userActivity: NSUserActivity,
         restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
     ) -> Bool {
-        return false
+        false
     }
 
     @available(iOS 13.0, *)
-    public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        return
-    }
+    public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {}
 
     /// - Parameters:
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used

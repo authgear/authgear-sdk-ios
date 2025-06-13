@@ -9,7 +9,7 @@ public class WKWebViewUIImplementation: NSObject, UIImplementation, AGWKWebViewC
     public var authgearDelegate: AuthgearDelegate?
     public var isInspectable: Bool
 
-    public override init() {
+    override public init() {
         self.isInspectable = false
         super.init()
     }
