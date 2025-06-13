@@ -29,7 +29,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let uiImplementation: UIImplementation
         if useWKWebView {
-            uiImplementation = WKWebViewUIImplementation(isInspectable: true)
+            let wkWebViewUIImpl = WKWebViewUIImplementation()
+            wkWebViewUIImpl.wechatRedirectURI = URL(string: App.wechatRedirectURI)!
+            wkWebViewUIImpl.authgearDelegate = self
+            wkWebViewUIImpl.isInspectable = true
+            uiImplementation = wkWebViewUIImpl
         } else {
             uiImplementation = ASWebAuthenticationSessionUIImplementation()
         }
@@ -47,17 +51,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.appContainer.postConfig()
         }
         appContainer.container?.delegate = self
+    }
 
-        // configure WeChat SDK
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         WXApi.registerApp(App.wechatAppID, universalLink: App.wechatUniversalLink)
         WXApi.startLog(by: .detail) { log in
             print(#line, "wechat sdk wxapi: " + log)
         }
-    }
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        true
+        return true
     }
 
     // MARK: UISceneSession Lifecycle
@@ -90,7 +91,6 @@ extension AppDelegate: AuthgearDelegate {
     func sendWechatAuthRequest(_ state: String) {
         print(#line, "sendWechatAuthRequest: \(state)")
         let req = SendAuthReq()
-        req.openID = App.wechatAppID
         req.scope = "snsapi_userinfo"
         req.state = state
         WXApi.send(req)

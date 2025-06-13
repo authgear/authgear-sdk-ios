@@ -345,8 +345,6 @@ public class Authgear {
 
     private let dpopProvider: DPoPProvider
 
-    private var currentWechatRedirectURI: String?
-
     public private(set) var sessionState: SessionState = .unknown
 
     public weak var delegate: AuthgearDelegate?
@@ -442,9 +440,7 @@ public class Authgear {
             let url = try self.buildAuthorizationURL(request: request, clientID: self.clientId, verifier: verifier)
 
             DispatchQueue.main.async {
-                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.uiImplementation.openAuthorizationURL(url: url, redirectURI: URL(string: request.redirectURI)!, shareCookiesWithDeviceBrowser: self.shareCookiesWithDeviceBrowser) { result in
-                    self.unregisterCurrentWechatRedirectURI()
                     switch result {
                     case let .success(url):
                         self.workerQueue.async {
@@ -482,9 +478,7 @@ public class Authgear {
         DispatchQueue.main.async {
             switch request {
             case let .success(request):
-                self.registerCurrentWechatRedirectURI(uri: options.wechatRedirectURI)
                 self.uiImplementation.openAuthorizationURL(url: request.url, redirectURI: URL(string: request.redirectURI)!, shareCookiesWithDeviceBrowser: self.shareCookiesWithDeviceBrowser) { result in
-                    self.unregisterCurrentWechatRedirectURI()
                     switch result {
                     case let .success(url):
                         self.workerQueue.async {
@@ -757,65 +751,16 @@ public class Authgear {
         }
     }
 
-    private func registerCurrentWechatRedirectURI(uri: String?) {
-        currentWechatRedirectURI = uri
-    }
-
-    private func unregisterCurrentWechatRedirectURI() {
-        currentWechatRedirectURI = nil
-    }
-
-    private func handleWechatRedirectURI(_ url: URL) -> Bool {
-        if currentWechatRedirectURI == nil {
-            return false
-        }
-
-        guard var uc = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return false
-        }
-
-        // get state
-        let params = uc.queryParams
-        let state = params["state"]
-        if (state ?? "").isEmpty {
-            return false
-        }
-
-        // construct and compare url without query
-        uc.query = nil
-        uc.fragment = nil
-        guard let urlWithoutQuery = uc.string else {
-            return false
-        }
-
-        if urlWithoutQuery == currentWechatRedirectURI {
-            delegate?.sendWechatAuthRequest(state!)
-            return true
-        }
-
-        return false
-    }
-
     public func application(
         _ application: UIApplication,
         continue userActivity: NSUserActivity,
         restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
     ) -> Bool {
-        if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-           let url = userActivity.webpageURL {
-            _ = handleWechatRedirectURI(url)
-        }
-        return true
+        false
     }
 
     @available(iOS 13.0, *)
-    public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-              let url = userActivity.webpageURL else {
-            return
-        }
-        _ = handleWechatRedirectURI(url)
-    }
+    public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {}
 
     /// - Parameters:
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
@@ -1209,15 +1154,6 @@ public class Authgear {
                 handler?(.failure(err))
 
             case let .success(endpoint):
-                // For opening setting page, sdk will not know when user end
-                // the setting page.
-                // So we cannot unregister the wechat uri in this case
-                // It is fine to not unresgister it, as everytime we open a
-                // new authorize section (authorize or setting page)
-                // registerCurrentWeChatRedirectURI will be called and overwrite
-                // previous registered wechatRedirectURI
-                self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
-
                 self.uiImplementation.openAuthorizationURL(
                     url: endpoint,
                     redirectURI: URL(string: Authgear.SDKRedirectURI)!,
@@ -1226,7 +1162,6 @@ public class Authgear {
                     // the app session token cookie is forgotten when the webview is closed.
                     shareCookiesWithDeviceBrowser: false
                 ) { result in
-                    self.unregisterCurrentWechatRedirectURI()
                     switch result {
                     case .success:
                         handler?(.success(()))
@@ -1283,15 +1218,6 @@ public class Authgear {
                     case let .failure(err):
                         handler?(.failure(err))
                     case let .success(url):
-                        // For opening setting page, sdk will not know when user end
-                        // the setting page.
-                        // So we cannot unregister the wechat uri in this case
-                        // It is fine to not unresgister it, as everytime we open a
-                        // new authorize section (authorize or setting page)
-                        // registerCurrentWeChatRedirectURI will be called and overwrite
-                        // previous registered wechatRedirectURI
-                        self.registerCurrentWechatRedirectURI(uri: wechatRedirectURI)
-
                         self.uiImplementation.openAuthorizationURL(
                             url: url,
                             redirectURI: URL(string: redirectURI)!,
@@ -1300,7 +1226,6 @@ public class Authgear {
                             // the app session token cookie is forgotten when the webview is closed.
                             shareCookiesWithDeviceBrowser: false
                         ) { result in
-                            self.unregisterCurrentWechatRedirectURI()
                             switch result {
                             case let .success(url):
                                 this.finishSettingsAction(url: url, redirectURI: redirectURI, verifier: verifier) { result in

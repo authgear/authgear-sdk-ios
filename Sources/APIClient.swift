@@ -536,7 +536,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
         fetchOIDCConfiguration { [weak self] result in
             switch result {
             case let .success(config):
-
                 var queryParams = [String: String]()
                 queryParams["client_id"] = clientId
                 queryParams["grant_type"] = grantType.rawValue
@@ -699,7 +698,6 @@ class DefaultAuthAPIClient: AuthAPIClient {
         fetchOIDCConfiguration { [weak self] result in
             switch result {
             case let .success(config):
-
                 var urlComponents = URLComponents()
                 urlComponents.queryParams = ["token": refreshToken]
 

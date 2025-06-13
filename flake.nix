@@ -32,17 +32,17 @@
 
             (
               let
-                version = "0.55.5";
-              in
-              pkgs.swiftformat.overrideAttrs {
                 # GitHub Actions runner macos-14 includes this version of swiftformat.
                 # See https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md#tools
+                version = "0.56.3";
+              in
+              pkgs.swiftformat.overrideAttrs {
                 inherit version;
                 src = pkgs.fetchFromGitHub {
                   owner = "nicklockwood";
                   repo = "SwiftFormat";
                   rev = version;
-                  hash = "sha256-AZAQSwmGNHN6ykh9ufeQLC1dEXvTt32X24MPTDh6bI8=";
+                  hash = "sha256-ZPz/AAAs8L0Zn4jWbbCz2y0dVE8Ap1U16rVpxwQYUPI=";
                 };
               }
             )
