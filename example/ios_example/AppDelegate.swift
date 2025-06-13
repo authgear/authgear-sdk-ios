@@ -91,7 +91,6 @@ extension AppDelegate: AuthgearDelegate {
     func sendWechatAuthRequest(_ state: String) {
         print(#line, "sendWechatAuthRequest: \(state)")
         let req = SendAuthReq()
-        req.openID = App.wechatAppID
         req.scope = "snsapi_userinfo"
         req.state = state
         WXApi.send(req)
