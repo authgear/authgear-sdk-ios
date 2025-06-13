@@ -10,27 +10,36 @@ protocol AGWKWebViewControllerPresentationContextProviding: AnyObject {
 }
 
 class AGWKWebViewController: UIViewController, WKNavigationDelegate {
+    typealias WechatRedirectURICallback = (URL) -> Void
     typealias CompletionHandler = (URL?, Error?) -> Void
+
     weak var presentationContextProvider: AGWKWebViewControllerPresentationContextProviding?
     var navigationBarBackgroundColor: UIColor?
     var navigationBarButtonTintColor: UIColor?
 
-    private let url: URL
-    private let redirectURI: URL
-    private var completionHandler: CompletionHandler?
+    let url: URL
+    let isInspectable: Bool
+
+    var redirectURI: URL
+    var wechatRedirectURI: URL?
+    var wechatRedirectURICallback: WechatRedirectURICallback?
+    var completionHandler: CompletionHandler?
+
     private let webView: WKWebView
     private var result: URL?
-    private let isInspectable: Bool
 
     private let disableUserSelectSource: String = """
         document.documentElement.style.webkitUserSelect = 'none';
         document.documentElement.style.userSelect = 'none';
     """
 
-    init(url: URL, redirectURI: URL, isInspectable: Bool, completionHandler: @escaping CompletionHandler) {
+    init(
+        url: URL,
+        redirectURI: URL,
+        isInspectable: Bool
+    ) {
         self.url = url
         self.redirectURI = redirectURI
-        self.completionHandler = completionHandler
         self.isInspectable = isInspectable
 
         let configuration = WKWebViewConfiguration()
@@ -181,16 +190,26 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
                     return
                 }
             }
-            // Handle redirect uri
+
             var parts = URLComponents(url: navigationURL, resolvingAgainstBaseURL: false)
             parts?.query = nil
             parts?.fragment = nil
             if let partsString = parts?.string {
+                // Handle redirect uri
                 if partsString == self.redirectURI.absoluteString {
                     decisionHandler(.cancel)
                     self.result = navigationURL
                     self.dismissSelf()
                     return
+                }
+
+                // Handle wechatRedirectURI
+                if let wechatRedirectURI = self.wechatRedirectURI {
+                    if partsString == wechatRedirectURI.absoluteString {
+                        decisionHandler(.cancel)
+                        self.wechatRedirectURICallback?(navigationURL)
+                        return
+                    }
                 }
             }
         }

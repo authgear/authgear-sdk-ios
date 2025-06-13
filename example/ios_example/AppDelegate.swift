@@ -29,7 +29,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let uiImplementation: UIImplementation
         if useWKWebView {
-            uiImplementation = WKWebViewUIImplementation(isInspectable: true)
+            let wkWebViewUIImpl = WKWebViewUIImplementation()
+            wkWebViewUIImpl.wechatRedirectURI = URL(string: App.wechatRedirectURI)!
+            wkWebViewUIImpl.authgearDelegate = self
+            wkWebViewUIImpl.isInspectable = true
+            uiImplementation = wkWebViewUIImpl
         } else {
             uiImplementation = ASWebAuthenticationSessionUIImplementation()
         }
