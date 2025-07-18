@@ -354,6 +354,7 @@ public class Authgear {
         endpoint: String,
         tokenStorage: TokenStorage = PersistentTokenStorage(),
         uiImplementation: UIImplementation = ASWebAuthenticationSessionUIImplementation(),
+        urlSession: URLSession = URLSession(configuration: .default),
         isSSOEnabled: Bool = false,
         preAuthenticatedURLEnabled: Bool = false,
         name: String? = nil,
@@ -375,6 +376,7 @@ public class Authgear {
             sharedStorage: self.sharedStorage
         )
         self.apiClient = DefaultAuthAPIClient(
+            urlSession: urlSession,
             endpoint: URL(string: endpoint)!,
             dpopProvider: self.dpopProvider
         )
