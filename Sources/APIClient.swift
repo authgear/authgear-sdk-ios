@@ -439,12 +439,13 @@ class DefaultAuthAPIClient: AuthAPIClient {
     public let endpoint: URL
     private let dpopProvider: DPoPProvider
 
-    init(endpoint: URL, dpopProvider: DPoPProvider) {
+    init(urlSession: URLSession, endpoint: URL, dpopProvider: DPoPProvider) {
+        self.urlSession = urlSession
         self.endpoint = endpoint
         self.dpopProvider = dpopProvider
     }
 
-    private let defaultSession = URLSession(configuration: .default)
+    private let urlSession: URLSession
     private var oidcConfiguration: OIDCConfiguration?
 
     private func buildFetchOIDCConfigurationRequest() -> URLRequest {
@@ -481,7 +482,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
             handler(.failure(wrapError(error: error)))
             return
         }
-        authgearFetch(urlSession: defaultSession, request: r) { result in
+        authgearFetch(urlSession: self.urlSession, request: r) { result in
             handler(result.flatMap { (data, _) -> Result<T, Error> in
                 do {
                     let decorder = JSONDecoder()
@@ -662,7 +663,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 )
                 urlRequest.httpBody = body
 
-                authgearFetch(urlSession: self!.defaultSession, request: urlRequest, handler: { result in
+                authgearFetch(urlSession: self!.urlSession, request: urlRequest, handler: { result in
                     handler(result.map { _ in () })
                 })
             case let .failure(error):
@@ -711,7 +712,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                 )
                 urlRequest.httpBody = body
 
-                authgearFetch(urlSession: self!.defaultSession, request: urlRequest, handler: { result in
+                authgearFetch(urlSession: self!.urlSession, request: urlRequest, handler: { result in
                     handler(result.map { _ in () })
                 })
             case let .failure(error):
@@ -783,7 +784,7 @@ class DefaultAuthAPIClient: AuthAPIClient {
                     forHTTPHeaderField: "content-type"
                 )
                 urlRequest.httpBody = urlComponents.query?.data(using: .utf8)
-                authgearFetch(urlSession: self.defaultSession, request: urlRequest, handler: { result in
+                authgearFetch(urlSession: self.urlSession, request: urlRequest, handler: { result in
                     handler(result.map { _ in () })
                 })
             }
