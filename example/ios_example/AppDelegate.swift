@@ -38,11 +38,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             uiImplementation = ASWebAuthenticationSessionUIImplementation()
         }
 
+        let urlSessionConfiguration = URLSessionConfiguration.default
+        urlSessionConfiguration.httpAdditionalHeaders = ["X-Custom-Header": "42"]
+        let myURLSession = URLSession(configuration: urlSessionConfiguration)
+
         appContainer.container = Authgear(
             clientId: clientId,
             endpoint: endpoint,
             tokenStorage: tokenStorageInstance,
             uiImplementation: uiImplementation,
+            urlSession: myURLSession,
             isSSOEnabled: isSSOEnabled,
             preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
             app2AppOptions: app2AppOptions
