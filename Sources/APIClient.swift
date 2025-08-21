@@ -436,7 +436,7 @@ func authgearFetch(
 }
 
 class DefaultAuthAPIClient: AuthAPIClient {
-    public let endpoint: URL
+    let endpoint: URL
     private let dpopProvider: DPoPProvider
 
     init(urlSession: URLSession, endpoint: URL, dpopProvider: DPoPProvider) {
