@@ -50,6 +50,7 @@ jobs:
     - uses: authgear/gh-actions-install-apple-certificate-and-provisioning-profile@v1
       with:
         certificate_base64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+        certificate_password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
         provisioning_profile_base64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
     - uses: authgear/gh-actions-create-fastlane-api-key-json-file@v1
       with:
