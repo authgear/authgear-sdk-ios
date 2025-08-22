@@ -493,7 +493,7 @@ struct App2AppConfirmation {
 
 class AppError: Error, LocalizedError {
     private let message: String
-    public var errorDescription: String? {
+    var errorDescription: String? {
         message
     }
 

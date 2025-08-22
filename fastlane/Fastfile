@@ -34,11 +34,10 @@ platform :ios do
   end
 
   lane :sdk_test do
-    xcodebuild(
-      test: true,
-      # xcodebuild test requires a concrete device.
-      # -destination="generic/platform=iOS Simulator" does not work.
-      destination: "platform=iOS Simulator,name=iPhone 16,OS=18.2",
+    # Use scan to run tests.
+    # It knows how to run available simulators and use the first of them.
+    # See https://docs.fastlane.tools/actions/scan/
+    scan(
       workspace: "./Authgear.xcworkspace",
       scheme: "Authgear-iOS"
     )

@@ -12,7 +12,7 @@ on:
 
 jobs:
   gh-pages:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -24,7 +24,7 @@ jobs:
       # Output its version.
       - run: swiftformat --version
       - run: make format
-      - run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+      - run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
       - run: make pod-install
       - run: make xcframework
       - run: make test
@@ -37,7 +37,7 @@ jobs:
           publish_dir: ./docs
   ios:
     if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.event_name == 'push' }}
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
@@ -45,11 +45,12 @@ jobs:
         # runs 'bundle install' and caches installed gems automatically
         bundler-cache: true
     - run: make ruby-audit
-    - run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+    - run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
     - run: make pod-install
     - uses: authgear/gh-actions-install-apple-certificate-and-provisioning-profile@v1
       with:
         certificate_base64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+        certificate_password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
         provisioning_profile_base64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
     - uses: authgear/gh-actions-create-fastlane-api-key-json-file@v1
       with:
