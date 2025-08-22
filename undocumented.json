@@ -577,181 +577,181 @@
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
       "line": 352,
-      "symbol": "Authgear.init(clientId:endpoint:tokenStorage:uiImplementation:isSSOEnabled:preAuthenticatedURLEnabled:name:app2AppOptions:)",
+      "symbol": "Authgear.init(clientId:endpoint:tokenStorage:uiImplementation:urlSession:isSSOEnabled:preAuthenticatedURLEnabled:name:app2AppOptions:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 393,
+      "line": 395,
       "symbol": "Authgear.configure(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 754,
+      "line": 756,
       "symbol": "Authgear.application(_:continue:restorationHandler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 763,
+      "line": 765,
       "symbol": "Authgear.scene(_:continue:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 869,
+      "line": 871,
       "symbol": "Authgear.authenticateAnonymously(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1011,
+      "line": 1013,
       "symbol": "Authgear.logout(force:redirectURI:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1136,
+      "line": 1138,
       "symbol": "Authgear.openURL(path:uiLocales:colorScheme:wechatRedirectURI:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1180,
+      "line": 1182,
       "symbol": "Authgear.open(page:uiLocales:colorScheme:wechatRedirectURI:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1318,
+      "line": 1320,
       "symbol": "Authgear.changePassword(uiLocales:colorScheme:wechatRedirectURI:redirectURI:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1335,
+      "line": 1337,
       "symbol": "Authgear.deleteAccount(uiLocales:colorScheme:wechatRedirectURI:redirectURI:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1432,
+      "line": 1434,
       "symbol": "Authgear.refreshAccessTokenIfNeeded(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1451,
+      "line": 1453,
       "symbol": "Authgear.clearSessionState(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1457,
+      "line": 1459,
       "symbol": "Authgear.fetchUserInfo(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1474,
+      "line": 1476,
       "symbol": "Authgear.refreshIDToken(handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1537,
+      "line": 1539,
       "symbol": "Authgear.wechatAuthCallback(code:state:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1553,
+      "line": 1555,
       "symbol": "Authgear.checkBiometricSupported()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1564,
+      "line": 1566,
       "symbol": "Authgear.isBiometricEnabled()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1573,
+      "line": 1575,
       "symbol": "Authgear.disableBiometric()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1582,
+      "line": 1584,
       "symbol": "Authgear.enableBiometric(localizedReason:constraint:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1633,
+      "line": 1635,
       "symbol": "Authgear.authenticateBiometric(localizedReason:policy:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1714,
+      "line": 1716,
       "symbol": "Authgear.startApp2AppAuthentication(options:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1753,
+      "line": 1755,
       "symbol": "Authgear.parseApp2AppAuthenticationRequest(userActivity:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1769,
+      "line": 1771,
       "symbol": "Authgear.approveApp2AppAuthenticationRequest(request:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1784,
+      "line": 1786,
       "symbol": "Authgear.rejectApp2AppAuthenticationRequest(request:reason:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1800,
+      "line": 1802,
       "symbol": "Authgear.handleApp2AppAuthenticationResult(userActivity:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authgear.swift",
-      "line": 1812,
+      "line": 1814,
       "symbol": "Authgear.makePreAuthenticatedURL(webApplicationClientID:webApplicationURI:state:handler:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
