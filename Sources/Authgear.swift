@@ -1552,8 +1552,8 @@ public class Authgear {
     }
 
     @available(iOS 11.3, *)
-    public func checkBiometricSupported() throws {
-        let policy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
+    public func checkBiometricSupported(policy: BiometricLAPolicy) throws {
+        let policy = policy.laPolicy
         let context = LAContext(policy: policy)
         var error: NSError?
         _ = context.canEvaluatePolicy(policy, error: &error)
@@ -1583,12 +1583,13 @@ public class Authgear {
     @available(iOS 11.3, *)
     public func enableBiometric(
         localizedReason: String,
+        policy: BiometricLAPolicy,
         constraint: BiometricAccessConstraint,
         handler: @escaping VoidCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
 
-        let laPolicy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
+        let laPolicy = policy.laPolicy
         let context = LAContext(policy: laPolicy)
         // First we perform a biometric authentication first.
         // But this actually is just a test to ensure biometric authentication works.
