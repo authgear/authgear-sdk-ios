@@ -10,6 +10,13 @@ class App: ObservableObject {
     static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
     static let wechatAppID = "wxa2f631873c63add1"
 
+    static let biometricLAPolicy = BiometricLAPolicy.deviceOwnerAuthenticationWithBiometrics
+    // static let biometricLAPolicy = BiometricLAPolicy.deviceOwnerAuthentication
+
+    static let biometricAccessConstraint = BiometricAccessConstraint.biometryCurrentSet
+    // static let biometricAccessConstraint = BiometricAccessConstraint.biometryAny
+    // static let biometricAccessConstraint = BiometricAccessConstraint.userPresence
+
     var systemColorScheme: SwiftUI.ColorScheme? {
         let s = UIApplication.shared.keyWindow?.rootViewController?.traitCollection.userInterfaceStyle
         switch s {
@@ -114,7 +121,7 @@ class App: ObservableObject {
     private func updateBiometricState() {
         var supported = false
         do {
-            try self.container?.checkBiometricSupported()
+            try self.container?.checkBiometricSupported(policy: App.biometricLAPolicy)
             supported = true
         } catch {}
         self.biometricEnabled = false
@@ -187,7 +194,7 @@ class App: ObservableObject {
                     redirectURI: App.redirectURI,
                     colorScheme: self.colorScheme,
                     localizedReason: "Authenticate with biometric",
-                    policy: .deviceOwnerAuthenticationWithBiometrics
+                    policy: App.biometricLAPolicy
                 ) { result in
                     self.updateBiometricState()
                     switch result {
@@ -228,7 +235,8 @@ class App: ObservableObject {
     func enableBiometric() {
         container?.enableBiometric(
             localizedReason: "Enable biometric!",
-            constraint: .biometryCurrentSet
+            policy: App.biometricLAPolicy,
+            constraint: App.biometricAccessConstraint
         ) { result in
             if case let .failure(error) = result {
                 self.setError(error)
@@ -249,7 +257,7 @@ class App: ObservableObject {
     func loginBiometric() {
         container?.authenticateBiometric(
             localizedReason: "Authenticate with biometric",
-            policy: .deviceOwnerAuthenticationWithBiometrics,
+            policy: App.biometricLAPolicy,
             handler: self.handleAuthorizeResult
         )
     }
