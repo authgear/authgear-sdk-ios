@@ -9,7 +9,7 @@ class App2App {
     private let apiClient: AuthAPIClient
     private let storage: ContainerStorage
     private let dispatchQueue: DispatchQueue
-    internal weak var authgear: Authgear?
+    weak var authgear: Authgear?
 
     private var resultHandlerRegistry: Dictionary<String, WeakHandlerRef> = Dictionary()
     private let resultHandlerLock = NSLock()
@@ -168,9 +168,9 @@ class App2App {
                 request: request
             ) { approveResult in
                 switch approveResult {
-                case .success(let resultURL):
+                case let .success(resultURL):
                     self.openURLInUniversalLink(url: resultURL, handler: handler)
-                case .failure(let error):
+                case let .failure(error):
                     let resultURL = self.constructErrorURL(
                         request: request,
                         defaultError: "unknown_error",
@@ -300,7 +300,7 @@ class App2App {
             switch result {
             case .success:
                 handler(.success(url))
-            case .failure(let err):
+            case let .failure(err):
                 handler(.failure(err))
             }
         }

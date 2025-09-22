@@ -678,7 +678,7 @@ public class Authgear {
         }
     }
 
-    internal func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
+    func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
         if let refreshToken = oidcTokenResponse.refreshToken {
             let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
             guard case .success = result else {
@@ -1091,7 +1091,7 @@ public class Authgear {
                     responseMode: nil,
                     xPreAuthenticatedURLToken: nil
                 ), clientID: self.clientId, verifier: verifier)
-                
+
                 if let refreshToken = appSessionTokenResponse.refreshToken {
                     let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
                     switch result {
@@ -1102,7 +1102,7 @@ public class Authgear {
                             }
                             handler?(.success(endpoint))
                         }
-                    case .failure(let error):
+                    case let .failure(error):
                         handler?(.failure(wrapError(error: error)))
                     }
                 } else {
