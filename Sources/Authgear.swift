@@ -390,6 +390,7 @@ public class Authgear {
             storage: self.storage,
             dispatchQueue: self.workerQueue
         )
+        self.app2app.authgear = self
     }
 
     public func configure(
@@ -677,7 +678,7 @@ public class Authgear {
         }
     }
 
-    private func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
+    internal func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
         if let refreshToken = oidcTokenResponse.refreshToken {
             let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
             guard case .success = result else {
@@ -1055,14 +1056,16 @@ public class Authgear {
                     return
                 }
 
-                var token = ""
+                let appSessionTokenResponse: AppSessionTokenResponse
                 do {
-                    token = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken).appSessionToken
+                    appSessionTokenResponse = try self.apiClient.syncRequestAppSessionToken(refreshToken: refreshToken)
                 } catch {
                     self._handleInvalidGrantException(error: error)
                     handler?(.failure(wrapError(error: error)))
                     return
                 }
+
+                let token = appSessionTokenResponse.appSessionToken
 
                 let loginHint = "https://authgear.com/login_hint?type=app_session_token&app_session_token=\(token.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)"
 
@@ -1088,8 +1091,23 @@ public class Authgear {
                     responseMode: nil,
                     xPreAuthenticatedURLToken: nil
                 ), clientID: self.clientId, verifier: verifier)
-
-                handler?(.success(endpoint))
+                
+                if let refreshToken = appSessionTokenResponse.refreshToken {
+                    let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
+                    switch result {
+                    case .success:
+                        DispatchQueue.main.async {
+                            if let refreshToken = appSessionTokenResponse.refreshToken {
+                                self.refreshToken = refreshToken
+                            }
+                            handler?(.success(endpoint))
+                        }
+                    case .failure(let error):
+                        handler?(.failure(wrapError(error: error)))
+                    }
+                } else {
+                    handler?(.success(endpoint))
+                }
             } catch {
                 handler?(.failure(wrapError(error: error)))
             }

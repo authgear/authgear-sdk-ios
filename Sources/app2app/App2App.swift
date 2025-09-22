@@ -9,6 +9,7 @@ class App2App {
     private let apiClient: AuthAPIClient
     private let storage: ContainerStorage
     private let dispatchQueue: DispatchQueue
+    internal weak var authgear: Authgear?
 
     private var resultHandlerRegistry: Dictionary<String, WeakHandlerRef> = Dictionary()
     private let resultHandlerLock = NSLock()
@@ -161,20 +162,31 @@ class App2App {
         request: App2AppAuthenticateRequest,
         handler: @escaping (Result<Void, Error>) -> Void
     ) {
-        var resultURL: URL
         do {
-            resultURL = try doApproveApp2AppAuthenticationRequest(
+            try doApproveApp2AppAuthenticationRequest(
                 maybeRefreshToken: maybeRefreshToken,
                 request: request
-            )
+            ) { approveResult in
+                switch approveResult {
+                case .success(let resultURL):
+                    self.openURLInUniversalLink(url: resultURL, handler: handler)
+                case .failure(let error):
+                    let resultURL = self.constructErrorURL(
+                        request: request,
+                        defaultError: "unknown_error",
+                        e: error
+                    )
+                    self.openURLInUniversalLink(url: resultURL, handler: handler)
+                }
+            }
         } catch {
-            resultURL = constructErrorURL(
+            let resultURL = constructErrorURL(
                 request: request,
                 defaultError: "unknown_error",
                 e: error
             )
+            self.openURLInUniversalLink(url: resultURL, handler: handler)
         }
-        openURLInUniversalLink(url: resultURL, handler: handler)
     }
 
     @available(iOS 11.3, *)
@@ -237,8 +249,9 @@ class App2App {
     @available(iOS 11.3, *)
     private func doApproveApp2AppAuthenticationRequest(
         maybeRefreshToken: String?,
-        request: App2AppAuthenticateRequest
-    ) throws -> URL {
+        request: App2AppAuthenticateRequest,
+        handler: @escaping (Result<URL, Error>) -> Void
+    ) throws {
         guard let refreshToken = maybeRefreshToken else {
             throw OAuthError(
                 error: "invalid_grant",
@@ -281,7 +294,16 @@ class App2App {
             resolvingAgainstBaseURL: false
         )!
         urlcomponents.percentEncodedQuery = query.encodeAsQuery()
-        return urlcomponents.url!
+        let url = urlcomponents.url!
+
+        self.authgear?.persistSession(oidcTokenResponse, reason: .foundToken) { result in
+            switch result {
+            case .success:
+                handler(.success(url))
+            case .failure(let err):
+                handler(.failure(err))
+            }
+        }
     }
 
     func listenToApp2AppAuthenticationResult(redirectUri: String, handler: @escaping ResultHandler) -> App2App.ResultUnsubscriber {

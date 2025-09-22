@@ -205,6 +205,7 @@ struct AppSessionTokenBody: Encodable {
 struct AppSessionTokenResponse: Decodable {
     let appSessionToken: String
     let expireAt: String
+    let refreshToken: String?
 }
 
 protocol AuthAPIClient: AnyObject {
