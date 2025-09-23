@@ -679,14 +679,6 @@ public class Authgear {
     }
 
     func persistSession(_ oidcTokenResponse: OIDCTokenResponse, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
-        if let refreshToken = oidcTokenResponse.refreshToken {
-            let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
-            guard case .success = result else {
-                handler(result)
-                return
-            }
-        }
-
         if let idToken = oidcTokenResponse.idToken {
             let result = Result { try self.sharedStorage.setIDToken(namespace: self.name, token: idToken) }
             guard case .success = result else {
@@ -703,17 +695,42 @@ public class Authgear {
             }
         }
 
-        DispatchQueue.main.async {
-            self.accessToken = oidcTokenResponse.accessToken
-            if let refreshToken = oidcTokenResponse.refreshToken {
+        if let refreshToken = oidcTokenResponse.refreshToken {
+            updateRefreshToken(refreshToken) { result in
+                if case let .failure(err) = result {
+                    handler(.failure(err))
+                    return
+                }
+                DispatchQueue.main.async {
+                    if let idToken = oidcTokenResponse.idToken {
+                        self.idToken = idToken
+                    }
+                    if let accessToken = oidcTokenResponse.accessToken {
+                        self.accessToken = accessToken
+                        self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn!) * Authgear.ExpireInPercentage))
+                        self.setSessionState(.authenticated, reason: reason)
+                    }
+                    handler(.success(()))
+                }
+            }
+        }
+    }
+
+    private func updateRefreshToken(_ refreshToken: String, handler: @escaping VoidCompletionHandler) {
+        let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
+        switch result {
+        case let .failure(error):
+            handler(.failure(error))
+            return
+        case .success:
+            DispatchQueue.main.async {
                 self.refreshToken = refreshToken
+                // We should invalidate the existing access token whenever we got a new refresh token
+                self.accessToken = nil
+                self.expireAt = nil
+                handler(.success(()))
             }
-            if let idToken = oidcTokenResponse.idToken {
-                self.idToken = idToken
-            }
-            self.expireAt = Date(timeIntervalSinceNow: TimeInterval(Double(oidcTokenResponse.expiresIn!) * Authgear.ExpireInPercentage))
-            self.setSessionState(.authenticated, reason: reason)
-            handler(.success(()))
+            return
         }
     }
 
@@ -1096,11 +1113,14 @@ public class Authgear {
                     let result = Result { try self.tokenStorage.setRefreshToken(namespace: self.name, token: refreshToken) }
                     switch result {
                     case .success:
-                        DispatchQueue.main.async {
-                            if let refreshToken = appSessionTokenResponse.refreshToken {
-                                self.refreshToken = refreshToken
+                        if let refreshToken = appSessionTokenResponse.refreshToken {
+                            self.updateRefreshToken(refreshToken) { result in
+                                if case let .failure(err) = result {
+                                    handler?(.failure(err))
+                                    return
+                                }
+                                handler?(.success(endpoint))
                             }
-                            handler?(.success(endpoint))
                         }
                     case let .failure(error):
                         handler?(.failure(wrapError(error: error)))
@@ -1385,7 +1405,10 @@ public class Authgear {
         guard refreshToken != nil else { return false }
 
         // 2.1 Either the access token is not present, e.g. just right after configure()
-        if case .none = self.accessToken, case .none = self.expireAt {
+        if case .none = self.accessToken {
+            return true
+        }
+        if case .none = self.expireAt {
             return true
         }
 
