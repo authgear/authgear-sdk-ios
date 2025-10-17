@@ -540,6 +540,7 @@ class LatteViewController: UIViewController {
         self.webView = LatteWKWebView(request: request, isInspectable: webviewIsInspectable)
         super.init(nibName: nil, bundle: nil)
         self.webView.viewController = self
+        self.webView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     private func addWebviewToView() {
@@ -552,11 +553,12 @@ class LatteViewController: UIViewController {
     
     private func doAddWebviewToView() {
         self.view.addSubview(self.webView)
-        self.webView.translatesAutoresizingMaskIntoConstraints = false
-        self.webView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        self.webView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
-        self.webView.rightAnchor.constraint(equalTo: self.view.rightAnchor).isActive = true
-        self.webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            self.webView.topAnchor.constraint(equalTo: view.topAnchor),
+            self.webView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            self.webView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            self.webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 
     override func viewDidLoad() {
@@ -583,6 +585,13 @@ class LatteViewController: UIViewController {
     func loadAndSuspendUntilReady(_ currentVisisbleView: UIView, timeoutMillis: Int) async throws {
         // Add the webview to a visible view so that it loads faster
         currentVisisbleView.addSubview(self.webView)
+        // Set the size to 1x1, move it off screen
+        NSLayoutConstraint.activate([
+            self.webView.widthAnchor.constraint(equalToConstant: 1),
+            self.webView.heightAnchor.constraint(equalToConstant: 1),
+            self.webView.leadingAnchor.constraint(equalTo: currentVisisbleView.trailingAnchor, constant: 1000),
+            self.webView.topAnchor.constraint(equalTo: currentVisisbleView.topAnchor)
+        ])
         self.webView.load()
         do {
             await try self.suspendUntilReady(timeoutMillis: timeoutMillis)
