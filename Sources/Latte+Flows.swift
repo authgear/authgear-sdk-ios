@@ -68,6 +68,7 @@ public extension Latte {
     }
 
     func authenticate(
+        currentView: UIView,
         xSecrets: [String: String] = [:],
         xState: [String: String] = [:],
         prompt: [PromptOption]? = nil,
@@ -101,10 +102,8 @@ public extension Latte {
                 let webViewRequest = LatteWebViewRequest(request: request)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.webView.delegate = self
-                latteVC.webView.load()
-
-                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
-
+                try await latteVC.loadAndSuspendUntilReady(currentView, timeoutMillis: webViewLoadTimeoutMillis)
+                
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
                 func run1() async throws -> UserInfo {
@@ -141,6 +140,7 @@ public extension Latte {
     }
 
     func reauthenticate(
+        currentView: UIView,
         email: String,
         phone: String,
         biometricOptions: LatteBiometricOptions? = nil,
@@ -189,10 +189,8 @@ public extension Latte {
                 let webViewRequest = LatteWebViewRequest(request: request)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.webView.delegate = self
-                latteVC.webView.load()
-
-                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
-
+                
+                try await latteVC.loadAndSuspendUntilReady(currentView, timeoutMillis: webViewLoadTimeoutMillis)
                 let handle = LatteHandle<Bool>(task: Task { try await run1() })
 
                 @Sendable @MainActor
@@ -270,6 +268,7 @@ public extension Latte {
     }
 
     func verifyEmail(
+        currentView: UIView,
         email: String,
         xState: [String: String] = [:],
         uiLocales: [String]? = nil,
@@ -309,10 +308,8 @@ public extension Latte {
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.webView.delegate = self
-                latteVC.webView.load()
-
-                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
-
+                
+                try await latteVC.loadAndSuspendUntilReady(currentView, timeoutMillis: webViewLoadTimeoutMillis)
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
                 func run1() async throws -> UserInfo {
@@ -335,6 +332,7 @@ public extension Latte {
     }
 
     func changePassword(
+        currentView: UIView,
         xState: [String: String] = [:],
         uiLocales: [String]? = nil,
         completion: @escaping Completion<Void>
@@ -367,9 +365,8 @@ public extension Latte {
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.webView.delegate = self
-                latteVC.webView.load()
-
-                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
+                
+                try await latteVC.loadAndSuspendUntilReady(currentView, timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<Void>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -389,6 +386,7 @@ public extension Latte {
     }
 
     func resetPassword(
+        currentView: UIView,
         url: URL,
         completion: @escaping Completion<Void>
     ) {
@@ -406,9 +404,8 @@ public extension Latte {
                 let webViewRequest = LatteWebViewRequest(url: URL(string: entryURL)!, redirectURI: redirectURI)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.webView.delegate = self
-                latteVC.webView.load()
-
-                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
+                
+                try await latteVC.loadAndSuspendUntilReady(currentView, timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<Void>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -434,6 +431,7 @@ public extension Latte {
     }
 
     func changeEmail(
+        currentView: UIView,
         email: String,
         phoneNumber: String,
         xState: [String: String] = [:],
@@ -476,9 +474,8 @@ public extension Latte {
                 let webViewRequest = LatteWebViewRequest(url: url, redirectURI: redirectURI)
                 let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
                 latteVC.webView.delegate = self
-                latteVC.webView.load()
-
-                try await latteVC.suspendUntilReady(timeoutMillis: webViewLoadTimeoutMillis)
+                
+                try await latteVC.loadAndSuspendUntilReady(currentView, timeoutMillis: webViewLoadTimeoutMillis)
 
                 let handle = LatteHandle<UserInfo>(task: Task { try await run1() })
                 @Sendable @MainActor
@@ -534,6 +531,7 @@ public extension Latte {
 @available(iOS 13.0, *)
 class LatteViewController: UIViewController {
     let webView: LatteWKWebView
+    var shouldAddWebviewToView: Bool = false
 
     init(
         request: LatteWebViewRequest,
@@ -543,16 +541,29 @@ class LatteViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.webView.viewController = self
     }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
+    
+    private func addWebviewToView() {
+        if self.view != nil {
+            self.doAddWebviewToView()
+        } else {
+            shouldAddWebviewToView = true
+        }
+    }
+    
+    private func doAddWebviewToView() {
         self.view.addSubview(self.webView)
         self.webView.translatesAutoresizingMaskIntoConstraints = false
         self.webView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
         self.webView.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
         self.webView.rightAnchor.constraint(equalTo: self.view.rightAnchor).isActive = true
         self.webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        if (self.shouldAddWebviewToView) {
+            self.doAddWebviewToView()
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -569,8 +580,21 @@ class LatteViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func suspendUntilReady(timeoutMillis: Int) async throws {
-        try await withCheckedThrowingContinuation { next in
+    func loadAndSuspendUntilReady(_ currentVisisbleView: UIView, timeoutMillis: Int) async throws {
+        // Add the webview to a visible view so that it loads faster
+        currentVisisbleView.addSubview(self.webView)
+        self.webView.load()
+        do {
+            await try self.suspendUntilReady(timeoutMillis: timeoutMillis)
+            self.addWebviewToView()
+        } catch {
+            self.webView.removeFromSuperview()
+            throw error
+        }
+    }
+
+    private func suspendUntilReady(timeoutMillis: Int) async throws {
+        try await withCheckedThrowingContinuation { (next: CheckedContinuation<Void, any Error>) in
             var isResumed = false
             var timeoutTask: Task<Void, Error>?
             self.webView.onReady = { _ in
