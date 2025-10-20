@@ -531,7 +531,8 @@ public extension Latte {
 @available(iOS 13.0, *)
 class LatteViewController: UIViewController {
     let webView: LatteWKWebView
-    var shouldAddWebviewToView: Bool = false
+    private var observedViewDidLoad: Bool = false
+    private var observedLoadAndSuspendUntilReadyResolved: Bool = false
 
     init(
         request: LatteWebViewRequest,
@@ -543,29 +544,33 @@ class LatteViewController: UIViewController {
         self.webView.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    private func addWebviewToView() {
-        if self.view != nil {
-            self.doAddWebviewToView()
-        } else {
-            shouldAddWebviewToView = true
+    internal func setLoadAndSuspendUntilReadyResolved() {
+        DispatchQueue.main.async {
+            self.observedLoadAndSuspendUntilReadyResolved = true
         }
     }
     
-    private func doAddWebviewToView() {
-        self.view.addSubview(self.webView)
-        NSLayoutConstraint.activate([
-            self.webView.topAnchor.constraint(equalTo: view.topAnchor),
-            self.webView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            self.webView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            self.webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+    internal func addWebviewToViewIfNeeded() {
+        DispatchQueue.main.async {
+            if (!self.observedViewDidLoad || !self.observedLoadAndSuspendUntilReadyResolved) {
+                return
+            }
+            self.webView.removeFromSuperview()
+            self.webView.removeConstraints(self.webView.constraints)
+            self.view.addSubview(self.webView)
+            NSLayoutConstraint.activate([
+                self.webView.topAnchor.constraint(equalTo: self.view.topAnchor),
+                self.webView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+                self.webView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+                self.webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
+            ])
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        if (self.shouldAddWebviewToView) {
-            self.doAddWebviewToView()
-        }
+        self.observedViewDidLoad = true
+        self.addWebviewToViewIfNeeded()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -584,22 +589,22 @@ class LatteViewController: UIViewController {
 
     func loadAndSuspendUntilReady(_ currentVisisbleView: UIView, timeoutMillis: Int) async throws {
         // Add the webview to a visible view so that it loads faster
-        currentVisisbleView.addSubview(self.webView)
-        // Set the size to 1x1, move it off screen
-        NSLayoutConstraint.activate([
-            self.webView.widthAnchor.constraint(equalToConstant: 1),
-            self.webView.heightAnchor.constraint(equalToConstant: 1),
-            self.webView.leadingAnchor.constraint(equalTo: currentVisisbleView.trailingAnchor, constant: 1000),
-            self.webView.topAnchor.constraint(equalTo: currentVisisbleView.topAnchor)
-        ])
-        self.webView.load()
-        do {
-            await try self.suspendUntilReady(timeoutMillis: timeoutMillis)
-            self.addWebviewToView()
-        } catch {
-            self.webView.removeFromSuperview()
-            throw error
+        DispatchQueue.main.async {
+            currentVisisbleView.addSubview(self.webView)
+            // Set the size to 1x1, move it off screen
+            NSLayoutConstraint.activate([
+                self.webView.widthAnchor.constraint(equalToConstant: 1),
+                self.webView.heightAnchor.constraint(equalToConstant: 1),
+                self.webView.leadingAnchor.constraint(equalTo: currentVisisbleView.trailingAnchor, constant: 1000),
+                self.webView.topAnchor.constraint(equalTo: currentVisisbleView.topAnchor)
+            ])
+            self.webView.load()
         }
+        defer {
+            self.setLoadAndSuspendUntilReadyResolved()
+            self.addWebviewToViewIfNeeded()
+        }
+        await try self.suspendUntilReady(timeoutMillis: timeoutMillis)
     }
 
     private func suspendUntilReady(timeoutMillis: Int) async throws {
