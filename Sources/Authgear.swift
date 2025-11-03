@@ -107,6 +107,7 @@ public struct UserInfo: Decodable {
         case sub
         case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
         case isVerified = "https://authgear.com/claims/user/is_verified"
+        case hasPrimaryPassword = "https://authgear.com/claims/user/has_primary_password"
         case canReauthenticate = "https://authgear.com/claims/user/can_reauthenticate"
         case customAttributes = "custom_attributes"
         case email
@@ -133,6 +134,7 @@ public struct UserInfo: Decodable {
     public let isAnonymous: Bool
     public let isVerified: Bool
     public let canReauthenticate: Bool
+    public let hasPrimaryPassword: Bool
 
     public let customAttributes: [String: Any]
 
@@ -162,6 +164,7 @@ public struct UserInfo: Decodable {
         self.isAnonymous = try values.decode(Bool.self, forKey: .isAnonymous)
         self.isVerified = try values.decode(Bool.self, forKey: .isVerified)
         self.canReauthenticate = try values.decode(Bool.self, forKey: .canReauthenticate)
+        self.hasPrimaryPassword = try values.decode(Bool.self, forKey: .hasPrimaryPassword)
 
         self.email = try values.decodeIfPresent(String.self, forKey: .email)
         self.emailVerified = try values.decodeIfPresent(Bool.self, forKey: .emailVerified)
