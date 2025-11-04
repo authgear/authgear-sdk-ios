@@ -948,6 +948,7 @@ public class Authgear {
                     accessToken: migratedSession.accessToken,
                     expiresIn: migratedSession.expiresIn,
                     refreshToken: migratedSession.refreshToken,
+                    deviceSecret: nil,
                     code: nil)
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
