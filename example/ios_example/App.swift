@@ -194,6 +194,7 @@ class App: ObservableObject {
                     redirectURI: App.redirectURI,
                     colorScheme: self.colorScheme,
                     localizedReason: "Authenticate with biometric",
+                    localizedCancelTitle: "Customized Cancel",
                     policy: App.biometricLAPolicy
                 ) { result in
                     self.updateBiometricState()
@@ -234,9 +235,10 @@ class App: ObservableObject {
 
     func enableBiometric() {
         container?.enableBiometric(
-            localizedReason: "Enable biometric!",
+            localizedReason: "Enable biometric",
             policy: App.biometricLAPolicy,
-            constraint: App.biometricAccessConstraint
+            constraint: App.biometricAccessConstraint,
+            localizedCancelTitle: "Customized Cancel"
         ) { result in
             if case let .failure(error) = result {
                 self.setError(error)
