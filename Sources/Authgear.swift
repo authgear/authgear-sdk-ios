@@ -815,6 +815,7 @@ public class Authgear {
         wechatRedirectURI: String? = nil,
         maxAge: Int? = nil,
         localizedReason: String? = nil,
+        localizedCancelTitle: String? = nil,
         policy: BiometricLAPolicy? = nil,
         customUIQuery: String? = nil,
         authenticationFlowGroup: String? = nil,
@@ -827,7 +828,7 @@ public class Authgear {
             if #available(iOS 11.3, *) {
                 let biometricEnabled = try self.isBiometricEnabled()
                 if let localizedReason = localizedReason, let policy = policy, biometricEnabled {
-                    self.authenticateBiometric(localizedReason: localizedReason, policy: policy) { result in
+                    self.authenticateBiometric(localizedReason: localizedReason, policy: policy, localizedCancelTitle: localizedCancelTitle) { result in
                         switch result {
                         case let .success(userInfo):
                             handler(.success(userInfo))
@@ -1554,7 +1555,9 @@ public class Authgear {
     @available(iOS 11.3, *)
     public func checkBiometricSupported(policy: BiometricLAPolicy) throws {
         let policy = policy.laPolicy
-        let context = LAContext(policy: policy)
+        // We do not actually show any UI,
+        // thus it is OK not to supply localizedCancelTitle.
+        let context = LAContext(policy: policy, localizedCancelTitle: nil)
         var error: NSError?
         _ = context.canEvaluatePolicy(policy, error: &error)
         if let error = error {
@@ -1585,12 +1588,13 @@ public class Authgear {
         localizedReason: String,
         policy: BiometricLAPolicy,
         constraint: BiometricAccessConstraint,
+        localizedCancelTitle: String? = nil,
         handler: @escaping VoidCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
 
         let laPolicy = policy.laPolicy
-        let context = LAContext(policy: laPolicy)
+        let context = LAContext(policy: laPolicy, localizedCancelTitle: localizedCancelTitle)
         // First we perform a biometric authentication first.
         // But this actually is just a test to ensure biometric authentication works.
         context.evaluatePolicy(
@@ -1636,11 +1640,12 @@ public class Authgear {
     public func authenticateBiometric(
         localizedReason: String,
         policy: BiometricLAPolicy,
+        localizedCancelTitle: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let laPolicy = policy.laPolicy
         let handler = withMainQueueHandler(handler)
-        let context = LAContext(policy: laPolicy)
+        let context = LAContext(policy: laPolicy, localizedCancelTitle: localizedCancelTitle)
 
         context.evaluatePolicy(
             laPolicy,

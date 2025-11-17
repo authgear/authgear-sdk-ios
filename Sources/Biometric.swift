@@ -35,13 +35,14 @@ public enum BiometricLAPolicy {
 }
 
 extension LAContext {
-    convenience init(policy: LAPolicy) {
+    convenience init(policy: LAPolicy, localizedCancelTitle: String?) {
         self.init()
         if case .deviceOwnerAuthenticationWithBiometrics = policy {
             // Hide the fallback button
             // https://developer.apple.com/documentation/localauthentication/lacontext/1514183-localizedfallbacktitle
             self.localizedFallbackTitle = ""
         }
+        self.localizedCancelTitle = localizedCancelTitle
     }
 }
 
