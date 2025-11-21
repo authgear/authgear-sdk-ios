@@ -267,6 +267,90 @@ public extension Latte {
         }
     }
 
+    func reauthenticateV2(
+        currentView: UIView,
+        email: String,
+        phone: String,
+        xState: [String: String] = [:],
+        uiLocales: [String]? = nil,
+        completion: @escaping Completion<Bool>
+    ) {
+        Task { await run() }
+
+        @Sendable @MainActor
+        func run() async {
+            do {
+                guard let idTokenHint = self.authgear.idTokenHint else {
+                    throw AuthgearError.unauthenticatedUser
+                }
+                let xSecrets = [
+                    "phone": phone,
+                    "email": email
+                ]
+                var reauthXState = xState
+                reauthXState["user_initiate"] = "reauthv2"
+
+                let finalXState = try await makeXStateWithSecrets(
+                    xState: reauthXState,
+                    xSecrets: xSecrets
+                )
+                let request = try authgear.experimental.createReauthenticateRequest(
+                    redirectURI: "latte://complete",
+                    idTokenHint: idTokenHint,
+                    xState: finalXState.encodeAsQuery(),
+                    uiLocales: uiLocales
+                ).get()
+                let webViewRequest = LatteWebViewRequest(request: request)
+                let latteVC = LatteViewController(request: webViewRequest, webviewIsInspectable: webviewIsInspectable)
+                latteVC.webView.delegate = self
+                
+                try await latteVC.loadAndSuspendUntilReady(currentView, timeoutMillis: webViewLoadTimeoutMillis)
+                let handle = LatteHandle<Bool>(task: Task { try await run1() })
+
+                @Sendable @MainActor
+                func run1() async throws -> Bool {
+                    let result: Bool = try await withCheckedThrowingContinuation { [weak self] next in
+                        guard let nc = self?.eventNotificationCenter else { return }
+                        var isResumed = false
+                        func resume(_ result: Result<Bool, Error>) {
+                            guard isResumed == false else { return }
+                            isResumed = true
+                            next.resume(with: result)
+                        }
+                        let observer = nc.addObserver(
+                            forName: LatteInternalEvent.resetPasswordCompleted.notificationName,
+                            object: nil,
+                            queue: nil,
+                            using: { _ in
+                                Task {
+                                    await latteVC.dispatchWebViewSignal(signal: .resetPasswordCompleted)
+                                }
+                            }
+                        )
+                        latteVC.webView.completion = { (_, result) in
+                            do {
+                                nc.removeObserver(observer)
+                                let finishURL = try result.get().unwrap()
+                                self?.authgear.experimental.finishReauthentication(finishURL: finishURL, request: request) { r in
+                                    resume(r.flatMap { _ in
+                                        .success(true)
+                                    })
+                                }
+                            } catch {
+                                resume(.failure(wrapError(error: error)))
+                            }
+                        }
+                    }
+                    return result
+                }
+                completion(.success((latteVC, handle)))
+
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+
     func verifyEmail(
         currentView: UIView,
         email: String,
