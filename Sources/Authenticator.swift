@@ -6,18 +6,12 @@ public struct Authenticator: Decodable {
         case updatedAt = "updated_at"
         case type
         case kind
-        case displayName = "display_name"
-        case email
-        case phone
     }
 
     public let createdAt: Date
     public let updatedAt: Date
     public let type: AuthenticatorType
     public let kind: AuthenticatorKind
-    public let displayName: String?
-    public let email: String?
-    public let phone: String?
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -38,9 +32,6 @@ public struct Authenticator: Decodable {
         self.updatedAt = updatedAt
         self.type = try values.decode(AuthenticatorType.self, forKey: .type)
         self.kind = try values.decode(AuthenticatorKind.self, forKey: .kind)
-        self.displayName = try values.decodeIfPresent(String.self, forKey: .displayName)
-        self.email = try values.decodeIfPresent(String.self, forKey: .email)
-        self.phone = try values.decodeIfPresent(String.self, forKey: .phone)
     }
 }
 
