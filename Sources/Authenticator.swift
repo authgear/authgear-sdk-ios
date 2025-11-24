@@ -36,13 +36,13 @@ public struct Authenticator: Decodable {
 }
 
 public enum AuthenticatorKind: String, Decodable {
-    case primary = "primary"
-    case secondary = "secondary"
+    case primary
+    case secondary
 }
 
 public enum AuthenticatorType: String, Decodable {
-    case password = "password"
+    case password
     case oobOtpEmail = "oob_otp_email"
     case oobOtpSms = "oob_otp_sms"
-    case totp = "totp"
+    case totp
 }
