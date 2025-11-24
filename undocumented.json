@@ -79,36 +79,57 @@
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
-      "line": 43,
+      "line": 41,
+      "symbol": "AuthenticatorKind.unknown",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
+      "line": 54,
       "symbol": "AuthenticatorType",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
-      "line": 44,
+      "line": 55,
       "symbol": "AuthenticatorType.password",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
-      "line": 45,
+      "line": 56,
       "symbol": "AuthenticatorType.oobOtpEmail",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
-      "line": 46,
+      "line": 57,
       "symbol": "AuthenticatorType.oobOtpSms",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
-      "line": 47,
+      "line": 58,
       "symbol": "AuthenticatorType.totp",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
+      "line": 59,
+      "symbol": "AuthenticatorType.passkey",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/Authenticator.swift",
+      "line": 60,
+      "symbol": "AuthenticatorType.unknown",
       "symbol_kind": "source.lang.swift.decl.enumelement",
       "warning": "undocumented"
     },
