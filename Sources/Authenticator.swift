@@ -56,6 +56,7 @@ public enum AuthenticatorType: String, Decodable {
     case oobOtpEmail = "oob_otp_email"
     case oobOtpSms = "oob_otp_sms"
     case totp
+    case passkey
     case unknown
 
     public init(from decoder: Decoder) throws {
@@ -66,6 +67,7 @@ public enum AuthenticatorType: String, Decodable {
         case "oob_otp_email": self = .oobOtpEmail
         case "oob_otp_sms": self = .oobOtpSms
         case "totp": self = .totp
+        case "passkey": self = .passkey
         default: self = .unknown
         }
     }
