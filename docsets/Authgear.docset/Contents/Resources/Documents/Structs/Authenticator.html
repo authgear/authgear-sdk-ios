@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>TransientTokenStorage Class Reference</title>
+    <title>Authenticator Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -13,8 +13,8 @@
     <script src="../js/jazzy.search.js" defer></script>
   </head>
   <body>
-    <a name="//apple_ref/swift/Class/TransientTokenStorage" class="dashAnchor"></a>
-    <a title="TransientTokenStorage Class Reference"></a>
+    <a name="//apple_ref/swift/Struct/Authenticator" class="dashAnchor"></a>
+    <a title="Authenticator Structure Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">Authgear iOS SDK git-8b5254c1c484</a></p>
@@ -29,9 +29,9 @@
       <p id="breadcrumbs">
         <a href="../index.html">Authgear</a>
         <img id="carat" src="../img/carat.png" alt=""/>
-        <a href="../Classes.html">Classes</a>
+        <a href="../Structs.html">Structures</a>
         <img id="carat" src="../img/carat.png" alt=""/>
-        TransientTokenStorage Class Reference
+        Authenticator Structure Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -172,11 +172,11 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>TransientTokenStorage</h1>
+            <h1>Authenticator</h1>
               <div class="declaration">
                 <div class="language">
                   
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">TransientTokenStorage</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/TokenStorage.html">TokenStorage</a></span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Authenticator</span> <span class="p">:</span> <span class="kt">Decodable</span></code></pre>
 
                 </div>
               </div>
@@ -189,9 +189,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear21TransientTokenStorageCACycfc"></a>
-                    <a name="//apple_ref/swift/Method/init()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageCACycfc">init()</a>
+                    <a name="/s:8Authgear13AuthenticatorV9createdAt10Foundation4DateVvp"></a>
+                    <a name="//apple_ref/swift/Property/createdAt" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear13AuthenticatorV9createdAt10Foundation4DateVvp">createdAt</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -206,7 +206,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">()</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">createdAt</span><span class="p">:</span> <span class="kt">Date</span></code></pre>
 
                         </div>
                       </div>
@@ -216,9 +216,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC010setRefreshC09namespace5tokenySS_SStKF"></a>
-                    <a name="//apple_ref/swift/Method/setRefreshToken(namespace:token:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC010setRefreshC09namespace5tokenySS_SStKF">setRefreshToken(namespace:<wbr>token:<wbr>)</a>
+                    <a name="/s:8Authgear13AuthenticatorV9updatedAt10Foundation4DateVvp"></a>
+                    <a name="//apple_ref/swift/Property/updatedAt" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear13AuthenticatorV9updatedAt10Foundation4DateVvp">updatedAt</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -233,7 +233,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setRefreshToken</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">updatedAt</span><span class="p">:</span> <span class="kt">Date</span></code></pre>
 
                         </div>
                       </div>
@@ -243,9 +243,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC010getRefreshC09namespaceSSSgSS_tKF"></a>
-                    <a name="//apple_ref/swift/Method/getRefreshToken(namespace:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC010getRefreshC09namespaceSSSgSS_tKF">getRefreshToken(namespace:<wbr>)</a>
+                    <a name="/s:8Authgear13AuthenticatorV4typeAA0B4TypeOvp"></a>
+                    <a name="//apple_ref/swift/Property/type" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear13AuthenticatorV4typeAA0B4TypeOvp">type</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -260,7 +260,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getRefreshToken</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../Enums/AuthenticatorType.html">AuthenticatorType</a></span></code></pre>
 
                         </div>
                       </div>
@@ -270,9 +270,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC010delRefreshC09namespaceySS_tKF"></a>
-                    <a name="//apple_ref/swift/Method/delRefreshToken(namespace:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC010delRefreshC09namespaceySS_tKF">delRefreshToken(namespace:<wbr>)</a>
+                    <a name="/s:8Authgear13AuthenticatorV4kindAA0B4KindOvp"></a>
+                    <a name="//apple_ref/swift/Property/kind" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8Authgear13AuthenticatorV4kindAA0B4KindOvp">kind</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -287,7 +287,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">delRefreshToken</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">kind</span><span class="p">:</span> <span class="kt"><a href="../Enums/AuthenticatorKind.html">AuthenticatorKind</a></span></code></pre>
 
                         </div>
                       </div>
@@ -297,9 +297,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC10setIDToken9namespace5tokenySS_SStKF"></a>
-                    <a name="//apple_ref/swift/Method/setIDToken(namespace:token:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC10setIDToken9namespace5tokenySS_SStKF">setIDToken(namespace:<wbr>token:<wbr>)</a>
+                    <a name="/s:Se4fromxs7Decoder_p_tKcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(from:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:Se4fromxs7Decoder_p_tKcfc">init(from:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -307,149 +307,13 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setIDToken</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC10getIDToken9namespaceSSSgSS_tKF"></a>
-                    <a name="//apple_ref/swift/Method/getIDToken(namespace:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC10getIDToken9namespaceSSSgSS_tKF">getIDToken(namespace:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getIDToken</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span><span class="p">?</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC10delIDToken9namespaceySS_tKF"></a>
-                    <a name="//apple_ref/swift/Method/delIDToken(namespace:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC10delIDToken9namespaceySS_tKF">delIDToken(namespace:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">delIDToken</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC15setDeviceSecret9namespace6secretySS_SStKF"></a>
-                    <a name="//apple_ref/swift/Method/setDeviceSecret(namespace:secret:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC15setDeviceSecret9namespace6secretySS_SStKF">setDeviceSecret(namespace:<wbr>secret:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setDeviceSecret</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">secret</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC15getDeviceSecret9namespaceSSSgSS_tKF"></a>
-                    <a name="//apple_ref/swift/Method/getDeviceSecret(namespace:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC15getDeviceSecret9namespaceSSSgSS_tKF">getDeviceSecret(namespace:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getDeviceSecret</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span><span class="p">?</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:8Authgear21TransientTokenStorageC15delDeviceSecret9namespaceySS_tKF"></a>
-                    <a name="//apple_ref/swift/Method/delDeviceSecret(namespace:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8Authgear21TransientTokenStorageC15delDeviceSecret9namespaceySS_tKF">delDeviceSecret(namespace:<wbr>)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">delDeviceSecret</span><span class="p">(</span><span class="nv">namespace</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="n">from</span> <span class="nv">decoder</span><span class="p">:</span> <span class="kt">Decoder</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
