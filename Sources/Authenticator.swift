@@ -38,6 +38,17 @@ public struct Authenticator: Decodable {
 public enum AuthenticatorKind: String, Decodable {
     case primary
     case secondary
+    case unknown
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let value = try container.decode(String.self)
+        switch value {
+        case "primary": self = .primary
+        case "secondary": self = .secondary
+        default: self = .unknown
+        }
+    }
 }
 
 public enum AuthenticatorType: String, Decodable {
@@ -45,4 +56,19 @@ public enum AuthenticatorType: String, Decodable {
     case oobOtpEmail = "oob_otp_email"
     case oobOtpSms = "oob_otp_sms"
     case totp
+    case passkey
+    case unknown
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let value = try container.decode(String.self)
+        switch value {
+        case "password": self = .password
+        case "oob_otp_email": self = .oobOtpEmail
+        case "oob_otp_sms": self = .oobOtpSms
+        case "totp": self = .totp
+        case "passkey": self = .passkey
+        default: self = .unknown
+        }
+    }
 }
