@@ -139,6 +139,7 @@ public struct UserInfo: Decodable {
         case isAnonymous = "https://authgear.com/claims/user/is_anonymous"
         case isVerified = "https://authgear.com/claims/user/is_verified"
         case canReauthenticate = "https://authgear.com/claims/user/can_reauthenticate"
+        case recoveryCodeEnabled = "https://authgear.com/claims/user/recovery_code_enabled"
         case roles = "https://authgear.com/claims/user/roles"
         case customAttributes = "custom_attributes"
         case email
@@ -159,12 +160,14 @@ public struct UserInfo: Decodable {
         case zoneinfo
         case locale
         case address
+        case authenticators = "https://authgear.com/claims/user/authenticators"
     }
 
     public let sub: String
     public let isAnonymous: Bool
     public let isVerified: Bool
     public let canReauthenticate: Bool
+    public let recoveryCodeEnabled: Bool?
     public let roles: [String]?
 
     public let customAttributes: [String: Any]
@@ -187,6 +190,7 @@ public struct UserInfo: Decodable {
     public let zoneinfo: String?
     public let locale: String?
     public let address: UserInfoAddress?
+    public let authenticators: [Authenticator]?
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -195,6 +199,7 @@ public struct UserInfo: Decodable {
         self.isAnonymous = try values.decode(Bool.self, forKey: .isAnonymous)
         self.isVerified = try values.decode(Bool.self, forKey: .isVerified)
         self.canReauthenticate = try values.decode(Bool.self, forKey: .canReauthenticate)
+        self.recoveryCodeEnabled = try values.decodeIfPresent(Bool.self, forKey: .recoveryCodeEnabled)
         self.roles = try values.decodeIfPresent([String].self, forKey: .roles)
 
         self.email = try values.decodeIfPresent(String.self, forKey: .email)
@@ -215,6 +220,7 @@ public struct UserInfo: Decodable {
         self.zoneinfo = try values.decodeIfPresent(String.self, forKey: .zoneinfo)
         self.locale = try values.decodeIfPresent(String.self, forKey: .locale)
         self.address = try values.decodeIfPresent(UserInfoAddress.self, forKey: .address)
+        self.authenticators = try values.decodeIfPresent([Authenticator].self, forKey: .authenticators)
         self.customAttributes = try values.decode([String: Any].self, forKey: .customAttributes)
     }
 }
