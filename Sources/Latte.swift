@@ -178,7 +178,7 @@ public protocol LatteLAContext {
 
 class DefaultLatteLAContext: LatteLAContext {
     let laPolicy: LAPolicy
-    lazy var laCtx: LAContext = .init(policy: laPolicy)
+    lazy var laCtx: LAContext = .init(policy: laPolicy, localizedCancelTitle: nil)
 
     init(laPolicy: LAPolicy) {
         self.laPolicy = laPolicy
