@@ -84,8 +84,7 @@ class App2App {
             throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
         }
 
-        let privateKey = item as! SecKey
-        return privateKey
+        return item as! SecKey
     }
 
     private func openURLInUniversalLink(
@@ -133,8 +132,7 @@ class App2App {
         let header = JWTHeader(typ: .app2app, jwk: jwk, includeJWK: true)
         let payload = JWTPayload(challenge: challenge, action: App2AppPayloadAction.setup.rawValue)
         let jwt = JWT(header: header, payload: payload)
-        let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
-        return signedJWT
+        return try jwt.sign(with: JWTSigner(privateKey: privateKey))
     }
 
     @available(iOS 11.3, *)

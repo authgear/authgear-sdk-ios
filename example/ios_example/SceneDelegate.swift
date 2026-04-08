@@ -25,14 +25,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
         let app2appRequest = appDelegate?.appContainer.container?.parseApp2AppAuthenticationRequest(
-            userActivity: userActivity)
+            userActivity: userActivity
+        )
         if let app2appRequest = app2appRequest {
             appDelegate?.appContainer.pendingApp2AppRequest = app2appRequest
             return
         }
         if let container = appDelegate?.appContainer.container,
            container.handleApp2AppAuthenticationResult(
-               userActivity: userActivity) == true {
+               userActivity: userActivity
+           ) == true {
             return
         }
     }
@@ -69,14 +71,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // wechat sdk handle
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         let app2appRequest = appDelegate?.appContainer.container?.parseApp2AppAuthenticationRequest(
-            userActivity: userActivity)
+            userActivity: userActivity
+        )
         if let app2appRequest = app2appRequest {
             appDelegate?.appContainer.pendingApp2AppRequest = app2appRequest
             return
         }
         if let container = appDelegate?.appContainer.container,
            container.handleApp2AppAuthenticationResult(
-               userActivity: userActivity) == true {
+               userActivity: userActivity
+           ) == true {
             return
         }
         WXApi.handleOpenUniversalLink(userActivity, delegate: appDelegate)

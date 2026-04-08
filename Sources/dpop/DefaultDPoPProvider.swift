@@ -23,8 +23,7 @@ class DefaultDPoPProvider: DPoPProvider {
             htu: htu
         )
         let jwt = JWT(header: header, payload: payload)
-        let signedJWT = try jwt.sign(with: JWTSigner(privateKey: privateKey))
-        return signedJWT
+        return try jwt.sign(with: JWTSigner(privateKey: privateKey))
     }
 
     func computeJKT() throws -> String? {
@@ -75,8 +74,7 @@ class DefaultDPoPProvider: DPoPProvider {
             throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
         }
 
-        let privateKey = item as! SecKey
-        return privateKey
+        return item as! SecKey
     }
 
     @available(iOS 11.3, *)

@@ -4,7 +4,7 @@ import Combine
 import SwiftUI
 
 extension Notification {
-    // for getting keyboard height from keyboardWillShowNotification
+    /// for getting keyboard height from keyboardWillShowNotification
     var keyboardHeight: CGFloat {
         (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
     }

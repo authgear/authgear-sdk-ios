@@ -15,6 +15,7 @@ private extension CharacterSet {
 extension String {
     func encodeAsQueryComponent() -> String? {
         self.addingPercentEncoding(
-            withAllowedCharacters: CharacterSet.queryComponentAllowed)
+            withAllowedCharacters: CharacterSet.queryComponentAllowed
+        )
     }
 }

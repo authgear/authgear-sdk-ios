@@ -78,14 +78,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
     ) -> Bool {
         let app2appRequest = appContainer.container?.parseApp2AppAuthenticationRequest(
-            userActivity: userActivity)
+            userActivity: userActivity
+        )
         if let app2appRequest = app2appRequest {
             appContainer.pendingApp2AppRequest = app2appRequest
             return true
         }
         if let container = appContainer.container,
            container.handleApp2AppAuthenticationResult(
-               userActivity: userActivity) == true {
+               userActivity: userActivity
+           ) == true {
             return true
         }
         return false

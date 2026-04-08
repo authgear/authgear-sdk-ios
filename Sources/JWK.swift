@@ -179,8 +179,7 @@ struct JWKStore {
 
         switch status {
         case errSecSuccess:
-            let privateKey = item as! SecKey
-            return privateKey
+            return item as! SecKey
         case errSecItemNotFound:
             return nil
         default:
