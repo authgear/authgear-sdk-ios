@@ -27,8 +27,11 @@ public enum AuthgearError: CustomNSError, LocalizedError {
     case runtimeError(String)
     case preAuthenticatedURLNotAllowed(PreAuthenticatedURLNotAllowedError)
 
-    // Implements CustomNSError
-    public static var errorDomain: String { "AuthgearError" }
+    /// Implements CustomNSError
+    public static var errorDomain: String {
+        "AuthgearError"
+    }
+
     public var errorCode: Int {
         switch self {
         case .cancel:
@@ -95,7 +98,7 @@ public enum AuthgearError: CustomNSError, LocalizedError {
         return info
     }
 
-    // Implements LocalizedError
+    /// Implements LocalizedError
     public var errorDescription: String? {
         var message = ""
         switch self {
@@ -160,9 +163,15 @@ public struct OAuthError: LocalizedError, CustomNSError, Decodable {
         self.errorUri = errorUri
     }
 
-    // Implements CustomNSError
-    public static var errorDomain: String { "OAuthError" }
-    public var errorCode: Int { 0 }
+    /// Implements CustomNSError
+    public static var errorDomain: String {
+        "OAuthError"
+    }
+
+    public var errorCode: Int {
+        0
+    }
+
     public var errorUserInfo: [String: Any] {
         var userInfo: [String: Any] = [
             "error": self.error
@@ -198,9 +207,15 @@ public struct ServerError: CustomNSError, LocalizedError, Decodable {
         info = try? values.decode([String: Any].self, forKey: .info)
     }
 
-    // Implements CustomNSError
-    public static var errorDomain: String { "ServerError" }
-    public var errorCode: Int { 0 }
+    /// Implements CustomNSError
+    public static var errorDomain: String {
+        "ServerError"
+    }
+
+    public var errorCode: Int {
+        0
+    }
+
     public var errorUserInfo: [String: Any] {
         var userInfo: [String: Any] = [
             "name": self.name,
@@ -213,7 +228,7 @@ public struct ServerError: CustomNSError, LocalizedError, Decodable {
         return userInfo
     }
 
-    // Implements LocalizedError
+    /// Implements LocalizedError
     public var errorDescription: String? {
         let message = "\(reason): \(message)"
         return "\(Self.errorDomain): \(message)"

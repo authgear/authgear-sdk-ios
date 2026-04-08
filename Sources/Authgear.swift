@@ -44,7 +44,8 @@ struct AuthenticateOptions {
 
     var request: OIDCAuthenticationRequest {
         let scopes = getAuthenticationScopes(
-            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled)
+            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled
+        )
         return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
             responseType: "code",
@@ -581,14 +582,16 @@ public class Authgear {
             let userInfo = try apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
 
             persistSession(oidcTokenResponse, reason: .authenticated) { result in
-                handler(result.flatMap {
-                    Result { () in
-                        if #available(iOS 11.3, *) {
-                            try self.disableBiometric()
+                handler(
+                    result.flatMap {
+                        Result { () in
+                            if #available(iOS 11.3, *) {
+                                try self.disableBiometric()
+                            }
                         }
                     }
-                }
-                .map { userInfo })
+                    .map { userInfo }
+                )
             }
         } catch {
             return handler(.failure(wrapError(error: error)))
@@ -927,15 +930,17 @@ public class Authgear {
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
 
                 self.persistSession(oidcTokenResponse, reason: .authenticated) { result in
-                    handler(result.flatMap {
-                        Result { () in
-                            try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId)
-                            if #available(iOS 11.3, *) {
-                                try self.disableBiometric()
+                    handler(
+                        result.flatMap {
+                            Result { () in
+                                try self.storage.setAnonymousKeyId(namespace: self.name, kid: keyId)
+                                if #available(iOS 11.3, *) {
+                                    try self.disableBiometric()
+                                }
                             }
                         }
-                    }
-                    .map { userInfo })
+                        .map { userInfo }
+                    )
                 }
             } catch {
                 handler(.failure(wrapError(error: error)))
@@ -1697,7 +1702,8 @@ public class Authgear {
                         accessToken: nil,
                         xApp2AppDeviceKeyJwt: nil,
                         scope: getAuthenticationScopes(
-                            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled),
+                            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled
+                        ),
                         requestedTokenType: nil,
                         subjectTokenType: nil,
                         subjectToken: nil,
@@ -1735,28 +1741,29 @@ public class Authgear {
         self.workerQueue.async {
             do {
                 try self.app2app.startAuthenticateRequest(
-                    request: request) { success in
-                        do {
-                            // If failed to start, fail immediately
-                            try success.get()
-                        } catch {
-                            handler(.failure(wrapError(error: error)))
-                        }
-                        var unsubscribe: (() -> Void)?
-                        unsubscribe = self.app2app.listenToApp2AppAuthenticationResult(
-                            redirectUri: request.redirectUri.absoluteString
-                        ) { [weak self] resultURL in
-                            unsubscribe?()
-                            guard let this = self else {
-                                return
-                            }
-                            this.finishAuthentication(
-                                url: resultURL,
-                                verifier: verifier,
-                                handler: handler
-                            )
-                        }
+                    request: request
+                ) { success in
+                    do {
+                        // If failed to start, fail immediately
+                        try success.get()
+                    } catch {
+                        handler(.failure(wrapError(error: error)))
                     }
+                    var unsubscribe: (() -> Void)?
+                    unsubscribe = self.app2app.listenToApp2AppAuthenticationResult(
+                        redirectUri: request.redirectUri.absoluteString
+                    ) { [weak self] resultURL in
+                        unsubscribe?()
+                        guard let this = self else {
+                            return
+                        }
+                        this.finishAuthentication(
+                            url: resultURL,
+                            verifier: verifier,
+                            handler: handler
+                        )
+                    }
+                }
             } catch {
                 handler(.failure(wrapError(error: error)))
             }

@@ -3,9 +3,11 @@ import SwiftUI
 
 struct AuthgearConfigurationDescription: View {
     var body: some View {
-        Text("Enter Client ID and Endpoint, " +
-            "and then click Configure to initialize the SDK")
-            .lineLimit(5)
+        Text(
+            "Enter Client ID and Endpoint, " +
+                "and then click Configure to initialize the SDK"
+        )
+        .lineLimit(5)
     }
 }
 
@@ -66,7 +68,9 @@ enum TokenStorageClassName: String, CaseIterable, Identifiable {
     case TransientTokenStorage
     case PersistentTokenStorage
 
-    var id: String { self.rawValue }
+    var id: String {
+        self.rawValue
+    }
 }
 
 struct AuthgearConfigurationForm: View {
@@ -207,9 +211,11 @@ struct AuthgearConfigurationForm: View {
 
 struct AuthgearActionDescription: View {
     var body: some View {
-        Text("After that, click one of the following buttons " +
-            "to try different feature")
-            .lineLimit(5)
+        Text(
+            "After that, click one of the following buttons " +
+                "to try different feature"
+        )
+        .lineLimit(5)
     }
 }
 
@@ -359,10 +365,12 @@ struct ActionButtonList: View {
 struct ErrorAlertView: View {
     @EnvironmentObject private var app: App
 
-    private var hasError: Binding<Bool> { Binding(
-        get: { self.app.authgearActionErrorMessage != nil },
-        set: { if !$0 { self.app.authgearActionErrorMessage = nil } }
-    ) }
+    private var hasError: Binding<Bool> {
+        Binding(
+            get: { self.app.authgearActionErrorMessage != nil },
+            set: { if !$0 { self.app.authgearActionErrorMessage = nil } }
+        )
+    }
 
     var body: some View {
         VStack {
@@ -380,10 +388,12 @@ struct ErrorAlertView: View {
 struct SuccessAlertView: View {
     @EnvironmentObject private var app: App
 
-    private var shouldShowSuccessDialog: Binding<Bool> { Binding(
-        get: { self.app.successAlertMessage != nil },
-        set: { if !$0 { self.app.successAlertMessage = nil } }
-    ) }
+    private var shouldShowSuccessDialog: Binding<Bool> {
+        Binding(
+            get: { self.app.successAlertMessage != nil },
+            set: { if !$0 { self.app.successAlertMessage = nil } }
+        )
+    }
 
     var body: some View {
         VStack {
@@ -401,10 +411,12 @@ struct SuccessAlertView: View {
 struct App2AppAlertView: View {
     @EnvironmentObject private var app: App
 
-    private var shouldShow: Binding<Bool> { Binding(
-        get: { self.app.app2AppConfirmation != nil },
-        set: { _ in }
-    ) }
+    private var shouldShow: Binding<Bool> {
+        Binding(
+            get: { self.app.app2AppConfirmation != nil },
+            set: { _ in }
+        )
+    }
 
     var body: some View {
         VStack {

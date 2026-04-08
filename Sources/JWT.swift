@@ -170,8 +170,7 @@ struct JWTSigner {
         let fixlenR = Asn1IntegerConversion.toRaw(varlenR, of: crv.coordinateOctetLength)
         let fixlenS = Asn1IntegerConversion.toRaw(varlenS, of: crv.coordinateOctetLength)
 
-        let fixedSignature = (fixlenR + fixlenS)
-        return fixedSignature
+        return (fixlenR + fixlenS)
     }
 
     func sign(header: String, payload: String) throws -> String {

@@ -95,8 +95,7 @@ func getPrivateKey(tag: String, laContext: LAContext) throws -> SecKey? {
         throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
     }
 
-    let privateKey = item as! SecKey
-    return privateKey
+    return item as! SecKey
 }
 
 @available(iOS 11.3, *)

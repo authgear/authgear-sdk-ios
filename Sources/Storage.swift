@@ -253,8 +253,7 @@ class KeychainStorageDriver {
 
         switch status {
         case errSecSuccess:
-            let value = String(data: result as! Data, encoding: .utf8)!
-            return value
+            return String(data: result as! Data, encoding: .utf8)!
         case errSecItemNotFound:
             return nil
         default:
