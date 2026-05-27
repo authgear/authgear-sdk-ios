@@ -24,7 +24,7 @@ jobs:
       # Output its version.
       - run: swiftformat --version
       - run: make format
-      - run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+      - run: sudo xcode-select -s /Applications/Xcode_26.0.app/Contents/Developer
       - run: make pod-install
       - run: make xcframework
       - run: make test
@@ -45,7 +45,7 @@ jobs:
         # runs 'bundle install' and caches installed gems automatically
         bundler-cache: true
     - run: make ruby-audit
-    - run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+    - run: sudo xcode-select -s /Applications/Xcode_26.0.app/Contents/Developer
     - run: make pod-install
     - uses: authgear/gh-actions-install-apple-certificate-and-provisioning-profile@v1
       with:
