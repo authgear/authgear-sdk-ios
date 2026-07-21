@@ -368,7 +368,11 @@ struct ErrorAlertView: View {
     private var hasError: Binding<Bool> {
         Binding(
             get: { self.app.authgearActionErrorMessage != nil },
-            set: { if !$0 { self.app.authgearActionErrorMessage = nil } }
+            set: {
+                if !$0 {
+                    self.app.authgearActionErrorMessage = nil
+                }
+            }
         )
     }
 
@@ -391,7 +395,11 @@ struct SuccessAlertView: View {
     private var shouldShowSuccessDialog: Binding<Bool> {
         Binding(
             get: { self.app.successAlertMessage != nil },
-            set: { if !$0 { self.app.successAlertMessage = nil } }
+            set: {
+                if !$0 {
+                    self.app.successAlertMessage = nil
+                }
+            }
         )
     }
 
