@@ -244,6 +244,7 @@ public enum AuthenticationPage: String {
 
 public enum SettingsPage: String {
     case settings = "/settings"
+    @available(*, deprecated, message: "Use `settings` if you want a list of identities. Use methods like `changeEmail`/`changePhone` instead if you want to change these identities.")
     case identity = "/settings/identities"
 }
 
