@@ -1435,7 +1435,7 @@ public class Authgear {
             } catch {
                 if let error = error as? AuthgearError,
                    case let .oauthError(oauthError) = error,
-                   oauthError.error == "invalid_grant" {
+                   oauthError.error == "invalid_grant" || oauthError.error == "invalid_dpop_proof" {
                     self._handleInvalidGrantException(error: error, handler: handler)
                     return
                 }
@@ -1931,7 +1931,7 @@ public class Authgear {
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {
         if let error = error as? AuthgearError,
            case let .oauthError(oauthError) = error,
-           oauthError.error == "invalid_grant" {
+           oauthError.error == "invalid_grant" || oauthError.error == "invalid_dpop_proof" {
             return self.cleanupSession(force: true, reason: .invalid) { result in handler?(result) }
         } else if let error = error as? AuthgearError,
                   case let .serverError(serverError) = error,
