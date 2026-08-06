@@ -341,6 +341,22 @@ class App: ObservableObject {
         self.fetchUserInfo(container: container)
     }
 
+    /// Unlike fetchUserInfo(), this does NOT chain any follow-up request
+    /// after refresh, so the refresh result (e.g. invalid_grant vs
+    /// invalid_dpop_proof) is not masked by a subsequent request made with a
+    /// stale/missing access token.
+    func refreshAccessToken() {
+        guard let container = container else { return }
+        container.refreshAccessTokenIfNeeded { result in
+            switch result {
+            case .success:
+                self.successAlertMessage = "Refreshed access token successfully.\nsessionState: \(container.sessionState.rawValue)"
+            case let .failure(error):
+                self.setError(error)
+            }
+        }
+    }
+
     func showAuthTime() {
         let f = DateFormatter()
         f.dateStyle = .long
