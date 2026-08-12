@@ -105,6 +105,13 @@ extension AppDelegate: AuthgearDelegate {
 
     func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason, error: Error?) {
         print(#line, "authgearSessionStateDidChange: sessionState=\(container.sessionState) reason=\(reason.rawValue) error=\(String(describing: error))")
+        if let error = error as? AuthgearError, case let .oauthError(oauthError) = error {
+            if oauthError.error == "invalid_grant" {
+                print(#line, "authgearSessionStateDidChange: error is invalid_grant")
+            } else if oauthError.error == "invalid_dpop_proof" {
+                print(#line, "authgearSessionStateDidChange: error is invalid_dpop_proof")
+            }
+        }
         appContainer.sessionState = container.sessionState
     }
 }
