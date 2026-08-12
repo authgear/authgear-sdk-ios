@@ -103,7 +103,8 @@ extension AppDelegate: AuthgearDelegate {
         WXApi.send(req)
     }
 
-    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {
+    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason, error: Error?) {
+        print(#line, "authgearSessionStateDidChange: sessionState=\(container.sessionState) reason=\(reason.rawValue) error=\(String(describing: error))")
         appContainer.sessionState = container.sessionState
     }
 }

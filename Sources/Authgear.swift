@@ -263,12 +263,15 @@ public enum SessionStateChangeReason: String {
 }
 
 public protocol AuthgearDelegate: AnyObject {
-    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason)
+    // error is non-nil when reason is .invalid, i.e. the session was cleared
+    // because a request failed with an error such as invalid_grant or
+    // invalid_dpop_proof. It is nil for all other reasons.
+    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason, error: Error?)
     func sendWechatAuthRequest(_ state: String)
 }
 
 public extension AuthgearDelegate {
-    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason) {}
+    func authgearSessionStateDidChange(_ container: Authgear, reason: SessionStateChangeReason, error: Error?) {}
     func sendWechatAuthRequest(_ state: String) {}
 }
 
@@ -421,9 +424,9 @@ public class Authgear {
         }
     }
 
-    private func setSessionState(_ newState: SessionState, reason: SessionStateChangeReason) {
+    private func setSessionState(_ newState: SessionState, reason: SessionStateChangeReason, error: Error? = nil) {
         sessionState = newState
-        delegate?.authgearSessionStateDidChange(self, reason: reason)
+        delegate?.authgearSessionStateDidChange(self, reason: reason, error: error)
     }
 
     func buildAuthorizationURL(request: OIDCAuthenticationRequest, clientID: String, verifier: CodeVerifier?) throws -> URL {
@@ -726,7 +729,7 @@ public class Authgear {
         }
     }
 
-    private func cleanupSession(force: Bool, reason: SessionStateChangeReason, handler: @escaping VoidCompletionHandler) {
+    private func cleanupSession(force: Bool, reason: SessionStateChangeReason, error: Error? = nil, handler: @escaping VoidCompletionHandler) {
         if case let .failure(error) = Result(catching: { try tokenStorage.delRefreshToken(namespace: name) }) {
             if !force {
                 return handler(.failure(wrapError(error: error)))
@@ -748,7 +751,7 @@ public class Authgear {
             self.refreshToken = nil
             self.idToken = nil
             self.expireAt = nil
-            self.setSessionState(.noSession, reason: reason)
+            self.setSessionState(.noSession, reason: reason, error: error)
             handler(.success(()))
         }
     }
@@ -1929,14 +1932,14 @@ public class Authgear {
     }
 
     private func _handleInvalidGrantException(error: Error, handler: VoidCompletionHandler? = nil) {
-        if let error = error as? AuthgearError,
-           case let .oauthError(oauthError) = error,
+        if let authgearError = error as? AuthgearError,
+           case let .oauthError(oauthError) = authgearError,
            oauthError.error == "invalid_grant" || oauthError.error == "invalid_dpop_proof" {
-            return self.cleanupSession(force: true, reason: .invalid) { result in handler?(result) }
-        } else if let error = error as? AuthgearError,
-                  case let .serverError(serverError) = error,
+            return self.cleanupSession(force: true, reason: .invalid, error: error) { result in handler?(result) }
+        } else if let authgearError = error as? AuthgearError,
+                  case let .serverError(serverError) = authgearError,
                   serverError.reason == "InvalidGrant" {
-            return self.cleanupSession(force: true, reason: .invalid) { result in handler?(result) }
+            return self.cleanupSession(force: true, reason: .invalid, error: error) { result in handler?(result) }
         }
         handler?(.success(()))
     }
