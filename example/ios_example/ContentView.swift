@@ -327,6 +327,12 @@ struct ActionButtonList: View {
                 }.disabled(!configured || !loggedIn)
 
                 Button(action: {
+                    self.app.refreshAccessToken()
+                }) {
+                    ActionButton(text: "Refresh Access Token If Needed")
+                }.disabled(!configured || !loggedIn)
+
+                Button(action: {
                     self.app.openSetting()
                 }) {
                     ActionButton(text: "Open Setting")
