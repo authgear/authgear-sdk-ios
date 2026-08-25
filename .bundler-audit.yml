@@ -6,11 +6,18 @@ ignore:
   # CVE-2026-54619 / GHSA-28hh-pr2h-2w89: use-after-free when redefining
   # SQLite functions with different arity, also fixed in sqlite3 gem >= 2.9.5.
   #
+  # GHSA-mwm8-39rw-8826 (no CVE): use-after-free in SQLite aggregate arguments
+  # in a heap-allocated argument array, fixed in sqlite3 gem >= 2.9.6.
+  #
+  # All three require the application to define a custom SQLite aggregate or
+  # scalar function, which jazzy does not do.
+  #
   # sqlite3 is a transitive dependency pulled in by jazzy (~> 1.3), which is
   # used only locally to generate API documentation and is not part of the
   # shipped SDK. jazzy has not relaxed its sqlite3 constraint in any released
-  # version (checked up to 0.15.4, latest as of 2026-08-04), so bundler cannot
-  # resolve a patched sqlite3 while jazzy stays in the Gemfile. Remove these
-  # ignores once jazzy allows sqlite3 >= 2.9.5 or is replaced.
+  # version, nor on master (checked 2026-08-25, latest release 0.15.4), so
+  # bundler cannot resolve a patched sqlite3 while jazzy stays in the Gemfile.
+  # Remove these ignores once jazzy allows sqlite3 >= 2.9.6 or is replaced.
   - CVE-2026-54620
   - CVE-2026-54619
+  - GHSA-mwm8-39rw-8826
