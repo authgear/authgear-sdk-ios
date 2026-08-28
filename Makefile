@@ -32,6 +32,14 @@ build-app:
 upload-app:
 	bundle exec fastlane example_upload_app
 
+.PHONY: build-app2
+build-app2:
+	bundle exec fastlane example_build_app2 CURRENT_PROJECT_VERSION:$(shell date +%s)
+
+.PHONY: upload-app2
+upload-app2:
+	bundle exec fastlane example_upload_app2
+
 .PHONY: docs
 docs:
 	bundle exec jazzy --module Authgear --title "Authgear iOS SDK $(GIT_HASH)" --hide-documentation-coverage
