@@ -2,12 +2,18 @@ import Authgear
 import SwiftUI
 
 class App: ObservableObject {
-    static let redirectURI = "com.authgear.example://host/path"
+    // Each build variant (see the ios_example / ios_example_app2 targets) ships its own
+    // Info.plist with these two keys set, so the same source can build either app and pick
+    // up that app's own custom URL scheme and associated domain at runtime.
+    static let redirectURIScheme = Bundle.main.object(forInfoDictionaryKey: "AuthgearRedirectURIScheme") as! String
+    static let demoHost = Bundle.main.object(forInfoDictionaryKey: "AuthgearDemoHost") as! String
 
-    static let app2appRedirectURI = "https://authgear-demo.pandawork.com/app2app/redirect"
-    static let app2appAuthorizeEndpoint = "https://authgear-demo.pandawork.com/app2app/authorize"
-    static let wechatUniversalLink = "https://authgear-demo.pandawork.com/wechat/"
-    static let wechatRedirectURI = "https://authgear-demo.pandawork.com/authgear/open_wechat_app"
+    static let redirectURI = "\(redirectURIScheme)://host/path"
+
+    static let app2appRedirectURI = "https://\(demoHost)/app2app/redirect"
+    static let app2appAuthorizeEndpoint = "https://\(demoHost)/app2app/authorize"
+    static let wechatUniversalLink = "https://\(demoHost)/wechat/"
+    static let wechatRedirectURI = "https://\(demoHost)/authgear/open_wechat_app"
     static let wechatAppID = "wxa2f631873c63add1"
 
     static let biometricLAPolicy = BiometricLAPolicy.deviceOwnerAuthenticationWithBiometrics
