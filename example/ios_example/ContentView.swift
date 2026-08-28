@@ -453,9 +453,16 @@ struct App2AppAlertView: View {
 struct ContentView: View {
     @EnvironmentObject private var app: App
 
+    private var appName: String {
+        Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Authgear Demo iOS"
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                Text(appName)
+                    .font(.title)
+                    .fontWeight(.bold)
                 AuthgearConfigurationDescription()
                 AuthgearConfigurationForm(app2appState: $app.app2AppState)
                     .environmentObject(app)
