@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>AuthgearDemoHost</key>
-	<string>authgear-demo.pandawork.com</string>
+	<string>authgear-demo-ios-app2.pandawork.com</string>
 	<key>AuthgearRedirectURIScheme</key>
-	<string>com.authgear.example</string>
+	<string>com.authgear.example.app2</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Authgear Demo iOS</string>
+	<string>Authgear Demo iOS 2</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -39,7 +39,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.authgear.example</string>
+				<string>com.authgear.example.app2</string>
 			</array>
 		</dict>
 	</array>

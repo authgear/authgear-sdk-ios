@@ -62,3 +62,29 @@ jobs:
     - name: Upload to TestFlight
       if: ${{ github.ref == 'refs/heads/main' }}
       run: make upload-app
+  ios-app2:
+    if: ${{ github.repository == 'authgear/authgear-sdk-ios' && github.event_name == 'push' }}
+    runs-on: macos-15
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        # runs 'bundle install' and caches installed gems automatically
+        bundler-cache: true
+    - run: sudo xcode-select -s /Applications/Xcode_26.0.app/Contents/Developer
+    - run: make pod-install
+    - uses: authgear/gh-actions-install-apple-certificate-and-provisioning-profile@v1
+      with:
+        certificate_base64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+        certificate_password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+        provisioning_profile_base64: ${{ secrets.IOS_APP2_PROVISIONING_PROFILE_BASE64 }}
+    - uses: authgear/gh-actions-create-fastlane-api-key-json-file@v1
+      with:
+        api_key_id: ${{ secrets.IOS_API_KEY_ID }}
+        api_key_issuer: ${{ secrets.IOS_API_KEY_ISSUER }}
+        api_key_base64: ${{ secrets.IOS_API_KEY_BASE64 }}
+        output_path: ./build/fastlane-api-key.json
+    - run: make build-app2
+    - name: Upload to TestFlight
+      if: ${{ github.ref == 'refs/heads/main' }}
+      run: make upload-app2
