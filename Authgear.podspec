@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Authgear'
-  s.version          = '0.0.1'
+  s.version          = '3.0.0'
   s.summary          = 'Authgear SDK for iOS'
   s.homepage         = 'https://github.com/authgear/authgear-sdk-ios'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
