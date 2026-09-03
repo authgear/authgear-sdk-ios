@@ -58,7 +58,13 @@ platform :ios do
   end
 
   lane :example_upload_app do
+    # Pin the target app explicitly. com.authgear.sdk.exampleapp.ios is a string
+    # prefix of com.authgear.sdk.exampleapp.ios.app2, and the App Store Connect
+    # API's filter[bundleId] is a partial match, so letting the app be inferred
+    # from the ipa is ambiguous. apple_id skips app resolution entirely.
     upload_to_testflight(
+      app_identifier: "com.authgear.sdk.exampleapp.ios",
+      apple_id: "6444355849",
       skip_waiting_for_build_processing: true,
       api_key_path: "./build/fastlane-api-key.json",
       ipa: "./build/Release/iOS/ios_example/ios_example.ipa"
@@ -80,7 +86,11 @@ platform :ios do
   end
 
   lane :example_upload_app2 do
+    # Pinned for the same reason as example_upload_app, so a future third
+    # variant cannot reintroduce the ambiguity.
     upload_to_testflight(
+      app_identifier: "com.authgear.sdk.exampleapp.ios.app2",
+      apple_id: "6807455024",
       skip_waiting_for_build_processing: true,
       api_key_path: "./build/fastlane-api-key.json",
       ipa: "./build/Release/iOS/ios_example_app2/ios_example_app2.ipa"
