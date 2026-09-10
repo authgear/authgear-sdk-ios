@@ -58,13 +58,26 @@ platform :ios do
   end
 
   lane :example_upload_app do
-    # Pin the target app explicitly. com.authgear.sdk.exampleapp.ios is a string
-    # prefix of com.authgear.sdk.exampleapp.ios.app2, and the App Store Connect
-    # API's filter[bundleId] is a partial match, so letting the app be inferred
-    # from the ipa is ambiguous. apple_id skips app resolution entirely.
+    apple_id = "6444355849"
+    # Xcode 26's altool resolves the target app by matching the ipa's bundle id
+    # against App Store Connect, and picks the wrong app when one bundle id is a
+    # string prefix of another. com.authgear.sdk.exampleapp.ios is a prefix of
+    # com.authgear.sdk.exampleapp.ios.app2, so app1's uploads were bound to
+    # app2's app record and rejected with "the bundle identifier cannot be
+    # changed from the current value, 'com.authgear.sdk.exampleapp.ios.app2'".
+    # Apple's recommended workaround is to pass --apple-id so that no matching
+    # happens at all.
+    #
+    # upload_to_testflight's own apple_id option is not sufficient: fastlane
+    # uses it for its own App Store Connect lookups but never forwards it to
+    # altool (see FastlaneCore::AltoolTransporterExecutor#build_upload_command),
+    # so it has to be injected through altool's argument list instead.
+    #
+    # See https://github.com/fastlane/fastlane/discussions/29680
+    ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"] = "--apple-id #{apple_id}"
     upload_to_testflight(
       app_identifier: "com.authgear.sdk.exampleapp.ios",
-      apple_id: "6444355849",
+      apple_id: apple_id,
       skip_waiting_for_build_processing: true,
       api_key_path: "./build/fastlane-api-key.json",
       ipa: "./build/Release/iOS/ios_example/ios_example.ipa"
@@ -86,11 +99,14 @@ platform :ios do
   end
 
   lane :example_upload_app2 do
-    # Pinned for the same reason as example_upload_app, so a future third
-    # variant cannot reintroduce the ambiguity.
+    apple_id = "6807455024"
+    # Pinned for the same reason as example_upload_app. Nothing currently
+    # prefixes app2's bundle id, so app2 resolves correctly on its own today,
+    # but pinning it keeps that true if a third variant is ever added.
+    ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"] = "--apple-id #{apple_id}"
     upload_to_testflight(
       app_identifier: "com.authgear.sdk.exampleapp.ios.app2",
-      apple_id: "6807455024",
+      apple_id: apple_id,
       skip_waiting_for_build_processing: true,
       api_key_path: "./build/fastlane-api-key.json",
       ipa: "./build/Release/iOS/ios_example_app2/ios_example_app2.ipa"

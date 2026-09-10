@@ -1,23 +1,60 @@
 ---
 ignore:
-  # CVE-2026-54620 / GHSA-j7fr-3v8c-3qc3: use-after-free in SQLite aggregate
-  # function callbacks, fixed in sqlite3 gem >= 2.9.5.
-  #
   # CVE-2026-54619 / GHSA-28hh-pr2h-2w89: use-after-free when redefining
-  # SQLite functions with different arity, also fixed in sqlite3 gem >= 2.9.5.
+  # SQLite functions with different arity, fixed in sqlite3 gem >= 2.9.5.
   #
   # GHSA-mwm8-39rw-8826 (no CVE): use-after-free in SQLite aggregate arguments
   # in a heap-allocated argument array, fixed in sqlite3 gem >= 2.9.6.
   #
-  # All three require the application to define a custom SQLite aggregate or
+  # Both require the application to define a custom SQLite aggregate or
   # scalar function, which jazzy does not do.
   #
   # sqlite3 is a transitive dependency pulled in by jazzy (~> 1.3), which is
   # used only locally to generate API documentation and is not part of the
   # shipped SDK. jazzy has not relaxed its sqlite3 constraint in any released
-  # version, nor on master (checked 2026-08-25, latest release 0.15.4), so
+  # version, nor on master (re-checked 2026-09-08, latest release 0.15.4), so
   # bundler cannot resolve a patched sqlite3 while jazzy stays in the Gemfile.
   # Remove these ignores once jazzy allows sqlite3 >= 2.9.6 or is replaced.
-  - CVE-2026-54620
+  #
+  # CVE-2026-54620 / GHSA-j7fr-3v8c-3qc3 was previously ignored here too, but
+  # the advisory has since been amended with "unaffected_versions: < 2.1.0",
+  # so the locked sqlite3 1.7.3 is no longer flagged. Ignore entry removed
+  # 2026-09-08.
+  #
+  # ---
+  #
+  # CVE-2026-85396 / GHSA-47m2-wp7j-p9vc: path traversal in rubyzip's
+  # Zip::Entry#extract, fixed in rubyzip >= 3.4.0. The locked rubyzip 2.4.1
+  # does contain the flawed code (entry.rb:217 compares paths with
+  # `extract_path.start_with?(dest_dir)`, missing the trailing separator), so
+  # this is a true positive at the dependency level. It is ignored because the
+  # vulnerable function is unreachable from this repo:
+  #
+  #   - rubyzip's only dependent here is fastlane (verified with
+  #     `gem dependency rubyzip --reverse-dependencies`; cocoapods and jazzy
+  #     do not use it).
+  #   - Fastlane's entire rubyzip surface is two lines in
+  #     fastlane_core/lib/fastlane_core/ipa_file_analyser.rb, which calls
+  #     Zip::File#read (an in-memory `get_input_stream(entry, &:read)`) to
+  #     pull Info.plist out of an .ipa. It never writes to the filesystem and
+  #     never computes an extraction path.
+  #   - Grepping every gem in vendor/bundle for `.extract`/`.extract_v3` calls
+  #     on zip objects returns nothing outside rubyzip's own source, and no
+  #     code in this repo uses rubyzip directly.
+  #   - The only path that does reach rubyzip is upload_to_testflight in
+  #     fastlane/Fastfile -> pilot -> IpaFileAnalyser, and the .ipa it reads is
+  #     one we build ourselves in the preceding lane, so the archive is not
+  #     attacker-controlled either.
+  #
+  # Exploiting this requires extracting an untrusted archive to disk, which
+  # nothing in this dependency graph does. Reachability verified 2026-09-08
+  # against rubyzip 2.4.1 / fastlane 2.237.0 -- recheck if fastlane starts
+  # extracting archives or if a gem that does is added.
+  #
+  # Fastlane's master gemspec has already relaxed the pin to
+  # `rubyzip >= 3.4.0, < 4.0.0`, but that is unreleased as of 2.239.0, so
+  # bundler cannot resolve a patched rubyzip yet. Remove this ignore and run
+  # `bundle update fastlane rubyzip` once a fastlane > 2.239.0 ships with it.
   - CVE-2026-54619
   - GHSA-mwm8-39rw-8826
+  - CVE-2026-85396
