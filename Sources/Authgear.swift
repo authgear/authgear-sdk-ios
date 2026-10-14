@@ -41,6 +41,7 @@ struct AuthenticateOptions {
     let page: AuthenticationPage?
     let authenticationFlowGroup: String?
     let oauthProviderAlias: String?
+    let resource: String?
 
     var request: OIDCAuthenticationRequest {
         let scopes = getAuthenticationScopes(
@@ -65,7 +66,8 @@ struct AuthenticateOptions {
             authenticationFlowGroup: self.authenticationFlowGroup,
             responseMode: nil,
             xPreAuthenticatedURLToken: nil,
-            oauthProviderAlias: self.oauthProviderAlias
+            oauthProviderAlias: self.oauthProviderAlias,
+            resource: self.resource
         )
     }
 }
@@ -779,6 +781,7 @@ public class Authgear {
 
     /// - Parameters:
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
+    ///   - resource: Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. The access tokens of the resulting session, including refreshed ones, have `aud` set to this URI instead of the Authgear endpoint.
     public func authenticate(
         redirectURI: String,
         xState: String? = nil,
@@ -789,6 +792,7 @@ public class Authgear {
         page: AuthenticationPage? = nil,
         authenticationFlowGroup: String? = nil,
         oauthProviderAlias: String? = nil,
+        resource: String? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         self.authenticate(AuthenticateOptions(
@@ -804,7 +808,8 @@ public class Authgear {
             wechatRedirectURI: wechatRedirectURI,
             page: page,
             authenticationFlowGroup: authenticationFlowGroup,
-            oauthProviderAlias: oauthProviderAlias
+            oauthProviderAlias: oauthProviderAlias,
+            resource: resource
         ), handler: handler)
     }
 
@@ -1005,7 +1010,8 @@ public class Authgear {
                         wechatRedirectURI: wechatRedirectURI,
                         page: nil,
                         authenticationFlowGroup: nil,
-                        oauthProviderAlias: oauthProviderAlias
+                        oauthProviderAlias: oauthProviderAlias,
+                        resource: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
