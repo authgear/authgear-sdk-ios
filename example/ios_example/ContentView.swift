@@ -90,6 +90,7 @@ struct AuthgearConfigurationForm: View {
     @State private var explicitColorSchemeString: String = ""
     @State private var authenticationFlowGroup: String = ""
     @State private var oauthProviderAlias: String = ""
+    @State private var resource: String = ""
 
     private let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
 
@@ -138,6 +139,13 @@ struct AuthgearConfigurationForm: View {
                     input: AuthgearConfigurationTextField(
                         placeHolder: "Override authentication flow group",
                         text: $authenticationFlowGroup
+                    )
+                )
+                AuthgearConfigurationInput(
+                    label: "Resource",
+                    input: AuthgearConfigurationTextField(
+                        placeHolder: "Enter resource URI",
+                        text: $resource
                     )
                 )
             }
@@ -199,7 +207,8 @@ struct AuthgearConfigurationForm: View {
                     preAuthenticatedURLClientID: self.preAuthenticatedURLClientID,
                     preAuthenticatedURLRedirectURI: self.preAuthenticatedURLRedirectURI,
                     useWKWebView: self.useWKWebView,
-                    oauthProviderAlias: self.oauthProviderAlias == "" ? nil : self.oauthProviderAlias
+                    oauthProviderAlias: self.oauthProviderAlias == "" ? nil : self.oauthProviderAlias,
+                    resource: self.resource == "" ? nil : self.resource
                 )
             }) {
                 ActionButton(text: "Configure")
