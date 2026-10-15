@@ -25,7 +25,8 @@ public struct AuthgearExperimental {
         page: AuthenticationPage? = nil,
         authenticationFlowGroup: String? = nil,
         oauthProviderAlias: String? = nil,
-        resource: String? = nil
+        resource: String? = nil,
+        scopes: [String]? = nil
     ) -> Result<AuthenticationRequest, Error> {
         let options = AuthenticateOptions(
             redirectURI: redirectURI,
@@ -41,7 +42,8 @@ public struct AuthgearExperimental {
             page: page,
             authenticationFlowGroup: authenticationFlowGroup,
             oauthProviderAlias: oauthProviderAlias,
-            resource: resource
+            resource: resource,
+            scopes: scopes
         )
         return self.authgear.createAuthenticateRequest(options).map { request in
             AuthenticationRequest.fromInternal(request)

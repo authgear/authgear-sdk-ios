@@ -16,13 +16,19 @@ public enum PromptOption: String {
     case selectAccount = "select_account"
 }
 
+/// Returns the scopes to request. `additionalScopes` are merged after the scopes required by the SDK,
+/// so the scopes required by the SDK are always requested.
 func getAuthenticationScopes(
-    preAuthenticatedURLEnabled: Bool
+    preAuthenticatedURLEnabled: Bool,
+    additionalScopes: [String]? = nil
 ) -> [String] {
     var scopes = ["openid", "offline_access", "https://authgear.com/scopes/full-access"]
     if preAuthenticatedURLEnabled {
         scopes.append("device_sso")
         scopes.append("https://authgear.com/scopes/pre-authenticated-url")
+    }
+    for scope in additionalScopes ?? [] where !scopes.contains(scope) {
+        scopes.append(scope)
     }
     return scopes
 }
@@ -42,10 +48,12 @@ struct AuthenticateOptions {
     let authenticationFlowGroup: String?
     let oauthProviderAlias: String?
     let resource: String?
+    let scopes: [String]?
 
     var request: OIDCAuthenticationRequest {
         let scopes = getAuthenticationScopes(
-            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled
+            preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
+            additionalScopes: self.scopes
         )
         return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
@@ -782,6 +790,7 @@ public class Authgear {
     /// - Parameters:
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
     ///   - resource: Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. The access tokens of the resulting session, including refreshed ones, have `aud` set to this URI instead of the Authgear endpoint.
+    ///   - scopes: Scopes of the API Resource given in `resource` to request. They are merged with the scopes required by the SDK. The scopes required by the SDK are always requested.
     public func authenticate(
         redirectURI: String,
         xState: String? = nil,
@@ -793,6 +802,7 @@ public class Authgear {
         authenticationFlowGroup: String? = nil,
         oauthProviderAlias: String? = nil,
         resource: String? = nil,
+        scopes: [String]? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         self.authenticate(AuthenticateOptions(
@@ -809,7 +819,8 @@ public class Authgear {
             page: page,
             authenticationFlowGroup: authenticationFlowGroup,
             oauthProviderAlias: oauthProviderAlias,
-            resource: resource
+            resource: resource,
+            scopes: scopes
         ), handler: handler)
     }
 
@@ -1011,7 +1022,8 @@ public class Authgear {
                         page: nil,
                         authenticationFlowGroup: nil,
                         oauthProviderAlias: oauthProviderAlias,
-                        resource: nil
+                        resource: nil,
+                        scopes: nil
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
