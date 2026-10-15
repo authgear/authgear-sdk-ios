@@ -24,7 +24,9 @@ public struct AuthgearExperimental {
         wechatRedirectURI: String? = nil,
         page: AuthenticationPage? = nil,
         authenticationFlowGroup: String? = nil,
-        oauthProviderAlias: String? = nil
+        oauthProviderAlias: String? = nil,
+        resource: String? = nil,
+        scopes: [String]? = nil
     ) -> Result<AuthenticationRequest, Error> {
         let options = AuthenticateOptions(
             redirectURI: redirectURI,
@@ -39,7 +41,9 @@ public struct AuthgearExperimental {
             wechatRedirectURI: wechatRedirectURI,
             page: page,
             authenticationFlowGroup: authenticationFlowGroup,
-            oauthProviderAlias: oauthProviderAlias
+            oauthProviderAlias: oauthProviderAlias,
+            resource: resource,
+            scopes: scopes
         )
         return self.authgear.createAuthenticateRequest(options).map { request in
             AuthenticationRequest.fromInternal(request)
