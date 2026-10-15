@@ -91,6 +91,7 @@ struct AuthgearConfigurationForm: View {
     @State private var authenticationFlowGroup: String = ""
     @State private var oauthProviderAlias: String = ""
     @State private var resource: String = ""
+    @State private var scopes: String = ""
 
     private let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String
 
@@ -146,6 +147,13 @@ struct AuthgearConfigurationForm: View {
                     input: AuthgearConfigurationTextField(
                         placeHolder: "Enter resource URI",
                         text: $resource
+                    )
+                )
+                AuthgearConfigurationInput(
+                    label: "Scopes",
+                    input: AuthgearConfigurationTextField(
+                        placeHolder: "Enter resource scopes separated by space",
+                        text: $scopes
                     )
                 )
             }
@@ -208,7 +216,8 @@ struct AuthgearConfigurationForm: View {
                     preAuthenticatedURLRedirectURI: self.preAuthenticatedURLRedirectURI,
                     useWKWebView: self.useWKWebView,
                     oauthProviderAlias: self.oauthProviderAlias == "" ? nil : self.oauthProviderAlias,
-                    resource: self.resource == "" ? nil : self.resource
+                    resource: self.resource == "" ? nil : self.resource,
+                    scopes: parseScopes(self.scopes)
                 )
             }) {
                 ActionButton(text: "Configure")
@@ -490,6 +499,11 @@ struct ContentView: View {
         .padding(.top) // avoid overlap with status bar
         .keyboardAvoider()
     }
+}
+
+private func parseScopes(_ scopes: String) -> [String]? {
+    let list = scopes.split(separator: " ").map(String.init)
+    return list.isEmpty ? nil : list
 }
 
 struct ContentView_Previews: PreviewProvider {

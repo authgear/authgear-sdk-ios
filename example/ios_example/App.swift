@@ -59,6 +59,7 @@ class App: ObservableObject {
     @Published var preAuthenticatedURLRedirectURI: String = ""
     @Published var oauthProviderAlias: String? = nil
     @Published var resource: String? = nil
+    @Published var scopes: [String]? = nil
 
     private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
@@ -85,7 +86,8 @@ class App: ObservableObject {
         preAuthenticatedURLRedirectURI: String,
         useWKWebView: Bool,
         oauthProviderAlias: String?,
-        resource: String?
+        resource: String?,
+        scopes: [String]?
     ) {
         guard clientId != "", endpoint != "" else {
             authgearActionErrorMessage = "Please input client ID and endpoint"
@@ -124,6 +126,7 @@ class App: ObservableObject {
         self.preAuthenticatedURLRedirectURI = preAuthenticatedURLRedirectURI
         self.oauthProviderAlias = oauthProviderAlias
         self.resource = resource
+        self.scopes = scopes
         self.updateBiometricState()
     }
 
@@ -181,6 +184,7 @@ class App: ObservableObject {
             authenticationFlowGroup: self.authenticationFlowGroup,
             oauthProviderAlias: self.oauthProviderAlias,
             resource: self.resource,
+            scopes: self.scopes,
             handler: self.handleAuthorizeResult
         )
     }
