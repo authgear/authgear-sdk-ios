@@ -17,7 +17,7 @@
     <a title="Authgear Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear iOS SDK git-e4c059214509</a></p>
+        <p><a href="../index.html">Authgear iOS SDK git-202063e45cf4</a></p>
         <div class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -532,9 +532,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC12authenticate11redirectURI6xState6prompt9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup18oauthProviderAlias7handlerySS_SSSgSayAA12PromptOptionOGSgSaySSGSgAA05ColorJ0OSgAnA18AuthenticationPageOSgA2Nys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/authenticate(redirectURI:xState:prompt:uiLocales:colorScheme:wechatRedirectURI:page:authenticationFlowGroup:oauthProviderAlias:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC12authenticate11redirectURI6xState6prompt9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup18oauthProviderAlias7handlerySS_SSSgSayAA12PromptOptionOGSgSaySSGSgAA05ColorJ0OSgAnA18AuthenticationPageOSgA2Nys6ResultOyAA8UserInfoVs5Error_pGctF">authenticate(redirectURI:<wbr>xState:<wbr>prompt:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>page:<wbr>authenticationFlowGroup:<wbr>oauthProviderAlias:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC12authenticate11redirectURI6xState6prompt9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup18oauthProviderAlias8resource6scopes7handlerySS_SSSgSayAA12PromptOptionOGSgSaySSGSgAA05ColorJ0OSgApA18AuthenticationPageOSgA3pVys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/authenticate(redirectURI:xState:prompt:uiLocales:colorScheme:wechatRedirectURI:page:authenticationFlowGroup:oauthProviderAlias:resource:scopes:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC12authenticate11redirectURI6xState6prompt9uiLocales11colorScheme014wechatRedirectD04page23authenticationFlowGroup18oauthProviderAlias8resource6scopes7handlerySS_SSSgSayAA12PromptOptionOGSgSaySSGSgAA05ColorJ0OSgApA18AuthenticationPageOSgA3pVys6ResultOyAA8UserInfoVs5Error_pGctF">authenticate(redirectURI:<wbr>xState:<wbr>prompt:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>page:<wbr>authenticationFlowGroup:<wbr>oauthProviderAlias:<wbr>resource:<wbr>scopes:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -558,6 +558,8 @@
     <span class="nv">page</span><span class="p">:</span> <span class="kt"><a href="../Enums/AuthenticationPage.html">AuthenticationPage</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">authenticationFlowGroup</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">oauthProviderAlias</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">resource</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">scopes</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a></span>
 <span class="p">)</span></code></pre>
 
@@ -576,6 +578,30 @@
                               <td>
                                 <div>
                                   <p>Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>resource</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. The access tokens of the resulting session, including refreshed ones, have <code>aud</code> set to this URI instead of the Authgear endpoint.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scopes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scopes of the API Resource given in <code>resource</code> to request. They are merged with the scopes required by the SDK. The scopes required by the SDK are always requested.</p>
                                 </div>
                               </td>
                             </tr>
