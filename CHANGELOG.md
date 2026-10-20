@@ -18,6 +18,16 @@ of earlier releases.
 - `authenticate()` accepts optional `scopes` to request the scopes of the API
   resource given in `resource`. They are merged with the scopes required by
   the SDK, so the scopes required by the SDK are always requested.
+- `configure()` accepts optional `resource` and `scopes`. They are the defaults
+  for every method that takes them, used only when the call does not give its
+  own. A `resource` or `scopes` given to a method replaces the default. The
+  scopes required by the SDK are always requested.
+- `authenticateAnonymously()`, `promoteAnonymousUser()` and
+  `authenticateBiometric()` accept optional `resource` and `scopes`.
+- `App2AppAuthenticateOptions` and `App2AppAuthenticateRequest` accept an
+  optional `resource`. The app that approves the request passes it on
+  unchanged.
+- `makePreAuthenticatedURL()` accepts an optional `resource`.
 
 ## [3.0.0] - 2026-09-03
 
