@@ -50,10 +50,11 @@ struct AuthenticateOptions {
     let resource: String?
     let scopes: [String]?
 
-    var request: OIDCAuthenticationRequest {
+    /// `self.resource` and `self.scopes` take precedence over the defaults.
+    func toRequest(defaultResource: String?, defaultScopes: [String]?) -> OIDCAuthenticationRequest {
         let scopes = getAuthenticationScopes(
             preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
-            additionalScopes: self.scopes
+            additionalScopes: self.scopes ?? defaultScopes
         )
         return OIDCAuthenticationRequest(
             redirectURI: self.redirectURI,
@@ -75,7 +76,7 @@ struct AuthenticateOptions {
             responseMode: nil,
             xPreAuthenticatedURLToken: nil,
             oauthProviderAlias: self.oauthProviderAlias,
-            resource: self.resource
+            resource: self.resource ?? defaultResource
         )
     }
 }
@@ -370,6 +371,10 @@ public class Authgear {
 
     public weak var delegate: AuthgearDelegate?
 
+    // Set by `configure`. A per-call value takes precedence; it is never merged with these.
+    private var defaultResource: String?
+    private var defaultScopes: [String]?
+
     public init(
         clientId: String,
         endpoint: String,
@@ -413,9 +418,16 @@ public class Authgear {
         )
     }
 
+    /// - Parameters:
+    ///   - resource: Default resource indicator (RFC 8707) for every method that accepts `resource`. A `resource` given to a method replaces it. It is not sent to requests that do not accept `resource`, such as biometric setup.
+    ///   - scopes: Default scopes of the API Resource given in `resource`, for every method that creates a new session. `scopes` given to a method replaces it. They are merged with the scopes required by the SDK.
     public func configure(
+        resource: String? = nil,
+        scopes: [String]? = nil,
         handler: VoidCompletionHandler? = nil
     ) {
+        self.defaultResource = resource
+        self.defaultScopes = scopes
         workerQueue.async {
             let refreshToken = Result { try self.tokenStorage.getRefreshToken(namespace: self.name) }
             switch refreshToken {
@@ -481,7 +493,7 @@ public class Authgear {
 
     func createAuthenticateRequest(_ options: AuthenticateOptions) -> Result<AuthenticationRequest, Error> {
         let verifier = CodeVerifier()
-        var request = options.request
+        var request = options.toRequest(defaultResource: self.defaultResource, defaultScopes: self.defaultScopes)
         // Ignore the error if jkt cannot be computed
         // The SDK should still work without DPoP
         request.dpopJKT = try? dpopProvider.computeJKT()
@@ -898,10 +910,17 @@ public class Authgear {
         }
     }
 
+    /// - Parameters:
+    ///   - resource: Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. Defaults to the `resource` given to `configure`.
+    ///   - scopes: Scopes of the API Resource given in `resource` to request. They are merged with the scopes required by the SDK. Defaults to the `scopes` given to `configure`.
     public func authenticateAnonymously(
+        resource: String? = nil,
+        scopes: [String]? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
+        let resource = resource ?? self.defaultResource
+        let scopes = scopes ?? self.defaultScopes
         workerQueue.async {
             do {
                 let token = try self.apiClient.syncRequestOAuthChallenge(purpose: "anonymous_request").token
@@ -937,7 +956,12 @@ public class Authgear {
                     jwt: signedJWT,
                     accessToken: nil,
                     xApp2AppDeviceKeyJwt: nil,
-                    scope: nil,
+                    scope: scopes.map {
+                        getAuthenticationScopes(
+                            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
+                            additionalScopes: $0
+                        )
+                    },
                     requestedTokenType: nil,
                     subjectTokenType: nil,
                     subjectToken: nil,
@@ -945,6 +969,8 @@ public class Authgear {
                     actorToken: nil,
                     audience: nil,
                     deviceSecret: nil
+,
+                    resource: resource
                 )
 
                 let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -970,6 +996,8 @@ public class Authgear {
 
     /// - Parameters:
     ///   - xState: Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used
+    ///   - resource: Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. Defaults to the `resource` given to `configure`.
+    ///   - scopes: Scopes of the API Resource given in `resource` to request. They are merged with the scopes required by the SDK. Defaults to the `scopes` given to `configure`.
     public func promoteAnonymousUser(
         redirectURI: String,
         xState: String? = nil,
@@ -977,6 +1005,8 @@ public class Authgear {
         colorScheme: ColorScheme? = nil,
         wechatRedirectURI: String? = nil,
         oauthProviderAlias: String? = nil,
+        resource: String? = nil,
+        scopes: [String]? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
@@ -1022,8 +1052,8 @@ public class Authgear {
                         page: nil,
                         authenticationFlowGroup: nil,
                         oauthProviderAlias: oauthProviderAlias,
-                        resource: nil,
-                        scopes: nil
+                        resource: resource,
+                        scopes: scopes
                     )
                 ) { [weak self] result in
                     guard let this = self else { return }
@@ -1669,13 +1699,20 @@ public class Authgear {
         }
     }
 
+    /// - Parameters:
+    ///   - resource: Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. Defaults to the `resource` given to `configure`.
+    ///   - scopes: Scopes of the API Resource given in `resource` to request. They are merged with the scopes required by the SDK. Defaults to the `scopes` given to `configure`.
     @available(iOS 11.3, *)
     public func authenticateBiometric(
         localizedReason: String,
         policy: BiometricLAPolicy,
         localizedCancelTitle: String? = nil,
+        resource: String? = nil,
+        scopes: [String]? = nil,
         handler: @escaping UserInfoCompletionHandler
     ) {
+        let resource = resource ?? self.defaultResource
+        let scopes = scopes ?? self.defaultScopes
         let laPolicy = policy.laPolicy
         let handler = withMainQueueHandler(handler)
         let context = LAContext(policy: laPolicy, localizedCancelTitle: localizedCancelTitle)
@@ -1724,7 +1761,8 @@ public class Authgear {
                         accessToken: nil,
                         xApp2AppDeviceKeyJwt: nil,
                         scope: getAuthenticationScopes(
-                            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled
+                            preAuthenticatedURLEnabled: self.preAuthenticatedURLEnabled,
+                            additionalScopes: scopes
                         ),
                         requestedTokenType: nil,
                         subjectTokenType: nil,
@@ -1732,7 +1770,8 @@ public class Authgear {
                         actorTokenType: nil,
                         actorToken: nil,
                         audience: nil,
-                        deviceSecret: nil
+                        deviceSecret: nil,
+                        resource: resource
                     )
 
                     let userInfo = try self.apiClient.syncRequestOIDCUserInfo(accessToken: oidcTokenResponse.accessToken!)
@@ -1759,6 +1798,7 @@ public class Authgear {
     ) {
         let handler = withMainQueueHandler(handler)
         let verifier = CodeVerifier()
+        let options = options.resource == nil ? options.withResource(self.defaultResource) : options
         let request = options.toRequest(clientID: self.clientId, codeVerifier: verifier)
         self.workerQueue.async {
             do {
@@ -1852,13 +1892,17 @@ public class Authgear {
         return app2app.handleApp2AppAuthenticationResult(url: incomingURL)
     }
 
+    /// - Parameters:
+    ///   - resource: Resource indicator (RFC 8707) for the session of the web application. Defaults to the `resource` given to `configure`.
     public func makePreAuthenticatedURL(
         webApplicationClientID: String,
         webApplicationURI: String,
         state: String?,
+        resource: String? = nil,
         handler: @escaping URLCompletionHandler
     ) {
         let handler = withMainQueueHandler(handler)
+        let resource = resource ?? self.defaultResource
         if !preAuthenticatedURLEnabled {
             handler(.failure(AuthgearError.runtimeError("makePreAuthenticatedURL requires preAuthenticatedURLEnabled to be true")))
             return
@@ -1897,7 +1941,8 @@ public class Authgear {
                     actorTokenType: .deviceSecret,
                     actorToken: deviceSecret,
                     audience: self.apiClient.endpoint.origin()!.absoluteString,
-                    deviceSecret: nil
+                    deviceSecret: nil,
+                    resource: resource
                 )
                 // Here access_token is pre-authenticated-url-token
                 let preAuthenticatedURLToken = tokenExchangeResult.accessToken
