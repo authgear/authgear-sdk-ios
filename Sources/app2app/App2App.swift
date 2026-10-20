@@ -265,7 +265,8 @@ class App2App {
             actorTokenType: nil,
             actorToken: nil,
             audience: nil,
-            deviceSecret: nil
+            deviceSecret: nil,
+            resource: request.resource
         )
         let code = oidcTokenResponse.code ?? ""
         var query: [String: String] = [

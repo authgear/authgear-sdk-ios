@@ -6,6 +6,7 @@ public struct App2AppAuthenticateRequest {
     public let clientID: String
     public let codeChallenge: String
     public let state: String?
+    public let resource: String?
 
     func toURL() throws -> URL {
         let urlcomponents = URLComponents(string: authorizationEndpoint)
@@ -20,6 +21,9 @@ public struct App2AppAuthenticateRequest {
         ]
         if let state = state {
             query["state"] = state
+        }
+        if let resource = resource {
+            query["resource"] = resource
         }
         urlcomponents.percentEncodedQuery = query.encodeAsQuery()
         return urlcomponents.url!.absoluteURL
@@ -54,6 +58,7 @@ public struct App2AppAuthenticateRequest {
         self.clientID = clientID
         self.codeChallenge = codeChallenge
         self.state = queryParams["state"]
+        self.resource = queryParams["resource"]
     }
 
     init(
@@ -61,12 +66,14 @@ public struct App2AppAuthenticateRequest {
         redirectUri: URL,
         clientID: String,
         codeChallenge: String,
-        state: String?
+        state: String?,
+        resource: String? = nil
     ) {
         self.authorizationEndpoint = authorizationEndpoint
         self.redirectUri = redirectUri
         self.clientID = clientID
         self.codeChallenge = codeChallenge
         self.state = state
+        self.resource = resource
     }
 }
