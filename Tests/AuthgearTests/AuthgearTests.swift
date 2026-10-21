@@ -80,14 +80,14 @@ final class AuthgearTests: XCTestCase {
         )
         let request = options.toRequest(clientID: "client", codeVerifier: CodeVerifier())
         XCTAssertEqual(request.resource, "https://api.example.com")
-        let parsed = try XCTUnwrap(App2AppAuthenticateRequest(url: try request.toURL()))
+        let parsed = try XCTUnwrap(try App2AppAuthenticateRequest(url: request.toURL()))
         XCTAssertEqual(parsed.resource, "https://api.example.com")
 
         let withoutResource = App2AppAuthenticateOptions(
             authorizationEndpoint: "https://app.example.com/app2app",
             redirectUri: "https://other.example.com/cb"
         ).toRequest(clientID: "client", codeVerifier: CodeVerifier())
-        let parsedWithout = try XCTUnwrap(App2AppAuthenticateRequest(url: try withoutResource.toURL()))
+        let parsedWithout = try XCTUnwrap(try App2AppAuthenticateRequest(url: withoutResource.toURL()))
         XCTAssertNil(parsedWithout.resource)
     }
 

@@ -968,8 +968,7 @@ public class Authgear {
                     actorTokenType: nil,
                     actorToken: nil,
                     audience: nil,
-                    deviceSecret: nil
-,
+                    deviceSecret: nil,
                     resource: resource
                 )
 
