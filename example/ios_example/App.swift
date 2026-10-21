@@ -58,8 +58,6 @@ class App: ObservableObject {
     @Published var preAuthenticatedURLClientID: String = ""
     @Published var preAuthenticatedURLRedirectURI: String = ""
     @Published var oauthProviderAlias: String? = nil
-    @Published var resource: String? = nil
-    @Published var scopes: [String]? = nil
 
     private var mPendingApp2AppRequest: App2AppAuthenticateRequest?
     var pendingApp2AppRequest: App2AppAuthenticateRequest? {
@@ -113,7 +111,9 @@ class App: ObservableObject {
             isSSOEnabled: isSSOEnabled,
             isApp2AppEnabled: isApp2AppEnabled,
             preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
-            useWKWebView: useWKWebView
+            useWKWebView: useWKWebView,
+            resource: resource,
+            scopes: scopes
         )
         self.clientID = clientId
         self.endpoint = endpoint
@@ -125,8 +125,6 @@ class App: ObservableObject {
         self.preAuthenticatedURLClientID = preAuthenticatedURLClientID
         self.preAuthenticatedURLRedirectURI = preAuthenticatedURLRedirectURI
         self.oauthProviderAlias = oauthProviderAlias
-        self.resource = resource
-        self.scopes = scopes
         self.updateBiometricState()
     }
 
@@ -183,8 +181,6 @@ class App: ObservableObject {
             page: self.authenticationPage,
             authenticationFlowGroup: self.authenticationFlowGroup,
             oauthProviderAlias: self.oauthProviderAlias,
-            resource: self.resource,
-            scopes: self.scopes,
             handler: self.handleAuthorizeResult
         )
     }
