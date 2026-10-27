@@ -12,7 +12,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         isSSOEnabled: Bool,
         isApp2AppEnabled: Bool,
         preAuthenticatedURLEnabled: Bool,
-        useWKWebView: Bool
+        useWKWebView: Bool,
+        resource: String?,
+        scopes: [String]?
     ) {
         let app2AppOptions = App2AppOptions(
             isEnabled: isApp2AppEnabled,
@@ -52,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             preAuthenticatedURLEnabled: preAuthenticatedURLEnabled,
             app2AppOptions: app2AppOptions
         )
-        appContainer.container?.configure() { _ in
+        appContainer.container?.configure(resource: resource, scopes: scopes) { _ in
             self.appContainer.postConfig()
         }
         appContainer.container?.delegate = self
