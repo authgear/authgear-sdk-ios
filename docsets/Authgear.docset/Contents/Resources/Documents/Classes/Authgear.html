@@ -17,7 +17,7 @@
     <a title="Authgear Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Authgear iOS SDK git-202063e45cf4</a></p>
+        <p><a href="../index.html">Authgear iOS SDK git-3da96f26f3b5</a></p>
         <div class="header-right">
           <form role="search" action="../search.json">
             <input type="text" placeholder="Search documentation" data-typeahead>
@@ -445,9 +445,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC9configure7handleryys6ResultOyyts5Error_pGcSg_tF"></a>
-                    <a name="//apple_ref/swift/Method/configure(handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC9configure7handleryys6ResultOyyts5Error_pGcSg_tF">configure(handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC9configure8resource6scopes7handlerySSSg_SaySSGSgys6ResultOyyts5Error_pGcSgtF"></a>
+                    <a name="//apple_ref/swift/Method/configure(resource:scopes:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC9configure8resource6scopes7handlerySSSg_SaySSGSgys6ResultOyyts5Error_pGcSgtF">configure(resource:<wbr>scopes:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -455,18 +455,50 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">configure</span><span class="p">(</span>
+    <span class="nv">resource</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">scopes</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear21VoidCompletionHandlera">VoidCompletionHandler</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
 <span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>resource</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Default resource indicator (RFC 8707) for every method that accepts <code>resource</code>. A <code>resource</code> given to a method replaces it. It is not sent to requests that do not accept <code>resource</code>, such as biometric setup.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scopes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Default scopes of the API Resource given in <code>resource</code>, for every method that creates a new session. <code>scopes</code> given to a method replaces it. They are merged with the scopes required by the SDK.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -673,9 +705,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC23authenticateAnonymously7handleryys6ResultOyAA8UserInfoVs5Error_pGc_tF"></a>
-                    <a name="//apple_ref/swift/Method/authenticateAnonymously(handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC23authenticateAnonymously7handleryys6ResultOyAA8UserInfoVs5Error_pGc_tF">authenticateAnonymously(handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC23authenticateAnonymously8resource6scopes7handlerySSSg_SaySSGSgys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateAnonymously(resource:scopes:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC23authenticateAnonymously8resource6scopes7handlerySSSg_SaySSGSgys6ResultOyAA8UserInfoVs5Error_pGctF">authenticateAnonymously(resource:<wbr>scopes:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -683,18 +715,50 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateAnonymously</span><span class="p">(</span>
+    <span class="nv">resource</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">scopes</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a></span>
 <span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>resource</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. Defaults to the <code>resource</code> given to <code>configure</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scopes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scopes of the API Resource given in <code>resource</code> to request. They are merged with the scopes required by the SDK. Defaults to the <code>scopes</code> given to <code>configure</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -702,9 +766,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC20promoteAnonymousUser11redirectURI6xState9uiLocales11colorScheme014wechatRedirectF018oauthProviderAlias7handlerySS_SSSgSaySSGSgAA05ColorK0OSgA2Kys6ResultOyAA0D4InfoVs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/promoteAnonymousUser(redirectURI:xState:uiLocales:colorScheme:wechatRedirectURI:oauthProviderAlias:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC20promoteAnonymousUser11redirectURI6xState9uiLocales11colorScheme014wechatRedirectF018oauthProviderAlias7handlerySS_SSSgSaySSGSgAA05ColorK0OSgA2Kys6ResultOyAA0D4InfoVs5Error_pGctF">promoteAnonymousUser(redirectURI:<wbr>xState:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>oauthProviderAlias:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC20promoteAnonymousUser11redirectURI6xState9uiLocales11colorScheme014wechatRedirectF018oauthProviderAlias8resource6scopes7handlerySS_SSSgSaySSGSgAA05ColorK0OSgA3mOys6ResultOyAA0D4InfoVs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/promoteAnonymousUser(redirectURI:xState:uiLocales:colorScheme:wechatRedirectURI:oauthProviderAlias:resource:scopes:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC20promoteAnonymousUser11redirectURI6xState9uiLocales11colorScheme014wechatRedirectF018oauthProviderAlias8resource6scopes7handlerySS_SSSgSaySSGSgAA05ColorK0OSgA3mOys6ResultOyAA0D4InfoVs5Error_pGctF">promoteAnonymousUser(redirectURI:<wbr>xState:<wbr>uiLocales:<wbr>colorScheme:<wbr>wechatRedirectURI:<wbr>oauthProviderAlias:<wbr>resource:<wbr>scopes:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -725,6 +789,8 @@
     <span class="nv">colorScheme</span><span class="p">:</span> <span class="kt"><a href="../Enums/ColorScheme.html">ColorScheme</a></span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">wechatRedirectURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">oauthProviderAlias</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">resource</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">scopes</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a></span>
 <span class="p">)</span></code></pre>
 
@@ -743,6 +809,30 @@
                               <td>
                                 <div>
                                   <p>Use this parameter to provide parameters from the client application to Custom UI. The string in xState can be accessed by the Custom UI. Ignore this parameter if default AuthUI is used</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>resource</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. Defaults to the <code>resource</code> given to <code>configure</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scopes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scopes of the API Resource given in <code>resource</code> to request. They are merged with the scopes required by the SDK. Defaults to the <code>scopes</code> given to <code>configure</code>.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1170,9 +1260,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC21authenticateBiometric15localizedReason6policy0D11CancelTitle7handlerySS_AA0C8LAPolicyOSSSgys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/authenticateBiometric(localizedReason:policy:localizedCancelTitle:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC21authenticateBiometric15localizedReason6policy0D11CancelTitle7handlerySS_AA0C8LAPolicyOSSSgys6ResultOyAA8UserInfoVs5Error_pGctF">authenticateBiometric(localizedReason:<wbr>policy:<wbr>localizedCancelTitle:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC21authenticateBiometric15localizedReason6policy0D11CancelTitle8resource6scopes7handlerySS_AA0C8LAPolicyOSSSgALSaySSGSgys6ResultOyAA8UserInfoVs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateBiometric(localizedReason:policy:localizedCancelTitle:resource:scopes:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC21authenticateBiometric15localizedReason6policy0D11CancelTitle8resource6scopes7handlerySS_AA0C8LAPolicyOSSSgALSaySSGSgys6ResultOyAA8UserInfoVs5Error_pGctF">authenticateBiometric(localizedReason:<wbr>policy:<wbr>localizedCancelTitle:<wbr>resource:<wbr>scopes:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1180,21 +1270,54 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateBiometric</span><span class="p">(</span>
+                          <pre class="highlight swift"><code><span class="kd">@available</span><span class="p">(</span><span class="n">iOS</span> <span class="mf">11.3</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateBiometric</span><span class="p">(</span>
     <span class="nv">localizedReason</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
     <span class="nv">policy</span><span class="p">:</span> <span class="kt"><a href="../Enums/BiometricLAPolicy.html">BiometricLAPolicy</a></span><span class="p">,</span>
     <span class="nv">localizedCancelTitle</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">resource</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+    <span class="nv">scopes</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear25UserInfoCompletionHandlera">UserInfoCompletionHandler</a></span>
 <span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>resource</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Resource indicator (RFC 8707). The URI of an API Resource registered in Authgear Portal. Defaults to the <code>resource</code> given to <code>configure</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>scopes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Scopes of the API Resource given in <code>resource</code> to request. They are merged with the scopes required by the SDK. Defaults to the <code>scopes</code> given to <code>configure</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -1349,9 +1472,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:8AuthgearAAC23makePreAuthenticatedURL22webApplicationClientID0fG3URI5state7handlerySS_S2SSgys6ResultOy10Foundation0E0Vs5Error_pGctF"></a>
-                    <a name="//apple_ref/swift/Method/makePreAuthenticatedURL(webApplicationClientID:webApplicationURI:state:handler:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:8AuthgearAAC23makePreAuthenticatedURL22webApplicationClientID0fG3URI5state7handlerySS_S2SSgys6ResultOy10Foundation0E0Vs5Error_pGctF">makePreAuthenticatedURL(webApplicationClientID:<wbr>webApplicationURI:<wbr>state:<wbr>handler:<wbr>)</a>
+                    <a name="/s:8AuthgearAAC23makePreAuthenticatedURL22webApplicationClientID0fG3URI5state8resource7handlerySS_S2SSgAIys6ResultOy10Foundation0E0Vs5Error_pGctF"></a>
+                    <a name="//apple_ref/swift/Method/makePreAuthenticatedURL(webApplicationClientID:webApplicationURI:state:resource:handler:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8AuthgearAAC23makePreAuthenticatedURL22webApplicationClientID0fG3URI5state8resource7handlerySS_S2SSgAIys6ResultOy10Foundation0E0Vs5Error_pGctF">makePreAuthenticatedURL(webApplicationClientID:<wbr>webApplicationURI:<wbr>state:<wbr>resource:<wbr>handler:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1359,8 +1482,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -1370,10 +1492,30 @@
     <span class="nv">webApplicationClientID</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
     <span class="nv">webApplicationURI</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
     <span class="nv">state</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span>
+    <span class="nv">resource</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
     <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Typealiases.html#/s:8Authgear20URLCompletionHandlera">URLCompletionHandler</a></span>
 <span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>resource</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Resource indicator (RFC 8707) for the session of the web application. Defaults to the <code>resource</code> given to <code>configure</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -1410,7 +1552,7 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2026 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2026-10-18)</p>
+          <p>&copy; 2026 <a class="link" href="https://github.com/authgear/authgear-sdk-ios" target="_blank" rel="external noopener">Authgear</a>. All rights reserved. (Last updated: 2026-10-27)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.5</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
