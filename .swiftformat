@@ -1,5 +1,5 @@
 # file options
---exclude vendor
+--exclude vendor,tools
 
 --symlinks ignore
 --swiftversion 5.1

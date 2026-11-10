@@ -1,5 +1,5 @@
 PODS:
-  - WechatOpenSDK-XCFramework (2.0.4)
+  - WechatOpenSDK-XCFramework (2.0.9)
 
 DEPENDENCIES:
   - WechatOpenSDK-XCFramework (~> 2.0.4)
@@ -9,7 +9,7 @@ SPEC REPOS:
     - WechatOpenSDK-XCFramework
 
 SPEC CHECKSUMS:
-  WechatOpenSDK-XCFramework: 36fb2bea0754266c17184adf4963d7e6ff98b69f
+  WechatOpenSDK-XCFramework: 996f8fe4f5ca9d75529546f7246da459ef31aa0d
 
 PODFILE CHECKSUM: 7d11734a533ebbd26f6b9b738d5b2ce7020c6604
 
