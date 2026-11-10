@@ -20,9 +20,8 @@ jobs:
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
       - run: make ruby-audit
-      # swiftformat is pre-installed on the runner.
-      # Output its version.
-      - run: swiftformat --version
+      # make vendor downloads the swiftformat version pinned in tools/Makefile.
+      - run: make vendor
       - run: make format
       - run: sudo xcode-select -s /Applications/Xcode_26.0.app/Contents/Developer
       - run: make pod-install

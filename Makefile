@@ -4,9 +4,16 @@ GIT_HASH ?= git-$(shell git rev-parse --short=12 HEAD)
 ruby-audit:
 	bundle exec bundler-audit check --update
 
+# Downloads the tools pinned in tools/Makefile (swiftformat).
+# .PHONY is needed because the repo has a directory named vendor.
+.PHONY: vendor
+vendor:
+	$(MAKE) -C tools
+
+# Run `make vendor` first.
 .PHONY: format
 format:
-	swiftformat --strict .
+	./tools/bin/swiftformat --strict .
 
 .PHONY: clean
 clean:
