@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AuthgearDemoHost</key>
-	<string>authgear-demo-ios-app2.pandawork.com</string>
+	<string>authgear-demo-ios-app2.oursky.codes</string>
 	<key>AuthgearRedirectURIScheme</key>
 	<string>com.authgear.example.app2</string>
 	<key>CFBundleDevelopmentRegion</key>
