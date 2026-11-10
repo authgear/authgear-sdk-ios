@@ -1,2 +1,7 @@
 ---
-ignore: []
+ignore:
+  # activesupport advisory: no fix available within the version range we can use.
+  # cocoapods and jazzy cap activesupport to <8, and the fix requires activesupport 8.
+  # Upstream tracking issue: https://github.com/CocoaPods/Core/issues/786
+  # TODO: remove this ignore once cocoapods supports activesupport 8.
+  - GHSA-8474-xrp6-wh69
