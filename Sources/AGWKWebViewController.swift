@@ -78,6 +78,12 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
         super.init(nibName: nil, bundle: nil)
 
         self.webView.navigationDelegate = self
+        if #available(iOS 16.0, *), let bridge = self.bridge as? AGWKWebViewBridge {
+            // Weak, so that the bridge, which the user content controller holds, does not hold this view controller.
+            bridge.presentationAnchorProvider = { [weak self] in
+                self?.view.window
+            }
+        }
     }
 
     @available(*, unavailable)
@@ -152,6 +158,9 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
     }
 
     override func viewDidDisappear(_ animated: Bool) {
+        // A passkey request must not stay pending after the web view is gone.
+        self.invalidateBridge()
+
         // We only call completion handler here because
         // The view controller could be swiped to dismiss.
         // viewDidDisappear is the most rebust way to detect whether the view controller is dismissed.
@@ -191,6 +200,18 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
 
     private func dismissSelf() {
         self.navigationController?.presentingViewController?.dismiss(animated: true)
+    }
+
+    private func invalidateBridge() {
+        if #available(iOS 16.0, *), let bridge = self.bridge as? AGWKWebViewBridge {
+            bridge.invalidate()
+        }
+    }
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        // The top-level page starts loading another page.
+        // Pending bridge requests are cancelled, and their replies never reach the new page.
+        self.invalidateBridge()
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {

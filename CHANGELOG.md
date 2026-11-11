@@ -10,6 +10,14 @@ of earlier releases.
 
 ## [Unreleased]
 
+### Added
+
+- On iOS 16+, `WKWebViewUIImplementation` provides `authgearBridge` to the
+  pages of the endpoint. When the login page loads, AuthUI uses it to ask the
+  app for a passkey that is already on this device, so the passkey sheet
+  appears without a tap. No change is needed in the app beyond the existing
+  `webcredentials:` associated domain.
+
 ### Removed
 
 - CocoaPods support, because CocoaPods is reaching end of life.
