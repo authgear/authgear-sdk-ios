@@ -27,6 +27,8 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
 
     private let webView: WKWebView
     private var result: URL?
+    /// AGWKWebViewBridge on iOS 16+. AnyObject so that this class still builds for older iOS versions.
+    private var bridge: AnyObject?
 
     private let disableUserSelectSource: String = """
         document.documentElement.style.webkitUserSelect = 'none';
@@ -51,6 +53,18 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
             forMainFrameOnly: false
         )
         configuration.userContentController.addUserScript(disableUserSelectScript)
+
+        // Provide the AuthUI bridge to pages of the endpoint's origin.
+        // .page is required because AuthUI's scripts run in the page world.
+        if #available(iOS 16.0, *) {
+            let webViewBridge = AGWKWebViewBridge(allowedOrigins: [url])
+            configuration.userContentController.addScriptMessageHandler(
+                webViewBridge,
+                contentWorld: .page,
+                name: AGWKWebViewBridge.name
+            )
+            self.bridge = webViewBridge
+        }
 
         self.webView = WKWebView(frame: .zero, configuration: configuration)
         self.webView.translatesAutoresizingMaskIntoConstraints = false
