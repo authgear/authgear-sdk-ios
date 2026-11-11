@@ -11,6 +11,7 @@
 		775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775FF73326047C7700B81ECD /* DeviceInfo.swift */; };
 		77EBB6182B833BC600EEDFD2 /* ASWebAuthenticationSessionUIImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77EBB6172B833BC600EEDFD2 /* ASWebAuthenticationSessionUIImplementation.swift */; };
 		77EBB61C2B833C5F00EEDFD2 /* AGWKWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77EBB61B2B833C5F00EEDFD2 /* AGWKWebViewController.swift */; };
+		A6D4B0012F2A000100A1B2C3 /* AGWKWebViewBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6D4B0002F2A000100A1B2C3 /* AGWKWebViewBridge.swift */; };
 		77EBB61E2B833CAA00EEDFD2 /* WKWebViewUIImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77EBB61D2B833CAA00EEDFD2 /* WKWebViewUIImplementation.swift */; };
 		95E67335299F652100C9466C /* AuthgearExperimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E67332299F652000C9466C /* AuthgearExperimental.swift */; };
 		A652CEAE2A812CA9006E789F /* App2AppOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A652CEAD2A812CA9006E789F /* App2AppOptions.swift */; };
@@ -66,6 +67,7 @@
 		775FF73326047C7700B81ECD /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
 		77EBB6172B833BC600EEDFD2 /* ASWebAuthenticationSessionUIImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASWebAuthenticationSessionUIImplementation.swift; sourceTree = "<group>"; };
 		77EBB61B2B833C5F00EEDFD2 /* AGWKWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AGWKWebViewController.swift; sourceTree = "<group>"; };
+		A6D4B0002F2A000100A1B2C3 /* AGWKWebViewBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AGWKWebViewBridge.swift; sourceTree = "<group>"; };
 		77EBB61D2B833CAA00EEDFD2 /* WKWebViewUIImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewUIImplementation.swift; sourceTree = "<group>"; };
 		95E67332299F652000C9466C /* AuthgearExperimental.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthgearExperimental.swift; sourceTree = "<group>"; };
 		A652CEAD2A812CA9006E789F /* App2AppOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App2AppOptions.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				F83D84AF24F860AA00B4393C /* UIImplementation.swift */,
 				77EBB6172B833BC600EEDFD2 /* ASWebAuthenticationSessionUIImplementation.swift */,
 				77EBB61B2B833C5F00EEDFD2 /* AGWKWebViewController.swift */,
+				A6D4B0002F2A000100A1B2C3 /* AGWKWebViewBridge.swift */,
 				77EBB61D2B833CAA00EEDFD2 /* WKWebViewUIImplementation.swift */,
 				F83D84A924F66C5100B4393C /* OIDCConfiguration.swift */,
 				F83D84AD24F6A93600B4393C /* CodeVerifier.swift */,
@@ -329,6 +332,7 @@
 				775FF73426047C7700B81ECD /* DeviceInfo.swift in Sources */,
 				A6E210C42C45001700D00D6E /* DefaultDPoPProvider.swift in Sources */,
 				77EBB61C2B833C5F00EEDFD2 /* AGWKWebViewController.swift in Sources */,
+				A6D4B0012F2A000100A1B2C3 /* AGWKWebViewBridge.swift in Sources */,
 				F8A657A7250551ED0027888F /* JWT.swift in Sources */,
 				A68DAD2229AF686000487DAF /* UILocales.swift in Sources */,
 				F8A657A52501D31E0027888F /* JWK.swift in Sources */,
