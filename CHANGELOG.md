@@ -8,7 +8,7 @@ and this project follows [Semantic Versioning](https://semver.org/).
 Entries below start from the `3.0.0` release; see the git tags for the history
 of earlier releases.
 
-## [Unreleased]
+## [3.1.0] - 2026-11-11
 
 ### Added
 
