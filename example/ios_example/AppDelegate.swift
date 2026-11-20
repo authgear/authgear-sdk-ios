@@ -1,5 +1,6 @@
 import Authgear
 import UIKit
+import WechatOpenSDK
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

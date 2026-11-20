@@ -1,6 +1,7 @@
 import Authgear
 import SwiftUI
 import UIKit
+import WechatOpenSDK
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
