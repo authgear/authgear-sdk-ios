@@ -24,16 +24,14 @@ VERSION=3.0.0
      as described above.
    - MINOR — backwards-compatible feature addition.
    - PATCH — backwards-compatible bug fix.
-4. Update `s.version` in [`Authgear.podspec`](./Authgear.podspec) to match
-   `VERSION`.
-5. Commit, push the release branch, and open a PR against `main`:
+4. Commit, push the release branch, and open a PR against `main`:
    ```
-   git add CHANGELOG.md Authgear.podspec
+   git add CHANGELOG.md
    git commit -m "Release $VERSION"
    git push -u origin release/$VERSION
    gh pr create --base main --title "Release $VERSION" --fill
    ```
-6. Once the PR is approved and merged, tag the resulting commit on `main`
+5. Once the PR is approved and merged, tag the resulting commit on `main`
    with an annotated tag, and push the tag:
    ```
    git checkout main
@@ -41,10 +39,10 @@ VERSION=3.0.0
    git tag -a "$VERSION" -m "Release $VERSION"
    git push origin "$VERSION"
    ```
-   SPM and CocoaPods consumers resolve this tag directly (`Authgear.podspec`'s
-   `s.source` uses `s.version` as the git tag), so pushing it is what makes
-   the release available — pushing a tag does not trigger CI, which only
-   runs on branch pushes and pull requests.
+   Swift Package Manager resolves versions from the git tags on GitHub, so
+   pushing the tag is what makes the release available. The tag must be a
+   bare semantic version such as `3.1.0`, with no `v` prefix. Pushing a tag
+   does not trigger CI, which only runs on branch pushes and pull requests.
 
 ## How to update Gems when some Gems are vulnerable
 

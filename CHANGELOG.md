@@ -10,6 +10,14 @@ of earlier releases.
 
 ## [Unreleased]
 
+### Removed
+
+- CocoaPods support, because CocoaPods is reaching end of life.
+  `Authgear.podspec` is removed, so installing with
+  `pod 'Authgear', :git => ...` works only up to `3.1.0`. Install the SDK
+  with Swift Package Manager from
+  `https://github.com/authgear/authgear-sdk-ios.git` instead.
+
 ### Changed
 
 - The minimum supported iOS version is now 15.0 (was 11.0 for Swift Package
