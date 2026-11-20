@@ -8,6 +8,17 @@ and this project follows [Semantic Versioning](https://semver.org/).
 Entries below start from the `3.0.0` release; see the git tags for the history
 of earlier releases.
 
+## [Unreleased]
+
+### Changed
+
+- The minimum supported iOS version is now 15.0 (was 11.0 for Swift Package
+  Manager and 12.0 for the prebuilt framework). Recent Xcode versions no longer
+  build for iOS versions below 15.0. Apps that still support iOS 11 to 14 can
+  keep using `3.1.0`.
+- The example app now uses Swift Package Manager instead of CocoaPods. CocoaPods
+  is no longer needed to build or test this repository.
+
 ## [3.1.0] - 2026-11-11
 
 ### Added

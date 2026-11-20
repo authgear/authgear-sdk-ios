@@ -1,10 +1,10 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.5
 
 import PackageDescription
 
 let package = Package(
     name: "Authgear",
-    platforms: [.iOS(.v11)],
+    platforms: [.iOS(.v15)],
     products: [.library(
         name: "Authgear",
         targets: ["Authgear"]
