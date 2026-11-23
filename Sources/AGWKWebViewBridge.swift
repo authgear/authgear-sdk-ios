@@ -9,6 +9,15 @@ import WebKit
 // window.webkit.messageHandlers.authgearBridge, and gets one reply, also a JSON
 // object encoded as a string, as the value of the promise that postMessage returns.
 
+/// The status of a reply.
+enum AGWKWebViewBridgeStatus: String, CaseIterable {
+    case ok
+    case unsupported
+    case error
+    case noCredential = "no_credential"
+    case cancelled
+}
+
 /// What the bridge does with a message.
 enum AGWKWebViewBridgeAction {
     /// Reply at once.
@@ -40,16 +49,16 @@ enum AGWKWebViewBridgeMessages {
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let id = json["id"] as? String
         else {
-            return .reply(["status": "error", "message": "invalid message"])
+            return .reply(["status": AGWKWebViewBridgeStatus.error.rawValue, "message": "invalid message"])
         }
 
         switch json["type"] as? String {
         case "bridge.capabilities":
-            return .reply(["id": id, "status": "ok", "capabilities": self.capabilities])
+            return .reply(["id": id, "status": AGWKWebViewBridgeStatus.ok.rawValue, "capabilities": self.capabilities])
         case "credentials.get":
             return self.credentialsGetAction(id: id, json: json)
         default:
-            return .reply(["id": id, "status": "unsupported"])
+            return .reply(["id": id, "status": AGWKWebViewBridgeStatus.unsupported.rawValue])
         }
     }
 
@@ -58,18 +67,18 @@ enum AGWKWebViewBridgeMessages {
         guard json["mediation"] as? String == "immediate",
               let publicKey = json["publicKey"] as? [String: Any]
         else {
-            return .reply(["id": id, "status": "unsupported"])
+            return .reply(["id": id, "status": AGWKWebViewBridgeStatus.unsupported.rawValue])
         }
         guard let rpId = publicKey["rpId"] as? String,
               let challengeText = publicKey["challenge"] as? String,
               let challenge = self.decodeBase64URL(challengeText)
         else {
-            return .reply(["id": id, "status": "error", "message": "publicKey needs rpId and challenge"])
+            return .reply(["id": id, "status": AGWKWebViewBridgeStatus.error.rawValue, "message": "publicKey needs rpId and challenge"])
         }
         var userVerification: String?
         if let value = publicKey["userVerification"] {
             guard let value = value as? String else {
-                return .reply(["id": id, "status": "error", "message": "invalid publicKey.userVerification"])
+                return .reply(["id": id, "status": AGWKWebViewBridgeStatus.error.rawValue, "message": "invalid publicKey.userVerification"])
             }
             // As in WebAuthn, an unknown value is ignored, so iOS uses its default.
             if ["required", "preferred", "discouraged"].contains(value) {
@@ -79,14 +88,14 @@ enum AGWKWebViewBridgeMessages {
         var allowCredentialIDs: [Data] = []
         if let value = publicKey["allowCredentials"] {
             guard let descriptors = value as? [Any] else {
-                return .reply(["id": id, "status": "error", "message": "invalid publicKey.allowCredentials"])
+                return .reply(["id": id, "status": AGWKWebViewBridgeStatus.error.rawValue, "message": "invalid publicKey.allowCredentials"])
             }
             for descriptor in descriptors {
                 guard let descriptor = descriptor as? [String: Any],
                       let idText = descriptor["id"] as? String,
                       let credentialID = self.decodeBase64URL(idText)
                 else {
-                    return .reply(["id": id, "status": "error", "message": "invalid publicKey.allowCredentials"])
+                    return .reply(["id": id, "status": AGWKWebViewBridgeStatus.error.rawValue, "message": "invalid publicKey.allowCredentials"])
                 }
                 allowCredentialIDs.append(credentialID)
             }
@@ -138,7 +147,7 @@ enum AGWKWebViewBridgeMessages {
         guard let data = try? JSONSerialization.data(withJSONObject: reply, options: [.sortedKeys]),
               let text = String(data: data, encoding: .utf8)
         else {
-            return "{\"message\":\"cannot encode reply\",\"status\":\"error\"}"
+            return "{\"message\":\"cannot encode reply\",\"status\":\"\(AGWKWebViewBridgeStatus.error.rawValue)\"}"
         }
         return text
     }
@@ -208,7 +217,7 @@ class AGWKWebViewBridgePendingRequest {
         guard self.replyHandler != nil else {
             return
         }
-        self.finish(["status": "error", "message": "cancelled"])
+        self.finish(["status": AGWKWebViewBridgeStatus.error.rawValue, "message": "cancelled"])
         self.controller?.cancel()
     }
 }
@@ -274,7 +283,7 @@ class AGWKWebViewBridge: NSObject, WKScriptMessageHandlerWithReply, ASAuthorizat
         }
 
         guard self.pendingRequest == nil else {
-            reply(["status": "error", "message": "a passkey request is in progress"])
+            reply(["status": AGWKWebViewBridgeStatus.error.rawValue, "message": "a passkey request is in progress"])
             return
         }
 
@@ -292,7 +301,7 @@ class AGWKWebViewBridge: NSObject, WKScriptMessageHandlerWithReply, ASAuthorizat
         }
 
         guard self.presentationAnchorProvider?() != nil else {
-            reply(["status": "error", "message": "no window"])
+            reply(["status": AGWKWebViewBridgeStatus.error.rawValue, "message": "no window"])
             return
         }
 
@@ -318,7 +327,7 @@ class AGWKWebViewBridge: NSObject, WKScriptMessageHandlerWithReply, ASAuthorizat
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let assertion = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion else {
-            self.finish(controller: controller, reply: ["status": "error", "message": "unexpected credential"])
+            self.finish(controller: controller, reply: ["status": AGWKWebViewBridgeStatus.error.rawValue, "message": "unexpected credential"])
             return
         }
         let credential = AGWKWebViewBridgeMessages.publicKeyCredential(
@@ -329,7 +338,7 @@ class AGWKWebViewBridge: NSObject, WKScriptMessageHandlerWithReply, ASAuthorizat
             // userID is imported as Data!, so it is read as an optional to not crash on nil.
             userHandle: assertion.userID as Data?
         )
-        self.finish(controller: controller, reply: ["status": "ok", "credential": credential])
+        self.finish(controller: controller, reply: ["status": AGWKWebViewBridgeStatus.ok.rawValue, "credential": credential])
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
@@ -337,11 +346,11 @@ class AGWKWebViewBridge: NSObject, WKScriptMessageHandlerWithReply, ASAuthorizat
         // With .preferImmediatelyAvailableCredentials, "no passkey on this device" and
         // "the user closed the sheet" both end with canceled.
         if error.domain == ASAuthorizationError.errorDomain, error.code == ASAuthorizationError.canceled.rawValue {
-            self.finish(controller: controller, reply: ["status": "no_credential"])
+            self.finish(controller: controller, reply: ["status": AGWKWebViewBridgeStatus.noCredential.rawValue])
         } else {
             self.finish(
                 controller: controller,
-                reply: ["status": "error", "message": "\(error.domain) \(error.code): \(error.localizedDescription)"]
+                reply: ["status": AGWKWebViewBridgeStatus.error.rawValue, "message": "\(error.domain) \(error.code): \(error.localizedDescription)"]
             )
         }
     }

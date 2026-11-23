@@ -151,7 +151,11 @@ final class AuthgearTests: XCTestCase {
     }
 
     func testBridgeEncodeReply() throws {
-        for status in ["ok", "unsupported", "error", "no_credential", "cancelled"] {
+        XCTAssertEqual(
+            AGWKWebViewBridgeStatus.allCases.map(\.rawValue),
+            ["ok", "unsupported", "error", "no_credential", "cancelled"]
+        )
+        for status in AGWKWebViewBridgeStatus.allCases.map(\.rawValue) {
             let text = AGWKWebViewBridgeMessages.encodeReply(["id": "1", "status": status])
             let decoded = try XCTUnwrap(
                 try JSONSerialization.jsonObject(with: Data(text.utf8)) as? NSDictionary
