@@ -217,6 +217,23 @@ final class AuthgearTests: XCTestCase {
         ))
     }
 
+    func testBridgeIsRpIDAllowed() {
+        // The host.
+        XCTAssertTrue(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "auth.example.com", host: "auth.example.com"))
+        // A parent domain.
+        XCTAssertTrue(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "example.com", host: "auth.example.com"))
+        // Compared without case.
+        XCTAssertTrue(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "Example.COM", host: "AUTH.example.com"))
+        // A sibling domain.
+        XCTAssertFalse(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "other.example.com", host: "auth.example.com"))
+        // A suffix that is not at a label boundary.
+        XCTAssertFalse(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "example.com", host: "evilexample.com"))
+        // A subdomain of the host.
+        XCTAssertFalse(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "a.auth.example.com", host: "auth.example.com"))
+        // Empty.
+        XCTAssertFalse(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "", host: "auth.example.com"))
+    }
+
     func testBridgeCredentialsGet() throws {
         // The challenge "3PzO..." has no padding; it decodes to 32 bytes.
         let challenge = "3PzOb9VvB54BIdrOC5b88ewjYt1wEOmKbCd0IM8FQSA"
@@ -424,6 +441,7 @@ final class AuthgearTests: XCTestCase {
         ("testBridgeEnvelope", testBridgeEnvelope),
         ("testBridgeEncodeReply", testBridgeEncodeReply),
         ("testBridgeIsAllowedOrigin", testBridgeIsAllowedOrigin),
+        ("testBridgeIsRpIDAllowed", testBridgeIsRpIDAllowed),
         ("testBridgeCredentialsGet", testBridgeCredentialsGet),
         ("testBridgePublicKeyCredential", testBridgePublicKeyCredential),
         ("testBridgePublicKeyCredentialWithoutUserHandle", testBridgePublicKeyCredentialWithoutUserHandle),

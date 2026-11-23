@@ -16,7 +16,8 @@ of earlier releases.
   pages of the endpoint. When the login page loads, AuthUI uses it to ask the
   app for a passkey that is already on this device, so the passkey sheet
   appears without a tap. No change is needed in the app beyond the existing
-  `webcredentials:` associated domain.
+  `webcredentials:` associated domain. As in a browser, `credentials.get`
+  accepts only an `rpId` that is the page's host or a parent domain of it.
 
 ### Removed
 

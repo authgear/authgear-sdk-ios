@@ -204,6 +204,17 @@ enum AGWKWebViewBridgeMessages {
         }
     }
 
+    /// Whether a page of this host may ask for a passkey of this rpId.
+    /// As in a browser, the rpId must be the host or a parent domain of it, compared without case.
+    static func isRpIDAllowed(rpID: String, host: String) -> Bool {
+        let rpID = rpID.lowercased()
+        let host = host.lowercased()
+        guard !rpID.isEmpty else {
+            return false
+        }
+        return host == rpID || host.hasSuffix("." + rpID)
+    }
+
     private static func effectivePort(scheme: String, port: Int?) -> Int? {
         if let port = port, port != 0 {
             return port
@@ -300,19 +311,25 @@ class AGWKWebViewBridge: NSObject, WKScriptMessageHandlerWithReply, ASAuthorizat
         case let .reply(reply):
             replyHandler(AGWKWebViewBridgeMessages.encodeReply(reply), nil)
         case let .getPublicKeyCredential(id, request):
-            self.getPublicKeyCredential(id: id, request: request, replyHandler: replyHandler)
+            self.getPublicKeyCredential(id: id, request: request, host: origin.host, replyHandler: replyHandler)
         }
     }
 
     private func getPublicKeyCredential(
         id: String,
         request: AGWKWebViewBridgePublicKeyRequest,
+        host: String,
         replyHandler: @escaping (Any?, String?) -> Void
     ) {
         func reply(_ reply: AGWKWebViewBridgeReply) {
             var reply = reply
             reply.id = id
             replyHandler(AGWKWebViewBridgeMessages.encodeReply(reply), nil)
+        }
+
+        guard AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: request.rpId, host: host) else {
+            reply(AGWKWebViewBridgeReply(status: .error, message: "rpId is not allowed for this page"))
+            return
         }
 
         guard self.pendingRequest == nil else {
