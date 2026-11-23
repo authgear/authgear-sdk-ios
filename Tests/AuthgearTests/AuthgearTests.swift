@@ -91,10 +91,16 @@ final class AuthgearTests: XCTestCase {
         XCTAssertNil(parsedWithout.resource)
     }
 
+    /// The reply as the page sees it: encoded, then decoded as JSON.
+    private func decodedBridgeReply(_ reply: AGWKWebViewBridgeReply) -> NSDictionary? {
+        let text = AGWKWebViewBridgeMessages.encodeReply(reply)
+        return try? JSONSerialization.jsonObject(with: Data(text.utf8)) as? NSDictionary
+    }
+
     private func bridgeReply(_ body: Any) -> NSDictionary? {
         switch AGWKWebViewBridgeMessages.action(for: body) {
         case let .reply(reply):
-            return reply as NSDictionary
+            return decodedBridgeReply(reply)
         case .getPublicKeyCredential:
             return nil
         }
@@ -150,18 +156,26 @@ final class AuthgearTests: XCTestCase {
         )
     }
 
-    func testBridgeEncodeReply() throws {
+    func testBridgeEncodeReply() {
         XCTAssertEqual(
             AGWKWebViewBridgeStatus.allCases.map(\.rawValue),
             ["ok", "unsupported", "error", "no_credential", "cancelled"]
         )
-        for status in AGWKWebViewBridgeStatus.allCases.map(\.rawValue) {
-            let text = AGWKWebViewBridgeMessages.encodeReply(["id": "1", "status": status])
-            let decoded = try XCTUnwrap(
-                try JSONSerialization.jsonObject(with: Data(text.utf8)) as? NSDictionary
+        // nil fields are omitted, not null.
+        for status in AGWKWebViewBridgeStatus.allCases {
+            XCTAssertEqual(
+                decodedBridgeReply(AGWKWebViewBridgeReply(id: "1", status: status)),
+                ["id": "1", "status": status.rawValue] as NSDictionary
             )
-            XCTAssertEqual(decoded, ["id": "1", "status": status] as NSDictionary)
         }
+        XCTAssertEqual(
+            AGWKWebViewBridgeMessages.encodeReply(AGWKWebViewBridgeReply(id: "1", status: .error, message: "m")),
+            #"{"id":"1","message":"m","status":"error"}"#
+        )
+        XCTAssertEqual(
+            AGWKWebViewBridgeMessages.encodeReply(AGWKWebViewBridgeReply(status: .noCredential)),
+            #"{"status":"no_credential"}"#
+        )
     }
 
     func testBridgeIsAllowedOrigin() throws {
@@ -303,7 +317,7 @@ final class AuthgearTests: XCTestCase {
             signature: Data([0xFF]),
             userHandle: Data([0x01, 0x02])
         )
-        let text = AGWKWebViewBridgeMessages.encodeReply(["id": "2", "status": "ok", "credential": credential])
+        let text = AGWKWebViewBridgeMessages.encodeReply(AGWKWebViewBridgeReply(id: "2", status: .ok, credential: credential))
         let reply = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(text.utf8)) as? NSDictionary)
         XCTAssertEqual(reply, [
             "id": "2",
@@ -336,9 +350,19 @@ final class AuthgearTests: XCTestCase {
             signature: Data([0x04]),
             userHandle: nil
         )
-        let response = try XCTUnwrap(credential["response"] as? [String: Any])
-        XCTAssertNil(response["userHandle"])
-        XCTAssertEqual(response["signature"] as? String, "BA")
+        let reply = try XCTUnwrap(decodedBridgeReply(AGWKWebViewBridgeReply(id: "2", status: .ok, credential: credential)))
+        XCTAssertEqual(reply["credential"] as? NSDictionary, [
+            "id": "AQ",
+            "rawId": "AQ",
+            "type": "public-key",
+            "authenticatorAttachment": "platform",
+            "response": [
+                "clientDataJSON": "Ag",
+                "authenticatorData": "Aw",
+                "signature": "BA"
+            ],
+            "clientExtensionResults": [String: Any]()
+        ] as NSDictionary)
     }
 
     func testBridgePendingRequest() throws {
@@ -363,8 +387,8 @@ final class AuthgearTests: XCTestCase {
 
         // finish replies once.
         var (request, replies) = makeRequest()
-        request.finish(["status": "no_credential"])
-        request.finish(["status": "ok"])
+        request.finish(AGWKWebViewBridgeReply(status: .noCredential))
+        request.finish(AGWKWebViewBridgeReply(status: .ok))
         XCTAssertEqual(replies(), [["id": "2", "status": "no_credential"] as NSDictionary])
 
         // cancel replies error once.
@@ -375,7 +399,7 @@ final class AuthgearTests: XCTestCase {
         // finish after cancel replies nothing.
         (request, replies) = makeRequest()
         request.cancel()
-        request.finish(["status": "no_credential"])
+        request.finish(AGWKWebViewBridgeReply(status: .noCredential))
         XCTAssertEqual(replies(), [cancelled])
 
         // cancel twice replies once.
@@ -386,7 +410,7 @@ final class AuthgearTests: XCTestCase {
 
         // cancel after finish replies nothing more.
         (request, replies) = makeRequest()
-        request.finish(["status": "no_credential"])
+        request.finish(AGWKWebViewBridgeReply(status: .noCredential))
         request.cancel()
         XCTAssertEqual(replies(), [["id": "2", "status": "no_credential"] as NSDictionary])
     }
@@ -402,6 +426,7 @@ final class AuthgearTests: XCTestCase {
         ("testBridgeIsAllowedOrigin", testBridgeIsAllowedOrigin),
         ("testBridgeCredentialsGet", testBridgeCredentialsGet),
         ("testBridgePublicKeyCredential", testBridgePublicKeyCredential),
+        ("testBridgePublicKeyCredentialWithoutUserHandle", testBridgePublicKeyCredentialWithoutUserHandle),
         ("testBridgePendingRequest", testBridgePendingRequest)
     ]
 }
