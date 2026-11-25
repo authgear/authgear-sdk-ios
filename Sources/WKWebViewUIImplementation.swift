@@ -8,6 +8,12 @@ public class WKWebViewUIImplementation: NSObject, UIImplementation, AGWKWebViewC
     public var wechatRedirectURI: URL?
     public var authgearDelegate: AuthgearDelegate?
     public var isInspectable: Bool
+    /// URLs whose origins may use `authgearBridge` besides the origin of the endpoint,
+    /// such as the URL of a Custom UI. Only the scheme, host and port of each URL are used.
+    /// A URL is ignored unless its scheme is `https`, or it is `http` with the host `localhost`.
+    ///
+    /// A listed page can show the passkey sheet in the app, so list only origins you control.
+    public var bridgeAllowedOrigins: [URL] = []
 
     override public init() {
         self.isInspectable = false
@@ -18,7 +24,8 @@ public class WKWebViewUIImplementation: NSObject, UIImplementation, AGWKWebViewC
         let controller = AGWKWebViewController(
             url: url,
             redirectURI: redirectURI,
-            isInspectable: self.isInspectable
+            isInspectable: self.isInspectable,
+            bridgeAllowedOrigins: self.bridgeAllowedOrigins
         )
 
         controller.completionHandler = { url, error in

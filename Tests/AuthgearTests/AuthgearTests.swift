@@ -217,6 +217,23 @@ final class AuthgearTests: XCTestCase {
         ))
     }
 
+    func testBridgeIsBridgeAllowedOrigin() throws {
+        func isAllowed(_ url: String) throws -> Bool {
+            try AGWKWebViewBridgeMessages.isBridgeAllowedOrigin(XCTUnwrap(URL(string: url)))
+        }
+        // https, with any port, path or case.
+        XCTAssertTrue(try isAllowed("https://ui.example.com"))
+        XCTAssertTrue(try isAllowed("https://ui.example.com:8443/login?x=1"))
+        XCTAssertTrue(try isAllowed("HTTPS://UI.EXAMPLE.COM"))
+        // http only for localhost.
+        XCTAssertTrue(try isAllowed("http://localhost:8300/login"))
+        XCTAssertFalse(try isAllowed("http://ui.example.com"))
+        XCTAssertFalse(try isAllowed("http://127.0.0.1:8300"))
+        // Other schemes, and URLs without a host.
+        XCTAssertFalse(try isAllowed("myapp://host"))
+        XCTAssertFalse(try isAllowed("ui.example.com"))
+    }
+
     func testBridgeIsRpIDAllowed() {
         // The host.
         XCTAssertTrue(AGWKWebViewBridgeMessages.isRpIDAllowed(rpID: "auth.example.com", host: "auth.example.com"))

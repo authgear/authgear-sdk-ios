@@ -198,6 +198,18 @@ enum AGWKWebViewBridgeMessages {
         return String(data: data, encoding: .utf8)
     }
 
+    /// Whether a URL of bridgeAllowedOrigins may be allowed:
+    /// https, or http with the host localhost, as browsers treat localhost as a secure context.
+    static func isBridgeAllowedOrigin(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased(),
+              let host = url.host?.lowercased(),
+              !host.isEmpty
+        else {
+            return false
+        }
+        return scheme == "https" || (scheme == "http" && host == "localhost")
+    }
+
     /// Whether a page of this origin may use the bridge.
     /// Only the scheme, host and port of each allowed URL are used.
     /// A port of 0 or nil means the default port of the scheme, as in WKSecurityOrigin.
