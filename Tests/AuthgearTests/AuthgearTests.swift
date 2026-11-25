@@ -334,7 +334,7 @@ final class AuthgearTests: XCTestCase {
             signature: Data([0xFF]),
             userHandle: Data([0x01, 0x02])
         )
-        let text = AGWKWebViewBridgeMessages.encodeReply(AGWKWebViewBridgeReply(id: "2", status: .ok, credential: credential))
+        let text = AGWKWebViewBridgeMessages.encodeReply(AGWKWebViewBridgeReply(id: "2", status: .ok, credential: .publicKey(credential)))
         let reply = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(text.utf8)) as? NSDictionary)
         XCTAssertEqual(reply, [
             "id": "2",
@@ -367,7 +367,7 @@ final class AuthgearTests: XCTestCase {
             signature: Data([0x04]),
             userHandle: nil
         )
-        let reply = try XCTUnwrap(decodedBridgeReply(AGWKWebViewBridgeReply(id: "2", status: .ok, credential: credential)))
+        let reply = try XCTUnwrap(decodedBridgeReply(AGWKWebViewBridgeReply(id: "2", status: .ok, credential: .publicKey(credential))))
         XCTAssertEqual(reply["credential"] as? NSDictionary, [
             "id": "AQ",
             "rawId": "AQ",
