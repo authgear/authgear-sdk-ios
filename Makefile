@@ -27,9 +27,12 @@ xcframework: clean
 test:
 	bundle exec fastlane sdk_test
 
-.PHONY: pod-install
-pod-install:
-	cd ./example; bundle exec pod install
+# Builds the SDK as a Swift package for iOS, the way SPM consumers build it.
+# xcodebuild is not used because it would pick Authgear.xcworkspace instead
+# of Package.swift.
+.PHONY: spm-build
+spm-build:
+	swift build --triple arm64-apple-ios15.0 --sdk "$$(xcrun --sdk iphoneos --show-sdk-path)"
 
 .PHONY: build-app
 build-app:
