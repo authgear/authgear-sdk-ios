@@ -147,6 +147,7 @@
 				F89AEF7D24F57A6B00CF5F57 /* Frameworks */,
 				F89AEF7E24F57A6B00CF5F57 /* Resources */,
 				A68DAD1D29AF64DB00487DAF /* Embed Frameworks */,
+				A6C0C0A12EB0000100000004 /* Remove WechatOpenSDK.framework */,
 			);
 			buildRules = (
 			);
@@ -227,6 +228,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A6C0C0A12EB0000100000004 /* Remove WechatOpenSDK.framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Remove WechatOpenSDK.framework";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# WechatOpenSDK is a static framework, so its code is linked into the app binary.\n# Xcode still copies the SPM binary target into Frameworks/ with an empty stub\n# binary whose minimum OS (our deployment target) does not match the\n# MinimumOSVersion in its Info.plist, and App Store Connect rejects the upload\n# with ITMS-90208. Nothing loads it at runtime, so remove it.\nrm -rf \"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WechatOpenSDK.framework\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F89AEF7C24F57A6B00CF5F57 /* Sources */ = {
