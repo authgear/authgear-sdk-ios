@@ -1409,14 +1409,14 @@
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
-      "line": 12,
+      "line": 18,
       "symbol": "WKWebViewUIImplementation.init()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/runner/work/authgear-sdk-ios/authgear-sdk-ios/Sources/WKWebViewUIImplementation.swift",
-      "line": 17,
+      "line": 23,
       "symbol": "WKWebViewUIImplementation.openAuthorizationURL(url:redirectURI:shareCookiesWithDeviceBrowser:completion:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
