@@ -38,7 +38,8 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
     init(
         url: URL,
         redirectURI: URL,
-        isInspectable: Bool
+        isInspectable: Bool,
+        bridgeAllowedOrigins: [URL] = []
     ) {
         self.url = url
         self.redirectURI = redirectURI
@@ -54,10 +55,12 @@ class AGWKWebViewController: UIViewController, WKNavigationDelegate {
         )
         configuration.userContentController.addUserScript(disableUserSelectScript)
 
-        // Provide the AuthUI bridge to pages of the endpoint's origin.
+        // Provide the AuthUI bridge to pages of the endpoint's origin, and the origins the app allows.
         // .page is required because AuthUI's scripts run in the page world.
         if #available(iOS 16.0, *) {
-            let webViewBridge = AGWKWebViewBridge(allowedOrigins: [url])
+            let webViewBridge = AGWKWebViewBridge(
+                allowedOrigins: [url] + bridgeAllowedOrigins.filter { AGWKWebViewBridgeMessages.isBridgeAllowedOrigin($0) }
+            )
             configuration.userContentController.addScriptMessageHandler(
                 webViewBridge,
                 contentWorld: .page,

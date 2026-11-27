@@ -36,6 +36,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             wkWebViewUIImpl.wechatRedirectURI = URL(string: App.wechatRedirectURI)!
             wkWebViewUIImpl.authgearDelegate = self
             wkWebViewUIImpl.isInspectable = true
+            // The Custom UI of the demo project, so that it can use the passkey on page load.
+            wkWebViewUIImpl.bridgeAllowedOrigins = [URL(string: "https://ui.demo-app2app.qa.authgear-staging.com")!]
             uiImplementation = wkWebViewUIImpl
         } else {
             uiImplementation = ASWebAuthenticationSessionUIImplementation()

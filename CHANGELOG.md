@@ -18,6 +18,11 @@ of earlier releases.
   appears without a tap. No change is needed in the app beyond the existing
   `webcredentials:` associated domain. As in a browser, `credentials.get`
   accepts only an `rpId` that is the page's host or a parent domain of it.
+- `WKWebViewUIImplementation.bridgeAllowedOrigins`: URLs whose origins may use
+  the bridge besides the endpoint's, such as a Custom UI's URL. A URL is
+  ignored unless its scheme is `https`, or it is `http` with the host
+  `localhost`. A listed page can show the passkey sheet in the app, so list
+  only origins you control.
 
 ### Removed
 
